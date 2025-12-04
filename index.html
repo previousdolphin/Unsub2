@@ -9,13 +9,14 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         :root {
-            --bg: #f4f4f4; /* Clinical Grey-White */
+            --bg: #f4f4f4;
             --text: #050505;
             --border: #000000;
-            --alert: #ff2a00; /* High-vis safety orange/red */
+            --alert: #ff2a00;
             --font-main: 'Courier New', Courier, monospace;
             --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            --sidebar-width: 480px; /* Fixed width for the form on desktop */
+            --sidebar-width: 440px;
+            --ticker-height: 42px;
         }
 
         body.dark-mode {
@@ -41,18 +42,18 @@
         
         /* --- TYPOGRAPHY --- */
         h1 {
-            font-size: clamp(2.5rem, 4vw, 5rem); 
+            font-size: clamp(2.5rem, 3.5vw, 4.5rem); 
             line-height: 0.9;
             letter-spacing: -2px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-weight: 900;
-            max-width: 15ch; /* Forces the headline to wrap nicely */
+            max-width: 18ch; 
         }
 
         h2 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: var(--text);
             color: var(--bg);
             display: inline-block;
@@ -61,8 +62,8 @@
 
         p { 
             margin-bottom: 20px; 
-            font-size: 1.1rem; 
-            max-width: 65ch; /* Optimal reading length */
+            font-size: 1rem; 
+            max-width: 60ch; 
         }
 
         .fine-print { font-size: 0.75rem; opacity: 0.7; }
@@ -70,37 +71,41 @@
         /* --- MARQUEE --- */
         .marquee-container {
             width: 100%;
+            height: var(--ticker-height);
             overflow: hidden;
             white-space: nowrap;
             border-bottom: 2px solid var(--border);
-            padding: 10px 0;
             background: var(--text);
             color: var(--bg);
             font-weight: bold;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 20;
         }
 
         .marquee-content {
             display: inline-block;
             animation: scroll 30s linear infinite;
+            padding-left: 100%;
         }
 
         @keyframes scroll {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+            100% { transform: translateX(-100%); }
         }
 
-        /* --- LAYOUT GRID (DESKTOP OPTIMIZED) --- */
+        /* --- LAYOUT GRID --- */
         .grid-container {
             display: grid;
-            /* Sidebar is fixed width, Content takes the rest */
             grid-template-columns: 1fr var(--sidebar-width); 
-            min-height: calc(100vh - 150px); /* Approx height minus header/marquee */
+            min-height: calc(100vh - var(--ticker-height));
         }
 
         .content-col {
             border-right: 2px solid var(--border);
-            padding: 80px 100px; /* Generous padding for desktop luxury */
+            padding: 60px 80px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -109,73 +114,68 @@
         .sidebar-col {
             position: sticky;
             top: 0;
-            height: 100vh; /* Make form sticky on desktop */
-            overflow-y: auto;
+            height: 100vh; 
+            overflow-y: auto; 
             border-left: 0;
-        }
-
-        /* --- LOGO HEADER --- */
-        .logo-header {
-            text-align: center;
-            padding: 30px;
-            border-bottom: 2px solid var(--border);
             background: var(--bg);
-            transition: background 0.3s;
         }
 
-        .logo-header img {
-            max-width: 180px;
+        /* --- LOGO INTEGRATION (UPDATED) --- */
+        .logo-wrapper {
+            margin-bottom: 40px;
+            display: block;
+        }
+        
+        .logo-wrapper img {
+            width: 140px;
             height: auto;
             display: block;
-            margin: 0 auto;
-            /* BLEND MODE MAGIC: Hides white bg */
+            /* LIGHT MODE: 'Multiply' makes the white background of the JPG transparent */
             mix-blend-mode: multiply; 
         }
 
-        /* DARK MODE LOGO FIX */
-        body.dark-mode .logo-header img {
-            /* Invert flips colors (Red->Cyan), Grayscale makes it B&W, Contrast boosts it */
-            /* Since your logo is Red, standard inversion looks weird. 
-               We use brightness/contrast to make the white box dark. */
-            mix-blend-mode: screen; 
-            filter: invert(1); 
+        body.dark-mode .logo-wrapper img {
+            /* DARK MODE: We switch back to 'normal' so the red doesn't get dark/muddy.
+               We removed the 'invert' filter so it stays red.
+               NOTE: If the image has a white background, it will show as a white square here. */
+            mix-blend-mode: normal; 
+            filter: none; 
         }
 
         /* --- SECTIONS --- */
         .section-block {
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
 
         .week-list {
             list-style: none;
-            margin-top: 25px;
+            margin-top: 20px;
             border: 2px solid var(--border);
         }
 
         .week-list li {
-            padding: 20px;
+            padding: 15px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .week-list li:last-child { border-bottom: none; }
 
         .warning-box {
             border: 2px solid var(--alert);
             color: var(--alert);
-            padding: 25px;
-            margin-top: 40px;
+            padding: 20px;
+            margin-top: 30px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             line-height: 1.4;
         }
 
         /* --- FORM TERMINAL --- */
         .transfer-terminal {
-            background: var(--bg);
-            height: 100%;
+            min-height: 100%;
             display: flex;
             flex-direction: column;
         }
@@ -183,10 +183,11 @@
         .terminal-header {
             background: var(--text);
             color: var(--bg);
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             font-weight: bold;
             border-bottom: 2px solid var(--border);
+            flex-shrink: 0;
         }
 
         .input-group {
@@ -194,54 +195,53 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
         }
 
         label {
             display: block;
-            font-size: 0.75rem;
-            margin-bottom: 8px;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
             font-weight: 800;
             letter-spacing: 1px;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background: transparent;
             border: 2px solid var(--border);
             color: var(--text);
             font-family: inherit;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             outline: none;
             border-radius: 0;
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: border-color 0.2s;
         }
 
-        input:focus, select:focus, textarea:focus { border-color: var(--alert); }
+        input:focus, select:focus { border-color: var(--alert); }
 
         .submit-btn {
             width: 100%;
-            padding: 25px;
+            padding: 20px;
             background: var(--alert);
             color: white; 
             border: none;
             font-family: inherit;
             font-weight: 900;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             text-transform: uppercase;
             transition: opacity 0.2s;
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .submit-btn:hover { opacity: 0.8; }
         
         .payment-note {
-            font-size: 0.75rem;
-            margin-top: 20px;
-            padding: 15px;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            padding: 10px;
             border: 1px solid var(--alert);
             color: var(--alert);
             font-weight: bold;
@@ -249,56 +249,60 @@
             line-height: 1.4;
         }
 
+        .timer-bar {
+            padding: 15px; 
+            border-top: 2px solid var(--border); 
+            text-align: center; 
+            background: var(--text); 
+            color: var(--bg);
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
         /* --- THEME TOGGLE --- */
         #theme-toggle {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 999;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
             background: var(--bg);
             border: 2px solid var(--text);
-            padding: 10px 15px;
+            padding: 8px 12px;
             cursor: pointer;
             color: var(--text);
             font-family: inherit;
             font-weight: bold;
-            font-size: 0.8rem;
-            box-shadow: 4px 4px 0px var(--text);
-            transition: transform 0.1s;
+            font-size: 0.75rem;
+            box-shadow: 3px 3px 0px var(--text);
         }
         
         #theme-toggle:active {
             transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px var(--text);
+            box-shadow: 1px 1px 0px var(--text);
         }
 
-        /* --- MOBILE OPTIMIZATION --- */
+        /* --- MOBILE --- */
         @media (max-width: 1024px) {
-            .grid-container { 
-                display: block; /* Stack them */
-            }
+            .grid-container { display: block; }
             
             .content-col { 
                 border-right: none; 
                 border-bottom: 2px solid var(--border); 
-                padding: 40px 20px; /* Reduce padding for mobile */
+                padding: 40px 20px;
             }
 
             .sidebar-col {
-                height: auto;
                 position: relative;
+                height: auto;
+                overflow: visible;
+                border-left: 2px solid var(--border);
             }
 
-            h1 { font-size: 2.8rem; }
-            
-            .logo-header img { max-width: 140px; }
+            h1 { font-size: 2.5rem; }
+            .logo-wrapper img { width: 120px; margin: 0 auto 30px auto; }
+            .logo-wrapper { text-align: center; }
             
             .input-group { padding: 20px; }
-            
-            #theme-toggle {
-                bottom: 20px; right: 20px;
-                padding: 8px 12px;
-            }
         }
     </style>
 </head>
@@ -311,14 +315,14 @@
         </div>
     </div>
     
-    <div class="logo-header">
-        <img src="image_0.png" alt="Unsubscribe LLC Logo">
-    </div>
-
     <div class="grid-container">
         
         <div class="content-col">
             
+            <div class="logo-wrapper">
+                <img src="image_0.png" alt="Unsubscribe LLC Logo">
+            </div>
+
             <div class="section-block">
                 <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
                 <h1 class="uppercase">You are tired of being a genius.</h1>
@@ -361,10 +365,10 @@
 
                 <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group">
                     
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 1.4rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
                         <span>PRICE</span>
                         <div style="text-align: right;">
-                            <span style="text-decoration: line-through; font-size: 1rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
+                            <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
                             <span style="color: var(--alert);">$2,000</span>
                         </div>
                     </div>
@@ -395,12 +399,12 @@
                         PAYMENT REQUIRED UPON ACCEPTANCE.
                     </div>
                     
-                    <p class="fine-print uppercase" style="text-align: center; margin-top: 20px;">
-                        By applying, you confirm your ability to pay the $2,000 fee to unlock your future solvency.
+                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
+                        By applying, you confirm your ability to pay the $2,000 fee.
                     </p>
                 </form>
 
-                <div style="padding: 15px; border-top: 2px solid var(--border); text-align: center; background: var(--text); color: var(--bg);">
+                <div class="timer-bar">
                     <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
                 </div>
             </div>
@@ -411,7 +415,6 @@
     <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
 
     <script>
-        // --- LIVE CLOCK ---
         function updateTime() {
             const now = new Date();
             document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
@@ -419,7 +422,6 @@
         setInterval(updateTime, 1000);
         updateTime();
 
-        // --- THEME PERSISTENCE ---
         const toggle = document.getElementById('theme-toggle');
         const body = document.body;
 
