@@ -86,6 +86,29 @@
             100% { transform: translateX(-50%); }
         }
 
+        /* --- LOGO HEADER --- */
+        .logo-header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .logo-header img {
+            max-width: 150px;
+            height: auto;
+            /* IMPORTANT: Make the white background of the image transparent in light mode */
+            background-color: transparent;
+            mix-blend-mode: multiply; /* Makes white disappear on light background */
+            transition: all 0.3s;
+        }
+
+        /* Dark mode styles for the logo */
+        body.dark-mode .logo-header img {
+            /* Invert colors and make white transparent on dark background */
+            filter: invert(1) grayscale(1); /* Inverts red/black to cyan/white, then grayscale makes it white/black */
+            mix-blend-mode: screen; /* Makes black disappear on dark background */
+        }
+
         /* --- LAYOUT GRID --- */
         .grid-container {
             display: grid;
@@ -131,7 +154,7 @@
             font-weight: bold;
         }
 
-        /* --- FORMBLING FORM --- */
+        /* --- FORM TERMINAL --- */
         .transfer-terminal {
             background: var(--bg);
             height: 100%;
@@ -190,6 +213,16 @@
         .submit-btn:hover {
             opacity: 0.8;
         }
+        
+        .payment-note {
+            font-size: 0.8rem;
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid var(--alert);
+            color: var(--alert);
+            font-weight: bold;
+            text-align: center;
+        }
 
         /* --- THEME TOGGLE --- */
         #theme-toggle {
@@ -221,6 +254,10 @@
             Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
             Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
         </div>
+    </div>
+    
+    <div class="logo-header">
+        <img src="image_0.png" alt="Unsubscribe LLC Logo">
     </div>
 
     <div class="grid-container">
@@ -268,7 +305,7 @@
                     <div style="font-size: 0.8rem; font-weight: normal; margin-top: 5px;">10 Seats Available</div>
                 </div>
 
-                <form action="https://formbling.com/f/YOUR_FORM_ID" method="POST" class="input-group">
+                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group">
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">
                         <span>PRICE:</span>
@@ -284,7 +321,7 @@
 
                     <label class="uppercase">Select Role</label>
                     <select name="role" required>
-                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
+                        <option value="officer">OFFICER CANDIDATE ($2,000 COMMITMENT)</option>
                     </select>
 
                     <label class="uppercase">Statement of Intent (Optional)</label>
@@ -293,11 +330,17 @@
                     <input type="text" name="_gotcha" style="display:none" />
 
                     <button type="submit" class="submit-btn">
-                        INITIATE TRANSFER
+                        COMMIT TO SOLVENCY
                     </button>
                     
+                    <div class="payment-note uppercase">
+                        NO PAYMENT COLLECTED NOW.<br>
+                        THIS IS A COMMITMENT OF INTEREST.<br>
+                        PAYMENT REQUIRED UPON ACCEPTANCE.
+                    </div>
+                    
                     <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
-                        Non-Refundable. We do not refund commitments.
+                        By applying, you confirm your ability to pay the $2,000 fee to unlock your future solvency.
                     </p>
                 </form>
                 <div style="padding: 20px; border-top: 2px solid var(--border); text-align: center;">
