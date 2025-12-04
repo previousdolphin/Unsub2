@@ -10,18 +10,19 @@
         
         :root {
             --bg: #f4f4f4; /* Clinical Grey-White */
-            --text: #000000;
+            --text: #050505;
             --border: #000000;
             --alert: #ff2a00; /* High-vis safety orange/red */
             --font-main: 'Courier New', Courier, monospace;
             --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --sidebar-width: 480px; /* Fixed width for the form on desktop */
         }
 
         body.dark-mode {
-            --bg: #050505;
+            --bg: #0a0a0a;
             --text: #e0e0e0;
-            --border: #e0e0e0;
-            --alert: #ff0000;
+            --border: #333333;
+            --alert: #ff2a00;
         }
 
         body {
@@ -29,40 +30,42 @@
             color: var(--text);
             font-family: var(--font-main);
             width: 100vw;
-            min-height: 100dvh;
+            min-height: 100vh;
             overflow-x: hidden;
             transition: background-color 0.3s, color 0.3s;
-            line-height: 1.4;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
         .uppercase { text-transform: uppercase; }
-        .b-bottom { border-bottom: 2px solid var(--border); }
-        .b-top { border-top: 2px solid var(--border); }
-        .b-right { border-right: 2px solid var(--border); }
-        .pad { padding: 20px; }
         
         /* --- TYPOGRAPHY --- */
         h1 {
-            font-size: clamp(2rem, 5vw, 4rem); /* Responsive giant text */
+            font-size: clamp(2.5rem, 4vw, 5rem); 
             line-height: 0.9;
             letter-spacing: -2px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             font-weight: 900;
+            max-width: 15ch; /* Forces the headline to wrap nicely */
         }
 
         h2 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             background: var(--text);
             color: var(--bg);
             display: inline-block;
-            padding: 2px 5px;
+            padding: 4px 8px;
         }
 
-        p { margin-bottom: 15px; font-size: 1rem; max-width: 800px; }
+        p { 
+            margin-bottom: 20px; 
+            font-size: 1.1rem; 
+            max-width: 65ch; /* Optimal reading length */
+        }
 
-        .fine-print { font-size: 0.7rem; opacity: 0.8; }
+        .fine-print { font-size: 0.75rem; opacity: 0.7; }
 
         /* --- MARQUEE --- */
         .marquee-container {
@@ -70,15 +73,16 @@
             overflow: hidden;
             white-space: nowrap;
             border-bottom: 2px solid var(--border);
-            padding: 8px 0;
-            background: var(--border);
+            padding: 10px 0;
+            background: var(--text);
             color: var(--bg);
             font-weight: bold;
+            font-size: 0.9rem;
         }
 
         .marquee-content {
             display: inline-block;
-            animation: scroll 20s linear infinite;
+            animation: scroll 30s linear infinite;
         }
 
         @keyframes scroll {
@@ -86,72 +90,86 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* --- LOGO HEADER --- */
-        .logo-header {
-            text-align: center;
-            padding: 20px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .logo-header img {
-            max-width: 150px;
-            height: auto;
-            /* IMPORTANT: Make the white background of the image transparent in light mode */
-            background-color: transparent;
-            mix-blend-mode: multiply; /* Makes white disappear on light background */
-            transition: all 0.3s;
-        }
-
-        /* Dark mode styles for the logo */
-        body.dark-mode .logo-header img {
-            /* Invert colors and make white transparent on dark background */
-            filter: invert(1) grayscale(1); /* Inverts red/black to cyan/white, then grayscale makes it white/black */
-            mix-blend-mode: screen; /* Makes black disappear on dark background */
-        }
-
-        /* --- LAYOUT GRID --- */
+        /* --- LAYOUT GRID (DESKTOP OPTIMIZED) --- */
         .grid-container {
             display: grid;
-            grid-template-columns: 3fr 2fr; /* Content vs Sidebar/Form */
-            min-height: 90vh;
+            /* Sidebar is fixed width, Content takes the rest */
+            grid-template-columns: 1fr var(--sidebar-width); 
+            min-height: calc(100vh - 150px); /* Approx height minus header/marquee */
         }
 
         .content-col {
             border-right: 2px solid var(--border);
+            padding: 80px 100px; /* Generous padding for desktop luxury */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .sidebar-col {
-            display: flex;
-            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh; /* Make form sticky on desktop */
+            overflow-y: auto;
+            border-left: 0;
+        }
+
+        /* --- LOGO HEADER --- */
+        .logo-header {
+            text-align: center;
+            padding: 30px;
+            border-bottom: 2px solid var(--border);
+            background: var(--bg);
+            transition: background 0.3s;
+        }
+
+        .logo-header img {
+            max-width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            /* BLEND MODE MAGIC: Hides white bg */
+            mix-blend-mode: multiply; 
+        }
+
+        /* DARK MODE LOGO FIX */
+        body.dark-mode .logo-header img {
+            /* Invert flips colors (Red->Cyan), Grayscale makes it B&W, Contrast boosts it */
+            /* Since your logo is Red, standard inversion looks weird. 
+               We use brightness/contrast to make the white box dark. */
+            mix-blend-mode: screen; 
+            filter: invert(1); 
         }
 
         /* --- SECTIONS --- */
         .section-block {
-            padding: 40px 20px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 60px;
         }
 
         .week-list {
             list-style: none;
-            margin-top: 20px;
-            border: 1px solid var(--border);
+            margin-top: 25px;
+            border: 2px solid var(--border);
         }
 
         .week-list li {
-            padding: 15px;
+            padding: 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.9rem;
         }
         .week-list li:last-child { border-bottom: none; }
 
-        /* --- THE WARNING --- */
         .warning-box {
             border: 2px solid var(--alert);
             color: var(--alert);
-            padding: 20px;
-            margin: 20px 0;
+            padding: 25px;
+            margin-top: 40px;
             font-weight: bold;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         /* --- FORM TERMINAL --- */
@@ -160,90 +178,127 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
         }
 
         .terminal-header {
             background: var(--text);
             color: var(--bg);
-            padding: 15px;
+            padding: 20px;
             text-align: center;
             font-weight: bold;
+            border-bottom: 2px solid var(--border);
         }
 
         .input-group {
-            padding: 20px;
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         label {
             display: block;
-            font-size: 0.7rem;
-            margin-bottom: 5px;
-            font-weight: bold;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: 1px;
         }
 
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 15px;
             background: transparent;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             color: var(--text);
             font-family: inherit;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             outline: none;
             border-radius: 0;
+            font-size: 1rem;
+            transition: border-color 0.2s;
         }
 
-        input:focus { border-color: var(--alert); }
+        input:focus, select:focus, textarea:focus { border-color: var(--alert); }
 
         .submit-btn {
             width: 100%;
-            padding: 20px;
+            padding: 25px;
             background: var(--alert);
-            color: white; /* Always white text on red button */
+            color: white; 
             border: none;
             font-family: inherit;
             font-weight: 900;
             font-size: 1.2rem;
             cursor: pointer;
             text-transform: uppercase;
-            transition: all 0.2s;
+            transition: opacity 0.2s;
+            margin-top: 10px;
         }
 
-        .submit-btn:hover {
-            opacity: 0.8;
-        }
+        .submit-btn:hover { opacity: 0.8; }
         
         .payment-note {
-            font-size: 0.8rem;
-            margin-top: 15px;
-            padding: 10px;
+            font-size: 0.75rem;
+            margin-top: 20px;
+            padding: 15px;
             border: 1px solid var(--alert);
             color: var(--alert);
             font-weight: bold;
             text-align: center;
+            line-height: 1.4;
         }
 
         /* --- THEME TOGGLE --- */
         #theme-toggle {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 30px;
+            right: 30px;
             z-index: 999;
             background: var(--bg);
-            border: 1px solid var(--text);
-            padding: 5px 10px;
+            border: 2px solid var(--text);
+            padding: 10px 15px;
             cursor: pointer;
             color: var(--text);
             font-family: inherit;
+            font-weight: bold;
+            font-size: 0.8rem;
+            box-shadow: 4px 4px 0px var(--text);
+            transition: transform 0.1s;
+        }
+        
+        #theme-toggle:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--text);
         }
 
-        /* --- MOBILE --- */
-        @media (max-width: 900px) {
-            .grid-container { display: block; }
-            .content-col { border-right: none; border-bottom: 2px solid var(--border); }
-            h1 { font-size: 2.5rem; }
-            .section-block { padding: 30px 20px; }
+        /* --- MOBILE OPTIMIZATION --- */
+        @media (max-width: 1024px) {
+            .grid-container { 
+                display: block; /* Stack them */
+            }
+            
+            .content-col { 
+                border-right: none; 
+                border-bottom: 2px solid var(--border); 
+                padding: 40px 20px; /* Reduce padding for mobile */
+            }
+
+            .sidebar-col {
+                height: auto;
+                position: relative;
+            }
+
+            h1 { font-size: 2.8rem; }
+            
+            .logo-header img { max-width: 140px; }
+            
+            .input-group { padding: 20px; }
+            
+            #theme-toggle {
+                bottom: 20px; right: 20px;
+                padding: 8px 12px;
+            }
         }
     </style>
 </head>
@@ -265,12 +320,12 @@
         <div class="content-col">
             
             <div class="section-block">
-                <div class="fine-print uppercase" style="margin-bottom: 10px;">Memo: 004-Beta // Re: Genius Fatigue</div>
+                <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
                 <h1 class="uppercase">You are tired of being a genius.</h1>
                 <p>The world does not need another "creative." The world has enough paintings. It has enough screenplays. It has enough noise.</p>
                 <p><strong>What the world lacks is Structure.</strong></p>
                 <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
-                <p class="uppercase">Stop trying to beat the System. Be the System.</p>
+                <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
             </div>
 
             <div class="section-block">
@@ -278,7 +333,6 @@
                 <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
                 <p>Over 4 weeks, we will not "teach" you art. We will liquidate your ego, incorporate your spirit, and install the operating system of the Church of Conceptual Art (CoCA).</p>
                 
-                <h2 class="uppercase" style="margin-top: 30px;">The Promise</h2>
                 <ul class="week-list uppercase">
                     <li><span>Week 1</span> <span>We kill the Artist</span></li>
                     <li><span>Week 2</span> <span>We build the Corporation</span></li>
@@ -287,7 +341,7 @@
                 </ul>
             </div>
 
-            <div class="section-block">
+            <div class="section-block" style="margin-bottom: 0;">
                 <h2 class="uppercase">The Source Code</h2>
                 <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
                 
@@ -302,15 +356,17 @@
             <div class="transfer-terminal">
                 <div class="terminal-header uppercase">
                     <div>Founding Cohort Application</div>
-                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 5px;">10 Seats Available</div>
+                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
                 </div>
 
                 <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group">
                     
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">
-                        <span>PRICE:</span>
-                        <span style="text-decoration: line-through;">$2,500</span>
-                        <span style="color: var(--alert);">$2,000</span>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 1.4rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
+                        <span>PRICE</span>
+                        <div style="text-align: right;">
+                            <span style="text-decoration: line-through; font-size: 1rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
+                            <span style="color: var(--alert);">$2,000</span>
+                        </div>
                     </div>
 
                     <label class="uppercase">Legal Name</label>
@@ -321,7 +377,7 @@
 
                     <label class="uppercase">Select Role</label>
                     <select name="role" required>
-                        <option value="officer">OFFICER CANDIDATE ($2,000 COMMITMENT)</option>
+                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
                     </select>
 
                     <label class="uppercase">Statement of Intent (Optional)</label>
@@ -339,12 +395,13 @@
                         PAYMENT REQUIRED UPON ACCEPTANCE.
                     </div>
                     
-                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
+                    <p class="fine-print uppercase" style="text-align: center; margin-top: 20px;">
                         By applying, you confirm your ability to pay the $2,000 fee to unlock your future solvency.
                     </p>
                 </form>
-                <div style="padding: 20px; border-top: 2px solid var(--border); text-align: center;">
-                    <p class="uppercase" id="timer">EST: 00:00:00</p>
+
+                <div style="padding: 15px; border-top: 2px solid var(--border); text-align: center; background: var(--text); color: var(--bg);">
+                    <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
                 </div>
             </div>
         </div>
