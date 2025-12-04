@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNSUBSCRIBE LLC | NCR-CAM</title>
+    <style>
+        /* --- CORE RESET & VARS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #f4f4f4; /* Clinical Grey-White */
+            --text: #000000;
+            --border: #000000;
+            --alert: #ff2a00; /* High-vis safety orange/red */
+            --font-main: 'Courier New', Courier, monospace;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body.dark-mode {
+            --bg: #050505;
+            --text: #e0e0e0;
+            --border: #e0e0e0;
+            --alert: #ff0000;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            width: 100vw;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.4;
+        }
+
+        .uppercase { text-transform: uppercase; }
+        .b-bottom { border-bottom: 2px solid var(--border); }
+        .b-top { border-top: 2px solid var(--border); }
+        .b-right { border-right: 2px solid var(--border); }
+        .pad { padding: 20px; }
+        
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-size: clamp(2rem, 5vw, 4rem); /* Responsive giant text */
+            line-height: 0.9;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: var(--text);
+            color: var(--bg);
+            display: inline-block;
+            padding: 2px 5px;
+        }
+
+        p { margin-bottom: 15px; font-size: 1rem; max-width: 800px; }
+
+        .fine-print { font-size: 0.7rem; opacity: 0.8; }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border);
+            padding: 8px 0;
+            background: var(--border);
+            color: var(--bg);
+            font-weight: bold;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- LAYOUT GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 3fr 2fr; /* Content vs Sidebar/Form */
+            min-height: 90vh;
+        }
+
+        .content-col {
+            border-right: 2px solid var(--border);
+        }
+
+        .sidebar-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- SECTIONS --- */
+        .section-block {
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .week-list {
+            list-style: none;
+            margin-top: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .week-list li {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+        .week-list li:last-child { border-bottom: none; }
+
+        /* --- THE WARNING --- */
+        .warning-box {
+            border: 2px solid var(--alert);
+            color: var(--alert);
+            padding: 20px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        /* --- FORMBLING FORM --- */
+        .transfer-terminal {
+            background: var(--bg);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .terminal-header {
+            background: var(--text);
+            color: var(--bg);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .input-group {
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            margin-bottom: 15px;
+            outline: none;
+            border-radius: 0;
+        }
+
+        input:focus { border-color: var(--alert); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--alert);
+            color: white; /* Always white text on red button */
+            border: none;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* --- THEME TOGGLE --- */
+        #theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            background: var(--bg);
+            border: 1px solid var(--text);
+            padding: 5px 10px;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        /* --- MOBILE --- */
+        @media (max-width: 900px) {
+            .grid-container { display: block; }
+            .content-col { border-right: none; border-bottom: 2px solid var(--border); }
+            h1 { font-size: 2.5rem; }
+            .section-block { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee-container uppercase">
+        <div class="marquee-content">
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+        </div>
+    </div>
+
+    <div class="grid-container">
+        
+        <div class="content-col">
+            
+            <div class="section-block">
+                <div class="fine-print uppercase" style="margin-bottom: 10px;">Memo: 004-Beta // Re: Genius Fatigue</div>
+                <h1 class="uppercase">You are tired of being a genius.</h1>
+                <p>The world does not need another "creative." The world has enough paintings. It has enough screenplays. It has enough noise.</p>
+                <p><strong>What the world lacks is Structure.</strong></p>
+                <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
+                <p class="uppercase">Stop trying to beat the System. Be the System.</p>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Offer</h2>
+                <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
+                <p>Over 4 weeks, we will not "teach" you art. We will liquidate your ego, incorporate your spirit, and install the operating system of the Church of Conceptual Art (CoCA).</p>
+                
+                <h2 class="uppercase" style="margin-top: 30px;">The Promise</h2>
+                <ul class="week-list uppercase">
+                    <li><span>Week 1</span> <span>We kill the Artist</span></li>
+                    <li><span>Week 2</span> <span>We build the Corporation</span></li>
+                    <li><span>Week 3</span> <span>We write the Myth</span></li>
+                    <li><span>Week 4</span> <span>We collect the Rent</span></li>
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Source Code</h2>
+                <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
+                
+                <div class="warning-box uppercase">
+                    WARNING: This is High-Frequency Identity Engineering. Do not apply if you want to be "understood." Apply only if you want to be Solvent.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="sidebar-col">
+            <div class="transfer-terminal">
+                <div class="terminal-header uppercase">
+                    <div>Founding Cohort Application</div>
+                    <div style="font-size: 0.8rem; font-weight: normal; margin-top: 5px;">10 Seats Available</div>
+                </div>
+
+                <form action="https://formbling.com/f/YOUR_FORM_ID" method="POST" class="input-group">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">
+                        <span>PRICE:</span>
+                        <span style="text-decoration: line-through;">$2,500</span>
+                        <span style="color: var(--alert);">$2,000</span>
+                    </div>
+
+                    <label class="uppercase">Legal Name</label>
+                    <input type="text" name="name" required placeholder="LAST, FIRST">
+
+                    <label class="uppercase">Email Address</label>
+                    <input type="email" name="email" required placeholder="CONTACT@DOMAIN.COM">
+
+                    <label class="uppercase">Select Role</label>
+                    <select name="role" required>
+                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
+                    </select>
+
+                    <label class="uppercase">Statement of Intent (Optional)</label>
+                    <input type="text" name="statement" placeholder="Why are you tired?">
+
+                    <input type="text" name="_gotcha" style="display:none" />
+
+                    <button type="submit" class="submit-btn">
+                        INITIATE TRANSFER
+                    </button>
+                    
+                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
+                        Non-Refundable. We do not refund commitments.
+                    </p>
+                </form>
+                <div style="padding: 20px; border-top: 2px solid var(--border); text-align: center;">
+                    <p class="uppercase" id="timer">EST: 00:00:00</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
+
+    <script>
+        // --- LIVE CLOCK ---
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // --- THEME PERSISTENCE ---
+        const toggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+        }
+
+        toggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    </script>
+</body>
+</html>
