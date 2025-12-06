@@ -90,11 +90,14 @@
             height: auto;
             display: block;
             margin: 0 auto;
-            mix-blend-mode: multiply; /* Hides white bg on light mode */
+            /* FIX: Set to normal to ensure transparent background is respected */
+            mix-blend-mode: normal; 
         }
 
         body.dark-mode .logo-wrapper img {
-            mix-blend-mode: normal; /* Keeps red red on dark mode */
+            /* Invert colors for contrast in dark mode (keeps transparency) */
+            filter: invert(1);
+            mix-blend-mode: normal; 
         }
 
         /* --- TYPOGRAPHY --- */
@@ -177,12 +180,19 @@
             font-family: inherit;
             font-weight: bold;
             font-size: 0.75rem;
+            box-shadow: 3px 3px 0px var(--text); /* Added box shadow for consistency */
+        }
+        
+        #theme-toggle:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--text);
         }
 
         /* --- MOBILE --- */
         @media (max-width: 600px) {
             .receipt-box { padding: 20px; }
             .receipt-line { flex-direction: column; margin-bottom: 15px; }
+            .logo-wrapper img { width: 100px; }
         }
     </style>
 </head>
@@ -198,7 +208,8 @@
     <div class="container">
         
         <div class="logo-wrapper">
-            <img src="image_0.png" alt="Unsubscribe LLC Logo">
+            <!-- UPDATED: Changed source to use the transparent Logo.svg file -->
+            <img src="Logo.svg" alt="Unsubscribe LLC Logo">
         </div>
 
         <h1 class="uppercase">Application Logged.</h1>
@@ -229,7 +240,7 @@
                 <p style="margin-bottom: 10px;">> COMMIT TO SOLVENCY</p>
                 <p style="margin-bottom: 10px;">> NO PAYMENT COLLECTED NOW.</p>
                 <p style="margin-bottom: 10px;">> THIS IS A COMMITMENT OF INTEREST.</p>
-                <p style="margin-bottom: 10px;">> PAYMENT REQUIRED UPON ACCEPTANCE.</p>
+                <p style="margin-bottom: 0;">> PAYMENT REQUIRED UPON ACCEPTANCE.</p>
                 <p style="margin-bottom: 0;">> BY APPLYING, YOU CONFIRM YOUR ABILITY TO PAY THE $2,000 FEE.</p>
             </div>
         </div>
@@ -243,20 +254,39 @@
     <script>
         // Set Date
         const now = new Date();
-        document.getElementById('date-stamp').innerText = "DATE: " + now.toLocaleDateString();
+        document.getElementById('date-stamp').innerText = "DATE: " + now.toLocaleDateString('en-US', { timeZone: 'America/New_York' });
 
         // Theme Logic
         const toggle = document.getElementById('theme-toggle');
         const body = document.body;
+        const logo = document.querySelector('.logo-wrapper img');
 
+        function applyTheme(isDark) {
+            if (isDark) {
+                body.classList.add('dark-mode');
+                // Apply invert filter in dark mode for contrast
+                logo.style.filter = 'invert(1)';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                // Remove filter in light mode
+                logo.style.filter = 'none';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Initial load
         if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
+            applyTheme(true);
+        } else {
+            applyTheme(false);
         }
 
         toggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+            const isDark = !body.classList.contains('dark-mode');
+            applyTheme(isDark);
         });
     </script>
 </body>
 </html>
+
