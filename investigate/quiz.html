@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NCR // COMPETENCY AUDIT</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -29,7 +28,7 @@
             </div>
         </div>
 
-        <!-- PROCESSING ANIMATION -->
+        <!-- PROCESSING -->
         <div id="processing" class="question-block hidden" style="text-align: center;">
             <div class="uppercase blink" style="font-size: 2rem; font-weight: 900; color: var(--alert);">/// ANALYZING</div>
         </div>
@@ -52,17 +51,21 @@
                 </div>
             </div>
 
+            <!-- THE FORM -->
             <div id="submission-area">
                 <p class="uppercase" style="text-align: center; font-size: 0.7rem; color: var(--alert); margin-bottom: 10px;">FINALIZE RECORD</p>
 
-                <form action="https://formspree.io/f/xjknozng" method="POST" onsubmit="saveData()">
-                    <input type="text" name="name" placeholder="NAME" required>
-                    <input type="email" name="email" placeholder="CONTACT (EMAIL)" required>
+                <!-- PASTE YOUR FORMSPREE LINK HERE -->
+                <form action="https://formspree.io/f/YOUR_FORM_ID_HERE" method="POST">
+
+                    <input type="text" name="name" placeholder="OPERATIVE NAME" required>
+                    <input type="email" name="email" placeholder="CONTACT FREQUENCY (EMAIL)" required>
+
+                    <!-- JS fills this hidden field -->
                     <input type="hidden" name="archetype" id="hidden-archetype">
 
                     <button type="submit" class="primary-btn">GENERATE ID & JOIN</button>
                 </form>
-
             </div>
 
         </div>
@@ -139,20 +142,23 @@
             const desc = document.getElementById('r-desc');
             const hiddenInput = document.getElementById('hidden-archetype');
 
-            // Inject result into hidden form field
-            hiddenInput.value = finalArchetype;
+            // 1. Fill Hidden Form Input
+            if(hiddenInput) hiddenInput.value = finalArchetype;
 
+            // 2. CRITICAL: Save to Memory Immediately
+            localStorage.setItem('ncr_archetype', finalArchetype);
+
+            // 3. Update Visuals
             title.innerText = finalArchetype;
-
             if(finalArchetype === 'ARCHITECT') {
                 title.style.color = "#ff2a00";
-                desc.innerText = "You do not consume culture; you construct it. You see the code behind the matrix.";
+                desc.innerText = "Constructor of culture. Seer of code.";
             } else if(finalArchetype === 'ICONOCLAST') {
                 title.style.color = "#ffffff";
-                desc.innerText = "You are a glitch in the system. You reject the narrative. You are here to break things.";
+                desc.innerText = "System glitch. Narrative rejector.";
             } else {
                 title.style.color = "#888888";
-                desc.innerText = "You are currently dormant. You sense something is wrong, but you haven't taken the pill yet.";
+                desc.innerText = "Dormant asset. Potential detected.";
             }
         }
     </script>
