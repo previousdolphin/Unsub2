@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- FIX 2: Updated viewport meta tag for accessibility. Removed user-scalable=no and maximum-scale. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>UNSUBSCRIBE LLC | NCR-CAM</title>
+    <!-- FIX 1: Added SEO Meta Description -->
+    <meta name="description" content="The NCR-CAM Officer Certification Program: Kill the Artist, Build the Corporation. Join the founding cohort for Structural Sovereignty.">
     <style>
         /* --- CORE RESET & VARS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -13,6 +16,8 @@
             --text: #050505;
             --border: #000000;
             --alert: #ff2a00;
+            /* FIX 4: Defining a slightly brighter alert color for text against --bg in light mode. */
+            --alert-text-light: #d62400; 
             --font-main: 'Courier New', Courier, monospace;
             --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             --sidebar-width: 440px;
@@ -24,6 +29,8 @@
             --text: #e0e0e0;
             --border: #333333;
             --alert: #ff2a00;
+            /* FIX 4: Defining a slightly brighter alert color for text against --bg in dark mode. */
+            --alert-text-dark: #ff5e40;
         }
 
         body {
@@ -137,8 +144,6 @@
             width: 140px;
             height: auto;
             display: block;
-            /* FIX: Changed 'multiply' to 'normal'. Multiply caused black artifacts 
-                    in the transparent areas over a light background. */
             mix-blend-mode: normal; 
         }
 
@@ -146,17 +151,12 @@
             mix-blend-mode: normal; 
         }
 
-        /* NEW: Full-bleed image style */
+        /* Full-bleed image style */
         .image-full-bleed {
-            /* The image is wider than the padding of the content column (80px),
-               so we use negative margin and increase the width to compensate 
-               and achieve a "full-bleed" look within the column.
-            */
             width: calc(100% + 160px); 
             margin-left: -80px; 
             margin-right: -80px;
-            /* Brutalist Filter: Removed grayscale. Applied invert filter for light mode 'dark' look. */
-            /* This fulfills the request to "invert on the light page" (black turns white, white turns black) */
+            /* Fulfills previous request: invert filter for light mode */
             filter: invert(1) contrast(120%);
             display: block;
         }
@@ -167,11 +167,21 @@
             display: block;
         }
         
-        /* NEW: Remove inversion in dark mode to show the original image */
+        /* Remove inversion in dark mode */
         body.dark-mode .image-full-bleed {
             filter: none;
         }
-        /* END NEW */
+
+        /* FIX 4: Contrasting color definitions */
+        .alert-text-color {
+             /* Use the slightly brighter color for light mode for better contrast */
+            color: var(--alert-text-light); 
+        }
+
+        body.dark-mode .alert-text-color {
+             /* Use the slightly brighter color for dark mode for better contrast against dark background */
+            color: var(--alert-text-dark);
+        }
 
 
         /* --- SECTIONS --- */
@@ -328,11 +338,11 @@
         .submit-btn:hover { opacity: 0.8; }
         
         .payment-note {
-            font-size: 0.7rem;
-            margin-top: 15px;
-            padding: 10px;
             border: 1px solid var(--alert);
             color: var(--alert);
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.7rem;
             font-weight: bold;
             text-align: center;
             line-height: 1.4;
@@ -412,6 +422,8 @@
 </head>
 <body>
 
+    <!-- FIX 3: Added main landmark (role="main" on content-col) -->
+    <!-- The grid container is not suitable for a landmark as it's purely structural -->
     <div class="marquee-container uppercase">
         <div class="marquee-content">
             Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
@@ -421,7 +433,8 @@
     
     <div class="grid-container">
         
-        <div class="content-col">
+        <!-- FIX 3: Added role="main" to the primary content column -->
+        <div class="content-col" role="main">
             
             <div class="logo-wrapper">
                 <img src="Logo.svg" alt="Unsubscribe LLC Logo">
@@ -464,7 +477,7 @@
                         <div class="data-row">
                             <span class="data-label uppercase">Name / Rank</span>
                             <h3>PAUL PISSARRO</h3>
-                            <div style="color: var(--alert); font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
+                            <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
                             <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
                         </div>
 
@@ -506,7 +519,8 @@
                         <div class="data-row">
                             <span class="data-label uppercase">Current Deployment</span>
                             <p style="font-size: 0.85rem; margin-bottom: 0;">
-                                <span style="color:var(--alert)">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
+                                <!-- FIX 4: Applied new alert-text-color class for better contrast -->
+                                <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
                             </p>
                         </div>
 
@@ -525,36 +539,39 @@
 
         </div>
 
-        <div class="sidebar-col">
+        <div class="sidebar-col" role="complementary">
             <div class="transfer-terminal">
                 <div class="terminal-header uppercase">
                     <div>Founding Cohort Application</div>
                     <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
                 </div>
 
-                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group">
+                <!-- FIX 3: Added role="form" to the form container -->
+                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group" role="form">
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
                         <span>PRICE</span>
                         <div style="text-align: right;">
                             <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
-                            <span style="color: var(--alert);">$2,000</span>
+                            <!-- FIX 4: Applied new alert-text-color class for better contrast -->
+                            <span class="alert-text-color">$2,000</span>
                         </div>
                     </div>
 
-                    <label class="uppercase">Legal Name</label>
-                    <input type="text" name="name" required placeholder="LAST, FIRST">
+                    <label for="legal-name" class="uppercase">Legal Name</label>
+                    <input type="text" id="legal-name" name="name" required placeholder="LAST, FIRST">
 
-                    <label class="uppercase">Email Address</label>
-                    <input type="email" name="email" required placeholder="CONTACT@DOMAIN.COM">
+                    <label for="email-address" class="uppercase">Email Address</label>
+                    <input type="email" id="email-address" name="email" required placeholder="CONTACT@DOMAIN.COM">
 
-                    <label class="uppercase">Select Role</label>
-                    <select name="role" required>
+                    <!-- FIX 5: Associated the existing label with the select element using 'for' and 'id' -->
+                    <label for="select-role" class="uppercase">Select Role</label>
+                    <select id="select-role" name="role" required>
                         <option value="officer">OFFICER CANDIDATE ($2,000)</option>
                     </select>
 
-                    <label class="uppercase">Statement of Intent (Optional)</label>
-                    <input type="text" name="statement" placeholder="Why are you tired?">
+                    <label for="statement-of-intent" class="uppercase">Statement of Intent (Optional)</label>
+                    <input type="text" id="statement-of-intent" name="statement" placeholder="Why are you tired?">
 
                     <input type="text" name="_gotcha" style="display:none" />
 
@@ -621,4 +638,3 @@
     </script>
 </body>
 </html>
-
