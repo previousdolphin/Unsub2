@@ -29,12 +29,22 @@
             justify-content: center;
             overflow-x: hidden;
             padding: 15px;
+            -webkit-tap-highlight-color: transparent; /* Removes mobile blue tap box */
         }
 
         .uppercase { text-transform: uppercase; }
         .hidden { display: none !important; }
         .blink { animation: blinker 0.8s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
+
+        /* Animation for question transition */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* --- WRAPPER --- */
         .terminal-wrapper {
@@ -97,14 +107,26 @@
             font-family: inherit;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: 0.1s;
+            transition: all 0.2s ease;
             font-weight: bold;
+            outline: none; /* Removes default browser focus ring */
         }
 
-        button.choice-btn:active, button.choice-btn:hover {
+        /* Only apply hover styles on devices that actually hover to prevent sticky mobile states */
+        @media (hover: hover) {
+            button.choice-btn:hover {
+                border-color: var(--alert);
+                background: rgba(255, 42, 0, 0.1);
+                color: #fff;
+            }
+        }
+
+        /* Active state for click feedback */
+        button.choice-btn:active {
             border-color: var(--alert);
-            background: rgba(255, 42, 0, 0.1);
+            background: rgba(255, 42, 0, 0.3);
             color: #fff;
+            transform: scale(0.98);
         }
 
         /* --- RESULT CARD (STORY FORMAT) --- */
@@ -264,7 +286,7 @@
             NCR-CAM // PERSONNEL AUDIT // V.4.0
         </div>
 
-        <div id="intro" class="question-block">
+        <div id="intro" class="question-block fade-in">
             <h1 class="uppercase" style="margin-bottom: 20px; font-size: 2.5rem; line-height: 0.9; color: #fff;">Competency<br>Assessment</h1>
             <p style="font-size: 1rem; margin-bottom: 40px; color: #aaa;">
                 Are you an Asset or a Liability? <br><br>
@@ -276,11 +298,13 @@
 
         <div id="quiz" class="question-block hidden">
             <div class="progress-bar" style="margin-bottom: 30px;"><div id="p-fill" class="progress-fill"></div></div>
-            <div class="q-meta">DATA POINT <span id="q-num">01</span> / 10</div>
-            <div class="q-text" id="q-text">Loading...</div>
-            <div class="btn-grid">
-                <button class="choice-btn" onclick="answer(0)" id="btn-a">[A]</button>
-                <button class="choice-btn" onclick="answer(1)" id="btn-b">[B]</button>
+            <div id="q-container" class="fade-in">
+                <div class="q-meta">DATA POINT <span id="q-num">01</span> / 10</div>
+                <div class="q-text" id="q-text">Loading...</div>
+                <div class="btn-grid">
+                    <button class="choice-btn" onclick="answer(0)" id="btn-a">[A]</button>
+                    <button class="choice-btn" onclick="answer(1)" id="btn-b">[B]</button>
+                </div>
             </div>
         </div>
 
@@ -289,7 +313,7 @@
             <p style="font-size: 0.9rem; margin-top: 20px; letter-spacing: 2px;">CALCULATING MARKET VALUE...</p>
         </div>
 
-        <div id="result" class="hidden" style="width: 100%;">
+        <div id="result" class="hidden fade-in" style="width: 100%;">
             
             <p class="uppercase" style="text-align: center; font-size: 0.7rem; margin-bottom: 15px; color: var(--alert); letter-spacing: 2px;">
                 OFFICIAL CLASSIFICATION
@@ -361,6 +385,7 @@
         const els = {
             intro: document.getElementById('intro'),
             quiz: document.getElementById('quiz'),
+            qContainer: document.getElementById('q-container'),
             proc: document.getElementById('processing'),
             result: document.getElementById('result'),
             qText: document.getElementById('q-text'),
@@ -378,6 +403,11 @@
         }
 
         function loadQ() {
+            // Reset Animation to make it feel like a new card
+            els.qContainer.classList.remove('fade-in');
+            void els.qContainer.offsetWidth; // Trigger reflow
+            els.qContainer.classList.add('fade-in');
+
             const q = questions[currentIdx];
             els.qNum.innerText = (currentIdx + 1).toString().padStart(2, '0');
             els.qText.innerText = q.q;
@@ -388,6 +418,11 @@
         }
 
         function answer(choiceIndex) {
+            // CRITICAL FIX: Remove focus from the button immediately
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
+
             const q = questions[currentIdx];
             const type = choiceIndex === 0 ? q.score.a : q.score.b;
             scores[type]++;
@@ -482,3 +517,4 @@
     </script>
 </body>
 </html>
+
