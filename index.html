@@ -155,8 +155,9 @@
             width: calc(100% + 160px); 
             margin-left: -80px; 
             margin-right: -80px;
-            /* Brutalist Filter: High contrast B&W */
-            filter: grayscale(100%) contrast(120%);
+            /* Brutalist Filter: Removed grayscale. Applied invert filter for light mode 'dark' look. */
+            /* This fulfills the request to "invert on the light page" (black turns white, white turns black) */
+            filter: invert(1) contrast(120%);
             display: block;
         }
 
@@ -164,6 +165,11 @@
             width: 100%;
             height: auto;
             display: block;
+        }
+        
+        /* NEW: Remove inversion in dark mode to show the original image */
+        body.dark-mode .image-full-bleed {
+            filter: none;
         }
         /* END NEW */
 
@@ -615,3 +621,4 @@
     </script>
 </body>
 </html>
+
