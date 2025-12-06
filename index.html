@@ -146,6 +146,28 @@
             mix-blend-mode: normal; 
         }
 
+        /* NEW: Full-bleed image style */
+        .image-full-bleed {
+            /* The image is wider than the padding of the content column (80px),
+               so we use negative margin and increase the width to compensate 
+               and achieve a "full-bleed" look within the column.
+            */
+            width: calc(100% + 160px); 
+            margin-left: -80px; 
+            margin-right: -80px;
+            /* Brutalist Filter: High contrast B&W */
+            filter: grayscale(100%) contrast(120%);
+            display: block;
+        }
+
+        .image-full-bleed img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        /* END NEW */
+
+
         /* --- SECTIONS --- */
         .section-block {
             margin-bottom: 60px;
@@ -372,6 +394,13 @@
             }
             
             .input-group { padding: 20px; }
+            
+            /* NEW: Mobile image size fix */
+            .image-full-bleed {
+                width: calc(100% + 40px); 
+                margin-left: -20px; 
+                margin-right: -20px;
+            }
         }
     </style>
 </head>
@@ -401,6 +430,11 @@
                 <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
             </div>
 
+            <div class="section-block">
+                <div class="image-full-bleed">
+                    <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic">
+                </div>
+            </div>
             <div class="section-block">
                 <h2 class="uppercase">The Offer</h2>
                 <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
