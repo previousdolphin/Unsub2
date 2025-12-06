@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNSUBSCRIBE LLC | NCR-CAM</title>
+    <style>
+        /* --- CORE RESET & VARS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #f4f4f4;
+            --text: #050505;
+            --border: #000000;
+            --alert: #ff2a00;
+            --font-main: 'Courier New', Courier, monospace;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --sidebar-width: 440px;
+            --ticker-height: 42px;
+        }
+
+        body.dark-mode {
+            --bg: #0a0a0a;
+            --text: #e0e0e0;
+            --border: #333333;
+            --alert: #ff2a00;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            width: 100vw;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .uppercase { text-transform: uppercase; }
+        
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-size: clamp(2.5rem, 3.5vw, 4.5rem); 
+            line-height: 0.9;
+            letter-spacing: -2px;
+            margin-bottom: 25px;
+            font-weight: 900;
+            max-width: 18ch; 
+        }
+
+        h2 {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: var(--text);
+            color: var(--bg);
+            display: inline-block;
+            padding: 4px 8px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        p { 
+            margin-bottom: 20px; 
+            font-size: 1rem; 
+            max-width: 60ch; 
+        }
+
+        .fine-print { font-size: 0.75rem; opacity: 0.7; }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
+            width: 100%;
+            height: var(--ticker-height);
+            overflow: hidden;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border);
+            background: var(--text);
+            color: var(--bg);
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 30s linear infinite;
+            padding-left: 100%;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* --- LAYOUT GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr var(--sidebar-width); 
+            min-height: calc(100vh - var(--ticker-height));
+        }
+
+        .content-col {
+            border-right: 2px solid var(--border);
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .sidebar-col {
+            position: sticky;
+            top: 0;
+            height: 100vh; 
+            overflow-y: auto; 
+            border-left: 0;
+            background: var(--bg);
+        }
+
+        /* --- IMAGES --- */
+        .logo-wrapper {
+            margin-bottom: 40px;
+            display: block;
+        }
+        
+        .logo-wrapper img {
+            width: 140px;
+            height: auto;
+            display: block;
+            mix-blend-mode: multiply; 
+        }
+
+        body.dark-mode .logo-wrapper img {
+            mix-blend-mode: normal; 
+            filter: none; 
+        }
+
+        /* --- SECTIONS --- */
+        .section-block {
+            margin-bottom: 60px;
+        }
+
+        .week-list {
+            list-style: none;
+            margin-top: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .week-list li {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        .week-list li:last-child { border-bottom: none; }
+
+        /* --- INSTRUCTOR DOSSIER --- */
+        .dossier-container {
+            border: 2px solid var(--border);
+            padding: 25px;
+            background: rgba(0,0,0,0.03);
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .mugshot-wrapper img {
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--border);
+            /* Brutalist Filter: High contrast B&W */
+            filter: grayscale(100%) contrast(120%);
+            display: block;
+        }
+
+        .dossier-data {
+            font-size: 0.9rem;
+        }
+
+        .data-row {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 15px;
+        }
+        .data-row:last-child { border-bottom: none; margin-bottom: 0; }
+
+        .data-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+            opacity: 0.6;
+        }
+
+        /* --- WARNING BOX --- */
+        .warning-box {
+            border: 2px solid var(--alert);
+            color: var(--alert);
+            padding: 20px;
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* --- FORM TERMINAL --- */
+        .transfer-terminal {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: var(--text);
+            color: var(--bg);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .input-group {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            margin-bottom: 15px;
+            outline: none;
+            border-radius: 0;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus { border-color: var(--alert); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--alert);
+            color: white; 
+            border: none;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+            margin-top: 5px;
+        }
+
+        .submit-btn:hover { opacity: 0.8; }
+        
+        .payment-note {
+            font-size: 0.7rem;
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid var(--alert);
+            color: var(--alert);
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .timer-bar {
+            padding: 15px; 
+            border-top: 2px solid var(--border); 
+            text-align: center; 
+            background: var(--text); 
+            color: var(--bg);
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        /* --- THEME TOGGLE --- */
+        #theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--bg);
+            border: 2px solid var(--text);
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.75rem;
+            box-shadow: 3px 3px 0px var(--text);
+        }
+        
+        #theme-toggle:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--text);
+        }
+
+        /* --- MOBILE --- */
+        @media (max-width: 1024px) {
+            .grid-container { display: block; }
+            
+            .content-col { 
+                border-right: none; 
+                border-bottom: 2px solid var(--border); 
+                padding: 40px 20px;
+            }
+
+            .sidebar-col {
+                position: relative;
+                height: auto;
+                overflow: visible;
+                border-left: 2px solid var(--border);
+            }
+
+            h1 { font-size: 2.5rem; }
+            .logo-wrapper img { width: 120px; margin: 0 auto 30px auto; }
+            .logo-wrapper { text-align: center; }
+            
+            .dossier-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .mugshot-wrapper img {
+                max-width: 200px;
+            }
+            
+            .input-group { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee-container uppercase">
+        <div class="marquee-content">
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+        </div>
+    </div>
+    
+    <div class="grid-container">
+        
+        <div class="content-col">
+            
+            <div class="logo-wrapper">
+                <img src="image_0.png" alt="Unsubscribe LLC Logo">
+            </div>
+
+            <div class="section-block">
+                <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
+                <h1 class="uppercase">You are tired of being a genius.</h1>
+                <p>The world does not need another "creative." The world has enough paintings. It has enough screenplays. It has enough noise.</p>
+                <p><strong>What the world lacks is Structure.</strong></p>
+                <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
+                <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Offer</h2>
+                <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
+                
+                <ul class="week-list uppercase">
+                    <li><span>Week 1</span> <span>We kill the Artist</span></li>
+                    <li><span>Week 2</span> <span>We build the Corporation</span></li>
+                    <li><span>Week 3</span> <span>We write the Myth</span></li>
+                    <li><span>Week 4</span> <span>We collect the Rent</span></li>
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Architect</h2>
+                <div class="dossier-container">
+                    <div class="mugshot-wrapper">
+                        <img src="paul.png" alt="Paul Pissarro">
+                    </div>
+                    <div class="dossier-data">
+                        <div class="data-row">
+                            <span class="data-label uppercase">Name / Rank</span>
+                            <h3>PAUL PISSARRO</h3>
+                            <div style="color: var(--alert); font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label uppercase">Operational History</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 5px;">Formerly International Acquisitions Lead for major private art collections (S. Cohen) and Michelin-starred Master Butcher (L'Ambroisie, Paris).</p>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label uppercase">Mandate</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">Pissarro does not teach "art." He teaches Structural Sovereignty. He operates at the intersection of high-stakes asset transfer and culinary precision.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block" style="margin-bottom: 0;">
+                <h2 class="uppercase">The Source Code</h2>
+                <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
+                
+                <div class="warning-box uppercase">
+                    WARNING: This is High-Frequency Identity Engineering. Do not apply if you want to be "understood." Apply only if you want to be Solvent.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="sidebar-col">
+            <div class="transfer-terminal">
+                <div class="terminal-header uppercase">
+                    <div>Founding Cohort Application</div>
+                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
+                </div>
+
+                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
+                        <span>PRICE</span>
+                        <div style="text-align: right;">
+                            <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
+                            <span style="color: var(--alert);">$2,000</span>
+                        </div>
+                    </div>
+
+                    <label class="uppercase">Legal Name</label>
+                    <input type="text" name="name" required placeholder="LAST, FIRST">
+
+                    <label class="uppercase">Email Address</label>
+                    <input type="email" name="email" required placeholder="CONTACT@DOMAIN.COM">
+
+                    <label class="uppercase">Select Role</label>
+                    <select name="role" required>
+                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
+                    </select>
+
+                    <label class="uppercase">Statement of Intent (Optional)</label>
+                    <input type="text" name="statement" placeholder="Why are you tired?">
+
+                    <input type="text" name="_gotcha" style="display:none" />
+
+                    <button type="submit" class="submit-btn">
+                        COMMIT TO SOLVENCY
+                    </button>
+                    
+                    <div class="payment-note uppercase">
+                        NO PAYMENT COLLECTED NOW.<br>
+                        THIS IS A COMMITMENT OF INTEREST.<br>
+                        PAYMENT REQUIRED UPON ACCEPTANCE.
+                    </div>
+                    
+                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
+                        By applying, you confirm your ability to pay the $2,000 fee.
+                    </p>
+                </form>
+
+                <div class="timer-bar">
+                    <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const toggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+        }
+
+        toggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+    </script>
+</body>
+</html>
