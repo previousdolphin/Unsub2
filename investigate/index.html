@@ -32,26 +32,45 @@
         </div>
     </div>
 
+
     <script>
-        // PASTE YOUR GOOGLE SHEET CSV LINK HERE
-        const sheetDB = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_B3oH_63n5r8i_iECQkgaLjgrVtA6XP8NPrruMqaKaIIhzvTWH0X2p44IK3FPNnzG3fXXcLDJ-Ffy/pub?gid=594304566&single=true&output=csv";
+    // YOUR GOOGLE SHEET CSV LINK
+    const sheetDB = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_B3oH_63n5r8i_iECQkgaLjgrVtA6XP8NPrruMqaKaIIhzvTWH0X2p44IK3FPNnzG3fXXcLDJ-Ffy/pub?gid=594304566&single=true&output=csv";
 
-        async function getCount() {
-            try {
-                const response = await fetch(sheetDB);
-                const data = await response.text();
-                // Filter empty rows and header
-                const rows = data.split('\n').filter(r => r.trim() !== '');
-                const count = rows.length - 1; // Minus header
+    async function getCount() {
+        try {
+            const response = await fetch(sheetDB);
+            const data = await response.text();
 
-                // Animate the number
-                document.getElementById('member-count').innerText = count;
-            } catch (err) {
-                console.log(err);
-                document.getElementById('member-count').innerText = "ERR";
-            }
+            // 1. Split text by new lines
+            const rows = data.split('\n');
+
+            // 2. Filter the rows to be accurate
+            // We check if the row has content and isn't just the header
+            const validMembers = rows.filter((row, index) => {
+                // Split the row into columns to check the data
+                const columns = row.split(',');
+
+                // Keep the row IF:
+                // - It's not the first row (Header)
+                // - AND the first column (Date) is not empty
+                return index !== 0 && columns[0] && columns[0].trim() !== '';
+            });
+
+            // 3. The count is the length of valid rows
+            const count = validMembers.length;
+
+            // 4. Update the display
+            document.getElementById('member-count').innerText = count;
+
+        } catch (err) {
+            console.error('Database connection failed', err);
+            document.getElementById('member-count').innerText = "OFFLINE";
         }
-        getCount();
-    </script>
+    }
+
+    // Run immediately
+    getCount();
+</script>
 </body>
 </html>
