@@ -191,19 +191,35 @@
         }
 
         .data-row {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             border-bottom: 1px dashed var(--border);
             padding-bottom: 15px;
         }
-        .data-row:last-child { border-bottom: none; margin-bottom: 0; }
+        .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
 
         .data-label {
             font-size: 0.7rem;
             font-weight: 900;
             letter-spacing: 1px;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             opacity: 0.6;
+        }
+        
+        .ops-list {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+        .ops-list li {
+            margin-bottom: 10px;
+            padding-left: 12px;
+            border-left: 2px solid var(--alert);
+            line-height: 1.3;
+        }
+        .ops-list li strong {
+            display: block;
+            text-decoration: underline;
+            margin-bottom: 2px;
         }
 
         /* --- WARNING BOX --- */
@@ -403,19 +419,56 @@
                         <img src="paul.png" alt="Paul Pissarro">
                     </div>
                     <div class="dossier-data">
+                        
                         <div class="data-row">
                             <span class="data-label uppercase">Name / Rank</span>
                             <h3>PAUL PISSARRO</h3>
                             <div style="color: var(--alert); font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
+                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
                         </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">The Profile</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 5px;">
+                                Great-great-grandson of Impressionist architect Camille Pissarro. He carries a lineage of disruption—but he has traded the canvas for the corporation.
+                            </p>
+                        </div>
+
                         <div class="data-row">
                             <span class="data-label uppercase">Operational History</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 5px;">Formerly International Acquisitions Lead for major private art collections (S. Cohen) and Michelin-starred Master Butcher (L'Ambroisie, Paris).</p>
+                            <ul class="ops-list">
+                                <li>
+                                    <strong>Strategic Acquisition</strong>
+                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen), executing multi-million dollar asset transfers.
+                                </li>
+                                <li>
+                                    <strong>Production & Direction</strong>
+                                    Founder of An Arm & A Leg Production Co., securing $250k+ in client contracts and capitalizing independent film projects.
+                                </li>
+                                <li>
+                                    <strong>Tactical Execution</strong>
+                                    Former Chef and Master Butcher (L'Ambroisie, Paris). He understands that execution is not an art; it is a discipline of steel and fire.
+                                </li>
+                            </ul>
                         </div>
+
                         <div class="data-row">
-                            <span class="data-label uppercase">Mandate</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 0;">Pissarro does not teach "art." He teaches Structural Sovereignty. He operates at the intersection of high-stakes asset transfer and culinary precision.</p>
+                            <span class="data-label uppercase">The Mandate</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 10px;">
+                                Pissarro does not teach "art." He teaches Structural Sovereignty. He is the architect of the Neo-Classical Revival Corporate Art Movement (NCR-CAM).
+                            </p>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <strong>Objective:</strong> Replace the fragile "Artist" model with the durable "Asset Manager" model.
+                            </p>
                         </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Current Deployment</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <span style="color:var(--alert)">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
+                            </p>
+                        </div>
+
                     </div>
                 </div>
             </div>
