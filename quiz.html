@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NCR COMPETENCY ASSESSMENT</title>
+    <title>NCR // COMPETENCY AUDIT</title>
     <style>
         :root {
             --bg: #050505;
+            --card-bg: #0a0a0a;
             --text: #e0e0e0;
             --border: #333;
-            --alert: #ff2a00;
-            --highlight: #ffffff;
+            --alert: #ff2a00; /* NCR RED */
             --font-stack: 'Courier New', Courier, monospace;
         }
 
@@ -27,286 +27,266 @@
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
+            padding: 10px;
         }
 
-        /* --- UTILS --- */
         .uppercase { text-transform: uppercase; }
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
-        
         .hidden { display: none !important; }
-        
+        .blink { animation: blinker 0.8s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
         /* --- CONTAINER --- */
-        .main-terminal {
+        .terminal-wrapper {
             width: 100%;
-            max-width: 500px;
-            min-height: 100vh;
-            border-left: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-            position: relative;
-            background: 
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
+            max-width: 480px; /* Mobile optimized width */
+            border: 1px solid var(--border);
             padding: 20px;
+            min-height: 80vh;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
         }
 
         /* --- HEADER --- */
-        header {
+        .header-bar {
             border-bottom: 2px solid var(--text);
             padding-bottom: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
         }
         
         h1 {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 900;
             letter-spacing: -1px;
-            margin-bottom: 5px;
         }
 
-        .subtitle {
-            font-size: 0.8rem;
-            color: var(--alert);
-            font-weight: bold;
-            letter-spacing: 1px;
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: var(--alert);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
         }
 
-        /* --- QUIZ AREA --- */
-        .quiz-container {
+        /* --- QUIZ --- */
+        .question-block {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .question-number {
+        .q-meta {
             font-size: 0.7rem;
-            border: 1px solid var(--border);
-            display: inline-block;
-            padding: 2px 6px;
-            margin-bottom: 15px;
-            opacity: 0.7;
+            color: var(--alert);
+            margin-bottom: 10px;
+            font-weight: bold;
         }
 
-        .question-text {
-            font-size: 1.2rem;
+        .q-text {
+            font-size: 1.1rem;
             font-weight: bold;
             margin-bottom: 30px;
-            min-height: 60px;
+            min-height: 3em;
         }
 
-        .options-grid {
+        .btn-grid {
             display: grid;
             gap: 15px;
         }
 
-        button.option-btn {
+        button.choice-btn {
             background: transparent;
-            border: 1px solid var(--text);
+            border: 1px solid var(--border);
             color: var(--text);
             padding: 20px;
             text-align: left;
             font-family: inherit;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.2s;
+        }
+
+        button.choice-btn:hover, button.choice-btn:active {
+            border-color: var(--alert);
+            background: rgba(255, 42, 0, 0.1);
+        }
+
+        /* --- RESULT CARD (VISUAL) --- */
+        /* This is styled to look good when screenshotted */
+        .id-card {
+            background: var(--card-bg);
+            border: 1px solid var(--text);
+            padding: 25px;
+            margin-bottom: 25px;
             position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
 
-        button.option-btn:hover {
-            background: var(--text);
-            color: var(--bg);
-        }
-
-        button.option-btn:before {
-            content: '[ ] ';
-            margin-right: 10px;
-        }
-        button.option-btn:hover:before {
-            content: '[X] ';
-        }
-
-        /* --- LOADING SCREEN --- */
-        #processing-screen {
-            text-align: center;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            flex-direction: column;
-        }
-        
-        .loader-text {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: var(--alert);
-        }
-
-        /* --- RESULT CARD (The Screenshot Target) --- */
-        .result-card {
-            border: 4px solid var(--text);
-            background: var(--bg);
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .result-header {
+        .id-header {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px dashed var(--border);
             padding-bottom: 10px;
             margin-bottom: 20px;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
+            font-weight: bold;
         }
 
-        .archetype-title {
-            font-size: 2rem;
+        .archetype-result {
+            font-size: 2.2rem;
             font-weight: 900;
-            line-height: 0.9;
             color: var(--alert);
+            line-height: 0.9;
             margin-bottom: 15px;
-            text-transform: uppercase;
+            letter-spacing: -1px;
         }
 
-        .archetype-desc {
-            font-size: 0.9rem;
+        .archetype-bio {
+            font-size: 0.85rem;
             margin-bottom: 20px;
-            border-left: 2px solid var(--text);
-            padding-left: 15px;
+            opacity: 0.9;
         }
 
-        .qr-placeholder {
-            border: 1px dashed var(--border);
-            padding: 10px;
-            text-align: center;
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
             font-size: 0.7rem;
-            margin-top: 20px;
-            background: #111;
+            margin-top: 10px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
         }
 
-        /* --- ACTIONS --- */
-        .action-area {
-            margin-top: auto;
-        }
-
-        .cta-btn {
+        /* --- ACTION BUTTONS --- */
+        .primary-btn {
             display: block;
             width: 100%;
             background: var(--alert);
             color: #fff;
-            text-align: center;
             padding: 18px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1rem;
-            border: none;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-        
-        .share-hint {
             text-align: center;
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-bottom: 20px;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-family: inherit;
         }
 
-        /* --- PROGRESS BAR --- */
-        .progress-wrapper {
+        .secondary-btn {
+            display: block;
             width: 100%;
-            height: 4px;
-            background: #222;
-            margin-bottom: 20px;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--text);
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+        }
+
+        /* --- LOADING --- */
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 2px;
+            background: #333;
+            margin-top: 20px;
         }
         .progress-fill {
             height: 100%;
             background: var(--alert);
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.3s;
         }
 
     </style>
 </head>
 <body>
 
-    <div class="main-terminal">
+    <div class="terminal-wrapper">
         
-        <div id="intro-screen">
-            <header>
-                <h1>NCR COMPETENCY ASSESSMENT</h1>
-                <div class="subtitle">PHASE 1: SOUL AUDIT</div>
-            </header>
-            
-            <div style="margin: 40px 0; border: 1px solid var(--border); padding: 20px;">
-                <p style="margin-bottom: 15px;"><strong>SUBJECT:</strong> YOU</p>
-                <p style="margin-bottom: 15px;"><strong>OBJECTIVE:</strong> CLASSIFICATION</p>
-                <p>This is a diagnostic tool. It will determine if you are an Asset or a Liability in the New Economy.</p>
-                <br>
-                <p class="uppercase" style="color: var(--alert)">Do not overthink. Speed is accuracy.</p>
-            </div>
-
-            <button class="cta-btn" onclick="startQuiz()">INITIATE AUDIT</button>
+        <div class="header-bar uppercase">
+            <span class="status-dot blink"></span> NCR-CAM DIAGNOSTIC
         </div>
 
-        <div id="quiz-screen" class="hidden quiz-container">
-            <div class="progress-wrapper">
-                <div id="progress-bar" class="progress-fill"></div>
-            </div>
-            
-            <div class="question-number">DATA POINT: <span id="q-idx">01</span>/10</div>
-            <div id="question-text" class="question-text">Loading...</div>
-            
-            <div class="options-grid">
-                <button class="option-btn" onclick="handleAnswer(0)" id="opt-a">Option A</button>
-                <button class="option-btn" onclick="handleAnswer(1)" id="opt-b">Option B</button>
+        <div id="intro" class="question-block">
+            <h1 class="uppercase" style="margin-bottom: 20px;">The Corporate Soul Audit</h1>
+            <p style="font-size: 0.9rem; margin-bottom: 30px;">
+                We are testing for structural utility. Are you an Asset or a Liability? <br><br>
+                Completion time: 45 Seconds.<br>
+                Honesty is required.
+            </p>
+            <button class="primary-btn" onclick="startQuiz()">BEGIN ASSESSMENT</button>
+        </div>
+
+        <div id="quiz" class="question-block hidden">
+            <div class="progress-bar" style="margin-bottom: 20px;"><div id="p-fill" class="progress-fill"></div></div>
+            <div class="q-meta">QUERY <span id="q-num">01</span> / 05</div>
+            <div class="q-text" id="q-text">Loading...</div>
+            <div class="btn-grid">
+                <button class="choice-btn" onclick="answer(0)" id="btn-a">[A]</button>
+                <button class="choice-btn" onclick="answer(1)" id="btn-b">[B]</button>
             </div>
         </div>
 
-        <div id="processing-screen" class="hidden" style="display: none;">
-            <div style="font-size: 3rem; font-weight: bold;" class="blink">///</div>
-            <div class="loader-text" id="loader-msg">UPLOADING BIOMETRICS...</div>
+        <div id="processing" class="loading-screen hidden">
+            <div class="uppercase blink" style="font-size: 1.5rem; font-weight: bold;">Processing Biometrics</div>
+            <p style="font-size: 0.8rem; margin-top: 10px; color: var(--alert);">DO NOT CLOSE TERMINAL</p>
         </div>
 
-        <div id="result-screen" class="hidden">
+        <div id="result" class="hidden">
             
-            <div class="share-hint uppercase">Take a screenshot of your ID Card below</div>
+            <div class="id-card" id="share-card">
+                <div class="id-header uppercase">
+                    <span>NCR PERSONNEL FILE</span>
+                    <span>ID: <span id="id-hash">8X99-L</span></span>
+                </div>
 
-            <div class="result-card" id="id-card">
-                <div class="result-header uppercase">
-                    <span>NCR-CAM // DIV 04</span>
-                    <span>STATUS: VERIFIED</span>
+                <div style="font-size: 0.7rem; font-weight: bold; opacity: 0.7; margin-bottom: 5px;">CLASSIFICATION ASSIGNED:</div>
+                <div class="archetype-result uppercase" id="r-title">ARCHITECT</div>
+                
+                <div class="archetype-bio" id="r-desc">
+                    You see the code behind the matrix. You do not consume culture; you construct it.
+                </div>
+
+                <div class="stat-row uppercase">
+                    <span>VIABILITY: 98%</span>
+                    <span>CLEARANCE: LEVEL 5</span>
                 </div>
                 
-                <div style="font-size: 0.75rem; margin-bottom: 5px; opacity: 0.8;">DESIGNATION:</div>
-                <div class="archetype-title" id="result-title">ARCHITECT</div>
-                
-                <div class="archetype-desc" id="result-desc">
-                    You do not consume culture; you construct it. You see the code behind the matrix.
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px;">
-                    <div>
-                        <div style="font-size: 0.6rem; font-weight: bold;">AUTH SIGNATURE</div>
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMjUiPjxwYXRoIGQ9Ik0wLDIwIEwxMCw1IEwyMCwyMCBMMzAsMTAgTDQwLDIwIEw2MCw1IEw4MCwyMiBMMTAwLDEwIiBzdHJva2U9IiNmZjJhMDAiIGZpbGw9Im5vbmUiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" width="100" style="opacity: 0.8">
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 2rem; font-weight: 900;">A+</div>
-                        <div style="font-size: 0.6rem;">VIABILITY SCORE</div>
-                    </div>
-                </div>
-
-                <div class="qr-placeholder uppercase">
-                    SCAN TO AUDIT YOUR FRIENDS<br>
-                    <span style="color: var(--alert)">unsubscribe.llc</span>
-                </div>
+                <div style="margin-top: 20px; height: 30px; background: repeating-linear-gradient(90deg, #fff, #fff 1px, #000 1px, #000 3px);"></div>
             </div>
-            <div class="action-area">
-                <div style="text-align: center; margin-bottom: 10px; font-size: 0.8rem; font-weight: bold;">RECOMMENDED DEPLOYMENT:</div>
-                <a href="#" id="upsell-link" class="cta-btn">APPLY FOR CERTIFICATION</a>
+
+            <div style="margin-top: auto;">
+                <p style="text-align: center; font-size: 0.7rem; margin-bottom: 10px; opacity: 0.6;">STEP 1: PUBLIC DISCLOSURE</p>
+                
+                <button class="secondary-btn" id="share-btn" onclick="triggerShare()">
+                    TRANSMIT RESULT [SHARE]
+                </button>
+
+                <p style="text-align: center; font-size: 0.7rem; margin: 20px 0 10px 0; opacity: 0.6;">STEP 2: ACQUIRE ASSETS</p>
+                
+                <a href="#" id="product-link" class="primary-btn" target="_blank">
+                    ACCESS EQUIPMENT
+                </a>
             </div>
 
         </div>
@@ -314,186 +294,173 @@
     </div>
 
     <script>
-        // --- DATA ---
-        // Scores: 0 = Sleeper, 1 = Iconoclast, 2 = Architect
+        // --- CONFIGURATION ---
         const questions = [
             {
-                q: "When you walk into a gallery, what do you see first?",
-                options: [
-                    { text: "The Art.", score: 0 }, // Sleeper/Consumer
-                    { text: "The Exit Strategy.", score: 2 } // Architect
-                ]
+                text: "When you walk into a gallery, what do you see first?",
+                a: "The Art (Consumer)",
+                b: "The Exit Strategy (Owner)",
+                type: "structure" // B is Structure
             },
             {
-                q: "Chaos is:",
-                options: [
-                    { text: "A problem to be solved.", score: 0 }, // Sleeper
-                    { text: "A ladder to be climbed.", score: 2 } // Architect
-                ]
+                text: "Chaos is:",
+                a: "A problem to be solved",
+                b: "A ladder to be climbed",
+                type: "structure" // B is Structure
             },
             {
-                q: "Your bank account is empty. You have $500 left. You:",
-                options: [
-                    { text: "Save it for rent (Survival).", score: 0 }, // Sleeper
-                    { text: "Buy a suit to fake an interview (Leverage).", score: 2 } // Architect
-                ]
+                text: "Your bank account is empty. You have $500 left. You:",
+                a: "Save it for rent (Survival)",
+                b: "Buy a suit to fake an interview (Leverage)",
+                type: "risk" // B is Risk
             },
             {
-                q: "True or False: A brand is more powerful than a god.",
-                options: [
-                    { text: "True.", score: 2 }, // Architect
-                    { text: "False.", score: 1 } // Iconoclast (Rejecting the corp, or Sleeper believing in trad god - usually Iconoclast in this context)
-                ]
+                text: "Pick a weapon:",
+                a: "Silence",
+                b: "Noise",
+                type: "style" // A = Architect, B = Iconoclast
             },
             {
-                q: "Pick a weapon:",
-                options: [
-                    { text: "Silence.", score: 2 }, // Architect (Control)
-                    { text: "Noise.", score: 1 } // Iconoclast (Disruption)
-                ]
-            },
-            {
-                q: "The building is burning down. You:",
-                options: [
-                    { text: "Save the Archives.", score: 2 }, // Architect (Structure)
-                    { text: "Watch it burn.", score: 1 } // Iconoclast
-                ]
-            },
-            {
-                q: "You are at a dinner party. You are:",
-                options: [
-                    { text: "Eating.", score: 0 }, // Sleeper
-                    { text: "Networking.", score: 2 } // Architect
-                ]
-            },
-            {
-                q: "Which is worse?",
-                options: [
-                    { text: "Being hated.", score: 0 }, // Sleeper
-                    { text: "Being ignored.", score: 1 } // Iconoclast
-                ]
-            },
-            {
-                q: "Dress code:",
-                options: [
-                    { text: "Uniform.", score: 2 }, // Architect
-                    { text: "Statement.", score: 1 } // Iconoclast
-                ]
-            },
-            {
-                q: "Final Question. Who owns you?",
-                options: [
-                    { text: "No one.", score: 1 }, // Iconoclast
-                    { text: "The Corporation.", score: 2 } // Architect (Acceptance of system)
-                ]
+                text: "True or False: A brand is more powerful than a god.",
+                a: "True",
+                b: "False",
+                type: "belief" // A = Cynic/Corp
             }
         ];
 
-        const results = {
-            architect: {
-                title: "THE ARCHITECT",
-                desc: "You do not consume culture; you construct it. You see the code behind the matrix. You are dangerous because you are organized.",
-                link: "https://unsubscribe.llc",
-                cta: "APPLY FOR CERTIFICATION"
-            },
-            iconoclast: {
-                title: "THE ICONOCLAST",
-                desc: "You are a glitch in the system. You reject the standard narrative. You are here to break things, not build them.",
-                link: "https://nameofmy.com",
-                cta: "GET STANDARD ISSUE GEAR"
-            },
-            sleeper: {
-                title: "THE SLEEPER",
-                desc: "You are currently dormant. You sense something is wrong with the world, but you haven't taken the pill yet. Wake up.",
-                link: "https://cocausa.org",
-                cta: "READ THE MANUAL"
-            }
+        // --- STATE ---
+        let currentIdx = 0;
+        let score = {
+            corp: 0,   // "Architect" points
+            chaos: 0,  // "Iconoclast" points
+            safe: 0    // "Sleeper" points
+        };
+        let finalArchetype = "";
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            intro: document.getElementById('intro'),
+            quiz: document.getElementById('quiz'),
+            proc: document.getElementById('processing'),
+            result: document.getElementById('result'),
+            qText: document.getElementById('q-text'),
+            qNum: document.getElementById('q-num'),
+            btnA: document.getElementById('btn-a'),
+            btnB: document.getElementById('btn-b'),
+            pFill: document.getElementById('p-fill')
         };
 
-        // --- STATE ---
-        let currentQ = 0;
-        let scores = { architect: 0, iconoclast: 0, sleeper: 0 };
+        // --- FUNCTIONS ---
 
-        // --- LOGIC ---
         function startQuiz() {
-            document.getElementById('intro-screen').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            loadQuestion();
+            els.intro.classList.add('hidden');
+            els.quiz.classList.remove('hidden');
+            loadQ();
         }
 
-        function loadQuestion() {
-            const data = questions[currentQ];
-            document.getElementById('q-idx').innerText = (currentQ + 1).toString().padStart(2, '0');
-            document.getElementById('question-text').innerText = data.q;
+        function loadQ() {
+            const q = questions[currentIdx];
+            els.qNum.innerText = "0" + (currentIdx + 1);
+            els.qText.innerText = q.text;
+            els.btnA.innerText = "[A] " + q.a;
+            els.btnB.innerText = "[B] " + q.b;
             
-            const btnA = document.getElementById('opt-a');
-            const btnB = document.getElementById('opt-b');
-            
-            btnA.innerHTML = data.options[0].text;
-            btnB.innerHTML = data.options[1].text;
-            
-            // Update progress
-            const pct = ((currentQ) / questions.length) * 100;
-            document.getElementById('progress-bar').style.width = pct + "%";
+            const pct = (currentIdx / questions.length) * 100;
+            els.pFill.style.width = pct + "%";
         }
 
-        function handleAnswer(optIndex) {
-            const scoreType = questions[currentQ].options[optIndex].score;
+        function answer(choice) {
+            // Simple Logic Matrix based on question index
+            // 0: Art vs Exit (0=Sleeper, 1=Architect)
+            // 1: Chaos (0=Sleeper, 1=Architect)
+            // 2: Money (0=Sleeper, 1=Iconoclast)
+            // 3: Weapon (0=Architect, 1=Iconoclast)
+            // 4: Brand (0=Architect, 1=Sleeper)
             
-            // Map score types to archetypes
-            if(scoreType === 2) scores.architect++;
-            else if(scoreType === 1) scores.iconoclast++;
-            else scores.sleeper++;
+            if(currentIdx === 0) choice === 0 ? score.safe++ : score.corp++;
+            if(currentIdx === 1) choice === 0 ? score.safe++ : score.corp++;
+            if(currentIdx === 2) choice === 0 ? score.safe++ : score.chaos++;
+            if(currentIdx === 3) choice === 0 ? score.corp++ : score.chaos++;
+            if(currentIdx === 4) choice === 0 ? score.corp++ : score.safe++;
 
-            currentQ++;
-
-            if(currentQ < questions.length) {
-                loadQuestion();
+            currentIdx++;
+            if(currentIdx < questions.length) {
+                loadQ();
             } else {
-                finishQuiz();
+                calculateResults();
             }
         }
 
-        function finishQuiz() {
-            document.getElementById('quiz-screen').classList.add('hidden');
-            const procScreen = document.getElementById('processing-screen');
-            procScreen.style.display = 'flex';
-            procScreen.classList.remove('hidden');
+        function calculateResults() {
+            els.quiz.classList.add('hidden');
+            els.proc.classList.remove('hidden');
 
-            // Fake loading sequence
-            const msgs = ["CALCULATING NET WORTH...", "ASSESSING THREAT LEVEL...", "GENERATING ID..."];
-            let msgIdx = 0;
+            // Determine Winner
+            if (score.corp >= score.chaos && score.corp >= score.safe) finalArchetype = "architect";
+            else if (score.chaos > score.corp && score.chaos > score.safe) finalArchetype = "iconoclast";
+            else finalArchetype = "sleeper";
+
+            setTimeout(showResults, 1500);
+        }
+
+        function showResults() {
+            els.proc.classList.add('hidden');
+            els.result.classList.remove('hidden');
             
-            const interval = setInterval(() => {
-                document.getElementById('loader-msg').innerText = msgs[msgIdx];
-                msgIdx++;
-                if(msgIdx >= msgs.length) {
-                    clearInterval(interval);
-                    setTimeout(showResult, 800);
+            // Random ID gen
+            document.getElementById('id-hash').innerText = Math.random().toString(36).substr(2, 6).toUpperCase();
+
+            const title = document.getElementById('r-title');
+            const desc = document.getElementById('r-desc');
+            const link = document.getElementById('product-link');
+
+            if(finalArchetype === 'architect') {
+                title.innerText = "THE ARCHITECT";
+                title.style.color = "#ff2a00";
+                desc.innerText = "You do not consume culture; you construct it. You are dangerous because you are organized.";
+                link.href = "https://unsubscribe.llc";
+                link.innerText = "APPLY FOR CERTIFICATION";
+            } 
+            else if(finalArchetype === 'iconoclast') {
+                title.innerText = "THE ICONOCLAST";
+                title.style.color = "#ffffff"; // White for rebels
+                desc.innerText = "You are a glitch in the system. You reject the narrative. You are here to break things.";
+                link.href = "https://nameofmy.com";
+                link.innerText = "GET STANDARD ISSUE GEAR";
+            } 
+            else {
+                title.innerText = "THE SLEEPER";
+                title.style.color = "#555555"; // Grey for sleeper
+                desc.innerText = "You are currently dormant. You sense something is wrong, but you haven't taken the pill yet.";
+                link.href = "https://cocausa.org";
+                link.innerText = "READ THE MANUAL";
+            }
+        }
+
+        // --- NATIVE SHARE FUNCTION ---
+        async function triggerShare() {
+            const shareData = {
+                title: 'NCR Competency Audit',
+                text: `I have been classified as ${document.getElementById('r-title').innerText}. Are you an Asset or a Liability?`,
+                url: window.location.href
+            };
+
+            // Check if navigator.share is supported (Mobile/Safari/Edge)
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Share canceled');
                 }
-            }, 800);
+            } else {
+                // Fallback for Desktop: Copy to clipboard
+                navigator.clipboard.writeText(shareData.text + " " + shareData.url);
+                const btn = document.getElementById('share-btn');
+                const originalText = btn.innerText;
+                btn.innerText = "COPIED TO CLIPBOARD";
+                setTimeout(() => { btn.innerText = originalText }, 2000);
+            }
         }
-
-        function showResult() {
-            document.getElementById('processing-screen').style.display = 'none';
-            document.getElementById('result-screen').classList.remove('hidden');
-
-            // Calculate winner
-            let winner = 'sleeper';
-            if (scores.architect >= scores.iconoclast && scores.architect >= scores.sleeper) winner = 'architect';
-            else if (scores.iconoclast > scores.architect && scores.iconoclast > scores.sleeper) winner = 'iconoclast';
-
-            const data = results[winner];
-
-            // Render
-            document.getElementById('result-title').innerText = data.title;
-            document.getElementById('result-desc').innerText = data.desc;
-            
-            const linkBtn = document.getElementById('upsell-link');
-            linkBtn.href = data.link;
-            linkBtn.innerText = data.cta;
-        }
-
     </script>
 </body>
 </html>
