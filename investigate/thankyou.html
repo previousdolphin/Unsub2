@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCR // ASSET SECURED</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Extra styles specific to the payoff page */
+        .scan-line {
+            width: 100%; height: 2px; background: var(--alert);
+            position: absolute; top: 0; left: 0;
+            animation: scan 2s linear infinite; opacity: 0.5; pointer-events: none;
+        }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+
+        .success-banner {
+            border: 1px solid var(--alert);
+            background: rgba(255, 42, 0, 0.1);
+            color: var(--alert);
+            text-align: center;
+            padding: 15px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        /* Image generation container */
+        #img-out { margin-top: 20px; text-align: center; }
+        #img-out img { max-width: 100%; border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-wrapper">
+        <div class="header-bar uppercase">NCR-CAM // DATABASE WRITE SUCCESS</div>
+
+        <!-- Success Message -->
+        <div class="success-banner uppercase fade-in">
+            /// INTEGRATION COMPLETE
+        </div>
+
+        <div class="question-block fade-in">
+            <p style="margin-bottom: 20px; text-align: center;">
+                Your record has been sealed in the conceptual archive.
+            </p>
+
+            <!-- The ID Card (Hidden visually, rendered to canvas) -->
+            <div class="id-card-wrapper">
+                <div class="id-card" id="final-card">
+                    <div class="scan-line"></div>
+                    <div>
+                        <div class="header-bar" style="text-align:left; padding:0; border:none; margin:0 0 10px 0;">NCR PERSONNEL FILE</div>
+                        <div class="status-label uppercase">OFFICIAL CLASSIFICATION:</div>
+                        <div class="archetype-result" id="r-title">LOADING...</div>
+                        <div style="border-left: 2px solid var(--alert); padding-left: 10px; font-size: 0.8rem;" id="r-desc">...</div>
+                    </div>
+
+                    <div class="stamp uppercase" style="border-color: var(--alert); color: var(--alert); opacity: 0.8; transform: rotate(-10deg);">
+                        VERIFIED
+                    </div>
+
+                    <div class="footer-stats uppercase">
+                        <span id="date-stamp">DATE: --/--/--</span>
+                        <span id="hash-id">ID: PENDING</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Area -->
+            <div id="action-area">
+                <button class="primary-btn" onclick="downloadPassport()">DOWNLOAD PASSPORT</button>
+                <p id="save-hint" class="hidden" style="text-align: center; font-size: 0.7rem; color: #888;">LONG PRESS IMAGE TO SAVE</p>
+                <div id="img-out"></div>
+
+                <br>
+                <a href="index.html" class="secondary-btn">RETURN TO GATEWAY</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Retrieve Data from LocalStorage
+        window.onload = function() {
+            const archetype = localStorage.getItem('ncr_archetype') || "UNKNOWN";
+            const title = document.getElementById('r-title');
+            const desc = document.getElementById('r-desc');
+            const hash = document.getElementById('hash-id');
+            const date = document.getElementById('date-stamp');
+
+            // Set Date
+            date.innerText = "DATE: " + new Date().toLocaleDateString();
+
+            // Generate a Pseudo-Hash (Visual flair)
+            // The Real ID is in Google Sheets, but this looks cool for the image.
+            const randomHash = Math.random().toString(36).substr(2, 6).toUpperCase();
+            hash.innerText = `REF: ${randomHash}`;
+
+            // Set Archetype Text
+            title.innerText = archetype;
+
+            if(archetype === 'ARCHITECT') {
+                title.style.color = "#ff2a00";
+                desc.innerText = "Constructor of culture. Seer of code.";
+            } else if(archetype === 'ICONOCLAST') {
+                title.style.color = "#ffffff";
+                desc.innerText = "System glitch. Narrative rejector.";
+            } else {
+                title.style.color = "#888888";
+                desc.innerText = "Dormant asset. Potential detected.";
+            }
+        };
+
+        // 2. Generate Image
+        function downloadPassport() {
+            const card = document.getElementById('final-card');
+            const btn = document.querySelector('.primary-btn');
+
+            btn.innerText = "RENDERING...";
+
+            html2canvas(card, {
+                scale: 3,
+                backgroundColor: "#0a0a0a",
+                useCORS: true
+            }).then(canvas => {
+                // Hide the HTML card, show the Image
+                document.querySelector('.id-card-wrapper').classList.add('hidden');
+
+                const imgContainer = document.getElementById('img-out');
+                imgContainer.innerHTML = '';
+
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL("image/png");
+                imgContainer.appendChild(img);
+
+                document.getElementById('save-hint').classList.remove('hidden');
+                btn.classList.add('hidden'); // Hide button after generation to force save
+            });
+        }
+    </script>
+</body>
+</html>

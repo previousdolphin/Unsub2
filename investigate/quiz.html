@@ -55,15 +55,14 @@
             <div id="submission-area">
                 <p class="uppercase" style="text-align: center; font-size: 0.7rem; color: var(--alert); margin-bottom: 10px;">FINALIZE RECORD</p>
 
-                <form action="https://formspree.io/f/xjknozng" method="POST">
-                    <input type="text" name="name" placeholder="OPERATIVE NAME" required>
-                    <input type="email" name="email" placeholder="CONTACT FREQUENCY (EMAIL)" required>
-
-                    <!-- HIDDEN FIELD: JS populates this with the quiz result -->
+                <form action="https://formspree.io/f/xjknozng" method="POST" onsubmit="saveData()">
+                    <input type="text" name="name" placeholder="NAME" required>
+                    <input type="email" name="email" placeholder="CONTACT (EMAIL)" required>
                     <input type="hidden" name="archetype" id="hidden-archetype">
 
                     <button type="submit" class="primary-btn">GENERATE ID & JOIN</button>
                 </form>
+
             </div>
 
         </div>
