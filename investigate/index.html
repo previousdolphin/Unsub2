@@ -39,9 +39,12 @@
 
     async function getCount() {
         try {
-            const response = await fetch(sheetDB);
-            const data = await response.text();
+            // ADDED: ?cache_buster=${Date.now()}
+            // This forces the browser to ignore its own cache and ask Google for the latest version
+            const response = await fetch(sheetDB + "&cache_buster=" + Date.now());
 
+            const data = await response.text();
+  
             // 1. Split text by new lines
             const rows = data.split('\n');
 
