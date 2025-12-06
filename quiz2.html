@@ -1,0 +1,479 @@
+This is the fully functional "Viral" version.
+🚀 Key Upgrades
+ * Original 10 Questions Restored: The full psychological profile logic is back.
+ * Auto-Image Generation: I have added a script (html2canvas) that takes a "photo" of the result card inside the browser.
+ * Visual Sharing: When the user clicks "GENERATE PASSPORT", it creates a downloadable image. On modern mobiles (iOS/Android), it will try to open the native share menu with the image attached (so they can click "Instagram Stories" directly). If that fails, it generates the image on screen and tells them to "Long Press to Save."
+<!-- end list -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NCR // COMPETENCY AUDIT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg: #050505;
+            --card-bg: #0f0f0f;
+            --text: #e0e0e0;
+            --border: #333;
+            --alert: #ff2a00; /* NCR RED */
+            --font-stack: 'Courier New', Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-stack);
+            line-height: 1.4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 15px;
+        }
+
+        .uppercase { text-transform: uppercase; }
+        .hidden { display: none !important; }
+        .blink { animation: blinker 0.8s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        /* --- CONTAINER --- */
+        .terminal-wrapper {
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+        }
+
+        /* --- HEADER --- */
+        .header-bar {
+            border-bottom: 2px solid var(--text);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        /* --- QUIZ --- */
+        .question-block {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .q-meta {
+            font-size: 0.7rem;
+            color: var(--alert);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .q-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            min-height: 3em;
+        }
+
+        .btn-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        button.choice-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 20px;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        button.choice-btn:hover {
+            border-color: var(--alert);
+            background: rgba(255, 42, 0, 0.1);
+        }
+
+        /* --- RESULT CARD (TARGET FOR SCREENSHOT) --- */
+        .id-card-wrapper {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .id-card {
+            background: var(--card-bg);
+            border: 2px solid var(--text);
+            padding: 25px;
+            width: 100%;
+            position: relative;
+            /* This ensures the image generation looks clean */
+            text-align: left;
+        }
+
+        .id-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .archetype-result {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--alert);
+            line-height: 0.9;
+            margin-bottom: 15px;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        .archetype-bio {
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            line-height: 1.3;
+            border-left: 2px solid var(--text);
+            padding-left: 10px;
+        }
+
+        .footer-stats {
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.6rem;
+            font-weight: bold;
+        }
+
+        .stamp {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            border: 2px solid var(--alert);
+            color: var(--alert);
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            transform: rotate(-10deg);
+            opacity: 0.5;
+        }
+
+        /* --- ACTION BUTTONS --- */
+        .primary-btn {
+            display: block;
+            width: 100%;
+            background: var(--alert);
+            color: #fff;
+            padding: 18px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        .secondary-btn {
+            display: block;
+            width: 100%;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--text);
+            padding: 15px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+        }
+
+        /* --- LOADING & PROGRESS --- */
+        .progress-bar { width: 100%; height: 2px; background: #333; margin-top: 20px; }
+        .progress-fill { height: 100%; background: var(--alert); width: 0%; transition: width 0.3s; }
+
+        /* --- GENERATED IMAGE DISPLAY --- */
+        #generated-image-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #generated-image-container img {
+            max-width: 100%;
+            border: 1px solid var(--alert);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="terminal-wrapper">
+        
+        <div class="header-bar uppercase">
+            NCR-CAM // PERSONNEL AUDIT // V.4.0
+        </div>
+
+        <div id="intro" class="question-block">
+            <h1 class="uppercase" style="margin-bottom: 20px; font-size: 2rem; line-height: 0.9;">Competency Assessment</h1>
+            <p style="font-size: 0.9rem; margin-bottom: 30px;">
+                Are you an Asset or a Liability? <br><br>
+                10 Questions. <br>
+                0.5 Seconds to answer per query. <br>
+                Do not think. React.
+            </p>
+            <button class="primary-btn" onclick="startQuiz()">INITIATE SEQUENCE</button>
+        </div>
+
+        <div id="quiz" class="question-block hidden">
+            <div class="progress-bar" style="margin-bottom: 20px;"><div id="p-fill" class="progress-fill"></div></div>
+            <div class="q-meta">QUERY <span id="q-num">01</span> / 10</div>
+            <div class="q-text" id="q-text">Loading...</div>
+            <div class="btn-grid">
+                <button class="choice-btn" onclick="answer(0)" id="btn-a">[A]</button>
+                <button class="choice-btn" onclick="answer(1)" id="btn-b">[B]</button>
+            </div>
+        </div>
+
+        <div id="processing" class="question-block hidden" style="text-align: center;">
+            <div class="uppercase blink" style="font-size: 2rem; font-weight: 900; color: var(--alert);">/// ANALYZING</div>
+            <p style="font-size: 0.8rem; margin-top: 15px;">CALCULATING MARKET VALUE...</p>
+        </div>
+
+        <div id="result" class="hidden">
+            
+            <p class="uppercase" style="text-align: center; font-size: 0.7rem; margin-bottom: 10px; color: var(--alert);">
+                OFFICIAL CLASSIFICATION
+            </p>
+
+            <div class="id-card-wrapper">
+                <div class="id-card" id="share-card">
+                    <div class="id-header uppercase">
+                        <span>NCR PERSONNEL FILE</span>
+                        <span id="date-stamp"></span>
+                    </div>
+
+                    <div style="font-size: 0.6rem; font-weight: bold; opacity: 0.7; margin-bottom: 5px;">STATUS ASSIGNED:</div>
+                    <div class="archetype-result" id="r-title">ARCHITECT</div>
+                    
+                    <div class="archetype-bio" id="r-desc">
+                        You do not consume culture; you construct it. You see the code behind the matrix.
+                    </div>
+
+                    <div class="footer-stats uppercase">
+                        <span id="id-hash">ID: 8X99-L</span>
+                        <span>unsubscribe.llc</span>
+                    </div>
+
+                    <div class="stamp uppercase">VERIFIED</div>
+                </div>
+            </div>
+            
+            <div id="generated-image-container" class="hidden">
+                </div>
+
+            <div style="margin-top: auto;">
+                
+                <button class="secondary-btn" id="share-btn" onclick="generateAndShare()">
+                    GENERATE PASSPORT [SHARE]
+                </button>
+                <div id="save-instruction" class="hidden" style="text-align: center; font-size: 0.7rem; margin-top: 5px; color: var(--alert);">
+                    LONG PRESS IMAGE ABOVE TO SAVE TO PHOTOS
+                </div>
+
+                <div style="height: 20px;"></div>
+
+                <a href="#" id="product-link" class="primary-btn" target="_blank">
+                    ACCESS EQUIPMENT
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // --- 10 QUESTIONS RESTORED ---
+        const questions = [
+            { q: "When you walk into a gallery, what do you see first?", a: "The Art (Consumer)", b: "The Exit Strategy (Owner)", score: {a: 'sleeper', b: 'architect'} },
+            { q: "Chaos is:", a: "A problem to be solved", b: "A ladder to be climbed", score: {a: 'sleeper', b: 'architect'} },
+            { q: "Your bank account is empty. You have $500 left. You:", a: "Save it for rent (Survival)", b: "Buy a suit to fake an interview (Leverage)", score: {a: 'sleeper', b: 'architect'} },
+            { q: "True or False: A brand is more powerful than a god.", a: "True", b: "False", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "Pick a weapon:", a: "Silence", b: "Noise", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "The building is burning down. You:", a: "Save the Archives", b: "Watch it burn", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "You are at a dinner party. You are:", a: "Eating", b: "Networking", score: {a: 'sleeper', b: 'architect'} },
+            { q: "Which is worse?", a: "Being hated", b: "Being ignored", score: {a: 'sleeper', b: 'iconoclast'} },
+            { q: "Dress code:", a: "Uniform", b: "Statement", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "Who owns you?", a: "No one", b: "The Corporation", score: {a: 'iconoclast', b: 'architect'} }
+        ];
+
+        // --- STATE ---
+        let currentIdx = 0;
+        let scores = { architect: 0, iconoclast: 0, sleeper: 0 };
+        let finalArchetype = "";
+
+        // --- DOM ---
+        const els = {
+            intro: document.getElementById('intro'),
+            quiz: document.getElementById('quiz'),
+            proc: document.getElementById('processing'),
+            result: document.getElementById('result'),
+            qText: document.getElementById('q-text'),
+            qNum: document.getElementById('q-num'),
+            btnA: document.getElementById('btn-a'),
+            btnB: document.getElementById('btn-b'),
+            pFill: document.getElementById('p-fill')
+        };
+
+        // --- LOGIC ---
+        function startQuiz() {
+            els.intro.classList.add('hidden');
+            els.quiz.classList.remove('hidden');
+            document.getElementById('date-stamp').innerText = new Date().toLocaleDateString();
+            loadQ();
+        }
+
+        function loadQ() {
+            const q = questions[currentIdx];
+            els.qNum.innerText = (currentIdx + 1).toString().padStart(2, '0');
+            els.qText.innerText = q.q;
+            els.btnA.innerText = "[A] " + q.a;
+            els.btnB.innerText = "[B] " + q.b;
+            
+            const pct = (currentIdx / questions.length) * 100;
+            els.pFill.style.width = pct + "%";
+        }
+
+        function answer(choiceIndex) {
+            const q = questions[currentIdx];
+            const type = choiceIndex === 0 ? q.score.a : q.score.b;
+            scores[type]++;
+
+            currentIdx++;
+            if(currentIdx < questions.length) {
+                loadQ();
+            } else {
+                finish();
+            }
+        }
+
+        function finish() {
+            els.quiz.classList.add('hidden');
+            els.proc.classList.remove('hidden');
+
+            // Logic
+            if (scores.architect >= scores.iconoclast && scores.architect >= scores.sleeper) finalArchetype = "architect";
+            else if (scores.iconoclast > scores.architect && scores.iconoclast > scores.sleeper) finalArchetype = "iconoclast";
+            else finalArchetype = "sleeper";
+
+            setTimeout(showResults, 1200);
+        }
+
+        function showResults() {
+            els.proc.classList.add('hidden');
+            els.result.classList.remove('hidden');
+            
+            document.getElementById('id-hash').innerText = "ID: " + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+            const title = document.getElementById('r-title');
+            const desc = document.getElementById('r-desc');
+            const link = document.getElementById('product-link');
+            const card = document.getElementById('share-card');
+
+            if(finalArchetype === 'architect') {
+                title.innerText = "THE ARCHITECT";
+                title.style.color = "#ff2a00";
+                desc.innerText = "You do not consume culture; you construct it. You see the code behind the matrix.";
+                link.href = "https://unsubscribe.llc";
+            } 
+            else if(finalArchetype === 'iconoclast') {
+                title.innerText = "THE ICONOCLAST";
+                title.style.color = "#ffffff"; 
+                desc.innerText = "You are a glitch in the system. You reject the narrative. You are here to break things.";
+                link.href = "https://nameofmy.com";
+            } 
+            else {
+                title.innerText = "THE SLEEPER";
+                title.style.color = "#888888"; 
+                desc.innerText = "You are currently dormant. You sense something is wrong, but you haven't taken the pill yet.";
+                link.href = "https://cocausa.org";
+            }
+        }
+
+        // --- IMAGE GENERATION LOGIC ---
+        function generateAndShare() {
+            const btn = document.getElementById('share-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "RENDERING...";
+            
+            const card = document.getElementById('share-card');
+
+            html2canvas(card, {
+                scale: 2, // High res for retina
+                backgroundColor: "#0f0f0f", 
+                logging: false
+            }).then(canvas => {
+                
+                // 1. Show the image in the DOM (Fallback method)
+                const imgContainer = document.getElementById('generated-image-container');
+                imgContainer.innerHTML = ''; // clear old
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL("image/png");
+                imgContainer.appendChild(img);
+                
+                // Hide the HTML card, show the Image
+                document.querySelector('.id-card-wrapper').classList.add('hidden');
+                imgContainer.classList.remove('hidden');
+                document.getElementById('save-instruction').classList.remove('hidden');
+                
+                btn.innerText = "IMAGE GENERATED";
+
+                // 2. Try Native Share (Mobile)
+                canvas.toBlob(function(blob) {
+                    const files = [new File([blob], 'ncr-competency-audit.png', { type: 'image/png' })];
+                    
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
+                        navigator.share({
+                            files: files,
+                            title: 'NCR Audit Result',
+                            text: 'I have been classified. Are you an Asset or a Liability? https://unsubscribe.llc'
+                        }).catch((err) => {
+                            // User cancelled or not supported
+                            console.log("Share failed or cancelled", err);
+                        });
+                    }
+                });
+
+            });
+        }
+    </script>
+</body>
+</html>
+
