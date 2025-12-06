@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoCA // GATEWAY</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="terminal-wrapper">
+        <div class="header-bar uppercase">NCR-CAM // PUBLIC ACCESS</div>
+
+        <div class="question-block fade-in">
+            <h1 class="uppercase" style="font-size: 2.5rem; line-height: 0.9; color: #fff; margin-bottom: 20px;">
+                Church of<br>Conceptual Art
+            </h1>
+
+            <div style="border: 1px solid var(--border); padding: 20px; margin-bottom: 30px;">
+                <p class="uppercase" style="font-size: 0.7rem; color: var(--alert); margin-bottom: 10px;">CURRENT CENSUS</p>
+                <!-- This number loads from Google Sheets -->
+                <div id="member-count" style="font-size: 3rem; font-weight: 900;">...</div>
+                <p style="font-size: 0.8rem; opacity: 0.7;">INITIATES LOGGED</p>
+            </div>
+
+            <p style="margin-bottom: 40px;">
+                To receive a designation, you must undergo the competency audit.
+                <br><br>
+                <i>Join the others.</i>
+            </p>
+
+            <a href="quiz.html" class="primary-btn">BEGIN AUDIT</a>
+        </div>
+    </div>
+
+    <script>
+        // PASTE YOUR GOOGLE SHEET CSV LINK HERE
+        const sheetDB = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_B3oH_63n5r8i_iECQkgaLjgrVtA6XP8NPrruMqaKaIIhzvTWH0X2p44IK3FPNnzG3fXXcLDJ-Ffy/pub?gid=594304566&single=true&output=csv";
+
+        async function getCount() {
+            try {
+                const response = await fetch(sheetDB);
+                const data = await response.text();
+                // Filter empty rows and header
+                const rows = data.split('\n').filter(r => r.trim() !== '');
+                const count = rows.length - 1; // Minus header
+
+                // Animate the number
+                document.getElementById('member-count').innerText = count;
+            } catch (err) {
+                console.log(err);
+                document.getElementById('member-count').innerText = "ERR";
+            }
+        }
+        getCount();
+    </script>
+</body>
+</html>

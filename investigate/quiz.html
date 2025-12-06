@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NCR // COMPETENCY AUDIT</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <div class="terminal-wrapper">
+        <div class="header-bar uppercase">NCR-CAM // PERSONNEL AUDIT</div>
+
+        <!-- INTRO -->
+        <div id="intro" class="question-block fade-in">
+            <h1 class="uppercase" style="font-size: 2rem; margin-bottom: 20px;">Identity Protocol</h1>
+            <p style="margin-bottom: 30px;">Answer 10 questions to generate your NCR Profile.</p>
+            <button class="primary-btn" onclick="startQuiz()">INITIATE</button>
+        </div>
+
+        <!-- QUIZ UI -->
+        <div id="quiz" class="question-block hidden">
+            <div class="q-meta">DATA POINT <span id="q-num">01</span> / 10</div>
+            <div class="q-text" id="q-text">Loading...</div>
+            <div class="btn-grid">
+                <button class="choice-btn" onclick="answer(0)" id="btn-a"></button>
+                <button class="choice-btn" onclick="answer(1)" id="btn-b"></button>
+            </div>
+        </div>
+
+        <!-- PROCESSING ANIMATION -->
+        <div id="processing" class="question-block hidden" style="text-align: center;">
+            <div class="uppercase blink" style="font-size: 2rem; font-weight: 900; color: var(--alert);">/// ANALYZING</div>
+        </div>
+
+        <!-- RESULT & FORM -->
+        <div id="result" class="hidden fade-in" style="width: 100%;">
+
+            <!-- THE CARD (Visual Only) -->
+            <div class="id-card-wrapper">
+                <div class="id-card" id="share-card">
+                    <div>
+                        <div class="header-bar" style="text-align:left; padding:0; border:none; margin:0 0 10px 0;">NCR PERSONNEL</div>
+                        <div class="status-label uppercase">CLASSIFIED AS:</div>
+                        <div class="archetype-result" id="r-title">...</div>
+                        <div style="border-left: 2px solid var(--alert); padding-left: 10px; font-size: 0.8rem;" id="r-desc">...</div>
+                    </div>
+                    <div class="footer-stats uppercase">
+                        <span>PENDING REGISTRATION</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="submission-area">
+                <p class="uppercase" style="text-align: center; font-size: 0.7rem; color: var(--alert); margin-bottom: 10px;">FINALIZE RECORD</p>
+
+                <form action="https://formspree.io/f/xjknozng" method="POST">
+                    <input type="text" name="name" placeholder="OPERATIVE NAME" required>
+                    <input type="email" name="email" placeholder="CONTACT FREQUENCY (EMAIL)" required>
+
+                    <!-- HIDDEN FIELD: JS populates this with the quiz result -->
+                    <input type="hidden" name="archetype" id="hidden-archetype">
+
+                    <button type="submit" class="primary-btn">GENERATE ID & JOIN</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "When you walk into a gallery, what do you see first?", a: "The Art (Consumer)", b: "The Exit Strategy (Owner)", score: {a: 'sleeper', b: 'architect'} },
+            { q: "Chaos is:", a: "A problem to be solved", b: "A ladder to be climbed", score: {a: 'sleeper', b: 'architect'} },
+            { q: "Your bank account is empty. You have $500 left. You:", a: "Save it for rent (Survival)", b: "Buy a suit to fake an interview (Leverage)", score: {a: 'sleeper', b: 'architect'} },
+            { q: "True or False: A brand is more powerful than a god.", a: "True", b: "False", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "Pick a weapon:", a: "Silence", b: "Noise", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "The building is burning down. You:", a: "Save the Archives", b: "Watch it burn", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "You are at a dinner party. You are:", a: "Eating", b: "Networking", score: {a: 'sleeper', b: 'architect'} },
+            { q: "Which is worse?", a: "Being hated", b: "Being ignored", score: {a: 'sleeper', b: 'iconoclast'} },
+            { q: "Dress code:", a: "Uniform", b: "Statement", score: {a: 'architect', b: 'iconoclast'} },
+            { q: "Who owns you?", a: "No one", b: "The Corporation", score: {a: 'iconoclast', b: 'architect'} }
+        ];
+
+        let currentIdx = 0;
+        let scores = { architect: 0, iconoclast: 0, sleeper: 0 };
+        let finalArchetype = "";
+
+        const els = {
+            intro: document.getElementById('intro'),
+            quiz: document.getElementById('quiz'),
+            result: document.getElementById('result'),
+            qText: document.getElementById('q-text'),
+            qNum: document.getElementById('q-num'),
+            btnA: document.getElementById('btn-a'),
+            btnB: document.getElementById('btn-b'),
+        };
+
+        function startQuiz() {
+            els.intro.classList.add('hidden');
+            els.quiz.classList.remove('hidden');
+            loadQ();
+        }
+
+        function loadQ() {
+            const q = questions[currentIdx];
+            els.qNum.innerText = (currentIdx + 1).toString().padStart(2, '0');
+            els.qText.innerText = q.q;
+            els.btnA.innerText = "[A] " + q.a;
+            els.btnB.innerText = "[B] " + q.b;
+        }
+
+        function answer(choice) {
+            const q = questions[currentIdx];
+            const type = choice === 0 ? q.score.a : q.score.b;
+            scores[type]++;
+            currentIdx++;
+            if(currentIdx < questions.length) loadQ();
+            else finish();
+        }
+
+        function finish() {
+            els.quiz.classList.add('hidden');
+            document.getElementById('processing').classList.remove('hidden');
+
+            if (scores.architect >= scores.iconoclast && scores.architect >= scores.sleeper) finalArchetype = "ARCHITECT";
+            else if (scores.iconoclast > scores.architect && scores.iconoclast > scores.sleeper) finalArchetype = "ICONOCLAST";
+            else finalArchetype = "SLEEPER";
+
+            setTimeout(() => {
+                document.getElementById('processing').classList.add('hidden');
+                els.result.classList.remove('hidden');
+                populateCard();
+            }, 1200);
+        }
+
+        function populateCard() {
+            const title = document.getElementById('r-title');
+            const desc = document.getElementById('r-desc');
+            const hiddenInput = document.getElementById('hidden-archetype');
+
+            // Inject result into hidden form field
+            hiddenInput.value = finalArchetype;
+
+            title.innerText = finalArchetype;
+
+            if(finalArchetype === 'ARCHITECT') {
+                title.style.color = "#ff2a00";
+                desc.innerText = "You do not consume culture; you construct it. You see the code behind the matrix.";
+            } else if(finalArchetype === 'ICONOCLAST') {
+                title.style.color = "#ffffff";
+                desc.innerText = "You are a glitch in the system. You reject the narrative. You are here to break things.";
+            } else {
+                title.style.color = "#888888";
+                desc.innerText = "You are currently dormant. You sense something is wrong, but you haven't taken the pill yet.";
+            }
+        }
+    </script>
+</body>
+</html>
