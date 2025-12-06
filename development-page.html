@@ -137,12 +137,17 @@
             width: 140px;
             height: auto;
             display: block;
+            /* FIX: Changed 'multiply' to 'normal'. Multiply caused black artifacts 
+                    in the transparent areas over a light background. */
             mix-blend-mode: normal; 
         }
 
         body.dark-mode .logo-wrapper img {
             mix-blend-mode: normal; 
-            filter: none; 
+            /* To make the logo contrast in dark mode, we invert the colors 
+               (turning red/white into cyan/black/dark), then set blend mode to normal 
+               to prevent darkening artifacts. */
+            filter: invert(1);
         }
 
         /* --- SECTIONS --- */
@@ -553,13 +558,29 @@
         const toggle = document.getElementById('theme-toggle');
         const body = document.body;
 
+        // Use a filter to invert the colors of the logo in dark mode for contrast.
+        const logo = document.querySelector('.logo-wrapper img');
+
+        function applyTheme(isDark) {
+            if (isDark) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initial load
         if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
+            applyTheme(true);
+        } else {
+            applyTheme(false);
         }
 
         toggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+            const isDark = !body.classList.contains('dark-mode');
+            applyTheme(isDark);
         });
     </script>
 </body>
