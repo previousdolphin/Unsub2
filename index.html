@@ -156,20 +156,32 @@
             width: calc(100% + 160px); 
             margin-left: -80px; 
             margin-right: -80px;
-            /* Fulfills previous request: invert filter for light mode */
-            filter: invert(1) contrast(120%);
             display: block;
+            
+            /* FIX 3 (New image contrast/transparency logic): 
+               1. Invert colors (black to white) to work on the light background.
+               2. Use mix-blend-mode: multiply to make the new white areas "transparent"
+                  over the light background (since white * background = background). 
+                  The original black areas become white-inverted, which is black.
+               3. Remove the contrast filter for a softer, less harsh look.
+            */
+            filter: invert(1);
+            mix-blend-mode: multiply;
+            opacity: 0.8; /* Slight fade for the "transparent" look */
         }
-
+        
         .image-full-bleed img {
             width: 100%;
             height: auto;
             display: block;
         }
         
-        /* Remove inversion in dark mode */
+        /* FIX 3: Reset filter and blend mode for dark mode */
         body.dark-mode .image-full-bleed {
+            /* On dark mode: remove filters, make white background transparent */
             filter: none;
+            mix-blend-mode: screen; 
+            opacity: 1; 
         }
 
         /* FIX 4: Contrasting color definitions */
@@ -398,7 +410,12 @@
             }
 
             h1 { font-size: 2.5rem; }
-            .logo-wrapper img { width: 120px; margin: 0 auto 30px auto; }
+            .logo-wrapper img { 
+                width: 120px; 
+                /* FIX 1: Set height explicitly for CLS fix on mobile. */
+                height: 38px;
+                margin: 0 auto 30px auto; 
+            }
             .logo-wrapper { text-align: center; }
             
             .dossier-container {
@@ -422,8 +439,6 @@
 </head>
 <body>
 
-    <!-- FIX 3: Added main landmark (role="main" on content-col) -->
-    <!-- The grid container is not suitable for a landmark as it's purely structural -->
     <div class="marquee-container uppercase">
         <div class="marquee-content">
             Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
@@ -437,7 +452,9 @@
         <div class="content-col" role="main">
             
             <div class="logo-wrapper">
-                <img src="Logo.svg" alt="Unsubscribe LLC Logo">
+                <!-- FIX 1: Added explicit width and height attributes to the Logo.svg to prevent CLS. 
+                     Based on the CSS, the desktop width is 140px. Assuming the SVG's aspect ratio (width: 140, height: 45) -->
+                <img src="Logo.svg" alt="Unsubscribe LLC Logo" width="140" height="45">
             </div>
 
             <div class="section-block">
@@ -451,7 +468,8 @@
 
             <div class="section-block">
                 <div class="image-full-bleed">
-                    <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic">
+                    <!-- FIX 1: Added explicit width and height attributes to the image to prevent CLS. Assuming aspect ratio (1600x900) -->
+                    <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
                 </div>
             </div>
             <div class="section-block">
@@ -470,7 +488,8 @@
                 <h2 class="uppercase">The Architect</h2>
                 <div class="dossier-container">
                     <div class="mugshot-wrapper">
-                        <img src="paul.png" alt="Paul Pissarro">
+                        <!-- FIX 1: Added explicit width and height attributes to the image to prevent CLS. Assuming (280x370) -->
+                        <img src="paul.png" alt="Paul Pissarro" width="280" height="370">
                     </div>
                     <div class="dossier-data">
                         
@@ -637,4 +656,4 @@
         });
     </script>
 </body>
-</html>
+</html
