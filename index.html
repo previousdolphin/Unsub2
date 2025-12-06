@@ -60,6 +60,13 @@
             padding: 4px 8px;
         }
 
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
         p { 
             margin-bottom: 20px; 
             font-size: 1rem; 
@@ -120,7 +127,7 @@
             background: var(--bg);
         }
 
-        /* --- LOGO INTEGRATION (UPDATED) --- */
+        /* --- IMAGES --- */
         .logo-wrapper {
             margin-bottom: 40px;
             display: block;
@@ -130,21 +137,22 @@
             width: 140px;
             height: auto;
             display: block;
-            /* LIGHT MODE: 'Multiply' makes the white background of the JPG transparent */
-            mix-blend-mode: multiply; 
+            /* FIX: Changed 'multiply' to 'normal'. Multiply caused black artifacts 
+                    in the transparent areas over a light background. */
+            mix-blend-mode: normal; 
         }
 
         body.dark-mode .logo-wrapper img {
-            /* DARK MODE: We switch back to 'normal' so the red doesn't get dark/muddy.
-               We removed the 'invert' filter so it stays red.
-               NOTE: If the image has a white background, it will show as a white square here. */
             mix-blend-mode: normal; 
-            filter: none; 
+            /* To make the logo contrast in dark mode, we invert the colors 
+               (turning red/white into cyan/black/dark), then set blend mode to normal 
+               to prevent darkening artifacts. */
+            filter: invert(1);
         }
 
         /* --- SECTIONS --- */
         .section-block {
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
 
         .week-list {
@@ -163,6 +171,63 @@
         }
         .week-list li:last-child { border-bottom: none; }
 
+        /* --- INSTRUCTOR DOSSIER --- */
+        .dossier-container {
+            border: 2px solid var(--border);
+            padding: 25px;
+            background: rgba(0,0,0,0.03);
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .mugshot-wrapper img {
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--border);
+            /* Brutalist Filter: High contrast B&W */
+            filter: grayscale(100%) contrast(120%);
+            display: block;
+        }
+
+        .dossier-data {
+            font-size: 0.9rem;
+        }
+
+        .data-row {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 15px;
+        }
+        .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+
+        .data-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+            opacity: 0.6;
+        }
+        
+        .ops-list {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+        .ops-list li {
+            margin-bottom: 10px;
+            padding-left: 12px;
+            border-left: 2px solid var(--alert);
+            line-height: 1.3;
+        }
+        .ops-list li strong {
+            display: block;
+            text-decoration: underline;
+            margin-bottom: 2px;
+        }
+
+        /* --- WARNING BOX --- */
         .warning-box {
             border: 2px solid var(--alert);
             color: var(--alert);
@@ -302,6 +367,14 @@
             .logo-wrapper img { width: 120px; margin: 0 auto 30px auto; }
             .logo-wrapper { text-align: center; }
             
+            .dossier-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .mugshot-wrapper img {
+                max-width: 200px;
+            }
+            
             .input-group { padding: 20px; }
         }
     </style>
@@ -320,7 +393,7 @@
         <div class="content-col">
             
             <div class="logo-wrapper">
-                <img src="image_0.png" alt="Unsubscribe LLC Logo">
+                <img src="Logo.svg" alt="Unsubscribe LLC Logo">
             </div>
 
             <div class="section-block">
@@ -335,7 +408,6 @@
             <div class="section-block">
                 <h2 class="uppercase">The Offer</h2>
                 <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
-                <p>Over 4 weeks, we will not "teach" you art. We will liquidate your ego, incorporate your spirit, and install the operating system of the Church of Conceptual Art (CoCA).</p>
                 
                 <ul class="week-list uppercase">
                     <li><span>Week 1</span> <span>We kill the Artist</span></li>
@@ -343,6 +415,67 @@
                     <li><span>Week 3</span> <span>We write the Myth</span></li>
                     <li><span>Week 4</span> <span>We collect the Rent</span></li>
                 </ul>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Architect</h2>
+                <div class="dossier-container">
+                    <div class="mugshot-wrapper">
+                        <img src="paul.png" alt="Paul Pissarro">
+                    </div>
+                    <div class="dossier-data">
+                        
+                        <div class="data-row">
+                            <span class="data-label uppercase">Name / Rank</span>
+                            <h3>PAUL PISSARRO</h3>
+                            <div style="color: var(--alert); font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
+                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">The Profile</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 5px;">
+                                Great-great-grandson of Impressionist architect Camille Pissarro. He carries a lineage of disruption—but he has traded the canvas for the corporation.
+                            </p>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Operational History</span>
+                            <ul class="ops-list">
+                                <li>
+                                    <strong>Strategic Acquisition</strong>
+                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen), executing multi-million dollar asset transfers.
+                                </li>
+                                <li>
+                                    <strong>Production & Direction</strong>
+                                    Founder of An Arm & A Leg Production Co., securing $250k+ in client contracts and capitalizing independent film projects.
+                                </li>
+                                <li>
+                                    <strong>Tactical Execution</strong>
+                                    Former Chef and Master Butcher (L'Ambroisie, Paris). He understands that execution is not an art; it is a discipline of steel and fire.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">The Mandate</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 10px;">
+                                Pissarro does not teach "art." He teaches Structural Sovereignty. He is the architect of the Neo-Classical Revival Corporate Art Movement (NCR-CAM).
+                            </p>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <strong>Objective:</strong> Replace the fragile "Artist" model with the durable "Asset Manager" model.
+                            </p>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Current Deployment</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <span style="color:var(--alert)">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
             <div class="section-block" style="margin-bottom: 0;">
@@ -425,13 +558,29 @@
         const toggle = document.getElementById('theme-toggle');
         const body = document.body;
 
+        // Use a filter to invert the colors of the logo in dark mode for contrast.
+        const logo = document.querySelector('.logo-wrapper img');
+
+        function applyTheme(isDark) {
+            if (isDark) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initial load
         if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
+            applyTheme(true);
+        } else {
+            applyTheme(false);
         }
 
         toggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+            const isDark = !body.classList.contains('dark-mode');
+            applyTheme(isDark);
         });
     </script>
 </body>
