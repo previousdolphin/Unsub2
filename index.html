@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- FIX 2: Updated viewport meta tag for accessibility. Removed user-scalable=no and maximum-scale. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>UNSUBSCRIBE LLC | NCR-CAM</title>
-    <!-- FIX 1: Added SEO Meta Description -->
     <meta name="description" content="The NCR-CAM Officer Certification Program: Kill the Artist, Build the Corporation. Join the founding cohort for Structural Sovereignty.">
     <style>
         /* --- CORE RESET & VARS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         :root {
-            --bg: #f4f4f4;
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
+            --bg: rgba(244, 244, 244, 0.92);
+            --bg-solid: #f4f4f4; /* Fallback for solid elements */
             --text: #050505;
             --border: #000000;
             --alert: #ff2a00;
@@ -25,7 +25,9 @@
         }
 
         body.dark-mode {
-            --bg: #0a0a0a;
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
+            --bg: rgba(10, 10, 10, 0.92);
+            --bg-solid: #0a0a0a;
             --text: #e0e0e0;
             --border: #333333;
             --alert: #ff2a00;
@@ -33,14 +35,39 @@
             --alert-text-dark: #ff5e40;
         }
 
+        /* --- BACKGROUND CANVAS STYLES --- */
+        canvas#glCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -9999; 
+            transition: filter 0.5s ease, opacity 0.5s ease;
+        }
+
+        /* LIGHT MODE CANVAS: Invert colors to make it white smoke, lower opacity */
+        body:not(.dark-mode) canvas#glCanvas {
+            filter: invert(1);
+            opacity: 0.4;
+        }
+        
+        /* DARK MODE CANVAS: Native dark nebula */
+        body.dark-mode canvas#glCanvas {
+            filter: none;
+            opacity: 1;
+        }
+
         body {
-            background-color: var(--bg);
+            /* Set body background to transparent so canvas shows through */
+            background-color: transparent; 
             color: var(--text);
             font-family: var(--font-main);
             width: 100vw;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
+            transition: color 0.3s; /* Removed bg transition here, handled by containers */
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
@@ -62,7 +89,7 @@
             font-weight: bold;
             margin-bottom: 15px;
             background: var(--text);
-            color: var(--bg);
+            color: var(--bg-solid);
             display: inline-block;
             padding: 4px 8px;
         }
@@ -90,7 +117,7 @@
             white-space: nowrap;
             border-bottom: 2px solid var(--border);
             background: var(--text);
-            color: var(--bg);
+            color: var(--bg-solid);
             font-weight: bold;
             font-size: 0.9rem;
             display: flex;
@@ -123,6 +150,8 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
+            background-color: var(--bg); /* Semi-transparent bg */
+            backdrop-filter: blur(2px); /* Subtle blur for readability */
         }
 
         .sidebar-col {
@@ -131,7 +160,8 @@
             height: 100vh; 
             overflow-y: auto; 
             border-left: 0;
-            background: var(--bg);
+            background-color: var(--bg); /* Semi-transparent bg */
+            backdrop-filter: blur(2px);
         }
 
         /* --- IMAGES --- */
@@ -158,16 +188,10 @@
             margin-right: -80px;
             display: block;
             
-            /* FIX 3 (New image contrast/transparency logic): 
-               1. Invert colors (black to white) to work on the light background.
-               2. Use mix-blend-mode: multiply to make the new white areas "transparent"
-                  over the light background (since white * background = background). 
-                  The original black areas become white-inverted, which is black.
-               3. Remove the contrast filter for a softer, less harsh look.
-            */
+            /* FIX 3: Contrast/Transparency logic */
             filter: invert(1);
             mix-blend-mode: multiply;
-            opacity: 0.8; /* Slight fade for the "transparent" look */
+            opacity: 0.8; 
         }
         
         .image-full-bleed img {
@@ -178,7 +202,6 @@
         
         /* FIX 3: Reset filter and blend mode for dark mode */
         body.dark-mode .image-full-bleed {
-            /* On dark mode: remove filters, make white background transparent */
             filter: none;
             mix-blend-mode: screen; 
             opacity: 1; 
@@ -186,15 +209,12 @@
 
         /* FIX 4: Contrasting color definitions */
         .alert-text-color {
-             /* Use the slightly brighter color for light mode for better contrast */
             color: var(--alert-text-light); 
         }
 
         body.dark-mode .alert-text-color {
-             /* Use the slightly brighter color for dark mode for better contrast against dark background */
             color: var(--alert-text-dark);
         }
-
 
         /* --- SECTIONS --- */
         .section-block {
@@ -221,7 +241,7 @@
         .dossier-container {
             border: 2px solid var(--border);
             padding: 25px;
-            background: rgba(0,0,0,0.03);
+            background: rgba(125, 125, 125, 0.05); /* Slightly visible fill */
             display: grid;
             grid-template-columns: 180px 1fr;
             gap: 30px;
@@ -282,6 +302,7 @@
             font-weight: bold;
             font-size: 0.85rem;
             line-height: 1.4;
+            background: rgba(255, 42, 0, 0.05);
         }
 
         /* --- FORM TERMINAL --- */
@@ -293,7 +314,7 @@
 
         .terminal-header {
             background: var(--text);
-            color: var(--bg);
+            color: var(--bg-solid);
             padding: 15px;
             text-align: center;
             font-weight: bold;
@@ -319,7 +340,7 @@
         input, select, textarea {
             width: 100%;
             padding: 12px;
-            background: transparent;
+            background: rgba(255,255,255,0.05);
             border: 2px solid var(--border);
             color: var(--text);
             font-family: inherit;
@@ -365,7 +386,7 @@
             border-top: 2px solid var(--border); 
             text-align: center; 
             background: var(--text); 
-            color: var(--bg);
+            color: var(--bg-solid);
             margin-top: auto;
             flex-shrink: 0;
         }
@@ -376,7 +397,7 @@
             bottom: 20px;
             right: 20px;
             z-index: 100;
-            background: var(--bg);
+            background: var(--bg-solid);
             border: 2px solid var(--text);
             padding: 8px 12px;
             cursor: pointer;
@@ -439,6 +460,52 @@
 </head>
 <body>
 
+    <canvas id="glCanvas"></canvas>
+
+    <script type="x-shader/x-vertex" id="vertexShader">
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        precision mediump float;
+
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        
+        // Locked Parameters
+        const float ZOOM = 1.6;
+        const float CONTRAST = 1.0;
+
+        void main() {
+            // Normalized coordinates
+            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+            
+            // Aspect Ratio Correction
+            uv = (uv - 0.5) * 2.0; 
+            uv.x *= u_resolution.x / u_resolution.y;
+            
+            // Apply Zoom
+            vec2 p = uv * ZOOM;
+            float x = p.x;
+            float y = p.y;
+            float t = u_time;
+
+            // The Formula
+            float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
+
+            // Normalize to 0-1 range for color
+            float brightness = 0.5 + 0.5 * val;
+            
+            // Apply Contrast
+            brightness = pow(brightness, CONTRAST);
+
+            // Output Grayscale
+            gl_FragColor = vec4(vec3(brightness), 1.0);
+        }
+    </script>
     <div class="marquee-container uppercase">
         <div class="marquee-content">
             Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
@@ -448,12 +515,9 @@
     
     <div class="grid-container">
         
-        <!-- FIX 3: Added role="main" to the primary content column -->
         <div class="content-col" role="main">
             
             <div class="logo-wrapper">
-                <!-- FIX 1: Added explicit width and height attributes to the Logo.svg to prevent CLS. 
-                     Based on the CSS, the desktop width is 140px. Assuming the SVG's aspect ratio (width: 140, height: 45) -->
                 <img src="Logo.svg" alt="Unsubscribe LLC Logo" width="140">
             </div>
 
@@ -468,7 +532,6 @@
 
             <div class="section-block">
                 <div class="image-full-bleed">
-                    <!-- FIX 1: Added explicit width and height attributes to the image to prevent CLS. Assuming aspect ratio (1600x900) -->
                     <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
                 </div>
             </div>
@@ -488,7 +551,6 @@
                 <h2 class="uppercase">The Architect</h2>
                 <div class="dossier-container">
                     <div class="mugshot-wrapper">
-                        <!-- FIX 1: Added explicit width and height attributes to the image to prevent CLS. Assuming (280x370) -->
                         <img src="paul.jpeg" alt="Paul Pissarro" width="280" height="370">
                     </div>
                     <div class="dossier-data">
@@ -538,7 +600,6 @@
                         <div class="data-row">
                             <span class="data-label uppercase">Current Deployment</span>
                             <p style="font-size: 0.85rem; margin-bottom: 0;">
-                                <!-- FIX 4: Applied new alert-text-color class for better contrast -->
                                 <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
                             </p>
                         </div>
@@ -565,14 +626,12 @@
                     <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
                 </div>
 
-                <!-- FIX 3: Added role="form" to the form container -->
                 <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group" role="form">
                     
                     <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
                         <span>PRICE</span>
                         <div style="text-align: right;">
                             <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
-                            <!-- FIX 4: Applied new alert-text-color class for better contrast -->
                             <span class="alert-text-color">$2,000</span>
                         </div>
                     </div>
@@ -583,7 +642,6 @@
                     <label for="email-address" class="uppercase">Email Address</label>
                     <input type="email" id="email-address" name="email" required placeholder="CONTACT@DOMAIN.COM">
 
-                    <!-- FIX 5: Associated the existing label with the select element using 'for' and 'id' -->
                     <label for="select-role" class="uppercase">Select Role</label>
                     <select id="select-role" name="role" required>
                         <option value="officer">OFFICER CANDIDATE ($2,000)</option>
@@ -620,6 +678,90 @@
     <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
 
     <script>
+        // --- SECTION 1: WebGL Background Logic ---
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl');
+        const SPEED = 1.3;
+
+        if (!gl) {
+            console.error('WebGL not supported');
+        } else {
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            const vertexSrc = document.getElementById('vertexShader').textContent;
+            const fragmentSrc = document.getElementById('fragmentShader').textContent;
+
+            const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexSrc);
+            const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertShader);
+            gl.attachShader(program, fragShader);
+            gl.linkProgram(program);
+
+            gl.useProgram(program);
+
+            const posBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1.0,  1.0,
+                 1.0,  1.0,
+                -1.0, -1.0,
+                 1.0, -1.0,
+            ]), gl.STATIC_DRAW);
+
+            const posLoc = gl.getAttribLocation(program, "position");
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+            const resLoc = gl.getUniformLocation(program, "u_resolution");
+            const timeLoc = gl.getUniformLocation(program, "u_time");
+
+            function resize() {
+                const displayWidth  = canvas.clientWidth;
+                const displayHeight = canvas.clientHeight;
+
+                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                    canvas.width  = displayWidth;
+                    canvas.height = displayHeight;
+                    gl.viewport(0, 0, canvas.width, canvas.height);
+                }
+            }
+            window.addEventListener('resize', resize);
+
+            let time = 0;
+            let lastTime = 0;
+
+            function render(now) {
+                now *= 0.001; 
+                const deltaTime = now - lastTime;
+                lastTime = now;
+
+                resize(); 
+
+                time += deltaTime * SPEED;
+
+                gl.uniform2f(resLoc, canvas.width, canvas.height);
+                gl.uniform1f(timeLoc, time);
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+                requestAnimationFrame(render);
+            }
+            requestAnimationFrame(render);
+        }
+
+        // --- SECTION 2: Existing Site Logic ---
         function updateTime() {
             const now = new Date();
             document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
@@ -629,8 +771,6 @@
 
         const toggle = document.getElementById('theme-toggle');
         const body = document.body;
-
-        // Use a filter to invert the colors of the logo in dark mode for contrast.
         const logo = document.querySelector('.logo-wrapper img');
 
         function applyTheme(isDark) {
@@ -656,4 +796,4 @@
         });
     </script>
 </body>
-</html
+</html>
