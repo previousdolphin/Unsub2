@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>UNSUBSCRIBE LLC | NCR-CAM</title>
+    <meta name="description" content="The NCR-CAM Officer Certification Program: Kill the Artist, Build the Corporation. Join the founding cohort for Structural Sovereignty.">
+    <style>
+        /* --- CORE RESET & VARS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
+            --bg: rgba(244, 244, 244, 0.92);
+            --bg-solid: #f4f4f4; /* Fallback for solid elements */
+            --text: #050505;
+            --border: #000000;
+            --alert: #ff2a00;
+            /* FIX 4: Defining a slightly brighter alert color for text against --bg in light mode. */
+            --alert-text-light: #d62400; 
+            --font-main: 'Courier New', Courier, monospace;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --sidebar-width: 440px;
+            --ticker-height: 42px;
+        }
+
+        body.dark-mode {
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
+            --bg: rgba(10, 10, 10, 0.92);
+            --bg-solid: #0a0a0a;
+            --text: #e0e0e0;
+            --border: #333333;
+            --alert: #ff2a00;
+            /* FIX 4: Defining a slightly brighter alert color for text against --bg in dark mode. */
+            --alert-text-dark: #ff5e40;
+        }
+
+        /* --- BACKGROUND CANVAS STYLES --- */
+        canvas#glCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -9999; 
+            transition: filter 0.5s ease, opacity 0.5s ease;
+        }
+
+        /* LIGHT MODE CANVAS: Invert colors to make it white smoke, lower opacity */
+        body:not(.dark-mode) canvas#glCanvas {
+            filter: invert(1);
+            opacity: 0.4;
+        }
+        
+        /* DARK MODE CANVAS: Native dark nebula */
+        body.dark-mode canvas#glCanvas {
+            filter: none;
+            opacity: 1;
+        }
+
+        body {
+            /* Set body background to transparent so canvas shows through */
+            background-color: transparent; 
+            color: var(--text);
+            font-family: var(--font-main);
+            width: 100vw;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: color 0.3s; /* Removed bg transition here, handled by containers */
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .uppercase { text-transform: uppercase; }
+        
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-size: clamp(2.5rem, 3.5vw, 4.5rem); 
+            line-height: 0.9;
+            letter-spacing: -2px;
+            margin-bottom: 25px;
+            font-weight: 900;
+            max-width: 18ch; 
+        }
+
+        h2 {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: var(--text);
+            color: var(--bg-solid);
+            display: inline-block;
+            padding: 4px 8px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        p { 
+            margin-bottom: 20px; 
+            font-size: 1rem; 
+            max-width: 60ch; 
+        }
+
+        .fine-print { font-size: 0.75rem; opacity: 0.7; }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
+            width: 100%;
+            height: var(--ticker-height);
+            overflow: hidden;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border);
+            background: var(--text);
+            color: var(--bg-solid);
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 30s linear infinite;
+            padding-left: 100%;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* --- LAYOUT GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr var(--sidebar-width); 
+            min-height: calc(100vh - var(--ticker-height));
+        }
+
+        .content-col {
+            border-right: 2px solid var(--border);
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background-color: var(--bg); /* Semi-transparent bg */
+            backdrop-filter: blur(2px); /* Subtle blur for readability */
+        }
+
+        .sidebar-col {
+            position: sticky;
+            top: 0;
+            height: 100vh; 
+            overflow-y: auto; 
+            border-left: 0;
+            background-color: var(--bg); /* Semi-transparent bg */
+            backdrop-filter: blur(2px);
+        }
+
+        /* --- IMAGES --- */
+        .logo-wrapper {
+            margin-bottom: 40px;
+            display: block;
+        }
+        
+        .logo-wrapper img {
+            width: 240px;
+            height: auto;
+            display: block;
+            mix-blend-mode: normal; 
+        }
+
+        body.dark-mode .logo-wrapper img {
+            mix-blend-mode: normal; 
+        }
+
+        /* Full-bleed image style */
+        .image-full-bleed {
+            width: calc(100% + 160px); 
+            margin-left: -80px; 
+            margin-right: -80px;
+            display: block;
+            
+            /* FIX 3: Contrast/Transparency logic */
+            filter: invert(1);
+            mix-blend-mode: multiply;
+            opacity: 0.8; 
+        }
+        
+        .image-full-bleed img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* FIX 3: Reset filter and blend mode for dark mode */
+        body.dark-mode .image-full-bleed {
+            filter: none;
+            mix-blend-mode: screen; 
+            opacity: 1; 
+        }
+
+        /* FIX 4: Contrasting color definitions */
+        .alert-text-color {
+            color: var(--alert-text-light); 
+        }
+
+        body.dark-mode .alert-text-color {
+            color: var(--alert-text-dark);
+        }
+
+        /* --- SECTIONS --- */
+        .section-block {
+            margin-bottom: 60px;
+        }
+
+        .week-list {
+            list-style: none;
+            margin-top: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .week-list li {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        .week-list li:last-child { border-bottom: none; }
+
+        /* --- INSTRUCTOR DOSSIER --- */
+        .dossier-container {
+            border: 2px solid var(--border);
+            padding: 25px;
+            background: rgba(125, 125, 125, 0.05); /* Slightly visible fill */
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .mugshot-wrapper img {
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--border);
+            /* Brutalist Filter: High contrast B&W */
+            filter: grayscale(100%) contrast(120%);
+            display: block;
+        }
+
+        .dossier-data {
+            font-size: 0.9rem;
+        }
+
+        .data-row {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 15px;
+        }
+        .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+
+        .data-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+            opacity: 0.6;
+        }
+        
+        .ops-list {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+        .ops-list li {
+            margin-bottom: 10px;
+            padding-left: 12px;
+            border-left: 2px solid var(--alert);
+            line-height: 1.3;
+        }
+        .ops-list li strong {
+            display: block;
+            text-decoration: underline;
+            margin-bottom: 2px;
+        }
+
+        /* --- WARNING BOX --- */
+        .warning-box {
+            border: 2px solid var(--alert);
+            color: var(--alert);
+            padding: 20px;
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            background: rgba(255, 42, 0, 0.05);
+        }
+
+        /* --- FORM TERMINAL --- */
+        .transfer-terminal {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: var(--text);
+            color: var(--bg-solid);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .input-group {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            margin-bottom: 15px;
+            outline: none;
+            border-radius: 0;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus { border-color: var(--alert); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--alert);
+            color: white; 
+            border: none;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+            margin-top: 5px;
+        }
+
+        .submit-btn:hover { opacity: 0.8; }
+        
+        .payment-note {
+            border: 1px solid var(--alert);
+            color: var(--alert);
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .timer-bar {
+            padding: 15px; 
+            border-top: 2px solid var(--border); 
+            text-align: center; 
+            background: var(--text); 
+            color: var(--bg-solid);
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        /* --- THEME TOGGLE --- */
+        #theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--bg-solid);
+            border: 2px solid var(--text);
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.75rem;
+            box-shadow: 3px 3px 0px var(--text);
+        }
+        
+        #theme-toggle:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--text);
+        }
+
+        /* --- MOBILE --- */
+        @media (max-width: 1024px) {
+            .grid-container { display: block; }
+            
+            .content-col { 
+                border-right: none; 
+                border-bottom: 2px solid var(--border); 
+                padding: 40px 20px;
+            }
+
+            .sidebar-col {
+                position: relative;
+                height: auto;
+                overflow: visible;
+                border-left: 2px solid var(--border);
+            }
+
+            h1 { font-size: 2.5rem; }
+            .logo-wrapper img { 
+                width: 120px; 
+                /* FIX 1: Set height explicitly for CLS fix on mobile. */
+                height: 78px;
+                margin: 0 auto 30px auto; 
+            }
+            .logo-wrapper { text-align: center; }
+            
+            .dossier-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .mugshot-wrapper img {
+                max-width: 200px;
+            }
+            
+            .input-group { padding: 20px; }
+            
+            /* NEW: Mobile image size fix */
+            .image-full-bleed {
+                width: calc(100% + 40px); 
+                margin-left: -20px; 
+                margin-right: -20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="glCanvas"></canvas>
+
+    <script type="x-shader/x-vertex" id="vertexShader">
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        precision mediump float;
+
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        
+        // Locked Parameters
+        const float ZOOM = 1.6;
+        const float CONTRAST = 1.0;
+
+        void main() {
+            // Normalized coordinates
+            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+            
+            // Aspect Ratio Correction
+            uv = (uv - 0.5) * 2.0; 
+            uv.x *= u_resolution.x / u_resolution.y;
+            
+            // Apply Zoom
+            vec2 p = uv * ZOOM;
+            float x = p.x;
+            float y = p.y;
+            float t = u_time;
+
+            // The Formula
+            float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
+
+            // Normalize to 0-1 range for color
+            float brightness = 0.5 + 0.5 * val;
+            
+            // Apply Contrast
+            brightness = pow(brightness, CONTRAST);
+
+            // Output Grayscale
+            gl_FragColor = vec4(vec3(brightness), 1.0);
+        }
+    </script>
+    <div class="marquee-container uppercase">
+        <div class="marquee-content">
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+        </div>
+    </div>
+    
+    <div class="grid-container">
+        
+        <div class="content-col" role="main">
+            
+            <div class="logo-wrapper">
+                <img src="Logo.svg" alt="Unsubscribe LLC Logo" width="140">
+            </div>
+
+            <div class="section-block">
+                <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
+                <h1 class="uppercase">You are tired of being a genius.</h1>
+                <p>The world does not need another "creative." The world has enough paintings. It has enough screenplays. It has enough noise.</p>
+                <p><strong>What the world lacks is Structure.</strong></p>
+                <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
+                <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
+            </div>
+
+            <div class="section-block">
+                <div class="image-full-bleed">
+                    <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
+                </div>
+            </div>
+            <div class="section-block">
+                <h2 class="uppercase">The Offer</h2>
+                <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
+                
+                <ul class="week-list uppercase">
+                    <li><span>Week 1</span> <span>We kill the Artist</span></li>
+                    <li><span>Week 2</span> <span>We build the Corporation</span></li>
+                    <li><span>Week 3</span> <span>We write the Myth</span></li>
+                    <li><span>Week 4</span> <span>We collect the Rent</span></li>
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Architect</h2>
+                <div class="dossier-container">
+                    <div class="mugshot-wrapper">
+                        <img src="paul.jpeg" alt="Paul Pissarro" width="280" height="370">
+                    </div>
+                    <div class="dossier-data">
+                        
+                        <div class="data-row">
+                            <span class="data-label uppercase">Name / Rank</span>
+                            <h3>PAUL PISSARRO</h3>
+                            <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
+                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">The Profile</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 5px;">
+                                Great-great-grandson of Impressionist architect Camille Pissarro. He carries a lineage of disruption—but he has traded the canvas for the corporation.
+                            </p>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Operational History</span>
+                            <ul class="ops-list">
+                                <li>
+                                    <strong>Strategic Acquisition</strong>
+                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen), executing multi-million dollar asset transfers.
+                                </li>
+                                <li>
+                                    <strong>Production & Direction</strong>
+                                    Founder of An Arm & A Leg Production Co., securing $250k+ in client contracts and capitalizing independent film projects.
+                                </li>
+                                <li>
+                                    <strong>Tactical Execution</strong>
+                                    Former Chef and Master Butcher (L'Ambroisie, Paris). He understands that execution is not an art; it is a discipline of steel and fire.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">The Mandate</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 10px;">
+                                Pissarro does not teach "art." He teaches Structural Sovereignty. He is the architect of the Neo-Classical Revival Corporate Art Movement (NCR-CAM).
+                            </p>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <strong>Objective:</strong> Replace the fragile "Artist" model with the durable "Asset Manager" model.
+                            </p>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Current Deployment</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block" style="margin-bottom: 0;">
+                <h2 class="uppercase">The Source Code</h2>
+                <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
+                
+                <div class="warning-box uppercase">
+                    WARNING: This is High-Frequency Identity Engineering. Do not apply if you want to be "understood." Apply only if you want to be Solvent.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="sidebar-col" role="complementary">
+            <div class="transfer-terminal">
+                <div class="terminal-header uppercase">
+                    <div>Founding Cohort Application</div>
+                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
+                </div>
+
+                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group" role="form">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
+                        <span>PRICE</span>
+                        <div style="text-align: right;">
+                            <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
+                            <span class="alert-text-color">$2,000</span>
+                        </div>
+                    </div>
+
+                    <label for="legal-name" class="uppercase">Legal Name</label>
+                    <input type="text" id="legal-name" name="name" required placeholder="LAST, FIRST">
+
+                    <label for="email-address" class="uppercase">Email Address</label>
+                    <input type="email" id="email-address" name="email" required placeholder="CONTACT@DOMAIN.COM">
+
+                    <label for="select-role" class="uppercase">Select Role</label>
+                    <select id="select-role" name="role" required>
+                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
+                    </select>
+
+                    <label for="statement-of-intent" class="uppercase">Statement of Intent (Optional)</label>
+                    <input type="text" id="statement-of-intent" name="statement" placeholder="Why are you tired?">
+
+                    <input type="text" name="_gotcha" style="display:none" />
+
+                    <button type="submit" class="submit-btn">
+                        COMMIT TO SOLVENCY
+                    </button>
+                    
+                    <div class="payment-note uppercase">
+                        NO PAYMENT COLLECTED NOW.<br>
+                        THIS IS A COMMITMENT OF INTEREST.<br>
+                        PAYMENT REQUIRED UPON ACCEPTANCE.
+                    </div>
+                    
+                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
+                        By applying, you confirm your ability to pay the $2,000 fee.
+                    </p>
+                </form>
+
+                <div class="timer-bar">
+                    <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
+
+    <script>
+        // --- SECTION 1: WebGL Background Logic ---
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl');
+        const SPEED = 1.3;
+
+        if (!gl) {
+            console.error('WebGL not supported');
+        } else {
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            const vertexSrc = document.getElementById('vertexShader').textContent;
+            const fragmentSrc = document.getElementById('fragmentShader').textContent;
+
+            const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexSrc);
+            const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertShader);
+            gl.attachShader(program, fragShader);
+            gl.linkProgram(program);
+
+            gl.useProgram(program);
+
+            const posBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1.0,  1.0,
+                 1.0,  1.0,
+                -1.0, -1.0,
+                 1.0, -1.0,
+            ]), gl.STATIC_DRAW);
+
+            const posLoc = gl.getAttribLocation(program, "position");
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+            const resLoc = gl.getUniformLocation(program, "u_resolution");
+            const timeLoc = gl.getUniformLocation(program, "u_time");
+
+            function resize() {
+                const displayWidth  = canvas.clientWidth;
+                const displayHeight = canvas.clientHeight;
+
+                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                    canvas.width  = displayWidth;
+                    canvas.height = displayHeight;
+                    gl.viewport(0, 0, canvas.width, canvas.height);
+                }
+            }
+            window.addEventListener('resize', resize);
+
+            let time = 0;
+            let lastTime = 0;
+
+            function render(now) {
+                now *= 0.001; 
+                const deltaTime = now - lastTime;
+                lastTime = now;
+
+                resize(); 
+
+                time += deltaTime * SPEED;
+
+                gl.uniform2f(resLoc, canvas.width, canvas.height);
+                gl.uniform1f(timeLoc, time);
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+                requestAnimationFrame(render);
+            }
+            requestAnimationFrame(render);
+        }
+
+        // --- SECTION 2: Existing Site Logic ---
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        const toggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const logo = document.querySelector('.logo-wrapper img');
+
+        function applyTheme(isDark) {
+            if (isDark) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initial load
+        if (localStorage.getItem('theme') === 'dark') {
+            applyTheme(true);
+        } else {
+            applyTheme(false);
+        }
+
+        toggle.addEventListener('click', () => {
+            const isDark = !body.classList.contains('dark-mode');
+            applyTheme(isDark);
+        });
+    </script>
+</body>
+</html>
