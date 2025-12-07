@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organic Nebula Background</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            /* Ensures it stays in the background if included directly 
+               in a page with other content 
+            */
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -9999; 
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="glCanvas"></canvas>
+
+    <!-- Vertex Shader -->
+    <script type="x-shader/x-vertex" id="vertexShader">
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <!-- Fragment Shader -->
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        precision mediump float;
+
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        
+        // Locked Parameters
+        const float ZOOM = 1.6;
+        const float CONTRAST = 1.0;
+
+        void main() {
+            // Normalized coordinates
+            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+            
+            // Aspect Ratio Correction
+            uv = (uv - 0.5) * 2.0; 
+            uv.x *= u_resolution.x / u_resolution.y;
+            
+            // Apply Zoom
+            vec2 p = uv * ZOOM;
+            float x = p.x;
+            float y = p.y;
+            float t = u_time;
+
+            // The Formula
+            // Math.sin(Math.sqrt(x*x + y*y)*5 - t) * Math.cos((x - y)*3 + t*0.5)
+            float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
+
+            // Normalize to 0-1 range for color
+            float brightness = 0.5 + 0.5 * val;
+            
+            // Apply Contrast
+            brightness = pow(brightness, CONTRAST);
+
+            // Output Grayscale
+            gl_FragColor = vec4(vec3(brightness), 1.0);
+        }
+    </script>
+
+    <script>
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl');
+
+        // Locked Speed Parameter
+        const SPEED = 1.3;
+
+        if (!gl) {
+            console.error('WebGL not supported');
+        } else {
+            // --- Shader Compilation ---
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            const vertexSrc = document.getElementById('vertexShader').textContent;
+            const fragmentSrc = document.getElementById('fragmentShader').textContent;
+
+            const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexSrc);
+            const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertShader);
+            gl.attachShader(program, fragShader);
+            gl.linkProgram(program);
+
+            gl.useProgram(program);
+
+            // --- Geometry (Full Screen Quad) ---
+            const posBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1.0,  1.0,
+                 1.0,  1.0,
+                -1.0, -1.0,
+                 1.0, -1.0,
+            ]), gl.STATIC_DRAW);
+
+            const posLoc = gl.getAttribLocation(program, "position");
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+            // --- Uniforms ---
+            const resLoc = gl.getUniformLocation(program, "u_resolution");
+            const timeLoc = gl.getUniformLocation(program, "u_time");
+
+            // --- Resize Handling ---
+            function resize() {
+                // Resize the canvas to match the display size (CSS pixels)
+                // This ensures it scales perfectly in any div or iframe
+                const displayWidth  = canvas.clientWidth;
+                const displayHeight = canvas.clientHeight;
+
+                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                    canvas.width  = displayWidth;
+                    canvas.height = displayHeight;
+                    gl.viewport(0, 0, canvas.width, canvas.height);
+                }
+            }
+            window.addEventListener('resize', resize);
+
+            // --- Render Loop ---
+            let time = 0;
+            let lastTime = 0;
+
+            function render(now) {
+                now *= 0.001; // convert to seconds
+                const deltaTime = now - lastTime;
+                lastTime = now;
+
+                resize(); // Check resize every frame for smoothness in dynamic layouts
+
+                time += deltaTime * SPEED;
+
+                gl.uniform2f(resLoc, canvas.width, canvas.height);
+                gl.uniform1f(timeLoc, time);
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+                requestAnimationFrame(render);
+            }
+
+            requestAnimationFrame(render);
+        }
+    </script>
+</body>
+</html>
