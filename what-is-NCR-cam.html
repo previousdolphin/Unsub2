@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCR-CAM | THE ABSOLUTE TICKER</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --led-color: #ff3300; /* Deep brutalist red */
+            --led-dim: #4a0f00;
+            --bg-color: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--led-color);
+            font-family: 'Share Tech Mono', monospace;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        /* Scanline Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #ticker-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Ensures even distribution */
+        }
+
+        .ticker-row {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            /* Use vh for responsive height, but clamp to keep readable */
+            height: 8vh; 
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            
+            /* Text Styling */
+            font-size: clamp(1.5rem, 3.5vh, 3rem);
+            /* Increase line-height to prevent vertical clipping */
+            line-height: 1.5; 
+            
+            /* Glow */
+            text-shadow: 0 0 4px var(--led-color), 0 0 8px rgba(255, 51, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 51, 0, 0.05);
+        }
+
+        /* Alternating row styles */
+        .ticker-row:nth-child(even) {
+            background: rgba(255, 51, 0, 0.02);
+            color: rgba(255, 51, 0, 0.9);
+        }
+
+        /* The Scrolling Track */
+        .ticker-track {
+            display: flex;
+            width: fit-content;
+            will-change: transform;
+        }
+
+        .ticker-item {
+            padding: 0 1vw; /* Horizontal padding between items */
+            display: inline-block;
+        }
+
+        .separator {
+            color: #fff;
+            font-weight: bold;
+            margin: 0 1rem;
+            opacity: 0.6;
+            letter-spacing: 2px;
+            display: inline-block;
+        }
+
+        /* Animation Classes */
+        .scroll-left {
+            animation: scrollLeft linear infinite;
+        }
+        .scroll-right {
+            animation: scrollRight linear infinite;
+        }
+
+        @keyframes scrollLeft {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes scrollRight {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Glitch Effect - Applied via JS randomly */
+        .glitch-active {
+            animation: glitch-anim 0.2s 2;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); opacity: 1; }
+            20% { transform: translate(-2px, 2px); opacity: 0.8; }
+            40% { transform: translate(-2px, -2px); opacity: 1; }
+            60% { transform: translate(2px, 2px); opacity: 0.8; }
+            80% { transform: translate(2px, -2px); opacity: 1; }
+            100% { transform: translate(0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="ticker-container"></div>
+
+    <script>
+        const acronyms = [
+            "Non-dilutive Capital Reallocation – Corporate Asset Management",
+            "Necessary Capital Realization – Conceptual Asset Mechanism",
+            "Non-contingent Corporate Revenue – Church of Absolute Money",
+            "Nominal Cost Recovery – Corporate Art Market",
+            "New Capital Regime – Controlled Asset Movement",
+            "Net Cash Return – Consolidated Art Machine",
+            "Non-taxable Capital Reserve – Cloistered Asset Mandate",
+            "Neutral Corporate Risk – Clinical Asset Method",
+            "Necessary Corporate Ruthlessness – Capital Accumulation Model",
+            "Narcissistic Capital Retention – Corporate Art Monopoly",
+            "Negotiable Currency Rate – Conceptual Art Merger",
+            "Non-fungible Corporate Resource – Certified Art Matrix",
+            "New Commercial Reality – Corporate Asset Materialization",
+            "Net Conceptual Return – Capitalized Art Machine",
+            "Necessary Conceptual Ritual – Church of Absolute Mandate",
+            "Non-negotiable Catholic Reality – Church of Art Mysticism",
+            "New Canonical Revelation – Cathedral for Art Movement",
+            "Non-contingent Radical Religion – Church of Absolute Meaning",
+            "New Covenant Radiance – Conceptual Art Ministry",
+            "Nominal Clerical Rule – Canonized Art Method",
+            "Necessary Conceptual Redemption – Church of Art Martyrs",
+            "New Cosmic Resonance – Conceptual Aura Machine",
+            "Non-secular Corporate Rite – Church of Absolute Mind",
+            "Necessary Creed of Reality – Consecrated Art Movement",
+            "Null Contingency Realm – Cloistered Absolute Method",
+            "New Collective Rite – Cathedral for Art Meditation",
+            "New Concrete Reality – Corporate Architecture Movement",
+            "Non-contingent Rez-de-chaussée – Conceptual Art Matrix",
+            "Necessary Cytoskeletal Reconstruction – Cellular Art Mechanism",
+            "New Construction Regime – Concrete Art Monument",
+            "Nominal Conceptual Real estate – Church of Architecture Mandate",
+            "New Clinical Rigor – Constructed Art Model",
+            "Non-structural Collapse Recovery – Consolidated Art Material",
+            "New Cement Radicalism – Corporate Architecture Method",
+            "Neutral Context Reconstruction – Clinical Art Module",
+            "Necessary Core Realignment – Conceptual Art Mainframe",
+            "Necessary Command Routine – Corporate Action Manual",
+            "New Cool Radicalism – Conceptual Art Militia",
+            "Non-assignable Creative Role – Conceptual Agent Movement",
+            "Nominal Control Room – Corporate Authority Mechanism",
+            "New Clinical Reframing – Corporate Art Maneuver",
+            "Non-negotiable Command Rule – Centralized Art Mission",
+            "Necessary Crisis Response – Corporate Adaptation Method",
+            "New Coherent Rationality – Corporate Algorithm Machine",
+            "Neutral Contact Rate – Clinical Art Manual",
+            "Narcissistic Control Regime – Corporate Authority Matrix",
+            "New Creative Reflex – Conceptual Action Mode",
+            "New Conceptual Retro-causality – Church of Ancestral Memory",
+            "Non-linear Cyclic Re-imprinting – Conceptual Archive Machine",
+            "Necessary Clinical Redaction – Corporate Anonymity Mandate",
+            "New Coded Reality – Cipher of Art Meaning",
+            "Non-existent Creative Residue – Church of Absolute Mystery",
+            "Nominal Cipher Ring – Conceptual Art Magick",
+            "New Contextual Readymade – Corporate Appropriation Method",
+            "Null Context Region – Conceptual Art Mirror",
+            "Negative Capability Reserve – Church of Abstract Mind",
+            "New Conceptual Reprogramming – Collective Art Mind",
+            "Narcissistic Corporate Revolution – Clinical Art Madness",
+            "Non-answering Corporate Rhetoric – Conceptual Anti-meaning",
+            "New Confusion Regime – Corporate Absurdity Machine",
+            "Negative Cash Reality – Conceptual Art Mirage",
+            "Non-human Corporate Rationality – Cold Art Method",
+            "New Cynical Realism – Corporate Art Mockery",
+            "Non-visible Conceptual Radiance – Church of Art Minimalism",
+            "Necessary Corporate Repetition – Copy/Paste Art Movement",
+            "Null Content Requirement – Corporate Apathy Mandate",
+            "New Cheap Reality – Conceptual Art Merchandise",
+            "New Communal Ritual – Collective Art Meal",
+            "Non-hierarchical Creative Ring – Community Art Model",
+            "Necessary Compassionate Realism – Collective Art Maintenance",
+            "New Civic Responsibility – Corporate Art Morality",
+            "Neutral Calm Radius – Center for Art Meditation",
+            "New Connection Routine – Community Arrival Method",
+            "Non-heroic Creative Role – Common Art Mind",
+            "Necessary Care Regime – Clinical Art Ministry",
+            "New Corporate Rebranding – Conceptual Art Mark",
+            "Non-static Corporate Rhythm – Changing Art Mode",
+            "New Cool Relevance – Corporate Apparel Movement",
+            "Necessary Corporate Recognition – Conceptual Aura Machine",
+            "Nominal Clothing Regulation – Corporate Armor Mandate",
+            "New Commercial Resonance – Corporate Art Message",
+            "Non-stop Corporate Reach – Cultural Art Matrix",
+            "Narcissistic Consumer Reflex – Corporate Art Mechanism",
+            "Non-profit Corporate Registry – Chartered Art Mandate",
+            "New Contractual Reality – Corporate Agreement Method",
+            "Nominal Charter Ratification – Collective Art Meeting",
+            "Non-liable Corporate Representative – Certified Art Manager",
+            "Necessary Compliance Rule – Corporate Audit Mechanism",
+            "New Corporate Resolution – Chartered Art Mission",
+            "Neutral Code Regulation – Conceptual Art Measure",
+            "No Crap Reality – Cool Art Movement",
+            "New Code Red – Corporate Art Manifesto",
+            "Now Create Real – Conceptual Art Magic",
+            "Never Cease Rebranding – Corporate Art Machine",
+            "New Century Rule – Corporate Art Mindset",
+            "Necessary Cool Rigor – Conceptual Art Mode",
+            "New Collective Rhythm – Corporate Art Motion"
+        ];
+
+        const container = document.getElementById('ticker-container');
+        const SEPARATOR_TEXT = "NCR-CAM";
+
+        // Determine how many rows fit on the screen
+        function calculateRows() {
+            // Rough height of a row including margin/border
+            const rowHeightVH = 8; 
+            return Math.floor(100 / rowHeightVH);
+        }
+
+        // Shuffle utility
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Generate content string that is guaranteed to be wider than the screen
+        function generateSeamlessContent() {
+            let contentHtml = '';
+            // We create a temporary string to estimate width, or just overfill massively.
+            // A safe bet for 4k screens is ~500 chars minimum before doubling. 
+            // Our items are long, so taking random 20 items is usually enough width.
+            const shuffled = shuffle([...acronyms]);
+            
+            // We'll take a chunk of 25 items.
+            // On a normal 1920px screen, 25 items is waaaay wider than the screen.
+            const selection = shuffled.slice(0, 25);
+            
+            selection.forEach(item => {
+                contentHtml += `<span class="ticker-item">${item} <span class="separator">${SEPARATOR_TEXT}</span></span>`;
+            });
+
+            // Return the block HTML
+            return contentHtml;
+        }
+
+        function init() {
+            container.innerHTML = ''; // Clear existing
+            const rows = calculateRows();
+
+            for (let i = 0; i < rows; i++) {
+                const row = document.createElement('div');
+                row.className = 'ticker-row';
+                
+                const track = document.createElement('div');
+                track.className = 'ticker-track';
+                
+                // Set animation parameters
+                const isReverse = i % 2 !== 0; 
+                const speed = Math.floor(Math.random() * 50) + 40; // 40s to 90s duration
+                
+                track.classList.add(isReverse ? 'scroll-right' : 'scroll-left');
+                track.style.animationDuration = `${speed}s`;
+
+                // IMPORTANT: For infinite seamless scroll with transform (-50%),
+                // we need [Block A][Block A].
+                // Block A must be wider than the viewport.
+                const contentBlock = generateSeamlessContent();
+                track.innerHTML = contentBlock + contentBlock; 
+
+                row.appendChild(track);
+                container.appendChild(row);
+
+                // Add random glitch effect to specific rows
+                setInterval(() => {
+                    if (Math.random() > 0.85) {
+                        row.classList.add('glitch-active');
+                        setTimeout(() => row.classList.remove('glitch-active'), 400);
+                    }
+                }, Math.random() * 8000 + 2000);
+            }
+        }
+
+        // Re-init on resize to handle layout changes
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(init, 200);
+        });
+
+        init();
+
+    </script>
+</body>
+</html>
