@@ -2,165 +2,419 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harvest Now, Decrypt Later | Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>UNSUBSCRIBE LLC | HNDL_CALC</title>
+    <meta name="description" content="Harvest Now, Decrypt Later. Visualizing the inevitable decay of cryptographic assets.">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #050505; color: #e5e5e5; font-family: 'Courier New', Courier, monospace; }
+        /* --- CORE RESET & VARS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* Custom Range Slider Styling */
+        :root {
+            --bg: rgba(244, 244, 244, 0.92);
+            --bg-solid: #f4f4f4;
+            --text: #050505;
+            --border: #000000;
+            --alert: #ff2a00;
+            --alert-text-light: #d62400; 
+            --font-main: 'Courier New', Courier, monospace;
+            --sidebar-width: 440px;
+            --ticker-height: 42px;
+        }
+
+        body.dark-mode {
+            --bg: rgba(10, 10, 10, 0.92);
+            --bg-solid: #0a0a0a;
+            --text: #e0e0e0;
+            --border: #333333;
+            --alert: #ff2a00;
+            --alert-text-dark: #ff5e40;
+        }
+
+        /* --- BACKGROUND CANVAS (The Void) --- */
+        canvas#glCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -9999; 
+            transition: opacity 0.5s ease;
+        }
+
+        body:not(.dark-mode) canvas#glCanvas {
+            filter: invert(1);
+            opacity: 0.4;
+        }
+        
+        body.dark-mode canvas#glCanvas {
+            filter: none;
+            opacity: 1;
+        }
+
+        body {
+            background-color: transparent; 
+            color: var(--text);
+            font-family: var(--font-main);
+            width: 100vw;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .uppercase { text-transform: uppercase; }
+        a { color: inherit; text-decoration: none; }
+        
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-size: clamp(2rem, 3vw, 3.5rem); 
+            line-height: 0.9;
+            letter-spacing: -2px;
+            margin-bottom: 25px;
+            font-weight: 900;
+        }
+
+        h2 {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: var(--text);
+            color: var(--bg-solid);
+            display: inline-block;
+            padding: 4px 8px;
+        }
+
+        p { margin-bottom: 20px; font-size: 0.9rem; max-width: 60ch; }
+        .fine-print { font-size: 0.75rem; opacity: 0.7; }
+        .alert-text { color: var(--alert); font-weight: bold; }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
+            width: 100%;
+            height: var(--ticker-height);
+            overflow: hidden;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border);
+            background: var(--text);
+            color: var(--bg-solid);
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 40s linear infinite;
+            padding-left: 100%;
+        }
+
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* --- LAYOUT GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr var(--sidebar-width); 
+            min-height: calc(100vh - var(--ticker-height));
+        }
+
+        .content-col {
+            border-right: 2px solid var(--border);
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg);
+            backdrop-filter: blur(2px);
+            position: relative;
+        }
+
+        .sidebar-col {
+            position: sticky;
+            top: 0;
+            height: calc(100vh - var(--ticker-height));
+            overflow-y: auto; 
+            border-left: 0;
+            background-color: var(--bg);
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- LOGO --- */
+        .logo-wrapper { margin-bottom: 40px; display: block; }
+        .logo-wrapper svg { width: 180px; height: auto; display: block; fill: var(--text); }
+
+        /* --- 3D VIEWER CONTAINER --- */
+        #viewer-container {
+            width: 100%;
+            height: 50vh;
+            border: 2px solid var(--border);
+            margin-bottom: 40px;
+            position: relative;
+            background: rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        canvas#artifactCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* --- CONTROLS --- */
+        .control-group { padding: 30px; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .artifact-list {
+            list-style: none;
+            margin-bottom: 40px;
+            border: 2px solid var(--border);
+        }
+        
+        .artifact-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .artifact-btn:last-child { border-bottom: none; }
+        .artifact-btn:hover { background: rgba(125,125,125,0.1); }
+        .artifact-btn.active {
+            background: var(--text);
+            color: var(--bg-solid);
+        }
+        .artifact-btn.active .status-dot { background: var(--alert); }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--border);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* --- SLIDER --- */
+        .slider-wrapper {
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+        
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
             background: transparent;
+            margin: 10px 0;
         }
+        input[type=range]:focus { outline: none; }
+        
+        /* Thumb */
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 24px;
-            width: 12px;
-            background: #ffffff;
+            height: 30px;
+            width: 30px;
+            background: var(--alert);
             cursor: pointer;
-            border: 1px solid #00ff00;
-            margin-top: -10px;
-            box-shadow: 0 0 10px #00ff00;
+            border: 2px solid var(--text);
+            margin-top: -12px;
+            box-shadow: 2px 2px 0px var(--text);
         }
-        input[type=range]::-moz-range-thumb {
-            height: 24px;
-            width: 12px;
-            background: #ffffff;
-            cursor: pointer;
-            border: 1px solid #00ff00;
-            box-shadow: 0 0 10px #00ff00;
-        }
-        /* The Timeline Track - Dynamic Gradient handled in JS */
+        /* Track */
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
-            height: 4px;
+            height: 6px;
             cursor: pointer;
-            background: #333;
+            background: var(--text);
+            border: 0;
         }
-        
-        .artifact-btn {
-            transition: all 0.3s ease;
-            border: 1px solid #333;
-        }
-        .artifact-btn:hover {
-            border-color: #00ff00;
-            background: rgba(0, 255, 0, 0.1);
-        }
-        .artifact-btn.active {
-            border-color: #00ff00;
-            background: #00ff00;
-            color: #000;
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
             font-weight: bold;
+            margin-top: 10px;
+            opacity: 0.8;
         }
 
-        .glitch-text {
-            animation: glitch 1s linear infinite;
+        /* --- READOUTS --- */
+        .readout-box {
+            border: 2px solid var(--border);
+            padding: 20px;
+            margin-bottom: 30px;
+            background: rgba(255, 42, 0, 0.05);
         }
-        @keyframes glitch {
-            2%, 64% { transform: translate(2px,0) skew(0deg); }
-            4%, 60% { transform: translate(-2px,0) skew(0deg); }
-            62% { transform: translate(0,0) skew(5deg); }
+        .readout-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 5px;
+            opacity: 0.6;
+        }
+        .readout-value {
+            font-size: 1.2rem;
+            font-weight: 900;
         }
 
-        #timeline-container {
-            background: linear-gradient(to right, 
-                rgba(0,255,0,0.1) 0%, 
-                rgba(0,255,0,0.1) 10%, 
-                rgba(255,0,0,0.1) 25%, 
-                rgba(255,0,0,0.5) 100%);
+        .data-terminal-footer {
+            padding: 15px; 
+            border-top: 2px solid var(--border); 
+            text-align: center; 
+            background: var(--text); 
+            color: var(--bg-solid);
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        /* --- THEME TOGGLE --- */
+        #theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--bg-solid);
+            border: 2px solid var(--text);
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.75rem;
+            box-shadow: 3px 3px 0px var(--text);
+        }
+        #theme-toggle:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px var(--text); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            .grid-container { display: block; }
+            .content-col { padding: 40px 20px; border-right: none; border-bottom: 2px solid var(--border); }
+            .sidebar-col { position: relative; height: auto; border-left: 2px solid var(--border); }
+            h1 { font-size: 2.5rem; }
+            #viewer-container { height: 40vh; }
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <!-- UI Overlay -->
-    <div class="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-6">
+    <!-- BACKGROUND SHADER (From Reference) -->
+    <canvas id="glCanvas"></canvas>
+
+    <!-- MARQUEE -->
+    <div class="marquee-container uppercase">
+        <div class="marquee-content">
+            Unsubscribe LLC /// PROJECT: HARVEST_NOW_DECRYPT_LATER /// ALL YOUR SECRETS ARE BELONG TO THE FUTURE /// QUANTUM SUPREMACY IMMINENT /// ENCRYPTION IS TEMPORARY /// DECAY IS FOREVER /// &nbsp;
+            Unsubscribe LLC /// PROJECT: HARVEST_NOW_DECRYPT_LATER /// ALL YOUR SECRETS ARE BELONG TO THE FUTURE /// QUANTUM SUPREMACY IMMINENT /// ENCRYPTION IS TEMPORARY /// DECAY IS FOREVER /// &nbsp;
+        </div>
+    </div>
+
+    <div class="grid-container">
         
-        <!-- Header & Artifact Selector -->
-        <div class="pointer-events-auto max-w-md">
-            <h1 class="text-3xl font-bold mb-1 tracking-tighter text-green-500">HNDL CALCULATOR</h1>
-            <p class="text-xs text-gray-500 mb-6">HARVEST NOW, DECRYPT LATER RISK VISUALIZER</p>
+        <!-- LEFT COLUMN: VISUALIZATION -->
+        <div class="content-col">
+            
+            <a href="https://unsubscribe.llc" class="logo-wrapper">
+                 <!-- SVG Logo Placeholder based on "Unsubscribe" text -->
+                <svg viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
+                    <text x="0" y="30" font-family="'Courier New', monospace" font-weight="900" font-size="28" letter-spacing="-1">UNSUBSCRIBE</text>
+                </svg>
+            </a>
 
-            <div class="space-y-2">
-                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Select Stolen Artifact</p>
-                
-                <button onclick="setArtifact(0)" id="btn-0" class="artifact-btn active w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
-                    <span>SATOSHI_WALLET.DAT</span>
-                    <span class="text-xs text-red-400">ECDSA (secp256k1)</span>
-                </button>
-                
-                <button onclick="setArtifact(1)" id="btn-1" class="artifact-btn w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
-                    <span>SIGNAL_CHAT_DB.SQLITE</span>
-                    <span class="text-xs text-orange-400">X3DH (Curve25519)</span>
-                </button>
-                
-                <button onclick="setArtifact(2)" id="btn-2" class="artifact-btn w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
-                    <span>STATE_DEPT_CABLES.PDF</span>
-                    <span class="text-xs text-yellow-400">RSA-2048</span>
-                </button>
-                
-                <button onclick="setArtifact(3)" id="btn-3" class="artifact-btn w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
-                    <span>23ANDME_DNA_SEQ.ZIP</span>
-                    <span class="text-xs text-green-400">AES-256</span>
-                </button>
+            <div style="margin-bottom: 30px;">
+                <h2 class="uppercase">Tool: HNDL_Calc</h2>
+                <h1 class="uppercase">The Architecture of Decay</h1>
+                <p>Every encrypted packet you send today is being harvested. It sits in a server farm in Utah, waiting for the math to break. This tool visualizes the shelf-life of your secrets.</p>
             </div>
 
-            <div id="info-panel" class="mt-8 p-4 border-l-2 border-green-500 bg-black bg-opacity-80 backdrop-blur-md">
-                <h3 id="info-title" class="text-lg font-bold text-white">Target: Bitcoin Private Key</h3>
-                <p id="info-desc" class="text-xs text-gray-400 mt-2 leading-relaxed">
-                    Protected by Elliptic Curve Cryptography (ECDSA). While efficient, it is uniquely vulnerable to Shor's Algorithm. A quantum computer with ~4000 logical qubits could derive the private key from the public key in hours.
-                </p>
-                <div class="mt-4 flex justify-between items-end">
-                    <div>
-                        <span class="text-[10px] uppercase text-gray-600 block">Est. Shelf Life</span>
-                        <span id="info-date" class="text-xl text-red-500 font-mono">~2031</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[10px] uppercase text-gray-600 block">Status</span>
-                        <span id="info-status" class="text-sm text-green-500 font-mono">SECURE</span>
-                    </div>
+            <!-- THREE.JS CONTAINER -->
+            <div id="viewer-container">
+                <canvas id="artifactCanvas"></canvas>
+                <div style="position: absolute; top: 10px; left: 10px; font-size: 0.7rem; font-weight: bold; padding: 4px; border: 1px solid var(--text); background: var(--bg);">
+                    ASSET_PREVIEW_WINDOW
                 </div>
             </div>
+
+            <div class="readout-box">
+                <div class="readout-label uppercase">TECHNICAL ANALYSIS</div>
+                <p id="desc-text" style="font-size: 0.85rem; margin-bottom: 0;">
+                    Select an asset to analyze encryption vulnerability vectors.
+                </p>
+            </div>
+
         </div>
 
-        <!-- Timeline Slider -->
-        <div class="pointer-events-auto w-full mb-8">
-            <div class="flex justify-between text-xs text-gray-500 font-mono mb-2 px-1">
-                <span>2025</span>
-                <span class="text-gray-600">| 2026 NIST STANDARDS</span>
-                <span class="text-red-900">| 2029 FAULT TOLERANCE</span>
-                <span class="text-red-600">| 2033 Q-DAY (CRQC)</span>
-                <span>2060</span>
+        <!-- RIGHT COLUMN: CONTROLS -->
+        <div class="sidebar-col">
+            <div class="control-group">
+                <div style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 20px;">
+                    <span style="font-weight: 900; font-size: 1.2rem;">CONTROL TERMINAL</span>
+                </div>
+
+                <div class="readout-label uppercase">TARGET ASSET</div>
+                <div class="artifact-list">
+                    <button class="artifact-btn active uppercase" onclick="selectArtifact(0)">
+                        <span>01 // Satoshi_Wallet.dat</span> <span class="status-dot"></span>
+                    </button>
+                    <button class="artifact-btn uppercase" onclick="selectArtifact(1)">
+                        <span>02 // Signal_Chat_Log.db</span> <span class="status-dot"></span>
+                    </button>
+                    <button class="artifact-btn uppercase" onclick="selectArtifact(2)">
+                        <span>03 // US_State_Dept.pdf</span> <span class="status-dot"></span>
+                    </button>
+                    <button class="artifact-btn uppercase" onclick="selectArtifact(3)">
+                        <span>04 // 23andMe_DNA.zip</span> <span class="status-dot"></span>
+                    </button>
+                </div>
+
+                <div class="readout-box">
+                    <div class="readout-label uppercase">CURRENT STATUS</div>
+                    <div id="status-readout" class="readout-value alert-text">SECURE</div>
+                </div>
+
+                <div class="slider-wrapper">
+                    <div class="readout-label uppercase">TIMELINE PROJECTION</div>
+                    <div style="font-size: 2rem; font-weight: 900; font-family: var(--font-main);">
+                        YEAR: <span id="year-display">2025</span>
+                    </div>
+                    
+                    <input type="range" min="2025" max="2060" value="2025" step="0.1" id="time-slider" oninput="updateTimeLine(this.value)">
+                    
+                    <div class="timeline-labels uppercase">
+                        <span>2025</span>
+                        <span class="alert-text">2030 (Q-RISK)</span>
+                        <span>2060</span>
+                    </div>
+                </div>
+
+                <p class="fine-print uppercase" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 10px;">
+                    Warning: Mosca's Theorem applies. (Migration Time + Shelf Life > Time to Quantum).
+                </p>
             </div>
-            
-            <div id="timeline-container" class="relative h-6 rounded-sm border border-gray-800">
-                <!-- Milestones -->
-                <div class="absolute top-0 bottom-0 border-l border-gray-700" style="left: 2.8%"></div> <!-- 2026 -->
-                <div class="absolute top-0 bottom-0 border-l border-red-900" style="left: 11.4%"></div> <!-- 2029 -->
-                <div class="absolute top-0 bottom-0 border-l border-red-600" style="left: 22.8%"></div> <!-- 2033 -->
-                
-                <input type="range" min="2025" max="2060" value="2025" step="0.1" id="year-slider" 
-                       oninput="updateYear(this.value)" class="absolute inset-0 w-full h-full opacity-80 z-20">
-            </div>
-            <div class="text-center mt-4">
-                <span class="text-xs uppercase tracking-widest text-gray-600">Current Year Projection</span>
-                <div id="year-display" class="text-4xl font-mono text-white">2025.0</div>
+
+            <div class="data-terminal-footer">
+                <p class="uppercase" style="margin:0; font-weight: bold; font-size: 0.8rem;">SYSTEM: CONNECTED</p>
             </div>
         </div>
     </div>
 
-    <!-- 3D Canvas -->
-    <canvas id="canvas" class="absolute inset-0 z-0"></canvas>
+    <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
 
-    <!-- Shader Code -->
-    <script type="x-shader/x-vertex" id="vertexShader">
+    <!-- SHADERS FOR ARTIFACT (Decay Effect) -->
+    <script type="x-shader/x-vertex" id="artVertex">
         varying vec2 vUv;
         varying vec3 vPosition;
         varying vec3 vNormal;
-
         void main() {
             vUv = uv;
             vPosition = position;
@@ -168,18 +422,20 @@
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
     </script>
-
-    <script type="x-shader/x-fragment" id="fragmentShader">
+    <script type="x-shader/x-fragment" id="artFragment">
         uniform float uTime;
         uniform float uYear;
         uniform float uCrackStart;
         uniform float uCrackEnd;
+        uniform vec3 uColorBg;
+        uniform vec3 uColorText;
+        uniform vec3 uColorAlert;
         
         varying vec2 vUv;
         varying vec3 vPosition;
         varying vec3 vNormal;
-
-        // Simplex Noise (Simplified)
+        
+        // Noise functions
         vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
         vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
         vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
@@ -208,267 +464,328 @@
         }
 
         void main() {
-            // Calculate Decay Factor based on timeline
-            // 0.0 = Safe, 1.0 = Fully Broken
             float decay = smoothstep(uCrackStart, uCrackEnd, uYear);
+            float noise = snoise(vPosition.xy * 4.0 + vec2(0.0, uTime * 0.2));
             
-            // Noise generation for cracks
-            float noiseVal = snoise(vPosition.xy * 3.0 + vec2(0.0, uTime * 0.1));
-            float crack = smoothstep(0.4, 0.45, noiseVal); // Sharp cracks
-
-            // 1. Metal Base (Steel/Grey)
-            vec3 metalColor = vec3(0.3, 0.35, 0.4);
+            // Base "Secure" Metal (Matches Text Color)
+            vec3 secureColor = uColorText; // Black or White depending on theme
             
-            // 2. Rust/Decay Color (Red/Orange)
-            vec3 rustColor = vec3(0.6, 0.2, 0.05);
+            // "Rust" is the Alert Color
+            vec3 rustColor = uColorAlert;
+            
+            // "Glass" is faint BG color
+            vec3 glassColor = uColorBg; 
 
-            // 3. Glass/Broken Color (Greenish transparent)
-            vec3 glassColor = vec3(0.8, 0.9, 0.9);
-
-            vec3 finalColor = metalColor;
+            vec3 finalColor = secureColor;
             float alpha = 1.0;
 
-            if (decay < 0.2) {
-                // Phase 1: Just Metal
-                finalColor = metalColor;
-                // Add slight specular highlight based on normal
-                float light = dot(vNormal, vec3(0.0, 0.0, 1.0));
-                finalColor += vec3(0.2) * pow(light, 4.0);
+            if (decay < 0.1) {
+                // Secure Phase
+                // Add some wireframe grid logic via noise
+                float grid = step(0.9, fract(vUv.x * 10.0)) + step(0.9, fract(vUv.y * 10.0));
+                finalColor = mix(secureColor, uColorBg, grid * 0.5);
             } 
             else if (decay < 0.6) {
-                // Phase 2: Rusting & Cracking
-                float localDecay = (decay - 0.2) * 2.5; // 0 to 1
+                // Decay Phase
+                float localDecay = (decay - 0.1) * 2.0;
+                // Cracks appear
+                float crack = smoothstep(0.6 - localDecay*0.5, 0.65 - localDecay*0.5, noise);
+                finalColor = mix(secureColor, rustColor, crack);
                 
-                // Mix rust based on noise
-                float rustMix = smoothstep(0.6 - localDecay * 0.5, 0.7 - localDecay * 0.5, noiseVal);
-                finalColor = mix(metalColor, rustColor, rustMix);
-                
-                // Physical Cracks (discard pixels)
-                if (noiseVal > (0.8 - localDecay * 0.3)) {
-                   // discard; // Don't discard yet, just darken
-                   finalColor = vec3(0.05); 
+                if (noise > (0.8 - localDecay*0.4)) {
+                     // Holes start forming
+                     // discard; 
+                     alpha = 0.5;
+                     finalColor = rustColor;
                 }
             } 
             else {
-                // Phase 3: Glassification & Disintegration
-                float localDecay = (decay - 0.6) * 2.5; // 0 to 1
-                
-                // Turn to glass color
+                // Harvested Phase (Glass/Ghost)
+                float localDecay = (decay - 0.6) * 2.5;
                 finalColor = mix(rustColor, glassColor, localDecay);
-                
-                // Disintegration (Transparency)
                 alpha = 1.0 - localDecay;
                 
-                // Glitch effect in color
-                if (snoise(vUv * 50.0 + uTime) > 0.5) {
-                    finalColor += vec3(0.1, 0.0, 0.0);
+                // Digital Glitch
+                if (snoise(vUv * 50.0 + uTime*2.0) > 0.5) {
+                    finalColor = uColorAlert;
+                    alpha = 0.8;
                 }
                 
-                // Holes
-                if (noiseVal > (0.5 + (1.0 - alpha) * 0.5)) {
-                    discard;
-                }
+                if (noise > 0.4) discard;
             }
 
             gl_FragColor = vec4(finalColor, alpha);
         }
     </script>
 
+    <!-- MAIN SCRIPT -->
     <script>
         // --- DATA ---
         const artifacts = [
             {
-                name: "Satoshi's Wallet",
+                name: "Satoshi_Wallet.dat",
                 algo: "ECDSA (secp256k1)",
-                desc: "Protected by Elliptic Curve Cryptography. Vulnerable to Shor's Algorithm. A quantum computer with ~4000 logical qubits could break this.",
-                crackStart: 2029,
-                crackEnd: 2033,
-                shelfLife: "~2031",
-                secretText: ["PRIVATE KEY:", "KxFc1jmwwCoACiCA", "L59VaKz3S87"]
+                desc: "Bitcoin's elliptic curve cryptography. Vulnerable to Shor's Algorithm running on a large-scale quantum computer. Estimate: ~2031.",
+                crackStart: 2029, crackEnd: 2033,
+                icon: "₿"
             },
             {
-                name: "Signal Messages",
+                name: "Signal_Chat_Log.db",
                 algo: "X3DH (Curve25519)",
-                desc: "Uses X3DH key agreement. While Forward Secrecy protects future messages, any 'Harvested' encrypted blobs from the past will be readable once the curve is broken.",
-                crackStart: 2030,
-                crackEnd: 2035,
-                shelfLife: "~2032",
-                secretText: ["MESSAGE_ID: 992", "TARGET: SENATOR", "LOC: [REDACTED]"]
+                desc: "While forward secrecy protects future messages, harvested historical logs will be decrypted once the curve is broken. Estimate: ~2032.",
+                crackStart: 2030, crackEnd: 2035,
+                icon: "✉"
             },
             {
-                name: "State Dept Cables",
+                name: "US_State_Dept.pdf",
                 algo: "RSA-2048",
-                desc: "The backbone of legacy internet security. Factoring 2048-bit integers requires massive superposition, likely needing 20 million noisy physical qubits.",
-                crackStart: 2032,
-                crackEnd: 2038,
-                shelfLife: "~2034",
-                secretText: ["TOP SECRET", "CABLE: 09TELAVIV", "SUBJ: NUCLEAR"]
+                desc: "The diplomatic standard. Factoring 2048-bit integers requires massive superposition stability. Estimate: ~2034.",
+                crackStart: 2032, crackEnd: 2038,
+                icon: "🏛"
             },
             {
-                name: "23andMe DNA Zip",
+                name: "23andMe_DNA.zip",
                 algo: "AES-256",
-                desc: "Symmetric encryption is remarkably resilient. Grover's Algorithm only reduces security by half (256 bits -> 128 bits). This will likely survive the first quantum era.",
-                crackStart: 2055,
-                crackEnd: 2070,
-                shelfLife: "SAFE > 2050",
-                secretText: ["DNA SEQ: GTCA", "PHENOTYPE: A", "RISK: HIGH"]
+                desc: "Symmetric encryption. remarkably resilient. Grover's Algorithm only reduces effective key size to 128-bit. Safe until mid-century.",
+                crackStart: 2055, crackEnd: 2070,
+                icon: "🧬"
             }
         ];
 
-        let currentArtifactIdx = 0;
+        let currentIdx = 0;
 
-        // --- THREE.JS SETUP ---
-        const canvas = document.getElementById('canvas');
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        // --- BACKGROUND SHADER (The Void) ---
+        // Exactly as provided in the reference code
+        const canvasBg = document.getElementById('glCanvas');
+        const gl = canvasBg.getContext('webgl');
+        const SPEED = 1.3;
+
+        if (gl) {
+            const vertSrc = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
+            const fragSrc = `
+                precision mediump float;
+                uniform vec2 u_resolution;
+                uniform float u_time;
+                const float ZOOM = 1.6;
+                const float CONTRAST = 1.0;
+                void main() {
+                    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+                    uv = (uv - 0.5) * 2.0; 
+                    uv.x *= u_resolution.x / u_resolution.y;
+                    vec2 p = uv * ZOOM;
+                    float val = sin(sqrt(p.x*p.x + p.y*p.y)*5.0 - u_time) * cos((p.x - p.y)*3.0 + u_time*0.5);
+                    float brightness = 0.5 + 0.5 * val;
+                    brightness = pow(brightness, CONTRAST);
+                    gl_FragColor = vec4(vec3(brightness), 1.0);
+                }
+            `;
+
+            function createShader(gl, type, src) {
+                const s = gl.createShader(type);
+                gl.shaderSource(s, src);
+                gl.compileShader(s);
+                return s;
+            }
+            const prog = gl.createProgram();
+            gl.attachShader(prog, createShader(gl, gl.VERTEX_SHADER, vertSrc));
+            gl.attachShader(prog, createShader(gl, gl.FRAGMENT_SHADER, fragSrc));
+            gl.linkProgram(prog);
+            gl.useProgram(prog);
+
+            const buf = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1,1,1,-1,-1,1,-1]), gl.STATIC_DRAW);
+            const posLoc = gl.getAttribLocation(prog, "position");
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+            const uRes = gl.getUniformLocation(prog, "u_resolution");
+            const uTime = gl.getUniformLocation(prog, "u_time");
+
+            function resizeBg() {
+                canvasBg.width = window.innerWidth;
+                canvasBg.height = window.innerHeight;
+                gl.viewport(0,0,canvasBg.width, canvasBg.height);
+            }
+            window.addEventListener('resize', resizeBg);
+            resizeBg();
+
+            let t = 0, lt = 0;
+            function renderBg(now) {
+                now *= 0.001; 
+                t += (now - lt) * SPEED;
+                lt = now;
+                gl.uniform2f(uRes, canvasBg.width, canvasBg.height);
+                gl.uniform1f(uTime, t);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                requestAnimationFrame(renderBg);
+            }
+            requestAnimationFrame(renderBg);
+        }
+
+        // --- ARTIFACT VIEWER (Three.js) ---
+        const viewContainer = document.getElementById('viewer-container');
+        const artCanvas = document.getElementById('artifactCanvas');
+        const renderer = new THREE.WebGLRenderer({ canvas: artCanvas, alpha: true, antialias: true });
+        renderer.setSize(viewContainer.clientWidth, viewContainer.clientHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
         const scene = new THREE.Scene();
-        
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.z = 5;
-        camera.position.y = 0.5;
+        const camera = new THREE.PerspectiveCamera(45, viewContainer.clientWidth / viewContainer.clientHeight, 0.1, 100);
+        camera.position.z = 4.5;
 
-        // --- TEXTURE GENERATOR FOR "SECRET" ---
-        function createSecretTexture(texts) {
-            const ctxCanvas = document.createElement('canvas');
-            ctxCanvas.width = 512;
-            ctxCanvas.height = 512;
-            const ctx = ctxCanvas.getContext('2d');
+        // INNER SECRET (The Texture that gets revealed)
+        function createSecretTex(text, icon) {
+            const s = 512;
+            const c = document.createElement('canvas');
+            c.width = s; c.height = s;
+            const ctx = c.getContext('2d');
             
-            // Background (Paper/Screen)
+            // Brutalist Texture Style
+            ctx.fillStyle = '#f4f4f4'; // White BG
+            ctx.fillRect(0,0,s,s);
+            
+            // Icon Background
             ctx.fillStyle = '#e0e0e0';
-            ctx.fillRect(0, 0, 512, 512);
-            
-            // Text
-            ctx.fillStyle = '#cc0000'; // Red Stamp
-            ctx.font = 'bold 50px Courier New';
-            ctx.translate(256, 256);
-            ctx.rotate(-Math.PI / 4);
-            ctx.fillText("COMPROMISED", -200, 0);
-            ctx.rotate(Math.PI / 4);
-            ctx.translate(-256, -256);
+            ctx.font = '300px serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(icon, s/2, s/2);
 
-            ctx.fillStyle = '#000000';
-            ctx.font = '30px Courier New';
-            let y = 150;
-            texts.forEach(line => {
-                ctx.fillText(line, 50, y);
-                y += 50;
-            });
+            // STAMP
+            ctx.save();
+            ctx.translate(s/2, s/2);
+            ctx.rotate(-Math.PI/4);
+            ctx.strokeStyle = '#ff2a00';
+            ctx.lineWidth = 15;
+            ctx.strokeRect(-200, -80, 400, 160);
+            ctx.fillStyle = '#ff2a00';
+            ctx.font = 'bold 60px Courier New';
+            ctx.fillText("EXPOSED", 0, 0);
+            ctx.restore();
 
-            const tex = new THREE.CanvasTexture(ctxCanvas);
-            return tex;
+            return new THREE.CanvasTexture(c);
         }
 
-        // --- MESHES ---
-        
-        // 1. Inner Secret (Plane)
-        const secretGeo = new THREE.PlaneGeometry(2.5, 2.5);
-        let secretMat = new THREE.MeshBasicMaterial({ map: createSecretTexture(artifacts[0].secretText) });
+        const secretGeo = new THREE.PlaneGeometry(2, 2);
+        let secretMat = new THREE.MeshBasicMaterial({ map: createSecretTex(artifacts[0].name, artifacts[0].icon) });
         const secretMesh = new THREE.Mesh(secretGeo, secretMat);
         scene.add(secretMesh);
 
-        // 2. Outer Lock (Box with Shader)
-        const lockGeo = new THREE.BoxGeometry(2.6, 2.6, 0.5);
-        
+        // OUTER LOCK (Shader)
+        const lockGeo = new THREE.BoxGeometry(2.1, 2.1, 0.4);
         const uniforms = {
             uTime: { value: 0 },
             uYear: { value: 2025.0 },
             uCrackStart: { value: artifacts[0].crackStart },
-            uCrackEnd: { value: artifacts[0].crackEnd }
+            uCrackEnd: { value: artifacts[0].crackEnd },
+            // Theme Colors (Updated by JS)
+            uColorBg: { value: new THREE.Color(0xf4f4f4) },
+            uColorText: { value: new THREE.Color(0x050505) },
+            uColorAlert: { value: new THREE.Color(0xff2a00) }
         };
 
         const lockMat = new THREE.ShaderMaterial({
-            vertexShader: document.getElementById('vertexShader').textContent,
-            fragmentShader: document.getElementById('fragmentShader').textContent,
+            vertexShader: document.getElementById('artVertex').textContent,
+            fragmentShader: document.getElementById('artFragment').textContent,
             uniforms: uniforms,
             transparent: true,
             side: THREE.DoubleSide
         });
-
         const lockMesh = new THREE.Mesh(lockGeo, lockMat);
-        lockMesh.position.z = 0.3; // Slightly in front of secret
+        lockMesh.position.z = 0.25;
         scene.add(lockMesh);
 
-        // --- ANIMATION ---
+        // Animation Loop
         const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsed = clock.getElapsedTime();
-            uniforms.uTime.value = elapsed;
-
-            // Slow rotation for effect
-            lockMesh.rotation.y = Math.sin(elapsed * 0.2) * 0.1;
-            lockMesh.rotation.x = Math.cos(elapsed * 0.3) * 0.1;
+        function animateArt() {
+            requestAnimationFrame(animateArt);
+            const t = clock.getElapsedTime();
+            uniforms.uTime.value = t;
             
-            secretMesh.rotation.y = lockMesh.rotation.y;
-            secretMesh.rotation.x = lockMesh.rotation.x;
+            // Brutalist mechanical movement
+            lockMesh.rotation.y = Math.sin(t * 0.5) * 0.15;
+            lockMesh.rotation.x = Math.cos(t * 0.3) * 0.1;
+            secretMesh.rotation.copy(lockMesh.rotation);
 
             renderer.render(scene, camera);
         }
-        animate();
+        animateArt();
 
-        // --- INTERACTION LOGIC ---
-        
-        function updateYear(year) {
-            year = parseFloat(year);
-            document.getElementById('year-display').innerText = year.toFixed(1);
-            uniforms.uYear.value = year;
+        window.addEventListener('resize', () => {
+            camera.aspect = viewContainer.clientWidth / viewContainer.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(viewContainer.clientWidth, viewContainer.clientHeight);
+        });
 
-            // Update Status Text
-            const statusEl = document.getElementById('info-status');
-            const crackStart = artifacts[currentArtifactIdx].crackStart;
-            const crackEnd = artifacts[currentArtifactIdx].crackEnd;
+        // --- UI LOGIC ---
 
-            if (year < crackStart) {
+        function updateTimeLine(val) {
+            val = parseFloat(val);
+            document.getElementById('year-display').innerText = val.toFixed(1);
+            uniforms.uYear.value = val;
+            
+            const art = artifacts[currentIdx];
+            const statusEl = document.getElementById('status-readout');
+            
+            if (val < art.crackStart) {
                 statusEl.innerText = "SECURE";
-                statusEl.className = "text-sm text-green-500 font-mono";
-            } else if (year >= crackStart && year < crackEnd) {
-                statusEl.innerText = "DECAYING...";
-                statusEl.className = "text-sm text-yellow-500 font-mono glitch-text";
+                statusEl.style.color = "var(--text)";
+            } else if (val < art.crackEnd) {
+                statusEl.innerText = "DEGRADING...";
+                statusEl.style.color = "var(--alert)";
             } else {
-                statusEl.innerText = "HARVESTED";
-                statusEl.className = "text-sm text-red-600 font-bold font-mono glitch-text";
+                statusEl.innerText = "COMPROMISED";
+                statusEl.style.color = "var(--alert)";
             }
         }
 
-        function setArtifact(index) {
-            currentArtifactIdx = index;
-            const data = artifacts[index];
-
-            // Update UI Buttons
-            document.querySelectorAll('.artifact-btn').forEach((btn, i) => {
-                if(i === index) btn.classList.add('active');
-                else btn.classList.remove('active');
+        function selectArtifact(idx) {
+            currentIdx = idx;
+            const data = artifacts[idx];
+            
+            // Buttons
+            document.querySelectorAll('.artifact-btn').forEach((b, i) => {
+                if (i === idx) b.classList.add('active');
+                else b.classList.remove('active');
             });
 
-            // Update Info Panel
-            document.getElementById('info-title').innerText = `Target: ${data.name}`;
-            document.getElementById('info-desc').innerText = data.desc;
-            document.getElementById('info-date').innerText = data.shelfLife;
-            
-            // Update Shader Uniforms
+            // Text
+            document.getElementById('desc-text').innerText = data.desc;
+
+            // 3D Logic
             uniforms.uCrackStart.value = data.crackStart;
             uniforms.uCrackEnd.value = data.crackEnd;
-
-            // Update Inner Texture
-            secretMat.map = createSecretTexture(data.secretText);
+            secretMat.map = createSecretTex(data.name, data.icon);
             secretMat.needsUpdate = true;
-
-            // Reset Slider slightly to force re-check of status
-            updateYear(document.getElementById('year-slider').value);
+            
+            // Re-trigger visual check
+            updateTimeLine(document.getElementById('time-slider').value);
         }
 
-        // --- RESIZE HANDLER ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        // --- THEME ---
+        const toggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        function applyTheme(isDark) {
+            if (isDark) {
+                body.classList.add('dark-mode');
+                uniforms.uColorBg.value.setHex(0x0a0a0a);
+                uniforms.uColorText.value.setHex(0xe0e0e0);
+            } else {
+                body.classList.remove('dark-mode');
+                uniforms.uColorBg.value.setHex(0xf4f4f4);
+                uniforms.uColorText.value.setHex(0x050505);
+            }
+        }
+
+        toggle.addEventListener('click', () => {
+            const isDark = !body.classList.contains('dark-mode');
+            applyTheme(isDark);
         });
+        
+        // Initial Theme Check
+        if (localStorage.getItem('theme') === 'dark') applyTheme(true);
 
     </script>
 </body>
 </html>
-
