@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Now, Decrypt Later | Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; color: #e5e5e5; font-family: 'Courier New', Courier, monospace; }
+        
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 12px;
+            background: #ffffff;
+            cursor: pointer;
+            border: 1px solid #00ff00;
+            margin-top: -10px;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        input[type=range]::-moz-range-thumb {
+            height: 24px;
+            width: 12px;
+            background: #ffffff;
+            cursor: pointer;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        /* The Timeline Track - Dynamic Gradient handled in JS */
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #333;
+        }
+        
+        .artifact-btn {
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+        }
+        .artifact-btn:hover {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+        .artifact-btn.active {
+            border-color: #00ff00;
+            background: #00ff00;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .glitch-text {
+            animation: glitch 1s linear infinite;
+        }
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
+
+        #timeline-container {
+            background: linear-gradient(to right, 
+                rgba(0,255,0,0.1) 0%, 
+                rgba(0,255,0,0.1) 10%, 
+                rgba(255,0,0,0.1) 25%, 
+                rgba(255,0,0,0.5) 100%);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- UI Overlay -->
+    <div class="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-6">
+        
+        <!-- Header & Artifact Selector -->
+        <div class="pointer-events-auto max-w-md">
+            <h1 class="text-3xl font-bold mb-1 tracking-tighter text-green-500">HNDL CALCULATOR</h1>
+            <p class="text-xs text-gray-500 mb-6">HARVEST NOW, DECRYPT LATER RISK VISUALIZER</p>
+
+            <div class="space-y-2">
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Select Stolen Artifact</p>
+                
+                <button onclick="setArtifact(0)" id="btn-0" class="artifact-btn active w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
+                    <span>SATOSHI_WALLET.DAT</span>
+                    <span class="text-xs text-red-400">ECDSA (secp256k1)</span>
+                </button>
+                
+                <button onclick="setArtifact(1)" id="btn-1" class="artifact-btn w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
+                    <span>SIGNAL_CHAT_DB.SQLITE</span>
+                    <span class="text-xs text-orange-400">X3DH (Curve25519)</span>
+                </button>
+                
+                <button onclick="setArtifact(2)" id="btn-2" class="artifact-btn w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
+                    <span>STATE_DEPT_CABLES.PDF</span>
+                    <span class="text-xs text-yellow-400">RSA-2048</span>
+                </button>
+                
+                <button onclick="setArtifact(3)" id="btn-3" class="artifact-btn w-full text-left p-3 text-sm flex justify-between items-center bg-black bg-opacity-50 backdrop-blur-sm">
+                    <span>23ANDME_DNA_SEQ.ZIP</span>
+                    <span class="text-xs text-green-400">AES-256</span>
+                </button>
+            </div>
+
+            <div id="info-panel" class="mt-8 p-4 border-l-2 border-green-500 bg-black bg-opacity-80 backdrop-blur-md">
+                <h3 id="info-title" class="text-lg font-bold text-white">Target: Bitcoin Private Key</h3>
+                <p id="info-desc" class="text-xs text-gray-400 mt-2 leading-relaxed">
+                    Protected by Elliptic Curve Cryptography (ECDSA). While efficient, it is uniquely vulnerable to Shor's Algorithm. A quantum computer with ~4000 logical qubits could derive the private key from the public key in hours.
+                </p>
+                <div class="mt-4 flex justify-between items-end">
+                    <div>
+                        <span class="text-[10px] uppercase text-gray-600 block">Est. Shelf Life</span>
+                        <span id="info-date" class="text-xl text-red-500 font-mono">~2031</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] uppercase text-gray-600 block">Status</span>
+                        <span id="info-status" class="text-sm text-green-500 font-mono">SECURE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Slider -->
+        <div class="pointer-events-auto w-full mb-8">
+            <div class="flex justify-between text-xs text-gray-500 font-mono mb-2 px-1">
+                <span>2025</span>
+                <span class="text-gray-600">| 2026 NIST STANDARDS</span>
+                <span class="text-red-900">| 2029 FAULT TOLERANCE</span>
+                <span class="text-red-600">| 2033 Q-DAY (CRQC)</span>
+                <span>2060</span>
+            </div>
+            
+            <div id="timeline-container" class="relative h-6 rounded-sm border border-gray-800">
+                <!-- Milestones -->
+                <div class="absolute top-0 bottom-0 border-l border-gray-700" style="left: 2.8%"></div> <!-- 2026 -->
+                <div class="absolute top-0 bottom-0 border-l border-red-900" style="left: 11.4%"></div> <!-- 2029 -->
+                <div class="absolute top-0 bottom-0 border-l border-red-600" style="left: 22.8%"></div> <!-- 2033 -->
+                
+                <input type="range" min="2025" max="2060" value="2025" step="0.1" id="year-slider" 
+                       oninput="updateYear(this.value)" class="absolute inset-0 w-full h-full opacity-80 z-20">
+            </div>
+            <div class="text-center mt-4">
+                <span class="text-xs uppercase tracking-widest text-gray-600">Current Year Projection</span>
+                <div id="year-display" class="text-4xl font-mono text-white">2025.0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Canvas -->
+    <canvas id="canvas" class="absolute inset-0 z-0"></canvas>
+
+    <!-- Shader Code -->
+    <script type="x-shader/x-vertex" id="vertexShader">
+        varying vec2 vUv;
+        varying vec3 vPosition;
+        varying vec3 vNormal;
+
+        void main() {
+            vUv = uv;
+            vPosition = position;
+            vNormal = normal;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        uniform float uTime;
+        uniform float uYear;
+        uniform float uCrackStart;
+        uniform float uCrackEnd;
+        
+        varying vec2 vUv;
+        varying vec3 vPosition;
+        varying vec3 vNormal;
+
+        // Simplex Noise (Simplified)
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+        float snoise(vec2 v) {
+            const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+            vec2 i  = floor(v + dot(v, C.yy) );
+            vec2 x0 = v -   i + dot(i, C.xx);
+            vec2 i1;
+            i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+            vec4 x12 = x0.xyxy + C.xxzz;
+            x12.xy -= i1;
+            i = mod289(i);
+            vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+            m = m*m ;
+            m = m*m ;
+            vec3 x = 2.0 * fract(p * C.www) - 1.0;
+            vec3 h = abs(x) - 0.5;
+            vec3 ox = floor(x + 0.5);
+            vec3 a0 = x - ox;
+            m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+            vec3 g;
+            g.x  = a0.x  * x0.x  + h.x  * x0.y;
+            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+            return 130.0 * dot(m, g);
+        }
+
+        void main() {
+            // Calculate Decay Factor based on timeline
+            // 0.0 = Safe, 1.0 = Fully Broken
+            float decay = smoothstep(uCrackStart, uCrackEnd, uYear);
+            
+            // Noise generation for cracks
+            float noiseVal = snoise(vPosition.xy * 3.0 + vec2(0.0, uTime * 0.1));
+            float crack = smoothstep(0.4, 0.45, noiseVal); // Sharp cracks
+
+            // 1. Metal Base (Steel/Grey)
+            vec3 metalColor = vec3(0.3, 0.35, 0.4);
+            
+            // 2. Rust/Decay Color (Red/Orange)
+            vec3 rustColor = vec3(0.6, 0.2, 0.05);
+
+            // 3. Glass/Broken Color (Greenish transparent)
+            vec3 glassColor = vec3(0.8, 0.9, 0.9);
+
+            vec3 finalColor = metalColor;
+            float alpha = 1.0;
+
+            if (decay < 0.2) {
+                // Phase 1: Just Metal
+                finalColor = metalColor;
+                // Add slight specular highlight based on normal
+                float light = dot(vNormal, vec3(0.0, 0.0, 1.0));
+                finalColor += vec3(0.2) * pow(light, 4.0);
+            } 
+            else if (decay < 0.6) {
+                // Phase 2: Rusting & Cracking
+                float localDecay = (decay - 0.2) * 2.5; // 0 to 1
+                
+                // Mix rust based on noise
+                float rustMix = smoothstep(0.6 - localDecay * 0.5, 0.7 - localDecay * 0.5, noiseVal);
+                finalColor = mix(metalColor, rustColor, rustMix);
+                
+                // Physical Cracks (discard pixels)
+                if (noiseVal > (0.8 - localDecay * 0.3)) {
+                   // discard; // Don't discard yet, just darken
+                   finalColor = vec3(0.05); 
+                }
+            } 
+            else {
+                // Phase 3: Glassification & Disintegration
+                float localDecay = (decay - 0.6) * 2.5; // 0 to 1
+                
+                // Turn to glass color
+                finalColor = mix(rustColor, glassColor, localDecay);
+                
+                // Disintegration (Transparency)
+                alpha = 1.0 - localDecay;
+                
+                // Glitch effect in color
+                if (snoise(vUv * 50.0 + uTime) > 0.5) {
+                    finalColor += vec3(0.1, 0.0, 0.0);
+                }
+                
+                // Holes
+                if (noiseVal > (0.5 + (1.0 - alpha) * 0.5)) {
+                    discard;
+                }
+            }
+
+            gl_FragColor = vec4(finalColor, alpha);
+        }
+    </script>
+
+    <script>
+        // --- DATA ---
+        const artifacts = [
+            {
+                name: "Satoshi's Wallet",
+                algo: "ECDSA (secp256k1)",
+                desc: "Protected by Elliptic Curve Cryptography. Vulnerable to Shor's Algorithm. A quantum computer with ~4000 logical qubits could break this.",
+                crackStart: 2029,
+                crackEnd: 2033,
+                shelfLife: "~2031",
+                secretText: ["PRIVATE KEY:", "KxFc1jmwwCoACiCA", "L59VaKz3S87"]
+            },
+            {
+                name: "Signal Messages",
+                algo: "X3DH (Curve25519)",
+                desc: "Uses X3DH key agreement. While Forward Secrecy protects future messages, any 'Harvested' encrypted blobs from the past will be readable once the curve is broken.",
+                crackStart: 2030,
+                crackEnd: 2035,
+                shelfLife: "~2032",
+                secretText: ["MESSAGE_ID: 992", "TARGET: SENATOR", "LOC: [REDACTED]"]
+            },
+            {
+                name: "State Dept Cables",
+                algo: "RSA-2048",
+                desc: "The backbone of legacy internet security. Factoring 2048-bit integers requires massive superposition, likely needing 20 million noisy physical qubits.",
+                crackStart: 2032,
+                crackEnd: 2038,
+                shelfLife: "~2034",
+                secretText: ["TOP SECRET", "CABLE: 09TELAVIV", "SUBJ: NUCLEAR"]
+            },
+            {
+                name: "23andMe DNA Zip",
+                algo: "AES-256",
+                desc: "Symmetric encryption is remarkably resilient. Grover's Algorithm only reduces security by half (256 bits -> 128 bits). This will likely survive the first quantum era.",
+                crackStart: 2055,
+                crackEnd: 2070,
+                shelfLife: "SAFE > 2050",
+                secretText: ["DNA SEQ: GTCA", "PHENOTYPE: A", "RISK: HIGH"]
+            }
+        ];
+
+        let currentArtifactIdx = 0;
+
+        // --- THREE.JS SETUP ---
+        const canvas = document.getElementById('canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 5;
+        camera.position.y = 0.5;
+
+        // --- TEXTURE GENERATOR FOR "SECRET" ---
+        function createSecretTexture(texts) {
+            const ctxCanvas = document.createElement('canvas');
+            ctxCanvas.width = 512;
+            ctxCanvas.height = 512;
+            const ctx = ctxCanvas.getContext('2d');
+            
+            // Background (Paper/Screen)
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fillRect(0, 0, 512, 512);
+            
+            // Text
+            ctx.fillStyle = '#cc0000'; // Red Stamp
+            ctx.font = 'bold 50px Courier New';
+            ctx.translate(256, 256);
+            ctx.rotate(-Math.PI / 4);
+            ctx.fillText("COMPROMISED", -200, 0);
+            ctx.rotate(Math.PI / 4);
+            ctx.translate(-256, -256);
+
+            ctx.fillStyle = '#000000';
+            ctx.font = '30px Courier New';
+            let y = 150;
+            texts.forEach(line => {
+                ctx.fillText(line, 50, y);
+                y += 50;
+            });
+
+            const tex = new THREE.CanvasTexture(ctxCanvas);
+            return tex;
+        }
+
+        // --- MESHES ---
+        
+        // 1. Inner Secret (Plane)
+        const secretGeo = new THREE.PlaneGeometry(2.5, 2.5);
+        let secretMat = new THREE.MeshBasicMaterial({ map: createSecretTexture(artifacts[0].secretText) });
+        const secretMesh = new THREE.Mesh(secretGeo, secretMat);
+        scene.add(secretMesh);
+
+        // 2. Outer Lock (Box with Shader)
+        const lockGeo = new THREE.BoxGeometry(2.6, 2.6, 0.5);
+        
+        const uniforms = {
+            uTime: { value: 0 },
+            uYear: { value: 2025.0 },
+            uCrackStart: { value: artifacts[0].crackStart },
+            uCrackEnd: { value: artifacts[0].crackEnd }
+        };
+
+        const lockMat = new THREE.ShaderMaterial({
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent,
+            uniforms: uniforms,
+            transparent: true,
+            side: THREE.DoubleSide
+        });
+
+        const lockMesh = new THREE.Mesh(lockGeo, lockMat);
+        lockMesh.position.z = 0.3; // Slightly in front of secret
+        scene.add(lockMesh);
+
+        // --- ANIMATION ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsed = clock.getElapsedTime();
+            uniforms.uTime.value = elapsed;
+
+            // Slow rotation for effect
+            lockMesh.rotation.y = Math.sin(elapsed * 0.2) * 0.1;
+            lockMesh.rotation.x = Math.cos(elapsed * 0.3) * 0.1;
+            
+            secretMesh.rotation.y = lockMesh.rotation.y;
+            secretMesh.rotation.x = lockMesh.rotation.x;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- INTERACTION LOGIC ---
+        
+        function updateYear(year) {
+            year = parseFloat(year);
+            document.getElementById('year-display').innerText = year.toFixed(1);
+            uniforms.uYear.value = year;
+
+            // Update Status Text
+            const statusEl = document.getElementById('info-status');
+            const crackStart = artifacts[currentArtifactIdx].crackStart;
+            const crackEnd = artifacts[currentArtifactIdx].crackEnd;
+
+            if (year < crackStart) {
+                statusEl.innerText = "SECURE";
+                statusEl.className = "text-sm text-green-500 font-mono";
+            } else if (year >= crackStart && year < crackEnd) {
+                statusEl.innerText = "DECAYING...";
+                statusEl.className = "text-sm text-yellow-500 font-mono glitch-text";
+            } else {
+                statusEl.innerText = "HARVESTED";
+                statusEl.className = "text-sm text-red-600 font-bold font-mono glitch-text";
+            }
+        }
+
+        function setArtifact(index) {
+            currentArtifactIdx = index;
+            const data = artifacts[index];
+
+            // Update UI Buttons
+            document.querySelectorAll('.artifact-btn').forEach((btn, i) => {
+                if(i === index) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Update Info Panel
+            document.getElementById('info-title').innerText = `Target: ${data.name}`;
+            document.getElementById('info-desc').innerText = data.desc;
+            document.getElementById('info-date').innerText = data.shelfLife;
+            
+            // Update Shader Uniforms
+            uniforms.uCrackStart.value = data.crackStart;
+            uniforms.uCrackEnd.value = data.crackEnd;
+
+            // Update Inner Texture
+            secretMat.map = createSecretTexture(data.secretText);
+            secretMat.needsUpdate = true;
+
+            // Reset Slider slightly to force re-check of status
+            updateYear(document.getElementById('year-slider').value);
+        }
+
+        // --- RESIZE HANDLER ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
+
