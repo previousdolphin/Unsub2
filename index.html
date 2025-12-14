@@ -3,35 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>UNSUBSCRIBE LLC | HNDL_CALC</title>
-    <meta name="description" content="Harvest Now, Decrypt Later. Visualizing the inevitable decay of cryptographic assets.">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>UNSUBSCRIBE LLC | NCR-CAM</title>
+    <meta name="description" content="The NCR-CAM Officer Certification Program: Kill the Artist, Build the Corporation. Join the founding cohort for Structural Sovereignty.">
     <style>
         /* --- CORE RESET & VARS --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         :root {
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
             --bg: rgba(244, 244, 244, 0.92);
-            --bg-solid: #f4f4f4;
+            --bg-solid: #f4f4f4; /* Fallback for solid elements */
             --text: #050505;
             --border: #000000;
             --alert: #ff2a00;
+            /* FIX 4: Defining a slightly brighter alert color for text against --bg in light mode. */
             --alert-text-light: #d62400; 
             --font-main: 'Courier New', Courier, monospace;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             --sidebar-width: 440px;
             --ticker-height: 42px;
         }
 
         body.dark-mode {
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
             --bg: rgba(10, 10, 10, 0.92);
             --bg-solid: #0a0a0a;
             --text: #e0e0e0;
             --border: #333333;
             --alert: #ff2a00;
+            /* FIX 4: Defining a slightly brighter alert color for text against --bg in dark mode. */
             --alert-text-dark: #ff5e40;
         }
 
-        /* --- BACKGROUND CANVAS (The Void) --- */
+        /* --- BACKGROUND CANVAS STYLES --- */
         canvas#glCanvas {
             display: block;
             width: 100%;
@@ -40,44 +44,48 @@
             top: 0;
             left: 0;
             z-index: -9999; 
-            transition: opacity 0.5s ease;
+            transition: filter 0.5s ease, opacity 0.5s ease;
         }
 
+        /* LIGHT MODE CANVAS: Invert colors to make it white smoke, lower opacity */
         body:not(.dark-mode) canvas#glCanvas {
             filter: invert(1);
             opacity: 0.4;
         }
         
+        /* DARK MODE CANVAS: Native dark nebula */
         body.dark-mode canvas#glCanvas {
             filter: none;
             opacity: 1;
         }
 
         body {
+            /* Set body background to transparent so canvas shows through */
             background-color: transparent; 
             color: var(--text);
             font-family: var(--font-main);
             width: 100vw;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: color 0.3s; /* Removed bg transition here, handled by containers */
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
 
         .uppercase { text-transform: uppercase; }
-        a { color: inherit; text-decoration: none; }
         
         /* --- TYPOGRAPHY --- */
         h1 {
-            font-size: clamp(2rem, 3vw, 3.5rem); 
+            font-size: clamp(2.5rem, 3.5vw, 4.5rem); 
             line-height: 0.9;
             letter-spacing: -2px;
             margin-bottom: 25px;
             font-weight: 900;
+            max-width: 18ch; 
         }
 
         h2 {
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: bold;
             margin-bottom: 15px;
             background: var(--text);
@@ -86,9 +94,20 @@
             padding: 4px 8px;
         }
 
-        p { margin-bottom: 20px; font-size: 0.9rem; max-width: 60ch; }
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        p { 
+            margin-bottom: 20px; 
+            font-size: 1rem; 
+            max-width: 60ch; 
+        }
+
         .fine-print { font-size: 0.75rem; opacity: 0.7; }
-        .alert-text { color: var(--alert); font-weight: bold; }
 
         /* --- MARQUEE --- */
         .marquee-container {
@@ -109,11 +128,14 @@
 
         .marquee-content {
             display: inline-block;
-            animation: scroll 40s linear infinite;
+            animation: scroll 30s linear infinite;
             padding-left: 100%;
         }
 
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
 
         /* --- LAYOUT GRID --- */
         .grid-container {
@@ -127,148 +149,239 @@
             padding: 60px 80px;
             display: flex;
             flex-direction: column;
-            background-color: var(--bg);
-            backdrop-filter: blur(2px);
-            position: relative;
+            justify-content: flex-start;
+            background-color: var(--bg); /* Semi-transparent bg */
+            backdrop-filter: blur(2px); /* Subtle blur for readability */
         }
 
         .sidebar-col {
             position: sticky;
             top: 0;
-            height: calc(100vh - var(--ticker-height));
+            height: 100vh; 
             overflow-y: auto; 
             border-left: 0;
-            background-color: var(--bg);
+            background-color: var(--bg); /* Semi-transparent bg */
             backdrop-filter: blur(2px);
-            display: flex;
-            flex-direction: column;
         }
 
-        /* --- LOGO --- */
-        .logo-wrapper { margin-bottom: 40px; display: block; }
-        .logo-wrapper svg { width: 180px; height: auto; display: block; fill: var(--text); }
-
-        /* --- 3D VIEWER CONTAINER --- */
-        #viewer-container {
-            width: 100%;
-            height: 50vh;
-            border: 2px solid var(--border);
+        /* --- IMAGES --- */
+        .logo-wrapper {
             margin-bottom: 40px;
-            position: relative;
-            background: rgba(0,0,0,0.05);
-            overflow: hidden;
+            display: block;
         }
-        canvas#artifactCanvas {
+        
+        .logo-wrapper img {
+            width: 240px;
+            height: auto;
+            display: block;
+            mix-blend-mode: normal; 
+        }
+
+        body.dark-mode .logo-wrapper img {
+            mix-blend-mode: normal; 
+        }
+
+        /* Full-bleed image style */
+        .image-full-bleed {
+            width: calc(100% + 160px); 
+            margin-left: -80px; 
+            margin-right: -80px;
+            display: block;
+            
+            /* FIX 3: Contrast/Transparency logic */
+            filter: invert(1);
+            mix-blend-mode: multiply;
+            opacity: 0.8; 
+        }
+        
+        .image-full-bleed img {
             width: 100%;
-            height: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* FIX 3: Reset filter and blend mode for dark mode */
+        body.dark-mode .image-full-bleed {
+            filter: none;
+            mix-blend-mode: screen; 
+            opacity: 1; 
+        }
+
+        /* FIX 4: Contrasting color definitions */
+        .alert-text-color {
+            color: var(--alert-text-light); 
+        }
+
+        body.dark-mode .alert-text-color {
+            color: var(--alert-text-dark);
+        }
+
+        /* --- SECTIONS --- */
+        .section-block {
+            margin-bottom: 60px;
+        }
+
+        .week-list {
+            list-style: none;
+            margin-top: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .week-list li {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        .week-list li:last-child { border-bottom: none; }
+
+        /* --- INSTRUCTOR DOSSIER --- */
+        .dossier-container {
+            border: 2px solid var(--border);
+            padding: 25px;
+            background: rgba(125, 125, 125, 0.05); /* Slightly visible fill */
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .mugshot-wrapper img {
+            width: 100%;
+            height: auto;
+            border: 1px solid var(--border);
+            /* Brutalist Filter: High contrast B&W */
+            filter: grayscale(100%) contrast(120%);
             display: block;
         }
 
-        /* --- CONTROLS --- */
-        .control-group { padding: 30px; flex-grow: 1; display: flex; flex-direction: column; }
-        
-        .artifact-list {
-            list-style: none;
-            margin-bottom: 40px;
-            border: 2px solid var(--border);
-        }
-        
-        .artifact-btn {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 15px;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-            font-family: inherit;
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-        }
-        .artifact-btn:last-child { border-bottom: none; }
-        .artifact-btn:hover { background: rgba(125,125,125,0.1); }
-        .artifact-btn.active {
-            background: var(--text);
-            color: var(--bg-solid);
-        }
-        .artifact-btn.active .status-dot { background: var(--alert); }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--border);
-            border-radius: 50%;
-            display: inline-block;
+        .dossier-data {
+            font-size: 0.9rem;
         }
 
-        /* --- SLIDER --- */
-        .slider-wrapper {
-            margin-top: auto;
+        .data-row {
             margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 15px;
         }
-        
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-            margin: 10px 0;
-        }
-        input[type=range]:focus { outline: none; }
-        
-        /* Thumb */
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 30px;
-            width: 30px;
-            background: var(--alert);
-            cursor: pointer;
-            border: 2px solid var(--text);
-            margin-top: -12px;
-            box-shadow: 2px 2px 0px var(--text);
-        }
-        /* Track */
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 6px;
-            cursor: pointer;
-            background: var(--text);
-            border: 0;
-        }
+        .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
 
-        .timeline-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-top: 10px;
-            opacity: 0.8;
-        }
-
-        /* --- READOUTS --- */
-        .readout-box {
-            border: 2px solid var(--border);
-            padding: 20px;
-            margin-bottom: 30px;
-            background: rgba(255, 42, 0, 0.05);
-        }
-        .readout-label {
+        .data-label {
             font-size: 0.7rem;
             font-weight: 900;
             letter-spacing: 1px;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             opacity: 0.6;
         }
-        .readout-value {
-            font-size: 1.2rem;
-            font-weight: 900;
+        
+        .ops-list {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+        .ops-list li {
+            margin-bottom: 10px;
+            padding-left: 12px;
+            border-left: 2px solid var(--alert);
+            line-height: 1.3;
+        }
+        .ops-list li strong {
+            display: block;
+            text-decoration: underline;
+            margin-bottom: 2px;
         }
 
-        .data-terminal-footer {
+        /* --- WARNING BOX --- */
+        .warning-box {
+            border: 2px solid var(--alert);
+            color: var(--alert);
+            padding: 20px;
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            background: rgba(255, 42, 0, 0.05);
+        }
+
+        /* --- FORM TERMINAL --- */
+        .transfer-terminal {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: var(--text);
+            color: var(--bg-solid);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .input-group {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--border);
+            color: var(--text);
+            font-family: inherit;
+            margin-bottom: 15px;
+            outline: none;
+            border-radius: 0;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus { border-color: var(--alert); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--alert);
+            color: white; 
+            border: none;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+            margin-top: 5px;
+        }
+
+        .submit-btn:hover { opacity: 0.8; }
+        
+        .payment-note {
+            border: 1px solid var(--alert);
+            color: var(--alert);
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .timer-bar {
             padding: 15px; 
             border-top: 2px solid var(--border); 
             text-align: center; 
@@ -294,499 +407,393 @@
             font-size: 0.75rem;
             box-shadow: 3px 3px 0px var(--text);
         }
-        #theme-toggle:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px var(--text); }
+        
+        #theme-toggle:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--text);
+        }
 
-        /* --- RESPONSIVE --- */
+        /* --- MOBILE --- */
         @media (max-width: 1024px) {
             .grid-container { display: block; }
-            .content-col { padding: 40px 20px; border-right: none; border-bottom: 2px solid var(--border); }
-            .sidebar-col { position: relative; height: auto; border-left: 2px solid var(--border); }
+            
+            .content-col { 
+                border-right: none; 
+                border-bottom: 2px solid var(--border); 
+                padding: 40px 20px;
+            }
+
+            .sidebar-col {
+                position: relative;
+                height: auto;
+                overflow: visible;
+                border-left: 2px solid var(--border);
+            }
+
             h1 { font-size: 2.5rem; }
-            #viewer-container { height: 40vh; }
+            .logo-wrapper img { 
+                width: 120px; 
+                /* FIX 1: Set height explicitly for CLS fix on mobile. */
+                height: 78px;
+                margin: 0 auto 30px auto; 
+            }
+            .logo-wrapper { text-align: center; }
+            
+            .dossier-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .mugshot-wrapper img {
+                max-width: 200px;
+            }
+            
+            .input-group { padding: 20px; }
+            
+            /* NEW: Mobile image size fix */
+            .image-full-bleed {
+                width: calc(100% + 40px); 
+                margin-left: -20px; 
+                margin-right: -20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- BACKGROUND SHADER (From Reference) -->
     <canvas id="glCanvas"></canvas>
 
-    <!-- MARQUEE -->
+    <script type="x-shader/x-vertex" id="vertexShader">
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        precision mediump float;
+
+        uniform vec2 u_resolution;
+        uniform float u_time;
+        
+        // Locked Parameters
+        const float ZOOM = 1.6;
+        const float CONTRAST = 1.0;
+
+        void main() {
+            // Normalized coordinates
+            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+            
+            // Aspect Ratio Correction
+            uv = (uv - 0.5) * 2.0; 
+            uv.x *= u_resolution.x / u_resolution.y;
+            
+            // Apply Zoom
+            vec2 p = uv * ZOOM;
+            float x = p.x;
+            float y = p.y;
+            float t = u_time;
+
+            // The Formula
+            float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
+
+            // Normalize to 0-1 range for color
+            float brightness = 0.5 + 0.5 * val;
+            
+            // Apply Contrast
+            brightness = pow(brightness, CONTRAST);
+
+            // Output Grayscale
+            gl_FragColor = vec4(vec3(brightness), 1.0);
+        }
+    </script>
     <div class="marquee-container uppercase">
         <div class="marquee-content">
-            Unsubscribe LLC /// PROJECT: HARVEST_NOW_DECRYPT_LATER /// ALL YOUR SECRETS ARE BELONG TO THE FUTURE /// QUANTUM SUPREMACY IMMINENT /// ENCRYPTION IS TEMPORARY /// DECAY IS FOREVER /// &nbsp;
-            Unsubscribe LLC /// PROJECT: HARVEST_NOW_DECRYPT_LATER /// ALL YOUR SECRETS ARE BELONG TO THE FUTURE /// QUANTUM SUPREMACY IMMINENT /// ENCRYPTION IS TEMPORARY /// DECAY IS FOREVER /// &nbsp;
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
         </div>
     </div>
-
+    
     <div class="grid-container">
         
-        <!-- LEFT COLUMN: VISUALIZATION -->
-        <div class="content-col">
+        <div class="content-col" role="main">
             
-            <a href="https://unsubscribe.llc" class="logo-wrapper">
-                 <!-- SVG Logo Placeholder based on "Unsubscribe" text -->
-                <svg viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
-                    <text x="0" y="30" font-family="'Courier New', monospace" font-weight="900" font-size="28" letter-spacing="-1">UNSUBSCRIBE</text>
-                </svg>
-            </a>
-
-            <div style="margin-bottom: 30px;">
-                <h2 class="uppercase">Tool: HNDL_Calc</h2>
-                <h1 class="uppercase">The Architecture of Decay</h1>
-                <p>Every encrypted packet you send today is being harvested. It sits in a server farm in Utah, waiting for the math to break. This tool visualizes the shelf-life of your secrets.</p>
+            <div class="logo-wrapper">
+                <img src="Logo.svg" alt="Unsubscribe LLC Logo" width="140">
             </div>
 
-            <!-- THREE.JS CONTAINER -->
-            <div id="viewer-container">
-                <canvas id="artifactCanvas"></canvas>
-                <div style="position: absolute; top: 10px; left: 10px; font-size: 0.7rem; font-weight: bold; padding: 4px; border: 1px solid var(--text); background: var(--bg);">
-                    ASSET_PREVIEW_WINDOW
+            <div class="section-block">
+                <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
+                <h1 class="uppercase">You are tired of being a genius.</h1>
+                <p>The world does not need another "creative." The world has enough paintings. It has enough screenplays. It has enough noise.</p>
+                <p><strong>What the world lacks is Structure.</strong></p>
+                <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
+                <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
+            </div>
+
+            <div class="section-block">
+                <div class="image-full-bleed">
+                    <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
+                </div>
+            </div>
+            <div class="section-block">
+                <h2 class="uppercase">The Offer</h2>
+                <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
+                
+                <ul class="week-list uppercase">
+                    <li><span>Week 1</span> <span>We kill the Artist</span></li>
+                    <li><span>Week 2</span> <span>We build the Corporation</span></li>
+                    <li><span>Week 3</span> <span>We write the Myth</span></li>
+                    <li><span>Week 4</span> <span>We collect the Rent</span></li>
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Architect</h2>
+                <div class="dossier-container">
+                    <div class="mugshot-wrapper">
+                        <img src="paul.jpeg" alt="Paul Pissarro" width="280" height="370">
+                    </div>
+                    <div class="dossier-data">
+                        
+                        <div class="data-row">
+                            <span class="data-label uppercase">Name / Rank</span>
+                            <h3>PAUL PISSARRO</h3>
+                            <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
+                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">The Profile</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 5px;">
+                                Great-great-grandson of Impressionist architect Camille Pissarro. He carries a lineage of disruption—but he has traded the canvas for the corporation.
+                            </p>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Operational History</span>
+                            <ul class="ops-list">
+                                <li>
+                                    <strong>Strategic Acquisition</strong>
+                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen), executing multi-million dollar asset transfers.
+                                </li>
+                                <li>
+                                    <strong>Production & Direction</strong>
+                                    Founder of An Arm & A Leg Production Co., securing $250k+ in client contracts and capitalizing independent film projects.
+                                </li>
+                                <li>
+                                    <strong>Tactical Execution</strong>
+                                    Former Chef and Master Butcher (L'Ambroisie, Paris). He understands that execution is not an art; it is a discipline of steel and fire.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">The Mandate</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 10px;">
+                                Pissarro does not teach "art." He teaches Structural Sovereignty. He is the architect of the Neo-Classical Revival Corporate Art Movement (NCR-CAM).
+                            </p>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <strong>Objective:</strong> Replace the fragile "Artist" model with the durable "Asset Manager" model.
+                            </p>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Current Deployment</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
+                            </p>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
-            <div class="readout-box">
-                <div class="readout-label uppercase">TECHNICAL ANALYSIS</div>
-                <p id="desc-text" style="font-size: 0.85rem; margin-bottom: 0;">
-                    Select an asset to analyze encryption vulnerability vectors.
-                </p>
+            <div class="section-block" style="margin-bottom: 0;">
+                <h2 class="uppercase">The Source Code</h2>
+                <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
+                
+                <div class="warning-box uppercase">
+                    WARNING: This is High-Frequency Identity Engineering. Do not apply if you want to be "understood." Apply only if you want to be Solvent.
+                </div>
             </div>
 
         </div>
 
-        <!-- RIGHT COLUMN: CONTROLS -->
-        <div class="sidebar-col">
-            <div class="control-group">
-                <div style="border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 20px;">
-                    <span style="font-weight: 900; font-size: 1.2rem;">CONTROL TERMINAL</span>
+        <div class="sidebar-col" role="complementary">
+            <div class="transfer-terminal">
+                <div class="terminal-header uppercase">
+                    <div>Founding Cohort Application</div>
+                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
                 </div>
 
-                <div class="readout-label uppercase">TARGET ASSET</div>
-                <div class="artifact-list">
-                    <button class="artifact-btn active uppercase" onclick="selectArtifact(0)">
-                        <span>01 // Satoshi_Wallet.dat</span> <span class="status-dot"></span>
-                    </button>
-                    <button class="artifact-btn uppercase" onclick="selectArtifact(1)">
-                        <span>02 // Signal_Chat_Log.db</span> <span class="status-dot"></span>
-                    </button>
-                    <button class="artifact-btn uppercase" onclick="selectArtifact(2)">
-                        <span>03 // US_State_Dept.pdf</span> <span class="status-dot"></span>
-                    </button>
-                    <button class="artifact-btn uppercase" onclick="selectArtifact(3)">
-                        <span>04 // 23andMe_DNA.zip</span> <span class="status-dot"></span>
-                    </button>
-                </div>
+                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group" role="form">
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
+                        <span>PRICE</span>
+                        <div style="text-align: right;">
+                            <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
+                            <span class="alert-text-color">$2,000</span>
+                        </div>
+                    </div>
 
-                <div class="readout-box">
-                    <div class="readout-label uppercase">CURRENT STATUS</div>
-                    <div id="status-readout" class="readout-value alert-text">SECURE</div>
-                </div>
+                    <label for="legal-name" class="uppercase">Legal Name</label>
+                    <input type="text" id="legal-name" name="name" required placeholder="LAST, FIRST">
 
-                <div class="slider-wrapper">
-                    <div class="readout-label uppercase">TIMELINE PROJECTION</div>
-                    <div style="font-size: 2rem; font-weight: 900; font-family: var(--font-main);">
-                        YEAR: <span id="year-display">2025</span>
+                    <label for="email-address" class="uppercase">Email Address</label>
+                    <input type="email" id="email-address" name="email" required placeholder="CONTACT@DOMAIN.COM">
+
+                    <label for="select-role" class="uppercase">Select Role</label>
+                    <select id="select-role" name="role" required>
+                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
+                    </select>
+
+                    <label for="statement-of-intent" class="uppercase">Statement of Intent (Optional)</label>
+                    <input type="text" id="statement-of-intent" name="statement" placeholder="Why are you tired?">
+
+                    <input type="text" name="_gotcha" style="display:none" />
+
+                    <button type="submit" class="submit-btn">
+                        COMMIT TO SOLVENCY
+                    </button>
+                    
+                    <div class="payment-note uppercase">
+                        NO PAYMENT COLLECTED NOW.<br>
+                        THIS IS A COMMITMENT OF INTEREST.<br>
+                        PAYMENT REQUIRED UPON ACCEPTANCE.
                     </div>
                     
-                    <input type="range" min="2025" max="2060" value="2025" step="0.1" id="time-slider" oninput="updateTimeLine(this.value)">
-                    
-                    <div class="timeline-labels uppercase">
-                        <span>2025</span>
-                        <span class="alert-text">2030 (Q-RISK)</span>
-                        <span>2060</span>
-                    </div>
+                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
+                        By applying, you confirm your ability to pay the $2,000 fee.
+                    </p>
+                </form>
+
+                <div class="timer-bar">
+                    <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
                 </div>
-
-                <p class="fine-print uppercase" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 10px;">
-                    Warning: Mosca's Theorem applies. (Migration Time + Shelf Life > Time to Quantum).
-                </p>
-            </div>
-
-            <div class="data-terminal-footer">
-                <p class="uppercase" style="margin:0; font-weight: bold; font-size: 0.8rem;">SYSTEM: CONNECTED</p>
             </div>
         </div>
+
     </div>
 
     <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
 
-    <!-- SHADERS FOR ARTIFACT (Decay Effect) -->
-    <script type="x-shader/x-vertex" id="artVertex">
-        varying vec2 vUv;
-        varying vec3 vPosition;
-        varying vec3 vNormal;
-        void main() {
-            vUv = uv;
-            vPosition = position;
-            vNormal = normal;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-    </script>
-    <script type="x-shader/x-fragment" id="artFragment">
-        uniform float uTime;
-        uniform float uYear;
-        uniform float uCrackStart;
-        uniform float uCrackEnd;
-        uniform vec3 uColorBg;
-        uniform vec3 uColorText;
-        uniform vec3 uColorAlert;
-        
-        varying vec2 vUv;
-        varying vec3 vPosition;
-        varying vec3 vNormal;
-        
-        // Noise functions
-        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
-        float snoise(vec2 v) {
-            const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
-            vec2 i  = floor(v + dot(v, C.yy) );
-            vec2 x0 = v -   i + dot(i, C.xx);
-            vec2 i1;
-            i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-            vec4 x12 = x0.xyxy + C.xxzz;
-            x12.xy -= i1;
-            i = mod289(i);
-            vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
-            vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-            m = m*m ;
-            m = m*m ;
-            vec3 x = 2.0 * fract(p * C.www) - 1.0;
-            vec3 h = abs(x) - 0.5;
-            vec3 ox = floor(x + 0.5);
-            vec3 a0 = x - ox;
-            m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-            vec3 g;
-            g.x  = a0.x  * x0.x  + h.x  * x0.y;
-            g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-            return 130.0 * dot(m, g);
-        }
-
-        void main() {
-            float decay = smoothstep(uCrackStart, uCrackEnd, uYear);
-            float noise = snoise(vPosition.xy * 4.0 + vec2(0.0, uTime * 0.2));
-            
-            // Base "Secure" Metal (Matches Text Color)
-            vec3 secureColor = uColorText; // Black or White depending on theme
-            
-            // "Rust" is the Alert Color
-            vec3 rustColor = uColorAlert;
-            
-            // "Glass" is faint BG color
-            vec3 glassColor = uColorBg; 
-
-            vec3 finalColor = secureColor;
-            float alpha = 1.0;
-
-            if (decay < 0.1) {
-                // Secure Phase
-                // Add some wireframe grid logic via noise
-                float grid = step(0.9, fract(vUv.x * 10.0)) + step(0.9, fract(vUv.y * 10.0));
-                finalColor = mix(secureColor, uColorBg, grid * 0.5);
-            } 
-            else if (decay < 0.6) {
-                // Decay Phase
-                float localDecay = (decay - 0.1) * 2.0;
-                // Cracks appear
-                float crack = smoothstep(0.6 - localDecay*0.5, 0.65 - localDecay*0.5, noise);
-                finalColor = mix(secureColor, rustColor, crack);
-                
-                if (noise > (0.8 - localDecay*0.4)) {
-                     // Holes start forming
-                     // discard; 
-                     alpha = 0.5;
-                     finalColor = rustColor;
-                }
-            } 
-            else {
-                // Harvested Phase (Glass/Ghost)
-                float localDecay = (decay - 0.6) * 2.5;
-                finalColor = mix(rustColor, glassColor, localDecay);
-                alpha = 1.0 - localDecay;
-                
-                // Digital Glitch
-                if (snoise(vUv * 50.0 + uTime*2.0) > 0.5) {
-                    finalColor = uColorAlert;
-                    alpha = 0.8;
-                }
-                
-                if (noise > 0.4) discard;
-            }
-
-            gl_FragColor = vec4(finalColor, alpha);
-        }
-    </script>
-
-    <!-- MAIN SCRIPT -->
     <script>
-        // --- DATA ---
-        const artifacts = [
-            {
-                name: "Satoshi_Wallet.dat",
-                algo: "ECDSA (secp256k1)",
-                desc: "Bitcoin's elliptic curve cryptography. Vulnerable to Shor's Algorithm running on a large-scale quantum computer. Estimate: ~2031.",
-                crackStart: 2029, crackEnd: 2033,
-                icon: "₿"
-            },
-            {
-                name: "Signal_Chat_Log.db",
-                algo: "X3DH (Curve25519)",
-                desc: "While forward secrecy protects future messages, harvested historical logs will be decrypted once the curve is broken. Estimate: ~2032.",
-                crackStart: 2030, crackEnd: 2035,
-                icon: "✉"
-            },
-            {
-                name: "US_State_Dept.pdf",
-                algo: "RSA-2048",
-                desc: "The diplomatic standard. Factoring 2048-bit integers requires massive superposition stability. Estimate: ~2034.",
-                crackStart: 2032, crackEnd: 2038,
-                icon: "🏛"
-            },
-            {
-                name: "23andMe_DNA.zip",
-                algo: "AES-256",
-                desc: "Symmetric encryption. remarkably resilient. Grover's Algorithm only reduces effective key size to 128-bit. Safe until mid-century.",
-                crackStart: 2055, crackEnd: 2070,
-                icon: "🧬"
-            }
-        ];
-
-        let currentIdx = 0;
-
-        // --- BACKGROUND SHADER (The Void) ---
-        // Exactly as provided in the reference code
-        const canvasBg = document.getElementById('glCanvas');
-        const gl = canvasBg.getContext('webgl');
+        // --- SECTION 1: WebGL Background Logic ---
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl');
         const SPEED = 1.3;
 
-        if (gl) {
-            const vertSrc = `attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }`;
-            const fragSrc = `
-                precision mediump float;
-                uniform vec2 u_resolution;
-                uniform float u_time;
-                const float ZOOM = 1.6;
-                const float CONTRAST = 1.0;
-                void main() {
-                    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-                    uv = (uv - 0.5) * 2.0; 
-                    uv.x *= u_resolution.x / u_resolution.y;
-                    vec2 p = uv * ZOOM;
-                    float val = sin(sqrt(p.x*p.x + p.y*p.y)*5.0 - u_time) * cos((p.x - p.y)*3.0 + u_time*0.5);
-                    float brightness = 0.5 + 0.5 * val;
-                    brightness = pow(brightness, CONTRAST);
-                    gl_FragColor = vec4(vec3(brightness), 1.0);
+        if (!gl) {
+            console.error('WebGL not supported');
+        } else {
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
                 }
-            `;
-
-            function createShader(gl, type, src) {
-                const s = gl.createShader(type);
-                gl.shaderSource(s, src);
-                gl.compileShader(s);
-                return s;
+                return shader;
             }
-            const prog = gl.createProgram();
-            gl.attachShader(prog, createShader(gl, gl.VERTEX_SHADER, vertSrc));
-            gl.attachShader(prog, createShader(gl, gl.FRAGMENT_SHADER, fragSrc));
-            gl.linkProgram(prog);
-            gl.useProgram(prog);
 
-            const buf = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1,1,1,-1,-1,1,-1]), gl.STATIC_DRAW);
-            const posLoc = gl.getAttribLocation(prog, "position");
+            const vertexSrc = document.getElementById('vertexShader').textContent;
+            const fragmentSrc = document.getElementById('fragmentShader').textContent;
+
+            const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexSrc);
+            const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertShader);
+            gl.attachShader(program, fragShader);
+            gl.linkProgram(program);
+
+            gl.useProgram(program);
+
+            const posBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1.0,  1.0,
+                 1.0,  1.0,
+                -1.0, -1.0,
+                 1.0, -1.0,
+            ]), gl.STATIC_DRAW);
+
+            const posLoc = gl.getAttribLocation(program, "position");
             gl.enableVertexAttribArray(posLoc);
             gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-            const uRes = gl.getUniformLocation(prog, "u_resolution");
-            const uTime = gl.getUniformLocation(prog, "u_time");
+            const resLoc = gl.getUniformLocation(program, "u_resolution");
+            const timeLoc = gl.getUniformLocation(program, "u_time");
 
-            function resizeBg() {
-                canvasBg.width = window.innerWidth;
-                canvasBg.height = window.innerHeight;
-                gl.viewport(0,0,canvasBg.width, canvasBg.height);
+            function resize() {
+                const displayWidth  = canvas.clientWidth;
+                const displayHeight = canvas.clientHeight;
+
+                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                    canvas.width  = displayWidth;
+                    canvas.height = displayHeight;
+                    gl.viewport(0, 0, canvas.width, canvas.height);
+                }
             }
-            window.addEventListener('resize', resizeBg);
-            resizeBg();
+            window.addEventListener('resize', resize);
 
-            let t = 0, lt = 0;
-            function renderBg(now) {
+            let time = 0;
+            let lastTime = 0;
+
+            function render(now) {
                 now *= 0.001; 
-                t += (now - lt) * SPEED;
-                lt = now;
-                gl.uniform2f(uRes, canvasBg.width, canvasBg.height);
-                gl.uniform1f(uTime, t);
+                const deltaTime = now - lastTime;
+                lastTime = now;
+
+                resize(); 
+
+                time += deltaTime * SPEED;
+
+                gl.uniform2f(resLoc, canvas.width, canvas.height);
+                gl.uniform1f(timeLoc, time);
+
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-                requestAnimationFrame(renderBg);
+
+                requestAnimationFrame(render);
             }
-            requestAnimationFrame(renderBg);
+            requestAnimationFrame(render);
         }
 
-        // --- ARTIFACT VIEWER (Three.js) ---
-        const viewContainer = document.getElementById('viewer-container');
-        const artCanvas = document.getElementById('artifactCanvas');
-        const renderer = new THREE.WebGLRenderer({ canvas: artCanvas, alpha: true, antialias: true });
-        renderer.setSize(viewContainer.clientWidth, viewContainer.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, viewContainer.clientWidth / viewContainer.clientHeight, 0.1, 100);
-        camera.position.z = 4.5;
-
-        // INNER SECRET (The Texture that gets revealed)
-        function createSecretTex(text, icon) {
-            const s = 512;
-            const c = document.createElement('canvas');
-            c.width = s; c.height = s;
-            const ctx = c.getContext('2d');
-            
-            // Brutalist Texture Style
-            ctx.fillStyle = '#f4f4f4'; // White BG
-            ctx.fillRect(0,0,s,s);
-            
-            // Icon Background
-            ctx.fillStyle = '#e0e0e0';
-            ctx.font = '300px serif';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText(icon, s/2, s/2);
-
-            // STAMP
-            ctx.save();
-            ctx.translate(s/2, s/2);
-            ctx.rotate(-Math.PI/4);
-            ctx.strokeStyle = '#ff2a00';
-            ctx.lineWidth = 15;
-            ctx.strokeRect(-200, -80, 400, 160);
-            ctx.fillStyle = '#ff2a00';
-            ctx.font = 'bold 60px Courier New';
-            ctx.fillText("EXPOSED", 0, 0);
-            ctx.restore();
-
-            return new THREE.CanvasTexture(c);
+        // --- SECTION 2: Existing Site Logic ---
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
         }
+        setInterval(updateTime, 1000);
+        updateTime();
 
-        const secretGeo = new THREE.PlaneGeometry(2, 2);
-        let secretMat = new THREE.MeshBasicMaterial({ map: createSecretTex(artifacts[0].name, artifacts[0].icon) });
-        const secretMesh = new THREE.Mesh(secretGeo, secretMat);
-        scene.add(secretMesh);
-
-        // OUTER LOCK (Shader)
-        const lockGeo = new THREE.BoxGeometry(2.1, 2.1, 0.4);
-        const uniforms = {
-            uTime: { value: 0 },
-            uYear: { value: 2025.0 },
-            uCrackStart: { value: artifacts[0].crackStart },
-            uCrackEnd: { value: artifacts[0].crackEnd },
-            // Theme Colors (Updated by JS)
-            uColorBg: { value: new THREE.Color(0xf4f4f4) },
-            uColorText: { value: new THREE.Color(0x050505) },
-            uColorAlert: { value: new THREE.Color(0xff2a00) }
-        };
-
-        const lockMat = new THREE.ShaderMaterial({
-            vertexShader: document.getElementById('artVertex').textContent,
-            fragmentShader: document.getElementById('artFragment').textContent,
-            uniforms: uniforms,
-            transparent: true,
-            side: THREE.DoubleSide
-        });
-        const lockMesh = new THREE.Mesh(lockGeo, lockMat);
-        lockMesh.position.z = 0.25;
-        scene.add(lockMesh);
-
-        // Animation Loop
-        const clock = new THREE.Clock();
-        function animateArt() {
-            requestAnimationFrame(animateArt);
-            const t = clock.getElapsedTime();
-            uniforms.uTime.value = t;
-            
-            // Brutalist mechanical movement
-            lockMesh.rotation.y = Math.sin(t * 0.5) * 0.15;
-            lockMesh.rotation.x = Math.cos(t * 0.3) * 0.1;
-            secretMesh.rotation.copy(lockMesh.rotation);
-
-            renderer.render(scene, camera);
-        }
-        animateArt();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = viewContainer.clientWidth / viewContainer.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(viewContainer.clientWidth, viewContainer.clientHeight);
-        });
-
-        // --- UI LOGIC ---
-
-        function updateTimeLine(val) {
-            val = parseFloat(val);
-            document.getElementById('year-display').innerText = val.toFixed(1);
-            uniforms.uYear.value = val;
-            
-            const art = artifacts[currentIdx];
-            const statusEl = document.getElementById('status-readout');
-            
-            if (val < art.crackStart) {
-                statusEl.innerText = "SECURE";
-                statusEl.style.color = "var(--text)";
-            } else if (val < art.crackEnd) {
-                statusEl.innerText = "DEGRADING...";
-                statusEl.style.color = "var(--alert)";
-            } else {
-                statusEl.innerText = "COMPROMISED";
-                statusEl.style.color = "var(--alert)";
-            }
-        }
-
-        function selectArtifact(idx) {
-            currentIdx = idx;
-            const data = artifacts[idx];
-            
-            // Buttons
-            document.querySelectorAll('.artifact-btn').forEach((b, i) => {
-                if (i === idx) b.classList.add('active');
-                else b.classList.remove('active');
-            });
-
-            // Text
-            document.getElementById('desc-text').innerText = data.desc;
-
-            // 3D Logic
-            uniforms.uCrackStart.value = data.crackStart;
-            uniforms.uCrackEnd.value = data.crackEnd;
-            secretMat.map = createSecretTex(data.name, data.icon);
-            secretMat.needsUpdate = true;
-            
-            // Re-trigger visual check
-            updateTimeLine(document.getElementById('time-slider').value);
-        }
-
-        // --- THEME ---
         const toggle = document.getElementById('theme-toggle');
         const body = document.body;
+        const logo = document.querySelector('.logo-wrapper img');
 
         function applyTheme(isDark) {
             if (isDark) {
                 body.classList.add('dark-mode');
-                uniforms.uColorBg.value.setHex(0x0a0a0a);
-                uniforms.uColorText.value.setHex(0xe0e0e0);
+                localStorage.setItem('theme', 'dark');
             } else {
                 body.classList.remove('dark-mode');
-                uniforms.uColorBg.value.setHex(0xf4f4f4);
-                uniforms.uColorText.value.setHex(0x050505);
+                localStorage.setItem('theme', 'light');
             }
+        }
+
+        // Initial load
+        if (localStorage.getItem('theme') === 'dark') {
+            applyTheme(true);
+        } else {
+            applyTheme(false);
         }
 
         toggle.addEventListener('click', () => {
             const isDark = !body.classList.contains('dark-mode');
             applyTheme(isDark);
         });
-        
-        // Initial Theme Check
-        if (localStorage.getItem('theme') === 'dark') applyTheme(true);
-
     </script>
 </body>
 </html>
-
