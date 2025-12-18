@@ -1,0 +1,55 @@
+{
+  "name": "unsubscribe-llc-website",
+  "version": "1.0.0",
+  "description": "Static website for Unsubscribe LLC - NCR-CAM Officer Certification Program",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 12000",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 12001",
+    "serve": "python3 -m http.server 12000 --bind 0.0.0.0",
+    "lint": "eslint . --ext .js,.html --ignore-path .gitignore",
+    "lint:fix": "eslint . --ext .js,.html --ignore-path .gitignore --fix",
+    "format": "prettier --write . --ignore-path .gitignore",
+    "format:check": "prettier --check . --ignore-path .gitignore",
+    "test": "echo 'No tests specified' && exit 0",
+    "validate": "npm run lint && npm run format:check",
+    "deps:check": "npm outdated",
+    "deps:update": "npm update"
+  },
+  "keywords": [
+    "static-site",
+    "website",
+    "unsubscribe-llc",
+    "ncr-cam",
+    "three.js",
+    "tailwindcss"
+  ],
+  "author": "Unsubscribe LLC",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.4.10",
+    "eslint": "^9.15.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-html": "^8.1.2",
+    "@eslint/js": "^9.15.0",
+    "prettier": "^3.3.3",
+    "http-server": "^14.1.1",
+    "@vitejs/plugin-legacy": "^5.4.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "cssnano": "^7.0.6",
+    "globals": "^15.12.0"
+  },
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -25,10 +25,28 @@
             left: 0;
             z-index: -9999; 
         }
+        .home-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            font-family: monospace;
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        .home-link:hover {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
-
+    <a href="https://www.unsubscribe.llc" class="home-link">← UNSUBSCRIBE</a>
     <canvas id="glCanvas"></canvas>
 
     <!-- Vertex Shader -->

@@ -137,10 +137,32 @@
             100% { transform: translate(0); opacity: 1; }
         }
 
+        .home-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--led-color);
+            text-decoration: none;
+            font-size: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 6px 10px;
+            border: 1px solid var(--led-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .home-link:hover {
+            opacity: 1;
+            background: rgba(255, 51, 0, 0.1);
+        }
+
     </style>
 </head>
 <body>
-
+    <a href="https://www.unsubscribe.llc" class="home-link">← UNSUBSCRIBE</a>
     <div id="ticker-container"></div>
 
     <script>
