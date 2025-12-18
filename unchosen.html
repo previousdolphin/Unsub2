@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribe | The Chosen Life</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* CSS Scroll Snapping - The "Locking" Mechanism */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        main {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            background-color: #09090b; /* zinc-950 */
+        }
+
+        section {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+        }
+
+        /* Fade-in Animation Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .white-space-theme {
+            background-color: #f4f4f5; /* zinc-100 */
+            color: #09090b;
+        }
+
+        .final-theme {
+            background-color: #ffffff;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+
+<main id="scroll-container">
+    <section class="bg-black text-white">
+        <div class="text-center reveal">
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-4">UNSUBSCRIBE</h1>
+            <div class="w-16 h-1 bg-white mx-auto mb-6"></div>
+            <p class="text-zinc-500 uppercase tracking-[0.3em] text-sm">Scroll to begin</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light text-zinc-300 leading-tight">
+                Unsubscribe was talked about in living rooms around the world. Parents asked their kids to unsubscribe from all sorts of things.
+            </h2>
+        </div>
+    </section>
+
+    <section>
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light text-zinc-100 leading-tight">
+                Kids unsubscribed from what they perceived were their parent’s failings.
+            </h2>
+        </div>
+    </section>
+
+    <section class="bg-zinc-900">
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light text-white leading-tight mb-8">
+                The subscriber model wasn’t wrong, but unsubscribing broke the routine and allowed for something new...
+            </h2>
+            <p class="text-xl md:text-2xl text-zinc-400 font-serif italic border-l-2 border-zinc-700 pl-6">
+                ...where subscribing was really just the point of going from a free supporter to a paying one.
+            </p>
+        </div>
+    </section>
+
+    <section class="bg-zinc-900">
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light text-white leading-tight mb-8">
+                The hum of the world didn't stop, but the static cleared.
+            </h2>
+            <p class="text-xl md:text-2xl text-zinc-400 font-serif italic border-l-2 border-zinc-700 pl-6">
+                People looked at their bank statements and their calendars and saw white space where the clutter used to be.
+            </p>
+        </div>
+    </section>
+
+    <section class="bg-zinc-800">
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light text-white leading-tight mb-8">
+                To subscribe became a vow, not a trap.
+            </h2>
+            <p class="text-xl md:text-2xl text-zinc-300 font-serif italic border-l-2 border-zinc-500 pl-6">
+                It meant you looked a creator—or a cause, or a habit—in the eye and said, "I choose you again today."
+            </p>
+        </div>
+    </section>
+
+    <section class="bg-zinc-800">
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light text-white leading-tight mb-6">
+                The default setting of the universe shifted from "Forever until cancelled" to "Ask me again tomorrow."
+            </h2>
+            <p class="text-2xl text-zinc-400">And in that asking, value was found.</p>
+        </div>
+    </section>
+
+    <section class="bg-zinc-700">
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light text-white leading-tight">
+                And in speaking, gave time for listening. And listening gave time for silence.
+            </h2>
+        </div>
+    </section>
+
+    <section class="bg-zinc-600">
+        <div class="max-w-4xl reveal text-center">
+            <h2 class="text-4xl md:text-6xl font-bold text-white tracking-tighter">
+                And in that pause, the world learned the difference between momentum and movement.
+            </h2>
+        </div>
+    </section>
+
+    <section class="white-space-theme">
+        <div class="max-w-4xl reveal">
+            <h2 class="text-3xl md:text-5xl font-light leading-tight mb-8">
+                To remain subscribed was no longer an accident of inertia, but an act of daily devotion.
+            </h2>
+            <p class="text-xl md:text-2xl opacity-70 font-serif italic border-l-2 border-current pl-6">
+                We learned that to love something truly—whether a service, a belief, or a person—you must be willing to let it go, just to see if your hands are willing to reach out and grab it all over again.
+            </p>
+        </div>
+    </section>
+
+    <section class="final-theme">
+        <div class="max-w-4xl reveal text-center">
+            <h2 class="text-3xl md:text-5xl font-light mb-4">The automatic life ended,</h2>
+            <h2 class="text-5xl md:text-8xl font-black tracking-tighter uppercase">and the chosen life began.</h2>
+        </div>
+    </section>
+</main>
+
+<script>
+    // Intersection Observer to trigger fade-ins
+    const observerOptions = {
+        threshold: 0.5
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            } else {
+                // Remove the class if you want the animation to repeat when scrolling back up
+                entry.target.classList.remove('active');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach((el) => {
+        observer.observe(el);
+    });
+</script>
+
+</body>
+</html
