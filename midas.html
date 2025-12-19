@@ -2,52 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NCR-CAM | MIDAS PROTOCOL FINAL</title>
-    
-    <!-- PHYSICS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NCR-CAM | MIDAS PROTOCOL v4</title>
+    <!-- Physics Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    
-    <!-- FONTS -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #080808;
+            --bg-color: #050505;
             --term-red: #ff3300;
             --term-dim: #4a0f00;
             --midas-gold: #FFD700;
             --midas-shine: #FFF8DC;
             --midas-dark: #B8860B;
-            --glass-panel: rgba(10, 10, 10, 0.85);
         }
 
-        /* --- CORE RESET --- */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-color);
-            overflow: hidden; /* Prevent scroll */
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--term-red);
-            /* CRITICAL FOR IOS DRAGGING */
-            touch-action: none; 
-            -webkit-overflow-scrolling: none;
-            overscroll-behavior: none;
-        }
-
+        /* RESET & BASICS */
         * {
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            cursor: none !important; /* Custom cursor only */
+            cursor: none !important; /* Force hide native cursor */
+            touch-action: none; /* Critical for native mobile dragging */
         }
 
-        /* --- VISUALS --- */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--term-red);
+        }
+
+        /* --- VISUAL FX LAYER --- */
         .scanlines {
             position: fixed;
             top: 0;
@@ -57,13 +51,13 @@
             background: 
                 linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                 linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 6px 100%;
+            background-size: 100% 2px, 3px 100%;
             pointer-events: none;
-            z-index: 100;
+            z-index: 999;
         }
 
-        /* --- PHYSICS CONTAINER --- */
-        #stage {
+        /* --- PHYSICS LAYER --- */
+        #physics-container {
             position: absolute;
             top: 0;
             left: 0;
@@ -72,171 +66,184 @@
             z-index: 10;
         }
 
-        /* --- WORD ENTITIES --- */
-        .word-box {
+        /* --- THE WORD BOXES --- */
+        .box {
             position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 14px;
-            font-size: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
             line-height: 1.1;
             text-transform: uppercase;
-            
-            /* Aesthetics */
             border: 1px solid var(--term-red);
-            background: rgba(5, 0, 0, 0.9);
+            background: rgba(10, 0, 0, 0.9);
             color: var(--term-red);
-            box-shadow: 0 0 5px var(--term-red);
+            box-shadow: 0 0 8px var(--term-red);
             
-            /* Optimization */
-            will-change: transform;
-            backface-visibility: hidden;
+            /* CSS transitions for visual flair, physics controls position */
+            transition: opacity 0.8s ease-out, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+            will-change: transform, opacity;
+            
             transform-origin: center center;
-            
-            /* Typography */
             white-space: normal;
             word-wrap: break-word;
-            
-            /* Initial State */
-            opacity: 0; 
-            animation: spawnFade 0.5s forwards ease-out;
+            backface-visibility: hidden;
         }
 
-        @keyframes spawnFade { to { opacity: 1; } }
-
-        /* --- MIDAS STATE --- */
-        .word-box.midas {
+        /* --- MIDAS (GOLD) STATE --- */
+        .box.midas {
             border-color: var(--midas-gold);
             color: #000;
-            background: linear-gradient(135deg, var(--midas-gold) 0%, var(--midas-shine) 40%, var(--midas-dark) 100%);
-            box-shadow: 0 0 30px var(--midas-gold);
+            background: linear-gradient(135deg, var(--midas-gold) 0%, var(--midas-shine) 50%, var(--midas-dark) 100%);
+            box-shadow: 0 0 25px var(--midas-gold);
             font-weight: bold;
-            z-index: 50;
-            transition: opacity 1s ease-out; /* Fade out transition */
+            z-index: 100;
         }
-        
-        .word-box.fading {
+
+        .box.fading {
             opacity: 0;
-            pointer-events: none;
+            transform: scale(0.9);
         }
 
-        /* --- CUSTOM CURSOR (THE HAND) --- */
-        #hand-cursor {
+        /* --- GOLDEN HAND CURSOR --- */
+        #cursor {
             position: fixed;
-            top: 0; left: 0;
-            width: 60px; height: 60px;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
             pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
+            z-index: 5000;
+            transform: translate(-50%, -50%); /* Centered on point */
+            filter: drop-shadow(0 0 10px var(--midas-gold));
+            opacity: 0; /* Hidden until mode starts */
+            transition: opacity 0.5s ease-in, transform 0.1s linear;
             will-change: transform;
-            filter: drop-shadow(0 0 8px var(--midas-gold));
         }
         
-        #hand-svg {
-            width: 100%; height: 100%;
-            fill: none;
-            stroke: var(--midas-gold);
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: all 0.1s ease;
+        #cursor svg {
+            width: 100%;
+            height: 100%;
+            fill: var(--midas-gold);
+            transition: transform 0.1s ease;
         }
 
-        /* Grabbing State Visuals */
-        #hand-cursor.grabbing { transform: translate(-50%, -50%) scale(0.9); }
-        #hand-cursor.grabbing #hand-svg { fill: rgba(255, 215, 0, 0.2); stroke-width: 3; }
+        /* Grab Animation */
+        #cursor.grabbing svg {
+            transform: scale(0.8); /* Shrink slightly to indicate grip */
+        }
 
-        /* --- BOOT UI --- */
-        #boot-overlay {
+        /* --- BOOT INTERFACE --- */
+        #boot-screen {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: #000;
-            z-index: 2000;
+            z-index: 8000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            transition: opacity 0.5s ease;
-        }
-
-        .title-block {
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        h1 {
             font-family: 'VT323', monospace;
-            font-size: clamp(3rem, 10vw, 5rem);
-            margin: 0;
+            padding: 20px;
+            transition: opacity 0.8s ease-out;
+        }
+
+        h1.glitch {
+            font-size: clamp(3rem, 10vw, 6rem);
+            margin: 0 0 1rem 0;
+            position: relative;
+            animation: glitch-skew 2s infinite linear alternate-reverse;
+            text-shadow: 2px 2px var(--term-dim);
             color: var(--term-red);
-            text-shadow: 2px 2px 0px var(--term-dim);
-            letter-spacing: -2px;
         }
 
         .subtitle {
-            font-size: 1rem;
-            letter-spacing: 4px;
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            margin-bottom: 3rem;
             color: var(--term-red);
-            opacity: 0.7;
-            border-top: 1px solid var(--term-red);
-            padding-top: 10px;
-            display: inline-block;
+            border-bottom: 1px solid var(--term-red);
+            padding-bottom: 10px;
         }
 
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 600px;
+        .mode-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
             width: 100%;
+            max-width: 800px;
         }
 
         .btn {
-            background: rgba(20, 0, 0, 0.8);
-            border: 1px solid var(--term-red);
+            background: rgba(255, 51, 0, 0.05);
+            border: 2px solid var(--term-red);
             color: var(--term-red);
-            padding: 25px;
+            padding: 20px 40px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             cursor: pointer !important;
             transition: all 0.2s;
             text-transform: uppercase;
+            min-width: 280px;
             position: relative;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
         }
 
         .btn:hover {
             background: var(--term-red);
             color: #000;
-            box-shadow: 0 0 20px var(--term-red);
+            box-shadow: 0 0 30px var(--term-red);
+            transform: translateY(-2px);
         }
-
-        .btn:active { transform: scale(0.98); }
         
-        .btn span {
-            display: block;
-            font-size: 0.75rem;
-            margin-top: 8px;
-            opacity: 0.6;
+        .btn:disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: grayscale(1);
         }
 
-        #log-output {
-            margin-top: 30px;
+        .btn .desc {
+            display: block;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            opacity: 0.7;
+            font-family: 'VT323', monospace;
+        }
+
+        /* Status Log for Camera Loading */
+        #boot-log {
+            margin-top: 2rem;
             font-family: 'VT323', monospace;
             color: var(--midas-gold);
+            height: 1.5rem;
             font-size: 1.2rem;
-            height: 20px;
             text-align: center;
         }
 
-        /* Hidden Video for CV */
-        #webcam { position: fixed; right: 0; bottom: 0; width: 1px; opacity: 0; pointer-events: none; }
+        /* Debug Video (Hidden) */
+        #webcam {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 120px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
 
-        @media (max-width: 600px) {
-            .btn-grid { grid-template-columns: 1fr; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(-4deg); }
+            40% { transform: skew(4deg); }
+            60% { transform: skew(-2deg); }
+            80% { transform: skew(2deg); }
+            100% { transform: skew(0deg); }
         }
     </style>
 </head>
@@ -245,50 +252,44 @@
     <div class="scanlines"></div>
 
     <!-- BOOT SCREEN -->
-    <div id="boot-overlay">
-        <div class="title-block">
-            <h1>NCR-CAM</h1>
-            <div class="subtitle">MIDAS PROTOCOL v4.0</div>
-        </div>
-
-        <div class="btn-grid">
+    <div id="boot-screen">
+        <h1 class="glitch" data-text="NCR-CAM">NCR-CAM</h1>
+        <div class="subtitle">MIDAS PROTOCOL v4.0</div>
+        
+        <div class="mode-container">
             <button class="btn" id="btn-tactile">
-                TACTILE INPUT
-                <span>TOUCH / MOUSE DRAG</span>
+                TACTILE MODE
+                <span class="desc">MOUSE / TOUCH DRAG</span>
             </button>
             <button class="btn" id="btn-visual">
-                VISUAL INPUT
-                <span>CAMERA / HAND TRACKING</span>
+                VISUAL MODE
+                <span class="desc">CAMERA / PINCH TO GRAB</span>
             </button>
         </div>
-
-        <div id="log-output">AWAITING INPUT...</div>
+        
+        <div id="boot-log"></div>
     </div>
 
-    <!-- INTERACTIVE STAGE -->
-    <div id="stage"></div>
-
-    <!-- CUSTOM CURSOR -->
-    <div id="hand-cursor">
-        <!-- Stylized Cyber-Hand SVG -->
-        <svg id="hand-svg" viewBox="0 0 100 100">
-            <!-- Palm -->
-            <polygon points="30,60 70,60 75,90 25,90" />
-            <!-- Thumb -->
-            <path d="M25,65 L10,50 L15,40 L30,55" />
-            <!-- Fingers -->
-            <path d="M35,60 L32,20 L40,18 L43,60" /> <!-- Index -->
-            <path d="M48,60 L46,10 L54,8 L56,60" />  <!-- Middle -->
-            <path d="M60,60 L60,15 L68,17 L68,60" /> <!-- Ring -->
-            <path d="M72,60 L75,30 L80,32 L78,60" /> <!-- Pinky -->
+    <!-- MAIN INTERACTION LAYER -->
+    <div id="physics-container"></div>
+    
+    <!-- GOLDEN HAND -->
+    <div id="cursor">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21.92,14.67C21.92,14.66 21.92,14.65 21.92,14.64C21.84,13.73 21.08,13 20.15,13C20.1,13 20.06,13 20.01,13C20.04,12.87 20.06,12.73 20.06,12.59C20.06,11.53 19.2,10.67 18.14,10.67C18.1,10.67 18.06,10.67 18.03,10.68C18.03,10.68 18.03,10.68 18.03,10.68C17.94,9.69 17.11,8.92 16.1,8.92C15.97,8.92 15.85,8.93 15.73,8.95L15.65,2.94C15.65,1.88 14.79,1.03 13.73,1.03C12.67,1.03 11.81,1.88 11.81,2.94L11.81,13.25L10.38,12.5C10.21,12.4 10.03,12.35 9.85,12.35C9.44,12.35 9.06,12.55 8.84,12.89L7.74,14.54L13.11,20.16C13.82,20.91 14.81,21.33 15.85,21.33H19.74C20.89,21.33 21.84,20.44 21.91,19.29L22,19.25L22,19.22C22.06,18.08 22.06,16.5 21.92,14.67Z"/>
         </svg>
     </div>
 
     <video id="webcam" autoplay playsinline muted></video>
 
-    <script>
-        // --- CONTENT ---
-        const ACRONYMS = [
+    <script type="module">
+        /* Using ES Module to correctly import MediaPipe
+           This fixes the visual mode loading error.
+        */
+        import { FilesetResolver, HandLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/vision_bundle.js";
+
+        /* --- CONTENT DATABASE --- */
+        const acronyms = [
             "Non-dilutive Capital Reallocation – Corporate Asset Management",
             "Necessary Capital Realization – Conceptual Asset Mechanism",
             "Non-contingent Corporate Revenue – Church of Absolute Money",
@@ -358,212 +359,139 @@
             "New Cheap Reality – Conceptual Art Merchandise"
         ];
 
-        // --- SYSTEM GLOBALS ---
+        /* --- GLOBALS --- */
         let engine, world, runner;
-        let bodies = []; // { id, body, el, text, w, h }
+        let bodies = []; 
         let mouseConstraint;
-        let isVisualMode = false;
-        
-        // Tracking
-        let handX = window.innerWidth / 2;
-        let handY = window.innerHeight / 2;
-        let isGrabbing = false;
+        let handLandmarker = undefined;
+        let visualMode = false;
+        let pinchConstraint = null; // Physics constraint for visual grabbing
 
-        // UI Refs
-        const log = (msg) => document.getElementById('log-output').innerText = `> ${msg}`;
-        const cursorEl = document.getElementById('hand-cursor');
-        const container = document.getElementById('stage');
+        // DOM Refs
+        const container = document.getElementById('physics-container');
+        const cursorEl = document.getElementById('cursor');
+        const logEl = document.getElementById('boot-log');
+        const btnTactile = document.getElementById('btn-tactile');
+        const btnVisual = document.getElementById('btn-visual');
+        const webcamVideo = document.getElementById('webcam');
 
-        /* --- INITIALIZATION --- */
-        
-        // 1. TACTILE MODE (Click/Touch)
-        document.getElementById('btn-tactile').addEventListener('click', () => {
-            log("INITIALIZING PHYSICS...");
-            startPhysics();
+        /* --- SETUP EVENT LISTENERS --- */
+        btnTactile.addEventListener('click', initTactile);
+        btnVisual.addEventListener('click', initVisual);
+
+        /* --- BOOT SEQUENCE --- */
+        function fadeBoot() {
+            const screen = document.getElementById('boot-screen');
+            screen.style.opacity = '0';
+            setTimeout(() => screen.style.display = 'none', 800);
+            cursorEl.style.opacity = '1';
+        }
+
+        /* --- MODE: TACTILE --- */
+        function initTactile() {
+            logEl.innerText = "> INITIALIZING TACTILE ENGINE...";
+            startPhysics(true); // true = enable mouse constraint
             
-            // Native Event Listeners for Cursor Visuals
-            document.addEventListener('mousemove', e => updateCursor(e.clientX, e.clientY));
-            document.addEventListener('touchmove', e => {
-                if(e.touches.length > 0) updateCursor(e.touches[0].clientX, e.touches[0].clientY);
-            }, {passive: false});
-
-            // Physics Events handle the logic
-            Matter.Events.on(mouseConstraint, "startdrag", (e) => {
-                setGrabbing(true);
-                triggerMidas(e.body);
+            // UI Visual Feedback
+            document.addEventListener('mousemove', e => {
+                cursorEl.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
             });
-            Matter.Events.on(mouseConstraint, "enddrag", () => setGrabbing(false));
-
-            hideBoot();
-        });
-
-        // 2. VISUAL MODE (Camera)
-        document.getElementById('btn-visual').addEventListener('click', async () => {
-            log("REQUESTING CAMERA ACCESS...");
+            document.addEventListener('mousedown', () => cursorEl.classList.add('grabbing'));
+            document.addEventListener('mouseup', () => cursorEl.classList.remove('grabbing'));
             
+            document.addEventListener('touchstart', (e) => {
+                 const t = e.touches[0];
+                 cursorEl.style.transform = `translate(${t.clientX}px, ${t.clientY}px)`;
+                 cursorEl.classList.add('grabbing');
+            }, {passive: false});
+            
+            document.addEventListener('touchend', () => cursorEl.classList.remove('grabbing'));
+
+            fadeBoot();
+        }
+
+        /* --- MODE: VISUAL --- */
+        async function initVisual() {
+            logEl.innerText = "> DOWNLOADING AI MODELS...";
+            btnTactile.disabled = true;
+            btnVisual.disabled = true;
+
             try {
-                // IMMEDIATE REQUEST FOR PERMISSIONS (Critical for iOS/Safari)
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                const video = document.getElementById('webcam');
-                video.srcObject = stream;
-                
-                log("LOADING AI MODELS...");
-                
-                // Load MediaPipe Only After Permission
-                await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/vision_bundle.js");
-                
-                const { FilesetResolver, HandLandmarker } = vision;
                 const visionGen = await FilesetResolver.forVisionTasks(
-                    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+                    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
                 );
 
-                const handLandmarker = await HandLandmarker.createFromOptions(visionGen, {
+                handLandmarker = await HandLandmarker.createFromOptions(visionGen, {
                     baseOptions: {
                         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
                         delegate: "GPU"
                     },
                     runningMode: "VIDEO",
-                    numHands: 1,
-                    minHandDetectionConfidence: 0.5,
-                    minHandPresenceConfidence: 0.5,
-                    minTrackingConfidence: 0.5
+                    numHands: 1
                 });
 
-                video.addEventListener("loadeddata", () => {
-                    log("SYSTEM ONLINE");
-                    isVisualMode = true;
-                    startPhysics();
-                    hideBoot();
-                    startVisualLoop(video, handLandmarker);
+                logEl.innerText = "> REQUESTING CAMERA ACCESS...";
+                
+                // Get Camera
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                webcamVideo.srcObject = stream;
+                
+                webcamVideo.addEventListener("loadeddata", () => {
+                    logEl.innerText = "> OPTICAL LINK ESTABLISHED";
+                    visualMode = true;
+                    startPhysics(false); // false = no mouse constraint, we use custom pinch
+                    fadeBoot();
+                    predictWebcam();
                 });
 
             } catch (err) {
                 console.error(err);
-                log("ERROR: CAMERA BLOCKED OR INSECURE CONTEXT");
+                logEl.innerText = "> ERROR: CAMERA FAILED OR BLOCKED.";
+                btnTactile.disabled = false;
+                btnVisual.disabled = false;
             }
-        });
-
-        function hideBoot() {
-            const boot = document.getElementById('boot-overlay');
-            boot.style.opacity = 0;
-            setTimeout(() => boot.remove(), 500);
         }
 
-        /* --- PHYSICS ENGINE --- */
-        function startPhysics() {
-            const { Engine, Runner, World, Bodies, Mouse, MouseConstraint } = Matter;
-
-            engine = Engine.create();
-            world = engine.world;
-            engine.gravity.y = 0; // Zero G
-
-            // Walls
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            const wallOpts = { isStatic: true, render: { visible: false } };
-            const thick = 200;
-            World.add(world, [
-                Bodies.rectangle(w/2, -thick, w*2, thick, wallOpts),
-                Bodies.rectangle(w/2, h+thick, w*2, thick, wallOpts),
-                Bodies.rectangle(w+thick, h/2, thick, h*2, wallOpts),
-                Bodies.rectangle(-thick, h/2, thick, h*2, wallOpts)
-            ]);
-
-            // Mouse Interaction
-            const mouse = Mouse.create(container);
-            mouse.pixelRatio = window.devicePixelRatio || 1; // Retina fix
-            
-            mouseConstraint = MouseConstraint.create(engine, {
-                mouse: mouse,
-                constraint: {
-                    stiffness: 0.1,
-                    damping: 0.1,
-                    render: { visible: false }
-                }
-            });
-            World.add(world, mouseConstraint);
-
-            // Run
-            runner = Runner.create();
-            Runner.run(runner, engine);
-
-            // Spawn Initial
-            const density = Math.min(20, Math.floor((w*h) / 50000));
-            for(let i=0; i<density; i++) spawnWord();
-
-            // Render Loop
-            requestAnimationFrame(renderLoop);
-        }
-
-        function spawnWord() {
-            const text = ACRONYMS[Math.floor(Math.random() * ACRONYMS.length)];
-            const el = document.createElement('div');
-            el.className = 'word-box';
-            el.innerText = "NCR-CAM";
-            container.appendChild(el);
-
-            // Random Pos
-            const pad = 60;
-            const x = Math.random() * (window.innerWidth - pad*2) + pad;
-            const y = Math.random() * (window.innerHeight - pad*2) + pad;
-            
-            // Dimensions
-            const w = 140;
-            const h = 70;
-            el.style.width = w + 'px';
-            el.style.height = h + 'px';
-
-            const body = Matter.Bodies.rectangle(x, y, w, h, {
-                restitution: 0.9,
-                frictionAir: 0.03,
-                angle: (Math.random() - 0.5) * 1
-            });
-            
-            // Initial Push
-            Matter.Body.setVelocity(body, { 
-                x: (Math.random()-0.5)*5, 
-                y: (Math.random()-0.5)*5 
-            });
-
-            Matter.World.add(world, body);
-            bodies.push({ body, el, text, w, h, state: 'encrypted' });
-        }
-
-        /* --- VISUAL LOOP (AI) --- */
-        function startVisualLoop(video, landmarker) {
-            let lastTime = -1;
+        /* --- VISUAL TRACKING LOOP --- */
+        function predictWebcam() {
             const canvasW = window.innerWidth;
             const canvasH = window.innerHeight;
 
             function loop() {
-                if(video.currentTime !== lastTime) {
-                    lastTime = video.currentTime;
-                    const results = landmarker.detectForVideo(video, performance.now());
+                if (!visualMode) return;
+                let now = performance.now();
+                
+                if (webcamVideo.currentTime > 0) {
+                    const results = handLandmarker.detectForVideo(webcamVideo, now);
                     
-                    if(results.landmarks.length > 0) {
-                        const lm = results.landmarks[0];
+                    if (results.landmarks && results.landmarks.length > 0) {
+                        const marks = results.landmarks[0];
                         
-                        // Index Finger Tip (8)
-                        const ix = (1 - lm[8].x) * canvasW;
-                        const iy = lm[8].y * canvasH;
-                        
-                        // Thumb Tip (4) for Pinch detection
-                        const tx = (1 - lm[4].x) * canvasW;
-                        const ty = lm[4].y * canvasH;
-                        
-                        updateCursor(ix, iy);
-                        
-                        // Detect Pinch (Grab)
+                        // Index Tip (8) & Thumb Tip (4)
+                        const pIndex = marks[8];
+                        const pThumb = marks[4];
+
+                        // Convert to Screen Coords (Mirror X)
+                        const ix = (1 - pIndex.x) * canvasW;
+                        const iy = pIndex.y * canvasH;
+                        const tx = (1 - pThumb.x) * canvasW;
+                        const ty = pThumb.y * canvasH;
+
+                        // Center of Pinch
+                        const cx = (ix + tx) / 2;
+                        const cy = (iy + ty) / 2;
+
+                        // Update Cursor Position
+                        cursorEl.style.transform = `translate(${cx}px, ${cy}px)`;
+
+                        // Check Pinch Distance
                         const dist = Math.hypot(ix - tx, iy - ty);
-                        const isPinching = dist < 60;
-                        
-                        if(isPinching && !isGrabbing) {
-                            setGrabbing(true);
-                            // Visual Mode Interaction Check
-                            checkVisualGrab(ix, iy);
-                        } else if (!isPinching && isGrabbing) {
-                            setGrabbing(false);
-                        }
+                        const isPinching = dist < 60; // Tuning threshold
+
+                        handlePinchPhysics(cx, cy, isPinching);
+                    } else {
+                        // Release if hand lost
+                        handlePinchPhysics(0, 0, false);
                     }
                 }
                 requestAnimationFrame(loop);
@@ -571,93 +499,193 @@
             loop();
         }
 
-        /* --- SHARED LOGIC --- */
-        function updateCursor(x, y) {
-            handX = x; handY = y;
-            cursorEl.style.transform = `translate(${x}px, ${y}px)`;
-        }
+        /* --- PHYSICS ENGINE --- */
+        const Engine = Matter.Engine,
+              Runner = Matter.Runner,
+              World = Matter.World,
+              Bodies = Matter.Bodies,
+              Body = Matter.Body,
+              Constraint = Matter.Constraint,
+              Mouse = Matter.Mouse,
+              MouseConstraint = Matter.MouseConstraint,
+              Events = Matter.Events;
 
-        function setGrabbing(active) {
-            isGrabbing = active;
-            if(active) cursorEl.classList.add('grabbing');
-            else cursorEl.classList.remove('grabbing');
-        }
+        function startPhysics(enableMouse) {
+            engine = Engine.create();
+            world = engine.world;
+            engine.gravity.y = 0; // Zero G
 
-        function triggerMidas(physicsBody) {
-            const item = bodies.find(b => b.body === physicsBody);
-            if (!item || item.state !== 'encrypted') return;
+            // BOUNDARIES
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const wallOpts = { isStatic: true, render: { visible: false } };
+            const thick = 200;
+            World.add(world, [
+                Bodies.rectangle(w/2, -thick/2, w*3, thick, wallOpts), // Top
+                Bodies.rectangle(w/2, h+thick/2, w*3, thick, wallOpts), // Bottom
+                Bodies.rectangle(w+thick/2, h/2, thick, h*3, wallOpts), // Right
+                Bodies.rectangle(-thick/2, h/2, thick, h*3, wallOpts) // Left
+            ]);
 
-            item.state = 'revealed';
-            
-            // Haptic Feedback
-            if(navigator.vibrate) navigator.vibrate(20);
-
-            // Visual Transform
-            item.el.classList.add('midas');
-            item.el.innerText = item.text;
-            item.el.style.width = 'auto'; // Unlock width
-            item.el.style.height = 'auto';
-
-            // Lifecycle
-            setTimeout(() => {
-                item.el.classList.add('fading');
-                setTimeout(() => {
-                    Matter.World.remove(world, item.body);
-                    item.el.remove();
-                    bodies = bodies.filter(b => b !== item);
-                    spawnWord();
-                }, 1000);
-            }, 2500); // Read time
-        }
-        
-        // Manual Hit Test for Visual Mode (since no mouse constraint)
-        function checkVisualGrab(x, y) {
-            for(let item of bodies) {
-                if(item.state === 'encrypted') {
-                    const b = item.body;
-                    // Simple distance check
-                    const dist = Math.hypot(x - b.position.x, y - b.position.y);
-                    // If close enough and pinching
-                    if(dist < 100) {
-                        triggerMidas(b);
-                        // Apply a little force to verify grab
-                        Matter.Body.applyForce(b, b.position, { 
-                            x: (Math.random()-0.5)*0.05, 
-                            y: (Math.random()-0.5)*0.05 
-                        });
-                        break; // Grab one at a time
+            // TACTILE INTERACTION
+            if (enableMouse) {
+                // Attach to BODY to catch everything
+                const mouse = Mouse.create(document.body);
+                mouse.pixelRatio = window.devicePixelRatio || 1;
+                
+                mouseConstraint = MouseConstraint.create(engine, {
+                    mouse: mouse,
+                    constraint: {
+                        stiffness: 0.2, // Snappy drag
+                        damping: 0.1,
+                        render: { visible: false }
                     }
+                });
+                
+                // Transmute on drag start
+                Events.on(mouseConstraint, 'startdrag', (e) => {
+                    transmute(e.body);
+                });
+                
+                World.add(world, mouseConstraint);
+            }
+
+            // RUNNER
+            runner = Runner.create();
+            Runner.run(runner, engine);
+
+            // INITIAL SPAWN
+            const count = Math.min(25, Math.floor((w*h) / 45000));
+            for(let i=0; i<count; i++) spawnBox();
+
+            // RENDER LOOP
+            (function renderLoop() {
+                for (let i = bodies.length - 1; i >= 0; i--) {
+                    const item = bodies[i];
+                    if (item.body) {
+                        const { x, y } = item.body.position;
+                        const angle = item.body.angle;
+                        item.el.style.transform = `translate(${x - item.w/2}px, ${y - item.h/2}px) rotate(${angle}rad)`;
+                    }
+                }
+                requestAnimationFrame(renderLoop);
+            })();
+        }
+
+        /* --- PINCH PHYSICS LOGIC (MANUAL CONSTRAINT) --- */
+        function handlePinchPhysics(x, y, isPinching) {
+            
+            if (isPinching) {
+                cursorEl.classList.add('grabbing');
+
+                if (!pinchConstraint) {
+                    // Try to find a body to grab
+                    const bodiesToCheck = bodies.map(b => b.body);
+                    // Use Matter's query to find body under cursor
+                    const matches = Matter.Query.point(bodiesToCheck, { x, y });
+                    
+                    if (matches.length > 0) {
+                        const body = matches[0];
+                        
+                        // Create a Spring Constraint to the hand position
+                        // We use a dummy body for the hand to attach constraint
+                        const handBody = Bodies.circle(x, y, 1, { isStatic: true, isSensor: true });
+                        World.add(world, handBody);
+
+                        pinchConstraint = Constraint.create({
+                            bodyA: handBody,
+                            bodyB: body,
+                            pointA: { x: 0, y: 0 },
+                            pointB: { x: x - body.position.x, y: y - body.position.y },
+                            stiffness: 0.3,
+                            damping: 0.1,
+                            length: 0
+                        });
+                        
+                        World.add(world, pinchConstraint);
+                        
+                        // Trigger Effect
+                        transmute(body);
+                    }
+                } else {
+                    // Update hand position (move the anchor)
+                    Body.setPosition(pinchConstraint.bodyA, { x, y });
+                }
+            } else {
+                cursorEl.classList.remove('grabbing');
+                
+                // Release Constraint
+                if (pinchConstraint) {
+                    World.remove(world, pinchConstraint.bodyA); // Remove dummy hand body
+                    World.remove(world, pinchConstraint);
+                    pinchConstraint = null;
                 }
             }
         }
 
-        function renderLoop() {
-            // Sync DOM
-            for (let i = 0; i < bodies.length; i++) {
-                const b = bodies[i].body;
-                const el = bodies[i].el;
-                const { x, y } = b.position;
-                const r = b.angle;
-                // Offset by half dimensions for center origin
-                el.style.transform = `translate(${x - bodies[i].w/2}px, ${y - bodies[i].h/2}px) rotate(${r}rad)`;
-            }
-            requestAnimationFrame(renderLoop);
-        }
-        
-        function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                const s = document.createElement('script');
-                s.src = src;
-                s.onload = resolve;
-                s.onerror = reject;
-                document.head.appendChild(s);
+        function spawnBox() {
+            const text = acronyms[Math.floor(Math.random() * acronyms.length)];
+            const el = document.createElement('div');
+            el.className = 'box';
+            el.innerText = "NCR-CAM";
+            el.dataset.full = text;
+            el.dataset.state = "encrypted";
+            container.appendChild(el);
+
+            const pad = 80;
+            const x = Math.random() * (window.innerWidth - pad*2) + pad;
+            const y = Math.random() * (window.innerHeight - pad*2) + pad;
+            const w = 140; 
+            const h = 70;
+            el.style.width = w + 'px';
+            el.style.height = h + 'px';
+
+            const body = Bodies.rectangle(x, y, w, h, {
+                restitution: 0.9,
+                frictionAir: 0.02,
+                angle: Math.random() * Math.PI
             });
+            
+            Body.setVelocity(body, {
+                x: (Math.random() - 0.5) * 5,
+                y: (Math.random() - 0.5) * 5
+            });
+
+            World.add(world, body);
+            bodies.push({ body, el, w, h, text });
         }
-        
-        // Handle Resize
-        window.addEventListener('resize', () => location.reload()); // Simple reload for layout safety
+
+        function transmute(physicsBody) {
+            const item = bodies.find(b => b.body === physicsBody);
+            if (!item || item.el.dataset.state !== "encrypted") return;
+
+            item.el.dataset.state = "decrypted";
+            item.el.classList.add('midas');
+            item.el.innerText = item.text;
+            
+            // Allow expansion
+            item.el.style.width = 'auto';
+            item.el.style.height = 'auto';
+            // Increase Mass/Density so opened words feel heavier? Or lighter?
+            // Let's keep physics consistent for stability.
+            
+            // LIFECYCLE
+            setTimeout(() => {
+                item.el.classList.add('fading');
+                setTimeout(() => {
+                    World.remove(world, item.body);
+                    item.el.remove();
+                    bodies = bodies.filter(b => b !== item);
+                    spawnBox();
+                }, 800);
+            }, 3000);
+        }
+
+        window.addEventListener('resize', () => {
+             // In prod, resize walls. Here, reload preserves sanity.
+             // location.reload();
+        });
 
     </script>
 </body>
 </html>
-
