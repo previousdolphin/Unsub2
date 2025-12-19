@@ -332,7 +332,7 @@
     <!-- BOOT SCREEN -->
     <div id="boot-screen">
         <h1 class="glitch" data-text="NCR-CAM">NCR-CAM</h1>
-        <div class="subtitle">ORACLE ARTIFACT v9.0</div>
+        <div class="subtitle">ORACLE ARTIFACT v9.1</div>
         
         <div class="mode-container">
             <button class="btn" id="btn-tactile">
@@ -492,34 +492,39 @@
               Vector = Matter.Vector;
 
         function initPhysics() {
-            engine = Engine.create();
-            world = engine.world;
-            engine.gravity.y = 0; // Zero G
+            try {
+                engine = Engine.create();
+                world = engine.world;
+                engine.gravity.y = 0; // Zero G
 
-            // Walls
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            const wallOpts = { isStatic: true, render: { visible: false } };
-            const thick = 200;
-            World.add(world, [
-                Bodies.rectangle(w/2, -thick/2, w*3, thick, wallOpts),
-                Bodies.rectangle(w/2, h+thick/2, w*3, thick, wallOpts),
-                Bodies.rectangle(w+thick/2, h/2, thick, h*3, wallOpts),
-                Bodies.rectangle(-thick/2, h/2, thick, h*3, wallOpts)
-            ]);
+                // Walls
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                const wallOpts = { isStatic: true, render: { visible: false } };
+                const thick = 200;
+                World.add(world, [
+                    Bodies.rectangle(w/2, -thick/2, w*3, thick, wallOpts),
+                    Bodies.rectangle(w/2, h+thick/2, w*3, thick, wallOpts),
+                    Bodies.rectangle(w+thick/2, h/2, thick, h*3, wallOpts),
+                    Bodies.rectangle(-thick/2, h/2, thick, h*3, wallOpts)
+                ]);
 
-            spawnArtifact();
+                spawnArtifact();
 
-            runner = Runner.create();
-            Runner.run(runner, engine);
+                runner = Runner.create();
+                Runner.run(runner, engine);
 
-            // Loop
-            (function renderLoop() {
-                updateArtifact();
-                applyUprightForce(); // The Gyroscope Logic
-                checkShake();
-                requestAnimationFrame(renderLoop);
-            })();
+                // Loop
+                (function renderLoop() {
+                    updateArtifact();
+                    applyUprightForce(); // The Gyroscope Logic
+                    checkShake();
+                    requestAnimationFrame(renderLoop);
+                })();
+            } catch (e) {
+                console.error(e);
+                logEl.innerText = "ERROR: " + e.message;
+            }
         }
 
         function spawnArtifact() {
@@ -535,7 +540,7 @@
             displayTextEl.innerText = "NCR-CAM";
             
             win.appendChild(displayTextEl);
-            artifactEl.appendChild(windowEl = win);
+            artifactEl.appendChild(win);
             container.appendChild(artifactEl);
 
             // Positioning
@@ -646,6 +651,11 @@
         /* --- MODE: TACTILE --- */
         function initTactile() {
             logEl.innerText = "> INITIALIZING TACTILE ENGINE...";
+            // Check if Matter loaded
+            if (typeof Matter === 'undefined') {
+                 logEl.innerText = "ERROR: PHYSICS ENGINE NOT LOADED";
+                 return;
+            }
             initPhysics();
 
             // INPUT HANDLERS (Manual Constraint for 100% Grip reliability)
