@@ -332,7 +332,7 @@
     <!-- BOOT SCREEN -->
     <div id="boot-screen">
         <h1 class="glitch" data-text="NCR-CAM">NCR-CAM</h1>
-        <div class="subtitle">ORACLE ARTIFACT v8.0</div>
+        <div class="subtitle">ORACLE ARTIFACT v9.0</div>
         
         <div class="mode-container">
             <button class="btn" id="btn-tactile">
@@ -446,6 +446,8 @@
         /* --- GLOBALS --- */
         let engine, world, runner;
         let artifactBody; // Cube
+        let centerAnchorBody; // Static anchor for homing
+        let homingConstraint; // The spring returning it to center
         let artifactEl, displayTextEl;
         let dragConstraint = null; 
         let pinchConstraint = null; 
@@ -514,6 +516,7 @@
             // Loop
             (function renderLoop() {
                 updateArtifact();
+                applyUprightForce(); // The Gyroscope Logic
                 checkShake();
                 requestAnimationFrame(renderLoop);
             })();
@@ -532,13 +535,12 @@
             displayTextEl.innerText = "NCR-CAM";
             
             win.appendChild(displayTextEl);
-            artifactEl.appendChild(win);
+            artifactEl.appendChild(windowEl = win);
             container.appendChild(artifactEl);
 
-            // Body
+            // Positioning
             const x = window.innerWidth / 2;
             const y = window.innerHeight / 2;
-            // Slightly smaller box so it moves easier on mobile
             const s = Math.min(window.innerWidth * 0.7, 300); 
             
             artifactEl.style.width = s + 'px';
@@ -546,6 +548,7 @@
             win.style.width = (s * 0.8) + 'px';
             win.style.height = (s * 0.6) + 'px';
 
+            // 1. The Main Cube Body
             artifactBody = Bodies.rectangle(x, y, s, s, {
                 restitution: 0.4,
                 frictionAir: 0.1, // Heavy Fluid Feel
@@ -553,16 +556,45 @@
                 chamfer: { radius: 12 }
             });
 
-            World.add(world, artifactBody);
+            // 2. The Center Anchor (Invisible Static Point)
+            centerAnchorBody = Bodies.circle(x, y, 1, { 
+                isStatic: true, 
+                isSensor: true,
+                render: { visible: false }
+            });
+
+            // 3. The Homing Tether (Loose Spring to Center)
+            homingConstraint = Constraint.create({
+                bodyA: centerAnchorBody,
+                bodyB: artifactBody,
+                stiffness: 0.005, // Very loose, like a gentle magnetic drift
+                damping: 0.05,
+                render: { visible: false }
+            });
+
+            World.add(world, [artifactBody, centerAnchorBody, homingConstraint]);
         }
 
         function updateArtifact() {
             if(!artifactBody) return;
             const { x, y } = artifactBody.position;
             const angle = artifactBody.angle;
+            
             // Sync Center
             const s = parseFloat(artifactEl.style.width);
             artifactEl.style.transform = `translate(${x - s/2}px, ${y - s/2}px) rotate(${angle}rad)`;
+        }
+
+        // --- NEW: GYROSCOPE LOGIC (Upright Force) ---
+        function applyUprightForce() {
+            if(!artifactBody) return;
+            
+            // Gently push angular velocity towards 0 and angle towards 0
+            // Like a rotational spring/damper
+            const torque = -0.05 * artifactBody.angle; // restoring force
+            
+            // We modify angular velocity directly for smoother "gyro" feel than applyForce
+            Body.setAngularVelocity(artifactBody, artifactBody.angularVelocity * 0.9 + torque * 0.05);
         }
 
         /* --- SHAKE MECHANIC --- */
@@ -803,8 +835,15 @@
             }
         }
 
+        /* --- HANDLE RESIZE --- */
         window.addEventListener('resize', () => {
-             // location.reload();
+             // Keep anchor at center
+             if (centerAnchorBody) {
+                 Body.setPosition(centerAnchorBody, { 
+                     x: window.innerWidth / 2, 
+                     y: window.innerHeight / 2 
+                 });
+             }
         });
 
     </script>
