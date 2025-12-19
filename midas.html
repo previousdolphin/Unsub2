@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NCR-CAM | MIDAS PROTOCOL v7</title>
+    <title>NCR-CAM | ORACLE ARTIFACT</title>
     <!-- Physics Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <!-- Fonts -->
@@ -26,7 +26,7 @@
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
-            cursor: none !important; /* Force hide native cursor */
+            cursor: none !important; /* Hide native cursor */
             touch-action: none; /* Prevent scroll on mobile */
         }
 
@@ -41,7 +41,7 @@
             color: var(--term-red);
         }
 
-        /* --- VISUAL FX LAYER --- */
+        /* --- VISUAL FX --- */
         .scanlines {
             position: fixed;
             top: 0;
@@ -56,7 +56,7 @@
             z-index: 999;
         }
 
-        /* --- PHYSICS LAYER --- */
+        /* --- PHYSICS CONTAINER --- */
         #physics-container {
             position: absolute;
             top: 0;
@@ -66,47 +66,124 @@
             z-index: 10;
         }
 
-        /* --- THE WORD BOXES --- */
-        .box {
+        /* --- THE ORACLE ARTIFACT (CUBE) --- */
+        .artifact {
             position: absolute;
+            width: 300px;
+            height: 300px;
+            background: #0d0d0d;
+            border: 4px solid #1a1a1a;
+            border-radius: 12px;
+            box-shadow: 
+                0 0 40px rgba(0,0,0,0.8),
+                inset 0 0 60px rgba(0,0,0,0.9),
+                0 0 5px var(--term-dim);
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            padding: 1rem;
-            font-size: 1.1rem;
-            line-height: 1.1;
-            text-transform: uppercase;
-            border: 1px solid var(--term-red);
-            background: rgba(10, 0, 0, 0.9);
+            will-change: transform;
+            /* Industrial texture */
+            background-image: 
+                linear-gradient(45deg, #151515 25%, transparent 25%, transparent 75%, #151515 75%, #151515), 
+                linear-gradient(45deg, #151515 25%, transparent 25%, transparent 75%, #151515 75%, #151515);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        /* Labels on the box */
+        .artifact::before {
+            content: "PROPERTY OF COCA";
+            position: absolute;
+            top: 15px;
+            font-size: 0.7rem;
+            color: #444;
+            letter-spacing: 2px;
+            font-family: 'VT323', monospace;
+        }
+        
+        .artifact::after {
+            content: "// SHAKE TO DECRYPT //";
+            position: absolute;
+            bottom: 15px;
+            font-size: 0.8rem;
             color: var(--term-red);
-            box-shadow: 0 0 8px var(--term-red);
-            
-            transition: opacity 0.8s ease-out, border-color 0.3s, color 0.3s, box-shadow 0.3s;
-            will-change: transform, opacity;
-            
-            transform-origin: center center;
-            white-space: normal;
-            word-wrap: break-word;
-            backface-visibility: hidden;
+            opacity: 0.6;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite;
         }
 
-        /* Midas State */
-        .box.midas {
-            border-color: var(--midas-gold);
-            color: #000;
-            background: linear-gradient(135deg, var(--midas-gold) 0%, var(--midas-shine) 50%, var(--midas-dark) 100%);
-            box-shadow: 0 0 25px var(--midas-gold);
+        /* --- THE DISPLAY WINDOW --- */
+        .display-window {
+            width: 240px;
+            height: 180px;
+            background: #000;
+            border-radius: 6px;
+            border: 4px solid #222;
+            /* Inner shadow for depth */
+            box-shadow: 
+                inset 0 0 25px #000, 
+                0 0 2px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transform: translateZ(0); /* Fix flickering */
+        }
+
+        /* Glass Reflection */
+        .display-window::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 40%, transparent 45%, transparent 55%, rgba(255,255,255,0.01) 60%);
+            pointer-events: none;
+            transform: rotate(20deg);
+        }
+
+        .display-text {
+            color: var(--term-red);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 3rem;
+            text-align: center;
+            text-shadow: 0 0 10px var(--term-red);
+            transition: all 0.5s ease-out;
+            z-index: 10;
+            line-height: 1.1;
+            opacity: 1;
+        }
+
+        /* States */
+        .display-text.shaking {
+            filter: blur(4px);
+            opacity: 0.5;
+            transform: scale(0.95);
+            color: #500; /* Dimmer red */
+        }
+
+        .display-text.revealed {
+            color: var(--midas-gold);
+            text-shadow: 0 0 15px var(--midas-gold);
+            font-size: 1.1rem; /* Smaller for long text */
             font-weight: bold;
-            z-index: 100;
+            animation: floatUp 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
 
-        .box.fading {
-            opacity: 0;
-            transform: scale(0.9);
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
 
-        /* --- THE BLOCKY HAND CURSOR --- */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* --- BLOCKY HAND CURSOR (RESTORED) --- */
         #cursor {
             position: fixed;
             top: 0;
@@ -119,10 +196,10 @@
             opacity: 0; /* Hidden on boot */
             transition: opacity 0.5s ease-in;
             will-change: transform;
-            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5));
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.4));
         }
 
-        /* Individual Blocks within SVG */
+        /* SVG Parts */
         .hand-part {
             fill: var(--midas-gold);
             transition: transform 0.1s ease-out;
@@ -130,12 +207,12 @@
             transform-origin: center;
         }
 
-        /* Clench Animation States */
-        #cursor.grabbing .finger-1 { transform: translateY(5px); }
-        #cursor.grabbing .finger-2 { transform: translateY(7px); }
-        #cursor.grabbing .finger-3 { transform: translateY(7px); }
-        #cursor.grabbing .finger-4 { transform: translateY(5px); }
-        #cursor.grabbing .thumb    { transform: translateX(5px) rotate(-10deg); }
+        /* Clench Animation */
+        #cursor.grabbing .finger-1 { transform: translateY(8px); }
+        #cursor.grabbing .finger-2 { transform: translateY(10px); }
+        #cursor.grabbing .finger-3 { transform: translateY(10px); }
+        #cursor.grabbing .finger-4 { transform: translateY(8px); }
+        #cursor.grabbing .thumb    { transform: translateX(5px) rotate(-15deg); }
         #cursor.grabbing .palm     { transform: scale(0.95); }
 
         /* --- BOOT SCREEN --- */
@@ -255,7 +332,7 @@
     <!-- BOOT SCREEN -->
     <div id="boot-screen">
         <h1 class="glitch" data-text="NCR-CAM">NCR-CAM</h1>
-        <div class="subtitle">MIDAS PROTOCOL v7.0</div>
+        <div class="subtitle">ORACLE ARTIFACT v8.0</div>
         
         <div class="mode-container">
             <button class="btn" id="btn-tactile">
@@ -271,26 +348,22 @@
         <div id="boot-log"></div>
     </div>
 
-    <!-- MAIN PHYSICS LAYER -->
+    <!-- PHYSICS LAYER -->
     <div id="physics-container"></div>
     
     <!-- BLOCKY HAND CURSOR -->
     <div id="cursor">
         <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <!-- Palm Block -->
+            <!-- Palm -->
             <rect class="hand-part palm" x="30" y="45" width="40" height="40" rx="2" />
             
-            <!-- Thumb Blocks -->
+            <!-- Thumb -->
             <rect class="hand-part thumb" x="10" y="65" width="18" height="12" rx="1" transform="rotate(-30 19 71)" />
             
-            <!-- Finger Blocks (Separated Phalanxes aesthetic) -->
-            <!-- Index -->
+            <!-- Fingers -->
             <rect class="hand-part finger-1" x="30" y="15" width="8" height="25" rx="1" />
-            <!-- Middle -->
             <rect class="hand-part finger-2" x="41" y="8" width="8" height="32" rx="1" />
-            <!-- Ring -->
             <rect class="hand-part finger-3" x="52" y="10" width="8" height="30" rx="1" />
-            <!-- Pinky -->
             <rect class="hand-part finger-4" x="63" y="20" width="8" height="20" rx="1" />
         </svg>
     </div>
@@ -300,7 +373,6 @@
     <script type="module">
         import { FilesetResolver, HandLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/vision_bundle.js";
 
-        /* --- CONTENT --- */
         const acronyms = [
             "Non-dilutive Capital Reallocation – Corporate Asset Management",
             "Necessary Capital Realization – Conceptual Asset Mechanism",
@@ -373,13 +445,20 @@
 
         /* --- GLOBALS --- */
         let engine, world, runner;
-        let bodies = []; 
-        let handLandmarker = undefined;
-        let visualMode = false;
+        let artifactBody; // Cube
+        let artifactEl, displayTextEl;
+        let dragConstraint = null; 
+        let pinchConstraint = null; 
         
-        // Interaction Constraints
-        let dragConstraint = null; // Tactile
-        let pinchConstraint = null; // Visual
+        let visualMode = false;
+        let handLandmarker = undefined;
+
+        // Shake Logic
+        let shakeEnergy = 0;
+        let isShaking = false;
+        const SHAKE_THRESHOLD = 30;
+        const SHAKE_DECAY = 0.92;
+        let shakeInterval;
 
         // Refs
         const container = document.getElementById('physics-container');
@@ -389,7 +468,7 @@
         const btnVisual = document.getElementById('btn-visual');
         const webcamVideo = document.getElementById('webcam');
 
-        /* --- EVENT LISTENERS --- */
+        /* --- BOOT --- */
         btnTactile.addEventListener('click', initTactile);
         btnVisual.addEventListener('click', initVisual);
 
@@ -400,21 +479,22 @@
             cursorEl.style.opacity = '1';
         }
 
-        /* --- PHYSICS ENGINE INIT --- */
+        /* --- PHYSICS ENGINE --- */
         const Engine = Matter.Engine,
               Runner = Matter.Runner,
               World = Matter.World,
               Bodies = Matter.Bodies,
               Body = Matter.Body,
               Constraint = Matter.Constraint,
-              Query = Matter.Query;
+              Query = Matter.Query,
+              Vector = Matter.Vector;
 
         function initPhysics() {
             engine = Engine.create();
             world = engine.world;
-            engine.gravity.y = 0; 
+            engine.gravity.y = 0; // Zero G
 
-            // WALLS
+            // Walls
             const w = window.innerWidth;
             const h = window.innerHeight;
             const wallOpts = { isStatic: true, render: { visible: false } };
@@ -426,39 +506,119 @@
                 Bodies.rectangle(-thick/2, h/2, thick, h*3, wallOpts)
             ]);
 
+            spawnArtifact();
+
             runner = Runner.create();
             Runner.run(runner, engine);
 
-            // INITIAL SPAWN
-            const count = Math.min(25, Math.floor((w*h) / 45000));
-            for(let i=0; i<count; i++) spawnBox();
-
-            // RENDER LOOP
+            // Loop
             (function renderLoop() {
-                for (let i = bodies.length - 1; i >= 0; i--) {
-                    const item = bodies[i];
-                    if (item.body) {
-                        const { x, y } = item.body.position;
-                        const angle = item.body.angle;
-                        item.el.style.transform = `translate(${x - item.w/2}px, ${y - item.h/2}px) rotate(${angle}rad)`;
-                    }
-                }
+                updateArtifact();
+                checkShake();
                 requestAnimationFrame(renderLoop);
             })();
+        }
+
+        function spawnArtifact() {
+            // DOM
+            artifactEl = document.createElement('div');
+            artifactEl.className = 'artifact';
+            
+            const win = document.createElement('div');
+            win.className = 'display-window';
+            
+            displayTextEl = document.createElement('div');
+            displayTextEl.className = 'display-text';
+            displayTextEl.innerText = "NCR-CAM";
+            
+            win.appendChild(displayTextEl);
+            artifactEl.appendChild(win);
+            container.appendChild(artifactEl);
+
+            // Body
+            const x = window.innerWidth / 2;
+            const y = window.innerHeight / 2;
+            // Slightly smaller box so it moves easier on mobile
+            const s = Math.min(window.innerWidth * 0.7, 300); 
+            
+            artifactEl.style.width = s + 'px';
+            artifactEl.style.height = s + 'px';
+            win.style.width = (s * 0.8) + 'px';
+            win.style.height = (s * 0.6) + 'px';
+
+            artifactBody = Bodies.rectangle(x, y, s, s, {
+                restitution: 0.4,
+                frictionAir: 0.1, // Heavy Fluid Feel
+                density: 0.1,
+                chamfer: { radius: 12 }
+            });
+
+            World.add(world, artifactBody);
+        }
+
+        function updateArtifact() {
+            if(!artifactBody) return;
+            const { x, y } = artifactBody.position;
+            const angle = artifactBody.angle;
+            // Sync Center
+            const s = parseFloat(artifactEl.style.width);
+            artifactEl.style.transform = `translate(${x - s/2}px, ${y - s/2}px) rotate(${angle}rad)`;
+        }
+
+        /* --- SHAKE MECHANIC --- */
+        function checkShake() {
+            if(!artifactBody) return;
+            const speed = Vector.magnitude(artifactBody.velocity);
+            const angular = Math.abs(artifactBody.angularVelocity);
+            
+            // Add Energy
+            if (speed > 5 || angular > 0.2) {
+                shakeEnergy += (speed + angular * 10);
+            }
+            
+            shakeEnergy *= SHAKE_DECAY;
+
+            if (shakeEnergy > SHAKE_THRESHOLD) {
+                if (!isShaking) startShake();
+            } else if (shakeEnergy < 5 && isShaking) {
+                endShake();
+            }
+        }
+
+        function startShake() {
+            isShaking = true;
+            displayTextEl.classList.remove('revealed');
+            displayTextEl.classList.add('shaking');
+            
+            if (shakeInterval) clearInterval(shakeInterval);
+            shakeInterval = setInterval(() => {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                displayTextEl.innerText = Array(7).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
+            }, 60);
+        }
+
+        function endShake() {
+            isShaking = false;
+            if (shakeInterval) clearInterval(shakeInterval);
+            displayTextEl.classList.remove('shaking');
+            
+            // Pick New Fate
+            const txt = acronyms[Math.floor(Math.random() * acronyms.length)];
+            displayTextEl.innerText = txt;
+            
+            // Trigger Anim
+            void displayTextEl.offsetWidth;
+            displayTextEl.classList.add('revealed');
         }
 
         /* --- MODE: TACTILE --- */
         function initTactile() {
             logEl.innerText = "> INITIALIZING TACTILE ENGINE...";
             initPhysics();
-            
-            // Unified Input Handler
-            // We manually check for bodies under the cursor and create a constraint
-            // This bypasses Matter.Mouse quirks on some devices
-            
+
+            // INPUT HANDLERS (Manual Constraint for 100% Grip reliability)
             const handleMove = (x, y) => {
                 moveCursor(x, y);
-                // If dragging, move the anchor
                 if (dragConstraint) {
                     Body.setPosition(dragConstraint.bodyA, { x, y });
                 }
@@ -467,29 +627,27 @@
             const handleStart = (x, y) => {
                 cursorEl.classList.add('grabbing');
                 
-                // Physics Check
-                const allBodies = bodies.map(b => b.body);
-                const matches = Query.point(allBodies, { x, y });
-                
-                if (matches.length > 0) {
-                    const body = matches[0];
-                    // Anchor Body
-                    const anchor = Bodies.circle(x, y, 1, { isStatic: true, isSensor: true });
-                    World.add(world, anchor);
-                    
-                    dragConstraint = Constraint.create({
-                        bodyA: anchor,
-                        bodyB: body,
-                        pointA: { x: 0, y: 0 },
-                        pointB: { x: x - body.position.x, y: y - body.position.y },
-                        stiffness: 0.5,
-                        damping: 0.1,
-                        length: 0
-                    });
-                    World.add(world, dragConstraint);
-                    
-                    // Trigger Effect
-                    transmute(body);
+                // Raycast Check
+                if (Matter.Bounds.contains(artifactBody.bounds, { x, y })) {
+                    // Double check with vertices for rotation accuracy
+                    if (Matter.Vertices.contains(artifactBody.vertices, { x, y })) {
+                        
+                        // Anchor
+                        const anchor = Bodies.circle(x, y, 1, { isStatic: true, isSensor: true });
+                        World.add(world, anchor);
+                        
+                        // Sticky Constraint
+                        dragConstraint = Constraint.create({
+                            bodyA: anchor,
+                            bodyB: artifactBody,
+                            pointA: { x: 0, y: 0 },
+                            pointB: { x: x - artifactBody.position.x, y: y - artifactBody.position.y },
+                            stiffness: 0.1, // Loose "Sticky" feel
+                            damping: 0.1,
+                            length: 0
+                        });
+                        World.add(world, dragConstraint);
+                    }
                 }
             };
 
@@ -502,22 +660,21 @@
                 }
             };
 
-            // MOUSE
+            // Events
             document.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
             document.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
             document.addEventListener('mouseup', handleEnd);
 
-            // TOUCH
+            // Touch
             document.addEventListener('touchmove', e => {
-                // e.preventDefault(); // Stop scroll handled by CSS touch-action
-                const t = e.touches[0];
-                handleMove(t.clientX, t.clientY);
+                 const t = e.touches[0];
+                 handleMove(t.clientX, t.clientY);
             }, {passive: false});
 
             document.addEventListener('touchstart', e => {
-                const t = e.touches[0];
-                handleMove(t.clientX, t.clientY); // Move cursor to touch point immediately
-                handleStart(t.clientX, t.clientY);
+                 const t = e.touches[0];
+                 handleMove(t.clientX, t.clientY);
+                 handleStart(t.clientX, t.clientY);
             }, {passive: false});
 
             document.addEventListener('touchend', handleEnd);
@@ -560,7 +717,7 @@
 
             } catch (err) {
                 console.error(err);
-                logEl.innerText = "> ERROR: CAMERA BLOCKED.";
+                logEl.innerText = "> ERROR: CAMERA BLOCKED/FAILED.";
                 btnTactile.disabled = false;
                 btnVisual.disabled = false;
             }
@@ -579,8 +736,6 @@
                     
                     if (results.landmarks && results.landmarks.length > 0) {
                         const marks = results.landmarks[0];
-                        
-                        // Index Tip(8) & Thumb Tip(4)
                         const pIndex = marks[8];
                         const pThumb = marks[4];
 
@@ -611,32 +766,28 @@
             cursorEl.style.transform = `translate(${x}px, ${y}px)`;
         }
 
-        /* --- PINCH PHYSICS --- */
+        /* --- VISUAL PINCH LOGIC --- */
         function handlePinchPhysics(x, y, isPinching) {
             if (isPinching) {
-                cursorEl.classList.add('grabbing'); // Visual Clench
+                cursorEl.classList.add('grabbing');
 
                 if (!pinchConstraint) {
-                    const allBodies = bodies.map(b => b.body);
-                    const matches = Query.point(allBodies, { x, y });
-                    
-                    if (matches.length > 0) {
-                        const body = matches[0];
-                        const handBody = Bodies.circle(x, y, 1, { isStatic: true, isSensor: true });
+                    // Check intersection
+                    if (Matter.Bounds.contains(artifactBody.bounds, {x, y})) {
+                         const handBody = Bodies.circle(x, y, 1, { isStatic: true, isSensor: true });
                         World.add(world, handBody);
 
                         pinchConstraint = Constraint.create({
                             bodyA: handBody,
-                            bodyB: body,
+                            bodyB: artifactBody,
                             pointA: { x: 0, y: 0 },
-                            pointB: { x: x - body.position.x, y: y - body.position.y },
-                            stiffness: 0.4,
+                            pointB: { x: x - artifactBody.position.x, y: y - artifactBody.position.y },
+                            stiffness: 0.1, 
                             damping: 0.1,
                             length: 0
                         });
                         
                         World.add(world, pinchConstraint);
-                        transmute(body);
                     }
                 } else {
                     Body.setPosition(pinchConstraint.bodyA, { x, y });
@@ -652,64 +803,10 @@
             }
         }
 
-        function spawnBox() {
-            const text = acronyms[Math.floor(Math.random() * acronyms.length)];
-            const el = document.createElement('div');
-            el.className = 'box';
-            el.innerText = "NCR-CAM";
-            el.dataset.full = text;
-            el.dataset.state = "encrypted";
-            container.appendChild(el);
-
-            const pad = 80;
-            const x = Math.random() * (window.innerWidth - pad*2) + pad;
-            const y = Math.random() * (window.innerHeight - pad*2) + pad;
-            const w = 140; 
-            const h = 70;
-            el.style.width = w + 'px';
-            el.style.height = h + 'px';
-
-            const body = Bodies.rectangle(x, y, w, h, {
-                restitution: 0.9,
-                frictionAir: 0.02,
-                angle: Math.random() * Math.PI
-            });
-            
-            Body.setVelocity(body, {
-                x: (Math.random() - 0.5) * 5,
-                y: (Math.random() - 0.5) * 5
-            });
-
-            World.add(world, body);
-            bodies.push({ body, el, w, h, text });
-        }
-
-        function transmute(physicsBody) {
-            const item = bodies.find(b => b.body === physicsBody);
-            if (!item || item.el.dataset.state !== "encrypted") return;
-
-            item.el.dataset.state = "decrypted";
-            item.el.classList.add('midas');
-            item.el.innerText = item.text;
-            
-            item.el.style.width = 'auto';
-            item.el.style.height = 'auto';
-            
-            setTimeout(() => {
-                item.el.classList.add('fading');
-                setTimeout(() => {
-                    World.remove(world, item.body);
-                    item.el.remove();
-                    bodies = bodies.filter(b => b !== item);
-                    spawnBox();
-                }, 800);
-            }, 3000);
-        }
-
         window.addEventListener('resize', () => {
              // location.reload();
         });
 
     </script>
 </body>
-</html
+</html>
