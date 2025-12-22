@@ -229,7 +229,6 @@
             font-size: 0.85rem;
         }
         
-        /* Layout for week header row vs content */
         .week-header {
             display: flex; 
             justify-content: space-between; 
@@ -243,6 +242,27 @@
         }
 
         .week-list li:last-child { border-bottom: none; }
+
+        /* --- OBJECTIVES LIST (NEW) --- */
+        .obj-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        .obj-list li {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 2px solid var(--alert);
+        }
+        .obj-title {
+            font-weight: 900;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .obj-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
 
         /* --- INSTRUCTOR DOSSIER --- */
         .dossier-container {
@@ -283,20 +303,13 @@
             opacity: 0.6;
         }
         
-        .ops-list {
-            list-style: none;
+        .quote-block {
+            font-style: italic;
+            border-left: 2px solid var(--text);
+            padding-left: 15px;
+            margin: 15px 0;
             font-size: 0.85rem;
-        }
-        .ops-list li {
-            margin-bottom: 10px;
-            padding-left: 12px;
-            border-left: 2px solid var(--alert);
-            line-height: 1.3;
-        }
-        .ops-list li strong {
-            display: block;
-            text-decoration: underline;
-            margin-bottom: 2px;
+            opacity: 0.8;
         }
 
         /* --- WARNING BOX --- */
@@ -537,9 +550,35 @@
             </div>
 
             <div class="section-block">
-                <h2 class="uppercase">The Syllabus</h2>
-                <p>The <strong>NCR-CAM Officer Certification Program (Level 1)</strong> is for High-Level Operators who are tired of the "Feast or Famine" cycle. We stop selling labor. We start building equity.</p>
+                <h2 class="uppercase">Operational Objectives</h2>
+                <p>This is not a creative writing class. It is the installation of the <strong>Asset Manager Operating System.</strong></p>
                 
+                <ul class="obj-list">
+                    <li>
+                        <span class="obj-title uppercase">1. Install the Asset Manager OS</span>
+                        <span class="obj-desc">Liquidate the "Starving Artist" ego. Adopt the "Middle Mind" framework to prioritize execution over "Überthink." Perform the "Vow of Severance."</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">2. Construct the Financial Cloister</span>
+                        <span class="obj-desc">Design the "Architecture of Immunity" using the LLC, S-Corp, or 501(c)(3). Implement the "One-Way Valve" to separate Profane income from Sacred assets.</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">3. Execute the "Red Pen" Audit</span>
+                        <span class="obj-desc">Categorize every active commitment as either a Liability or an Asset. Apply the "Triad of Value" (Liquidity, Signal, Provenance) to your projects.</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">4. Engineer the "Retro-Causal" Myth</span>
+                        <span class="obj-desc">Write your history backward so your current success looks inevitable. Stop selling the "Product" (the paper) and start selling the "Transaction."</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">5. Deploy "Radar Lock"</span>
+                        <span class="obj-desc">Master "Statements Before Questions." Treat the calendar invite as a "Summoning Circle" rather than a casual chat.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Syllabus</h2>
                 <ul class="week-list uppercase">
                     <li>
                         <div class="week-header"><span>WEEK 01</span> <span>FEB 16 - FEB 22</span></div>
@@ -572,32 +611,33 @@
                             <span class="data-label uppercase">Name / Rank</span>
                             <h3>PAUL PISSARRO</h3>
                             <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
-                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
                         </div>
 
                         <div class="data-row">
-                            <span class="data-label uppercase">Operational History</span>
+                            <span class="data-label uppercase">Origin Story</span>
+                            <div class="quote-block">
+                                "I didn't build the Asset Manager OS because I wanted to be a teacher. I built it because I needed to survive myself."
+                            </div>
+                            <p style="font-size: 0.85rem; margin-bottom: 5px;">
+                                For years, Pissarro bought into the myth of the "Starving Artist"—the idea that chaos was the fuel for creativity. He paid for that lie with addiction, homelessness, and years of entropy.
+                            </p>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <strong>Compassion without structure spills.</strong> Today, he runs Unsubscribe.llc, a venture studio that treats Art as a transaction and the Artist as an Institution.
+                            </p>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Career Highlights</span>
                             <ul class="ops-list">
                                 <li>
-                                    <strong>Strategic Acquisition</strong>
-                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen).
+                                    <strong>Founder, Unsubscribe.llc</strong>
+                                    The Holding Company / Venture Studio.
                                 </li>
                                 <li>
-                                    <strong>Production & Direction</strong>
-                                    Founder of An Arm & A Leg Production Co., capitalizing independent film projects.
-                                </li>
-                                <li>
-                                    <strong>Venture Architect</strong>
-                                    Founder of Unsubscribe LLC. Replaces the "Artist" model with the "Asset Manager" model.
+                                    <strong>Director of Strategy, CoCA</strong>
+                                    The Church of Conceptual Art (The Institutional Authority).
                                 </li>
                             </ul>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label uppercase">Current Deployment</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 0;">
-                                <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
-                            </p>
                         </div>
 
                     </div>
@@ -632,8 +672,14 @@
 
                     <div class="info-block uppercase">
                         <span class="info-label">Active Schedule</span>
-                        <div class="info-value">Feb 16 — Mar 09</div>
+                        <div class="info-value">Feb 16 — Mar 09, 2026</div>
                         <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">4 Live Sessions • 4 Projects</div>
+                    </div>
+
+                    <div class="info-block uppercase">
+                        <span class="info-label">Tuition</span>
+                        <div class="info-value">$2,000 USD</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px; color: var(--alert);">Covered by Maven Guarantee</div>
                     </div>
 
                     <div class="info-block uppercase">
@@ -645,13 +691,18 @@
                     <div class="info-block uppercase">
                         <span class="info-label">Target Profile</span>
                         <ul style="list-style: none; font-size: 0.8rem; line-height: 1.4;">
-                            <li style="margin-bottom: 5px;">- Burned-Out Creative Director</li>
-                            <li style="margin-bottom: 5px;">- Boutique Agency Owner</li>
-                            <li>- Senior Operator (The Waiting Room)</li>
+                            <li style="margin-bottom: 10px;">
+                                <strong>The Burned-Out CD:</strong> 10+ years experience. Bank account fluctuates wildly.
+                            </li>
+                            <li style="margin-bottom: 10px;">
+                                <strong>The Boutique Owner:</strong> High-paid servant. 90% time spent managing emotions.
+                            </li>
+                            <li>
+                                <strong>The Senior Operator:</strong> Stuck in the "Waiting Room" for permission.
+                            </li>
                         </ul>
                     </div>
 
-                    <!-- CTA BUTTON TO MAVEN -->
                     <a href="https://maven.com/unsub/ncr-cam-officer-certification-program-level-1" target="_blank" class="maven-btn">
                         SECURE SEAT ON MAVEN
                     </a>
