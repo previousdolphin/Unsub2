@@ -2,483 +2,794 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NCR // COMPETENCY AUDIT</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>UNSUBSCRIBE LLC | NCR-CAM</title>
+    <meta name="description" content="The NCR-CAM Officer Certification Program: Kill the Artist, Build the Corporation. Join the founding cohort for Structural Sovereignty.">
     <style>
+        /* --- CORE RESET & VARS --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         :root {
-            --bg: #050505;
-            --card-bg: #0a0a0a;
-            --text: #e0e0e0;
-            --border: #333;
-            --alert: #ff2a00; /* NCR RED */
-            --font-stack: 'Courier New', Courier, monospace;
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
+            --bg: rgba(244, 244, 244, 0.92);
+            --bg-solid: #f4f4f4; /* Fallback for solid elements */
+            --text: #050505;
+            --border: #000000;
+            --alert: #ff2a00;
+            --alert-text-light: #d62400; 
+            --font-main: 'Courier New', Courier, monospace;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --sidebar-width: 440px;
+            --ticker-height: 42px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body.dark-mode {
+            /* Modified to RGBA for Glassmorphism effect over the canvas */
+            --bg: rgba(10, 10, 10, 0.92);
+            --bg-solid: #0a0a0a;
+            --text: #e0e0e0;
+            --border: #333333;
+            --alert: #ff2a00;
+            --alert-text-dark: #ff5e40;
+        }
+
+        /* --- BACKGROUND CANVAS STYLES --- */
+        canvas#glCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -9999; 
+            transition: filter 0.5s ease, opacity 0.5s ease;
+        }
+
+        /* LIGHT MODE CANVAS: Invert colors to make it white smoke, lower opacity */
+        body:not(.dark-mode) canvas#glCanvas {
+            filter: invert(1);
+            opacity: 0.4;
+        }
+        
+        /* DARK MODE CANVAS: Native dark nebula */
+        body.dark-mode canvas#glCanvas {
+            filter: none;
+            opacity: 1;
+        }
 
         body {
-            background-color: var(--bg);
+            background-color: transparent; 
             color: var(--text);
-            font-family: var(--font-stack);
-            line-height: 1.4;
+            font-family: var(--font-main);
+            width: 100vw;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             overflow-x: hidden;
-            padding: 15px;
+            transition: color 0.3s;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
         .uppercase { text-transform: uppercase; }
-        .hidden { display: none !important; }
-        .blink { animation: blinker 0.8s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
-
-        /* --- WRAPPER --- */
-        .terminal-wrapper {
-            width: 100%;
-            max-width: 450px; /* Constrained for mobile feel */
-            min-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        /* --- HEADER --- */
-        .header-bar {
-            border-bottom: 2px solid var(--text);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 0.7rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-        }
-
-        /* --- QUIZ --- */
-        .question-block {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .q-meta {
-            font-size: 0.7rem;
-            color: var(--alert);
-            margin-bottom: 15px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        .q-text {
-            font-size: 1.3rem; /* Larger for readability */
-            font-weight: bold;
-            margin-bottom: 40px;
-            line-height: 1.2;
-            min-height: 3em;
-        }
-
-        .btn-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        button.choice-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 25px 20px;
-            text-align: left;
-            font-family: inherit;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: 0.1s;
-            font-weight: bold;
-        }
-
-        button.choice-btn:active, button.choice-btn:hover {
-            border-color: var(--alert);
-            background: rgba(255, 42, 0, 0.1);
-            color: #fff;
-        }
-
-        /* --- RESULT CARD (STORY FORMAT) --- */
-        .id-card-wrapper {
-            margin-bottom: 20px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        .id-card {
-            background: var(--card-bg);
-            border: 4px solid var(--text); /* Thicker border for visual weight */
-            padding: 30px;
-            width: 100%;
-            
-            /* FORCE 9:16 ASPECT RATIO for Instagram Stories */
-            aspect-ratio: 9/16; 
-            
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            text-align: left;
-            
-            /* Subtle texture */
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        .id-header {
-            border-bottom: 2px solid var(--text);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            font-size: 0.7rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .status-label {
-            font-size: 0.8rem; 
-            font-weight: bold; 
-            opacity: 0.7; 
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-        }
-
-        /* Responsive Text Sizing to prevent Clipping */
-        .archetype-result {
-            font-size: clamp(2rem, 11vw, 3.5rem); /* Dynamic sizing */
-            font-weight: 900;
-            color: var(--alert);
+        
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-size: clamp(2.5rem, 3.5vw, 4.5rem); 
             line-height: 0.9;
-            margin-bottom: 20px;
             letter-spacing: -2px;
-            word-wrap: break-word; /* Prevents overflow */
-        }
-
-        .archetype-bio {
-            font-size: 0.9rem;
-            line-height: 1.4;
-            border-left: 3px solid var(--alert);
-            padding-left: 15px;
-            margin-bottom: auto; /* Pushes footer down */
-            padding-bottom: 20px;
-        }
-
-        .footer-stats {
-            border-top: 2px solid var(--text);
-            padding-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
+            margin-bottom: 25px;
             font-weight: 900;
-            letter-spacing: 1px;
+            max-width: 18ch; 
         }
 
-        /* Decorative Elements */
-        .stamp {
-            position: absolute;
-            top: 50%;
-            right: 20px;
-            border: 4px solid var(--text);
-            color: var(--text);
-            padding: 10px 20px;
-            font-size: 1.5rem;
-            font-weight: 900;
-            transform: rotate(-15deg) translateY(-50%);
-            opacity: 0.15;
-            pointer-events: none;
-        }
-
-        /* --- ACTION BUTTONS --- */
-        .action-area {
-            width: 100%;
-        }
-
-        .primary-btn {
-            display: block;
-            width: 100%;
-            background: var(--alert);
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 900;
-            text-transform: uppercase;
-            border: none;
-            cursor: pointer;
-            margin-bottom: 15px;
-            font-family: inherit;
+        h2 {
             font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: var(--text);
+            color: var(--bg-solid);
+            display: inline-block;
+            padding: 4px 8px;
         }
 
-        .secondary-btn {
-            display: block;
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        p { 
+            margin-bottom: 20px; 
+            font-size: 1rem; 
+            max-width: 60ch; 
+        }
+
+        .fine-print { font-size: 0.75rem; opacity: 0.7; }
+
+        /* --- MARQUEE --- */
+        .marquee-container {
             width: 100%;
-            background: #222;
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 15px;
-            text-align: center;
-            text-decoration: none;
+            height: var(--ticker-height);
+            overflow: hidden;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border);
+            background: var(--text);
+            color: var(--bg-solid);
             font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 30s linear infinite;
+            padding-left: 100%;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* --- LAYOUT GRID --- */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr var(--sidebar-width); 
+            min-height: calc(100vh - var(--ticker-height));
+        }
+
+        .content-col {
+            border-right: 2px solid var(--border);
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background-color: var(--bg); 
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-col {
+            position: sticky;
+            top: 0;
+            height: 100vh; 
+            overflow-y: auto; 
+            border-left: 0;
+            background-color: var(--bg);
+            backdrop-filter: blur(2px);
         }
 
         /* --- IMAGES --- */
-        #generated-image-container {
-            margin-bottom: 20px;
-            text-align: center;
-            width: 100%;
+        .logo-wrapper {
+            margin-bottom: 40px;
+            display: block;
         }
-        #generated-image-container img {
-            max-width: 100%;
+        
+        .logo-wrapper img {
+            width: 240px;
+            height: auto;
+            display: block;
+            mix-blend-mode: normal; 
+        }
+
+        body.dark-mode .logo-wrapper img {
+            mix-blend-mode: normal; 
+        }
+
+        .image-full-bleed {
+            width: calc(100% + 160px); 
+            margin-left: -80px; 
+            margin-right: -80px;
+            display: block;
+            filter: invert(1);
+            mix-blend-mode: multiply;
+            opacity: 0.8; 
+        }
+        
+        .image-full-bleed img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        body.dark-mode .image-full-bleed {
+            filter: none;
+            mix-blend-mode: screen; 
+            opacity: 1; 
+        }
+
+        .alert-text-color {
+            color: var(--alert-text-light); 
+        }
+
+        body.dark-mode .alert-text-color {
+            color: var(--alert-text-dark);
+        }
+
+        /* --- SECTIONS --- */
+        .section-block {
+            margin-bottom: 60px;
+        }
+
+        .week-list {
+            list-style: none;
+            margin-top: 20px;
+            border: 2px solid var(--border);
+        }
+
+        .week-list li {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        /* Layout for week header row vs content */
+        .week-header {
+            display: flex; 
+            justify-content: space-between; 
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .week-detail {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            font-weight: normal;
+        }
+
+        .week-list li:last-child { border-bottom: none; }
+
+        /* --- INSTRUCTOR DOSSIER --- */
+        .dossier-container {
+            border: 2px solid var(--border);
+            padding: 25px;
+            background: rgba(125, 125, 125, 0.05); 
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .mugshot-wrapper img {
+            width: 100%;
             height: auto;
             border: 1px solid var(--border);
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            filter: grayscale(100%) contrast(120%);
+            display: block;
         }
 
-        .progress-bar { width: 100%; height: 4px; background: #222; margin-top: 20px; }
-        .progress-fill { height: 100%; background: var(--alert); width: 0%; transition: width 0.3s; }
+        .dossier-data {
+            font-size: 0.9rem;
+        }
 
+        .data-row {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 15px;
+        }
+        .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
+
+        .data-label {
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+            opacity: 0.6;
+        }
+        
+        .ops-list {
+            list-style: none;
+            font-size: 0.85rem;
+        }
+        .ops-list li {
+            margin-bottom: 10px;
+            padding-left: 12px;
+            border-left: 2px solid var(--alert);
+            line-height: 1.3;
+        }
+        .ops-list li strong {
+            display: block;
+            text-decoration: underline;
+            margin-bottom: 2px;
+        }
+
+        /* --- WARNING BOX --- */
+        .warning-box {
+            border: 2px solid var(--alert);
+            color: var(--alert);
+            padding: 20px;
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            background: rgba(255, 42, 0, 0.05);
+        }
+
+        /* --- TERMINAL / SIDEBAR STYLES --- */
+        .transfer-terminal {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: var(--text);
+            color: var(--bg-solid);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .terminal-body {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-block {
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+        .info-block:last-of-type { border-bottom: none; }
+
+        .info-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.6;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .maven-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: var(--alert);
+            color: white; 
+            text-decoration: none;
+            text-align: center;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+            margin-top: 20px;
+            border: none;
+        }
+
+        .maven-btn:hover { opacity: 0.8; }
+        
+        .cohort-status {
+            margin-top: 15px;
+            border: 1px solid var(--alert);
+            color: var(--alert);
+            padding: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .timer-bar {
+            padding: 15px; 
+            border-top: 2px solid var(--border); 
+            text-align: center; 
+            background: var(--text); 
+            color: var(--bg-solid);
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        /* --- THEME TOGGLE --- */
+        #theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--bg-solid);
+            border: 2px solid var(--text);
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.75rem;
+            box-shadow: 3px 3px 0px var(--text);
+        }
+        
+        #theme-toggle:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--text);
+        }
+
+        /* --- MOBILE --- */
+        @media (max-width: 1024px) {
+            .grid-container { display: block; }
+            
+            .content-col { 
+                border-right: none; 
+                border-bottom: 2px solid var(--border); 
+                padding: 40px 20px;
+            }
+
+            .sidebar-col {
+                position: relative;
+                height: auto;
+                overflow: visible;
+                border-left: 2px solid var(--border);
+            }
+
+            h1 { font-size: 2.5rem; }
+            .logo-wrapper img { 
+                width: 120px; 
+                height: 78px;
+                margin: 0 auto 30px auto; 
+            }
+            .logo-wrapper { text-align: center; }
+            
+            .dossier-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .mugshot-wrapper img {
+                max-width: 200px;
+            }
+            
+            .terminal-body { padding: 20px; }
+            
+            .image-full-bleed {
+                width: calc(100% + 40px); 
+                margin-left: -20px; 
+                margin-right: -20px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="terminal-wrapper">
+    <canvas id="glCanvas"></canvas>
+
+    <script type="x-shader/x-vertex" id="vertexShader">
+        attribute vec2 position;
+        void main() {
+            gl_Position = vec4(position, 0.0, 1.0);
+        }
+    </script>
+
+    <script type="x-shader/x-fragment" id="fragmentShader">
+        precision mediump float;
+
+        uniform vec2 u_resolution;
+        uniform float u_time;
         
-        <div class="header-bar uppercase">
-            NCR-CAM // PERSONNEL AUDIT // V.4.0
-        </div>
+        // Locked Parameters
+        const float ZOOM = 1.6;
+        const float CONTRAST = 1.0;
 
-        <div id="intro" class="question-block">
-            <h1 class="uppercase" style="margin-bottom: 20px; font-size: 2.5rem; line-height: 0.9; color: #fff;">Competency<br>Assessment</h1>
-            <p style="font-size: 1rem; margin-bottom: 40px; color: #aaa;">
-                Are you an Asset or a Liability? <br><br>
-                10 Questions. <br>
-                Honesty is required.
-            </p>
-            <button class="primary-btn" onclick="startQuiz()">INITIATE SEQUENCE</button>
-        </div>
-
-        <div id="quiz" class="question-block hidden">
-            <div class="progress-bar" style="margin-bottom: 30px;"><div id="p-fill" class="progress-fill"></div></div>
-            <div class="q-meta">DATA POINT <span id="q-num">01</span> / 10</div>
-            <div class="q-text" id="q-text">Loading...</div>
-            <div class="btn-grid">
-                <button class="choice-btn" onclick="answer(0)" id="btn-a">[A]</button>
-                <button class="choice-btn" onclick="answer(1)" id="btn-b">[B]</button>
-            </div>
-        </div>
-
-        <div id="processing" class="question-block hidden" style="text-align: center;">
-            <div class="uppercase blink" style="font-size: 2rem; font-weight: 900; color: var(--alert);">/// ANALYZING</div>
-            <p style="font-size: 0.9rem; margin-top: 20px; letter-spacing: 2px;">CALCULATING MARKET VALUE...</p>
-        </div>
-
-        <div id="result" class="hidden" style="width: 100%;">
+        void main() {
+            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+            uv = (uv - 0.5) * 2.0; 
+            uv.x *= u_resolution.x / u_resolution.y;
             
-            <p class="uppercase" style="text-align: center; font-size: 0.7rem; margin-bottom: 15px; color: var(--alert); letter-spacing: 2px;">
-                OFFICIAL CLASSIFICATION
-            </p>
+            vec2 p = uv * ZOOM;
+            float x = p.x;
+            float y = p.y;
+            float t = u_time;
 
-            <div class="id-card-wrapper">
-                <div class="id-card" id="share-card">
-                    <div>
-                        <div class="id-header uppercase">
-                            <span>NCR PERSONNEL FILE</span>
-                            <span id="date-stamp"></span>
-                        </div>
+            float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
 
-                        <div class="status-label uppercase">STATUS ASSIGNED:</div>
-                        <div class="archetype-result uppercase" id="r-title">ARCHITECT</div>
-                        
-                        <div class="archetype-bio" id="r-desc">
-                            You do not consume culture; you construct it. You see the code behind the matrix.
-                        </div>
-                    </div>
+            float brightness = 0.5 + 0.5 * val;
+            brightness = pow(brightness, CONTRAST);
 
-                    <div class="stamp uppercase">CONFIDENTIAL</div>
+            gl_FragColor = vec4(vec3(brightness), 1.0);
+        }
+    </script>
+    <div class="marquee-container uppercase">
+        <div class="marquee-content">
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+        </div>
+    </div>
+    
+    <div class="grid-container">
+        
+        <div class="content-col" role="main">
+            
+            <div class="logo-wrapper">
+                <img src="Logo.svg" alt="Unsubscribe LLC Logo" width="140">
+            </div>
 
-                    <div class="footer-stats uppercase">
-                        <span id="id-hash">ID: 8X99-L</span>
-                        <span>unsubscribe.llc</span>
-                    </div>
+            <div class="section-block">
+                <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
+                <h1 class="uppercase">You are tired of being a genius.</h1>
+                <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
+                <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
+            </div>
+
+            <div class="section-block">
+                <div class="image-full-bleed">
+                    <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
                 </div>
             </div>
-            
-            <div id="generated-image-container" class="hidden"></div>
 
-            <div class="action-area">
-                <button class="primary-btn" id="share-btn" onclick="generateAndShare()">
-                    GENERATE PASSPORT [SHARE]
-                </button>
+            <div class="section-block">
+                <h2 class="uppercase">The Service Model is Dead</h2>
+                <p>The creative industry is collapsing into two tiers: The "Algorithms" (who work for free) and the "Institutions" (who set the price). If you are still operating as a freelancer selling your time, you are racing to the bottom.</p>
+                <p>"Talent" is no longer a moat. To survive 2026, you do not need better art; you need a better container.</p>
+                <p>This course matters because it is the only operational framework that treats the Artist not as a "Vendor," but as a <strong>Distressed Asset</strong> that needs a structural turnaround.</p>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Syllabus</h2>
+                <p>The <strong>NCR-CAM Officer Certification Program (Level 1)</strong> is for High-Level Operators who are tired of the "Feast or Famine" cycle. We stop selling labor. We start building equity.</p>
                 
-                <div id="save-instruction" class="hidden" style="text-align: center; font-size: 0.7rem; margin-bottom: 15px; color: var(--alert); font-weight: bold;">
-                    LONG PRESS IMAGE TO SAVE / SHARE TO STORY
-                </div>
-
-                <a href="#" id="product-link" class="secondary-btn" target="_blank">
-                    ACCESS EQUIPMENT
-                </a>
+                <ul class="week-list uppercase">
+                    <li>
+                        <div class="week-header"><span>WEEK 01</span> <span>FEB 16 - FEB 22</span></div>
+                        <div class="week-detail">WE LIQUIDATE THE ARTIST: The Purge & The Asset Manager OS</div>
+                    </li>
+                    <li>
+                        <div class="week-header"><span>WEEK 02</span> <span>FEB 23 - MAR 01</span></div>
+                        <div class="week-detail">WE BUILD THE CORPORATION: The Architecture of Immunity</div>
+                    </li>
+                    <li>
+                        <div class="week-header"><span>WEEK 03</span> <span>MAR 02 - MAR 08</span></div>
+                        <div class="week-detail">WE WRITE THE MYTH: Engineering Retro-Causal History</div>
+                    </li>
+                    <li>
+                        <div class="week-header"><span>WEEK 04</span> <span>MAR 09 - MAR 15</span></div>
+                        <div class="week-detail">WE COLLECT THE RENT: Deployment of the Radar Lock Signal</div>
+                    </li>
+                </ul>
             </div>
 
+            <div class="section-block">
+                <h2 class="uppercase">The Architect</h2>
+                <div class="dossier-container">
+                    <div class="mugshot-wrapper">
+                        <img src="paul.jpeg" alt="Paul Pissarro" width="280" height="370">
+                    </div>
+                    <div class="dossier-data">
+                        
+                        <div class="data-row">
+                            <span class="data-label uppercase">Name / Rank</span>
+                            <h3>PAUL PISSARRO</h3>
+                            <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
+                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Operational History</span>
+                            <ul class="ops-list">
+                                <li>
+                                    <strong>Strategic Acquisition</strong>
+                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen).
+                                </li>
+                                <li>
+                                    <strong>Production & Direction</strong>
+                                    Founder of An Arm & A Leg Production Co., capitalizing independent film projects.
+                                </li>
+                                <li>
+                                    <strong>Venture Architect</strong>
+                                    Founder of Unsubscribe LLC. Replaces the "Artist" model with the "Asset Manager" model.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="data-row">
+                            <span class="data-label uppercase">Current Deployment</span>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block" style="margin-bottom: 0;">
+                <h2 class="uppercase">The Source Code</h2>
+                <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
+                
+                <div class="warning-box uppercase">
+                    WARNING: This is High-Frequency Identity Engineering. Do not apply if you want to be "understood." Apply only if you want to be Solvent.
+                </div>
+            </div>
+
+        </div>
+
+        <div class="sidebar-col" role="complementary">
+            <div class="transfer-terminal">
+                <div class="terminal-header uppercase">
+                    <div>Cohort Status: Open</div>
+                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">Secure Transmission</div>
+                </div>
+
+                <div class="terminal-body">
+                    
+                    <div class="info-block uppercase">
+                        <span class="info-label">Program</span>
+                        <div class="info-value">NCR-CAM Officer Certification</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">Level 1</div>
+                    </div>
+
+                    <div class="info-block uppercase">
+                        <span class="info-label">Active Schedule</span>
+                        <div class="info-value">Feb 16 — Mar 09</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">4 Live Sessions • 4 Projects</div>
+                    </div>
+
+                    <div class="info-block uppercase">
+                        <span class="info-label">Live Ops Timing</span>
+                        <div class="info-value">Mondays</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">18:00 — 21:00 EST</div>
+                    </div>
+                    
+                    <div class="info-block uppercase">
+                        <span class="info-label">Target Profile</span>
+                        <ul style="list-style: none; font-size: 0.8rem; line-height: 1.4;">
+                            <li style="margin-bottom: 5px;">- Burned-Out Creative Director</li>
+                            <li style="margin-bottom: 5px;">- Boutique Agency Owner</li>
+                            <li>- Senior Operator (The Waiting Room)</li>
+                        </ul>
+                    </div>
+
+                    <!-- CTA BUTTON TO MAVEN -->
+                    <a href="https://maven.com/unsub/ncr-cam-officer-certification-program-level-1" target="_blank" class="maven-btn">
+                        SECURE SEAT ON MAVEN
+                    </a>
+
+                    <div class="cohort-status uppercase">
+                        LIMITED SEATING.<br>
+                        OPERATED BY MAVEN.<br>
+                        EXECUTE TRANSFER IMMEDIATELY.
+                    </div>
+
+                </div>
+
+                <div class="timer-bar">
+                    <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
+                </div>
+            </div>
         </div>
 
     </div>
 
+    <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
+
     <script>
-        const questions = [
-            { q: "When you walk into a gallery, what do you see first?", a: "The Art (Consumer)", b: "The Exit Strategy (Owner)", score: {a: 'sleeper', b: 'architect'} },
-            { q: "Chaos is:", a: "A problem to be solved", b: "A ladder to be climbed", score: {a: 'sleeper', b: 'architect'} },
-            { q: "Your bank account is empty. You have $500 left. You:", a: "Save it for rent (Survival)", b: "Buy a suit to fake an interview (Leverage)", score: {a: 'sleeper', b: 'architect'} },
-            { q: "True or False: A brand is more powerful than a god.", a: "True", b: "False", score: {a: 'architect', b: 'iconoclast'} },
-            { q: "Pick a weapon:", a: "Silence", b: "Noise", score: {a: 'architect', b: 'iconoclast'} },
-            { q: "The building is burning down. You:", a: "Save the Archives", b: "Watch it burn", score: {a: 'architect', b: 'iconoclast'} },
-            { q: "You are at a dinner party. You are:", a: "Eating", b: "Networking", score: {a: 'sleeper', b: 'architect'} },
-            { q: "Which is worse?", a: "Being hated", b: "Being ignored", score: {a: 'sleeper', b: 'iconoclast'} },
-            { q: "Dress code:", a: "Uniform", b: "Statement", score: {a: 'architect', b: 'iconoclast'} },
-            { q: "Who owns you?", a: "No one", b: "The Corporation", score: {a: 'iconoclast', b: 'architect'} }
-        ];
+        // --- SECTION 1: WebGL Background Logic ---
+        const canvas = document.getElementById('glCanvas');
+        const gl = canvas.getContext('webgl');
+        const SPEED = 1.3;
 
-        let currentIdx = 0;
-        let scores = { architect: 0, iconoclast: 0, sleeper: 0 };
-        let finalArchetype = "";
+        if (!gl) {
+            console.error('WebGL not supported');
+        } else {
+            function createShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error(gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
 
-        const els = {
-            intro: document.getElementById('intro'),
-            quiz: document.getElementById('quiz'),
-            proc: document.getElementById('processing'),
-            result: document.getElementById('result'),
-            qText: document.getElementById('q-text'),
-            qNum: document.getElementById('q-num'),
-            btnA: document.getElementById('btn-a'),
-            btnB: document.getElementById('btn-b'),
-            pFill: document.getElementById('p-fill')
-        };
+            const vertexSrc = document.getElementById('vertexShader').textContent;
+            const fragmentSrc = document.getElementById('fragmentShader').textContent;
 
-        function startQuiz() {
-            els.intro.classList.add('hidden');
-            els.quiz.classList.remove('hidden');
-            document.getElementById('date-stamp').innerText = new Date().toLocaleDateString();
-            loadQ();
+            const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexSrc);
+            const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vertShader);
+            gl.attachShader(program, fragShader);
+            gl.linkProgram(program);
+
+            gl.useProgram(program);
+
+            const posBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1.0,  1.0,
+                 1.0,  1.0,
+                -1.0, -1.0,
+                 1.0, -1.0,
+            ]), gl.STATIC_DRAW);
+
+            const posLoc = gl.getAttribLocation(program, "position");
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+            const resLoc = gl.getUniformLocation(program, "u_resolution");
+            const timeLoc = gl.getUniformLocation(program, "u_time");
+
+            function resize() {
+                const displayWidth  = canvas.clientWidth;
+                const displayHeight = canvas.clientHeight;
+
+                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                    canvas.width  = displayWidth;
+                    canvas.height = displayHeight;
+                    gl.viewport(0, 0, canvas.width, canvas.height);
+                }
+            }
+            window.addEventListener('resize', resize);
+
+            let time = 0;
+            let lastTime = 0;
+
+            function render(now) {
+                now *= 0.001; 
+                const deltaTime = now - lastTime;
+                lastTime = now;
+
+                resize(); 
+
+                time += deltaTime * SPEED;
+
+                gl.uniform2f(resLoc, canvas.width, canvas.height);
+                gl.uniform1f(timeLoc, time);
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+                requestAnimationFrame(render);
+            }
+            requestAnimationFrame(render);
         }
 
-        function loadQ() {
-            const q = questions[currentIdx];
-            els.qNum.innerText = (currentIdx + 1).toString().padStart(2, '0');
-            els.qText.innerText = q.q;
-            els.btnA.innerText = "[A] " + q.a;
-            els.btnB.innerText = "[B] " + q.b;
-            const pct = (currentIdx / questions.length) * 100;
-            els.pFill.style.width = pct + "%";
+        // --- SECTION 2: Existing Site Logic ---
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
         }
+        setInterval(updateTime, 1000);
+        updateTime();
 
-        function answer(choiceIndex) {
-            const q = questions[currentIdx];
-            const type = choiceIndex === 0 ? q.score.a : q.score.b;
-            scores[type]++;
-            currentIdx++;
-            if(currentIdx < questions.length) {
-                loadQ();
+        const toggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        function applyTheme(isDark) {
+            if (isDark) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
             } else {
-                finish();
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
             }
         }
 
-        function finish() {
-            els.quiz.classList.add('hidden');
-            els.proc.classList.remove('hidden');
-
-            if (scores.architect >= scores.iconoclast && scores.architect >= scores.sleeper) finalArchetype = "architect";
-            else if (scores.iconoclast > scores.architect && scores.iconoclast > scores.sleeper) finalArchetype = "iconoclast";
-            else finalArchetype = "sleeper";
-
-            setTimeout(showResults, 1200);
+        // Initial load
+        if (localStorage.getItem('theme') === 'dark') {
+            applyTheme(true);
+        } else {
+            applyTheme(false);
         }
 
-        function showResults() {
-            els.proc.classList.add('hidden');
-            els.result.classList.remove('hidden');
-            
-            document.getElementById('id-hash').innerText = "ID: " + Math.random().toString(36).substr(2, 6).toUpperCase();
-
-            const title = document.getElementById('r-title');
-            const desc = document.getElementById('r-desc');
-            const link = document.getElementById('product-link');
-
-            if(finalArchetype === 'architect') {
-                title.innerText = "THE ARCHITECT";
-                title.style.color = "#ff2a00";
-                desc.innerText = "You do not consume culture; you construct it. You see the code behind the matrix.";
-                link.href = "https://unsubscribe.llc";
-            } 
-            else if(finalArchetype === 'iconoclast') {
-                title.innerText = "THE ICONOCLAST";
-                title.style.color = "#ffffff"; 
-                desc.innerText = "You are a glitch in the system. You reject the narrative. You are here to break things.";
-                link.href = "https://nameofmy.com";
-            } 
-            else {
-                title.innerText = "THE SLEEPER";
-                title.style.color = "#888888"; 
-                desc.innerText = "You are currently dormant. You sense something is wrong, but you haven't taken the pill yet.";
-                link.href = "https://cocausa.org";
-            }
-        }
-
-        function generateAndShare() {
-            const btn = document.getElementById('share-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "RENDERING...";
-            
-            const card = document.getElementById('share-card');
-
-            // Set specific constraints for image generation
-            html2canvas(card, {
-                scale: 3, // Higher scale for crisp text
-                backgroundColor: "#0a0a0a",
-                logging: false,
-                useCORS: true
-            }).then(canvas => {
-                
-                const imgContainer = document.getElementById('generated-image-container');
-                imgContainer.innerHTML = ''; 
-                const img = document.createElement('img');
-                img.src = canvas.toDataURL("image/png");
-                imgContainer.appendChild(img);
-                
-                document.querySelector('.id-card-wrapper').classList.add('hidden');
-                imgContainer.classList.remove('hidden');
-                document.getElementById('save-instruction').classList.remove('hidden');
-                
-                btn.innerText = "PASSPORT GENERATED";
-
-                canvas.toBlob(function(blob) {
-                    const files = [new File([blob], 'ncr-file.png', { type: 'image/png' })];
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
-                        navigator.share({
-                            files: files,
-                            title: 'NCR Personnel File',
-                            text: 'My classification has been assigned. https://unsubscribe.llc'
-                        }).catch(() => console.log("Share skipped"));
-                    }
-                });
-            });
-        }
+        toggle.addEventListener('click', () => {
+            const isDark = !body.classList.contains('dark-mode');
+            applyTheme(isDark);
+        });
     </script>
 </body>
 </html>
