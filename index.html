@@ -16,7 +16,6 @@
             --text: #050505;
             --border: #000000;
             --alert: #ff2a00;
-            /* FIX 4: Defining a slightly brighter alert color for text against --bg in light mode. */
             --alert-text-light: #d62400; 
             --font-main: 'Courier New', Courier, monospace;
             --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -31,7 +30,6 @@
             --text: #e0e0e0;
             --border: #333333;
             --alert: #ff2a00;
-            /* FIX 4: Defining a slightly brighter alert color for text against --bg in dark mode. */
             --alert-text-dark: #ff5e40;
         }
 
@@ -60,14 +58,13 @@
         }
 
         body {
-            /* Set body background to transparent so canvas shows through */
             background-color: transparent; 
             color: var(--text);
             font-family: var(--font-main);
             width: 100vw;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: color 0.3s; /* Removed bg transition here, handled by containers */
+            transition: color 0.3s;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
@@ -150,8 +147,8 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            background-color: var(--bg); /* Semi-transparent bg */
-            backdrop-filter: blur(2px); /* Subtle blur for readability */
+            background-color: var(--bg); 
+            backdrop-filter: blur(2px);
         }
 
         .sidebar-col {
@@ -160,7 +157,7 @@
             height: 100vh; 
             overflow-y: auto; 
             border-left: 0;
-            background-color: var(--bg); /* Semi-transparent bg */
+            background-color: var(--bg);
             backdrop-filter: blur(2px);
         }
 
@@ -181,14 +178,11 @@
             mix-blend-mode: normal; 
         }
 
-        /* Full-bleed image style */
         .image-full-bleed {
             width: calc(100% + 160px); 
             margin-left: -80px; 
             margin-right: -80px;
             display: block;
-            
-            /* FIX 3: Contrast/Transparency logic */
             filter: invert(1);
             mix-blend-mode: multiply;
             opacity: 0.8; 
@@ -200,14 +194,12 @@
             display: block;
         }
         
-        /* FIX 3: Reset filter and blend mode for dark mode */
         body.dark-mode .image-full-bleed {
             filter: none;
             mix-blend-mode: screen; 
             opacity: 1; 
         }
 
-        /* FIX 4: Contrasting color definitions */
         .alert-text-color {
             color: var(--alert-text-light); 
         }
@@ -231,17 +223,52 @@
             padding: 15px;
             border-bottom: 1px solid var(--border);
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
             font-weight: bold;
             font-size: 0.85rem;
         }
+        
+        .week-header {
+            display: flex; 
+            justify-content: space-between; 
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .week-detail {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            font-weight: normal;
+        }
+
         .week-list li:last-child { border-bottom: none; }
+
+        /* --- OBJECTIVES LIST (NEW) --- */
+        .obj-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        .obj-list li {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 2px solid var(--alert);
+        }
+        .obj-title {
+            font-weight: 900;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .obj-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
 
         /* --- INSTRUCTOR DOSSIER --- */
         .dossier-container {
             border: 2px solid var(--border);
             padding: 25px;
-            background: rgba(125, 125, 125, 0.05); /* Slightly visible fill */
+            background: rgba(125, 125, 125, 0.05); 
             display: grid;
             grid-template-columns: 180px 1fr;
             gap: 30px;
@@ -252,7 +279,6 @@
             width: 100%;
             height: auto;
             border: 1px solid var(--border);
-            /* Brutalist Filter: High contrast B&W */
             filter: grayscale(100%) contrast(120%);
             display: block;
         }
@@ -277,20 +303,13 @@
             opacity: 0.6;
         }
         
-        .ops-list {
-            list-style: none;
+        .quote-block {
+            font-style: italic;
+            border-left: 2px solid var(--text);
+            padding-left: 15px;
+            margin: 15px 0;
             font-size: 0.85rem;
-        }
-        .ops-list li {
-            margin-bottom: 10px;
-            padding-left: 12px;
-            border-left: 2px solid var(--alert);
-            line-height: 1.3;
-        }
-        .ops-list li strong {
-            display: block;
-            text-decoration: underline;
-            margin-bottom: 2px;
+            opacity: 0.8;
         }
 
         /* --- WARNING BOX --- */
@@ -305,7 +324,7 @@
             background: rgba(255, 42, 0, 0.05);
         }
 
-        /* --- FORM TERMINAL --- */
+        /* --- TERMINAL / SIDEBAR STYLES --- */
         .transfer-terminal {
             min-height: 100%;
             display: flex;
@@ -322,59 +341,59 @@
             flex-shrink: 0;
         }
 
-        .input-group {
+        .terminal-body {
             padding: 30px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
-        label {
+        .info-block {
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+        .info-block:last-of-type { border-bottom: none; }
+
+        .info-label {
             display: block;
             font-size: 0.7rem;
-            margin-bottom: 5px;
-            font-weight: 800;
+            font-weight: 900;
             letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.6;
         }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid var(--border);
-            color: var(--text);
-            font-family: inherit;
-            margin-bottom: 15px;
-            outline: none;
-            border-radius: 0;
-            font-size: 0.9rem;
-            transition: border-color 0.2s;
+        .info-value {
+            font-size: 1rem;
+            font-weight: bold;
         }
-
-        input:focus, select:focus { border-color: var(--alert); }
-
-        .submit-btn {
+        
+        .maven-btn {
+            display: block;
             width: 100%;
             padding: 20px;
             background: var(--alert);
             color: white; 
-            border: none;
+            text-decoration: none;
+            text-align: center;
             font-family: inherit;
             font-weight: 900;
             font-size: 1.1rem;
             cursor: pointer;
             text-transform: uppercase;
             transition: opacity 0.2s;
-            margin-top: 5px;
+            margin-top: 20px;
+            border: none;
         }
 
-        .submit-btn:hover { opacity: 0.8; }
+        .maven-btn:hover { opacity: 0.8; }
         
-        .payment-note {
+        .cohort-status {
+            margin-top: 15px;
             border: 1px solid var(--alert);
             color: var(--alert);
             padding: 10px;
-            margin-top: 15px;
             font-size: 0.7rem;
             font-weight: bold;
             text-align: center;
@@ -433,7 +452,6 @@
             h1 { font-size: 2.5rem; }
             .logo-wrapper img { 
                 width: 120px; 
-                /* FIX 1: Set height explicitly for CLS fix on mobile. */
                 height: 78px;
                 margin: 0 auto 30px auto; 
             }
@@ -447,9 +465,8 @@
                 max-width: 200px;
             }
             
-            .input-group { padding: 20px; }
+            .terminal-body { padding: 20px; }
             
-            /* NEW: Mobile image size fix */
             .image-full-bleed {
                 width: calc(100% + 40px); 
                 margin-left: -20px; 
@@ -480,29 +497,20 @@
         const float CONTRAST = 1.0;
 
         void main() {
-            // Normalized coordinates
             vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-            
-            // Aspect Ratio Correction
             uv = (uv - 0.5) * 2.0; 
             uv.x *= u_resolution.x / u_resolution.y;
             
-            // Apply Zoom
             vec2 p = uv * ZOOM;
             float x = p.x;
             float y = p.y;
             float t = u_time;
 
-            // The Formula
             float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
 
-            // Normalize to 0-1 range for color
             float brightness = 0.5 + 0.5 * val;
-            
-            // Apply Contrast
             brightness = pow(brightness, CONTRAST);
 
-            // Output Grayscale
             gl_FragColor = vec4(vec3(brightness), 1.0);
         }
     </script>
@@ -524,8 +532,6 @@
             <div class="section-block">
                 <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
                 <h1 class="uppercase">You are tired of being a genius.</h1>
-                <p>The world does not need another "creative." The world has enough paintings. It has enough screenplays. It has enough noise.</p>
-                <p><strong>What the world lacks is Structure.</strong></p>
                 <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
                 <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
             </div>
@@ -535,15 +541,61 @@
                     <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
                 </div>
             </div>
+
             <div class="section-block">
-                <h2 class="uppercase">The Offer</h2>
-                <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
+                <h2 class="uppercase">The Service Model is Dead</h2>
+                <p>The creative industry is collapsing into two tiers: The "Algorithms" (who work for free) and the "Institutions" (who set the price). If you are still operating as a freelancer selling your time, you are racing to the bottom.</p>
+                <p>"Talent" is no longer a moat. To survive 2026, you do not need better art; you need a better container.</p>
+                <p>This course matters because it is the only operational framework that treats the Artist not as a "Vendor," but as a <strong>Distressed Asset</strong> that needs a structural turnaround.</p>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">Operational Objectives</h2>
+                <p>This is not a creative writing class. It is the installation of the <strong>Asset Manager Operating System.</strong></p>
                 
+                <ul class="obj-list">
+                    <li>
+                        <span class="obj-title uppercase">1. Install the Asset Manager OS</span>
+                        <span class="obj-desc">Liquidate the "Starving Artist" ego. Adopt the "Middle Mind" framework to prioritize execution over "Überthink." Perform the "Vow of Severance."</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">2. Construct the Financial Cloister</span>
+                        <span class="obj-desc">Design the "Architecture of Immunity" using the LLC, S-Corp, or 501(c)(3). Implement the "One-Way Valve" to separate Profane income from Sacred assets.</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">3. Execute the "Red Pen" Audit</span>
+                        <span class="obj-desc">Categorize every active commitment as either a Liability or an Asset. Apply the "Triad of Value" (Liquidity, Signal, Provenance) to your projects.</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">4. Engineer the "Retro-Causal" Myth</span>
+                        <span class="obj-desc">Write your history backward so your current success looks inevitable. Stop selling the "Product" (the paper) and start selling the "Transaction."</span>
+                    </li>
+                    <li>
+                        <span class="obj-title uppercase">5. Deploy "Radar Lock"</span>
+                        <span class="obj-desc">Master "Statements Before Questions." Treat the calendar invite as a "Summoning Circle" rather than a casual chat.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section-block">
+                <h2 class="uppercase">The Syllabus</h2>
                 <ul class="week-list uppercase">
-                    <li><span>Week 1</span> <span>We kill the Artist</span></li>
-                    <li><span>Week 2</span> <span>We build the Corporation</span></li>
-                    <li><span>Week 3</span> <span>We write the Myth</span></li>
-                    <li><span>Week 4</span> <span>We collect the Rent</span></li>
+                    <li>
+                        <div class="week-header"><span>WEEK 01</span> <span>FEB 16 - FEB 22</span></div>
+                        <div class="week-detail">WE LIQUIDATE THE ARTIST: The Purge & The Asset Manager OS</div>
+                    </li>
+                    <li>
+                        <div class="week-header"><span>WEEK 02</span> <span>FEB 23 - MAR 01</span></div>
+                        <div class="week-detail">WE BUILD THE CORPORATION: The Architecture of Immunity</div>
+                    </li>
+                    <li>
+                        <div class="week-header"><span>WEEK 03</span> <span>MAR 02 - MAR 08</span></div>
+                        <div class="week-detail">WE WRITE THE MYTH: Engineering Retro-Causal History</div>
+                    </li>
+                    <li>
+                        <div class="week-header"><span>WEEK 04</span> <span>MAR 09 - MAR 15</span></div>
+                        <div class="week-detail">WE COLLECT THE RENT: Deployment of the Radar Lock Signal</div>
+                    </li>
                 </ul>
             </div>
 
@@ -559,49 +611,33 @@
                             <span class="data-label uppercase">Name / Rank</span>
                             <h3>PAUL PISSARRO</h3>
                             <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
-                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
                         </div>
 
                         <div class="data-row">
-                            <span class="data-label uppercase">The Profile</span>
+                            <span class="data-label uppercase">Origin Story</span>
+                            <div class="quote-block">
+                                "I didn't build the Asset Manager OS because I wanted to be a teacher. I built it because I needed to survive myself."
+                            </div>
                             <p style="font-size: 0.85rem; margin-bottom: 5px;">
-                                Great-great-grandson of Impressionist architect Camille Pissarro. He carries a lineage of disruption—but he has traded the canvas for the corporation.
+                                For years, Pissarro bought into the myth of the "Starving Artist"—the idea that chaos was the fuel for creativity. He paid for that lie with addiction, homelessness, and years of entropy.
+                            </p>
+                            <p style="font-size: 0.85rem; margin-bottom: 0;">
+                                <strong>Compassion without structure spills.</strong> Today, he runs Unsubscribe.llc, a venture studio that treats Art as a transaction and the Artist as an Institution.
                             </p>
                         </div>
 
                         <div class="data-row">
-                            <span class="data-label uppercase">Operational History</span>
+                            <span class="data-label uppercase">Career Highlights</span>
                             <ul class="ops-list">
                                 <li>
-                                    <strong>Strategic Acquisition</strong>
-                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen), executing multi-million dollar asset transfers.
+                                    <strong>Founder, Unsubscribe.llc</strong>
+                                    The Holding Company / Venture Studio.
                                 </li>
                                 <li>
-                                    <strong>Production & Direction</strong>
-                                    Founder of An Arm & A Leg Production Co., securing $250k+ in client contracts and capitalizing independent film projects.
-                                </li>
-                                <li>
-                                    <strong>Tactical Execution</strong>
-                                    Former Chef and Master Butcher (L'Ambroisie, Paris). He understands that execution is not an art; it is a discipline of steel and fire.
+                                    <strong>Director of Strategy, CoCA</strong>
+                                    The Church of Conceptual Art (The Institutional Authority).
                                 </li>
                             </ul>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label uppercase">The Mandate</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 10px;">
-                                Pissarro does not teach "art." He teaches Structural Sovereignty. He is the architect of the Neo-Classical Revival Corporate Art Movement (NCR-CAM).
-                            </p>
-                            <p style="font-size: 0.85rem; margin-bottom: 0;">
-                                <strong>Objective:</strong> Replace the fragile "Artist" model with the durable "Asset Manager" model.
-                            </p>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label uppercase">Current Deployment</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 0;">
-                                <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
-                            </p>
                         </div>
 
                     </div>
@@ -622,50 +658,62 @@
         <div class="sidebar-col" role="complementary">
             <div class="transfer-terminal">
                 <div class="terminal-header uppercase">
-                    <div>Founding Cohort Application</div>
-                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
+                    <div>Cohort Status: Open</div>
+                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">Secure Transmission</div>
                 </div>
 
-                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group" role="form">
+                <div class="terminal-body">
                     
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
-                        <span>PRICE</span>
-                        <div style="text-align: right;">
-                            <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
-                            <span class="alert-text-color">$2,000</span>
-                        </div>
+                    <div class="info-block uppercase">
+                        <span class="info-label">Program</span>
+                        <div class="info-value">NCR-CAM Officer Certification</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">Level 1</div>
                     </div>
 
-                    <label for="legal-name" class="uppercase">Legal Name</label>
-                    <input type="text" id="legal-name" name="name" required placeholder="LAST, FIRST">
+                    <div class="info-block uppercase">
+                        <span class="info-label">Active Schedule</span>
+                        <div class="info-value">Feb 16 — Mar 09, 2026</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">4 Live Sessions • 4 Projects</div>
+                    </div>
 
-                    <label for="email-address" class="uppercase">Email Address</label>
-                    <input type="email" id="email-address" name="email" required placeholder="CONTACT@DOMAIN.COM">
+                    <div class="info-block uppercase">
+                        <span class="info-label">Tuition</span>
+                        <div class="info-value">$2,000 USD</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px; color: var(--alert);">Covered by Maven Guarantee</div>
+                    </div>
 
-                    <label for="select-role" class="uppercase">Select Role</label>
-                    <select id="select-role" name="role" required>
-                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
-                    </select>
-
-                    <label for="statement-of-intent" class="uppercase">Statement of Intent (Optional)</label>
-                    <input type="text" id="statement-of-intent" name="statement" placeholder="Why are you tired?">
-
-                    <input type="text" name="_gotcha" style="display:none" />
-
-                    <button type="submit" class="submit-btn">
-                        COMMIT TO SOLVENCY
-                    </button>
-                    
-                    <div class="payment-note uppercase">
-                        NO PAYMENT COLLECTED NOW.<br>
-                        THIS IS A COMMITMENT OF INTEREST.<br>
-                        PAYMENT REQUIRED UPON ACCEPTANCE.
+                    <div class="info-block uppercase">
+                        <span class="info-label">Live Ops Timing</span>
+                        <div class="info-value">Mondays</div>
+                        <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">18:00 — 21:00 EST</div>
                     </div>
                     
-                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
-                        By applying, you confirm your ability to pay the $2,000 fee.
-                    </p>
-                </form>
+                    <div class="info-block uppercase">
+                        <span class="info-label">Target Profile</span>
+                        <ul style="list-style: none; font-size: 0.8rem; line-height: 1.4;">
+                            <li style="margin-bottom: 10px;">
+                                <strong>The Burned-Out CD:</strong> 10+ years experience. Bank account fluctuates wildly.
+                            </li>
+                            <li style="margin-bottom: 10px;">
+                                <strong>The Boutique Owner:</strong> High-paid servant. 90% time spent managing emotions.
+                            </li>
+                            <li>
+                                <strong>The Senior Operator:</strong> Stuck in the "Waiting Room" for permission.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <a href="https://maven.com/unsub/ncr-cam-officer-certification-program-level-1" target="_blank" class="maven-btn">
+                        SECURE SEAT ON MAVEN
+                    </a>
+
+                    <div class="cohort-status uppercase">
+                        LIMITED SEATING.<br>
+                        OPERATED BY MAVEN.<br>
+                        EXECUTE TRANSFER IMMEDIATELY.
+                    </div>
+
+                </div>
 
                 <div class="timer-bar">
                     <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
@@ -771,8 +819,7 @@
 
         const toggle = document.getElementById('theme-toggle');
         const body = document.body;
-        const logo = document.querySelector('.logo-wrapper img');
-
+        
         function applyTheme(isDark) {
             if (isDark) {
                 body.classList.add('dark-mode');
