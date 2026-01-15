@@ -2,934 +2,560 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>UNSUBSCRIBE LLC | NCR-CAM</title>
-    <meta name="description" content="The NCR-CAM Officer Certification Program: Kill the Artist, Build the Corporation. Join the founding cohort for Structural Sovereignty.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNSUBSCRIBE NYC LLC | Manifesto</title>
+    
+    <!-- Fonts: Playfair Display (Art/Sacred) & Space Mono (System/Code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (for utility) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
-        /* --- CORE RESET & VARS --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         :root {
-            /* Modified to RGBA for Glassmorphism effect over the canvas */
-            --bg: rgba(244, 244, 244, 0.92);
-            --bg-solid: #f4f4f4; /* Fallback for solid elements */
-            --text: #050505;
-            --border: #000000;
-            --alert: #ff2a00;
-            /* FIX 4: Defining a slightly brighter alert color for text against --bg in light mode. */
-            --alert-text-light: #d62400; 
-            --font-main: 'Courier New', Courier, monospace;
-            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            --sidebar-width: 440px;
-            --ticker-height: 42px;
-        }
-
-        body.dark-mode {
-            /* Modified to RGBA for Glassmorphism effect over the canvas */
-            --bg: rgba(10, 10, 10, 0.92);
-            --bg-solid: #0a0a0a;
-            --text: #e0e0e0;
-            --border: #333333;
-            --alert: #ff2a00;
-            /* FIX 4: Defining a slightly brighter alert color for text against --bg in dark mode. */
-            --alert-text-dark: #ff5e40;
-        }
-
-        /* --- BACKGROUND CANVAS STYLES --- */
-        canvas#glCanvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -9999; 
-            transition: filter 0.5s ease, opacity 0.5s ease;
-        }
-
-        /* LIGHT MODE CANVAS: Invert colors to make it white smoke, lower opacity */
-        body:not(.dark-mode) canvas#glCanvas {
-            filter: invert(1);
-            opacity: 0.4;
-        }
-        
-        /* DARK MODE CANVAS: Native dark nebula */
-        body.dark-mode canvas#glCanvas {
-            filter: none;
-            opacity: 1;
+            --bg-color: #F2F2F2;
+            --text-color: #0F0F0F;
+            --accent-color: #FF2A2A; /* Signal Red */
+            --grid-line: 1px solid #0F0F0F;
         }
 
         body {
-            /* Set body background to transparent so canvas shows through */
-            background-color: transparent; 
-            color: var(--text);
-            font-family: var(--font-main);
-            width: 100vw;
-            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
             overflow-x: hidden;
-            transition: color 0.3s; /* Removed bg transition here, handled by containers */
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
+            cursor: crosshair; /* Brutalist cursor */
         }
 
-        .uppercase { text-transform: uppercase; }
-        
-        /* --- TYPOGRAPHY --- */
-        h1 {
-            font-size: clamp(2.5rem, 3.5vw, 4.5rem); 
-            line-height: 0.9;
-            letter-spacing: -2px;
-            margin-bottom: 25px;
-            font-weight: 900;
-            max-width: 18ch; 
+        /* Smooth Scroll Behavior */
+        html {
+            scroll-behavior: smooth;
         }
 
-        h2 {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            background: var(--text);
-            color: var(--bg-solid);
-            display: inline-block;
-            padding: 4px 8px;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-left: var(--grid-line);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-color);
         }
 
-        h3 {
-            font-size: 1.2rem;
-            font-weight: 900;
-            margin-bottom: 5px;
-            letter-spacing: -1px;
+        /* Typography Overrides */
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .font-mono {
+            font-family: 'Space Mono', monospace;
         }
 
-        p { 
-            margin-bottom: 20px; 
-            font-size: 1rem; 
-            max-width: 60ch; 
-        }
+        /* Brutalist Borders & Layout */
+        .border-b-black { border-bottom: var(--grid-line); }
+        .border-t-black { border-top: var(--grid-line); }
+        .border-l-black { border-left: var(--grid-line); }
+        .border-r-black { border-right: var(--grid-line); }
+        .border-black { border: var(--grid-line); }
 
-        .fine-print { font-size: 0.75rem; opacity: 0.7; }
-
-        /* --- MARQUEE --- */
-        .marquee-container {
-            width: 100%;
-            height: var(--ticker-height);
-            overflow: hidden;
-            white-space: nowrap;
-            border-bottom: 2px solid var(--border);
-            background: var(--text);
-            color: var(--bg-solid);
-            font-weight: bold;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            position: relative;
-            z-index: 20;
-        }
-
-        .marquee-content {
-            display: inline-block;
-            animation: scroll 30s linear infinite;
-            padding-left: 100%;
-        }
-
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* --- LAYOUT GRID --- */
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr var(--sidebar-width); 
-            min-height: calc(100vh - var(--ticker-height));
-        }
-
-        .content-col {
-            border-right: 2px solid var(--border);
-            padding: 60px 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            background-color: var(--bg); /* Semi-transparent bg */
-            backdrop-filter: blur(2px); /* Subtle blur for readability */
-        }
-
-        .sidebar-col {
-            position: sticky;
-            top: 0;
-            height: 100vh; 
-            overflow-y: auto; 
-            border-left: 0;
-            background-color: var(--bg); /* Semi-transparent bg */
-            backdrop-filter: blur(2px);
-        }
-
-        /* --- IMAGES --- */
-        .logo-wrapper {
-            margin-bottom: 40px;
-            display: block;
-        }
-        
-        .logo-wrapper img {
-            width: 240px;
-            height: auto;
-            display: block;
-            mix-blend-mode: normal; 
-        }
-
-        body.dark-mode .logo-wrapper img {
-            mix-blend-mode: normal; 
-        }
-
-        /* Full-bleed image style */
-        .image-full-bleed {
-            width: calc(100% + 160px); 
-            margin-left: -80px; 
-            margin-right: -80px;
-            display: block;
-            
-            /* FIX 3: Contrast/Transparency logic */
-            filter: invert(1);
-            mix-blend-mode: multiply;
-            opacity: 0.8; 
-        }
-        
-        .image-full-bleed img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        
-        /* FIX 3: Reset filter and blend mode for dark mode */
-        body.dark-mode .image-full-bleed {
-            filter: none;
-            mix-blend-mode: screen; 
-            opacity: 1; 
-        }
-
-        /* FIX 4: Contrasting color definitions */
-        .alert-text-color {
-            color: var(--alert-text-light); 
-        }
-
-        body.dark-mode .alert-text-color {
-            color: var(--alert-text-dark);
-        }
-
-        /* --- SECTIONS --- */
-        .section-block {
-            margin-bottom: 60px;
-        }
-
-        .week-list {
-            list-style: none;
-            margin-top: 20px;
-            border: 2px solid var(--border);
-        }
-
-        .week-list li {
-            padding: 15px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            font-size: 0.85rem;
-        }
-        .week-list li:last-child { border-bottom: none; }
-
-        /* --- INSTRUCTOR DOSSIER --- */
-        .dossier-container {
-            border: 2px solid var(--border);
-            padding: 25px;
-            background: rgba(125, 125, 125, 0.05); /* Slightly visible fill */
-            display: grid;
-            grid-template-columns: 180px 1fr;
-            gap: 30px;
-            align-items: start;
-        }
-
-        .mugshot-wrapper img {
-            width: 100%;
-            height: auto;
-            border: 1px solid var(--border);
-            /* Brutalist Filter: High contrast B&W */
-            filter: grayscale(100%) contrast(120%);
-            display: block;
-        }
-
-        .dossier-data {
-            font-size: 0.9rem;
-        }
-
-        .data-row {
-            margin-bottom: 20px;
-            border-bottom: 1px dashed var(--border);
-            padding-bottom: 15px;
-        }
-        .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
-
-        .data-label {
-            font-size: 0.7rem;
-            font-weight: 900;
-            letter-spacing: 1px;
-            display: block;
-            margin-bottom: 6px;
-            opacity: 0.6;
-        }
-        
-        .ops-list {
-            list-style: none;
-            font-size: 0.85rem;
-        }
-        .ops-list li {
-            margin-bottom: 10px;
-            padding-left: 12px;
-            border-left: 2px solid var(--alert);
-            line-height: 1.3;
-        }
-        .ops-list li strong {
-            display: block;
-            text-decoration: underline;
-            margin-bottom: 2px;
-        }
-
-        /* --- WARNING BOX --- */
-        .warning-box {
-            border: 2px solid var(--alert);
-            color: var(--alert);
-            padding: 20px;
-            margin-top: 30px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            background: rgba(255, 42, 0, 0.05);
-        }
-
-        /* --- FORM TERMINAL --- */
-        .transfer-terminal {
-            min-height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .terminal-header {
-            background: var(--text);
-            color: var(--bg-solid);
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            border-bottom: 2px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .input-group {
-            padding: 30px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            display: block;
-            font-size: 0.7rem;
-            margin-bottom: 5px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid var(--border);
-            color: var(--text);
-            font-family: inherit;
-            margin-bottom: 15px;
-            outline: none;
-            border-radius: 0;
-            font-size: 0.9rem;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, select:focus { border-color: var(--alert); }
-
-        .submit-btn {
-            width: 100%;
-            padding: 20px;
-            background: var(--alert);
-            color: white; 
-            border: none;
-            font-family: inherit;
-            font-weight: 900;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: opacity 0.2s;
-            margin-top: 5px;
-        }
-
-        .submit-btn:hover { opacity: 0.8; }
-        
-        .payment-note {
-            border: 1px solid var(--alert);
-            color: var(--alert);
-            padding: 10px;
-            margin-top: 15px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        .timer-bar {
-            padding: 15px; 
-            border-top: 2px solid var(--border); 
-            text-align: center; 
-            background: var(--text); 
-            color: var(--bg-solid);
-            margin-top: auto;
-            flex-shrink: 0;
-        }
-
-        /* --- THEME TOGGLE --- */
-        #theme-toggle {
+        /* Canvas Container */
+        #canvas-container {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            background: var(--bg-solid);
-            border: 2px solid var(--text);
-            padding: 8px 12px;
-            cursor: pointer;
-            color: var(--text);
-            font-family: inherit;
-            font-weight: bold;
-            font-size: 0.75rem;
-            box-shadow: 3px 3px 0px var(--text);
-        }
-        
-        #theme-toggle:active {
-            transform: translate(2px, 2px);
-            box-shadow: 1px 1px 0px var(--text);
-        }
-
-        /* --- NEW: COSMIC CORNER RIBBON --- */
-        .ribbon-container {
-            /* Fixed container that sits over the corner but lets click through */
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 250px;
-            height: 250px;
-            overflow: hidden;
-            z-index: 9999;
-            pointer-events: none; /* Let clicks pass through the empty square area */
-            display: none; /* Toggled by JS */
-        }
-
-        .ribbon-wrapper {
-            position: absolute;
-            top: 40px;
-            right: -60px;
-            width: 300px;
-            height: 60px;
-            
-            /* The Diagonal Rotation */
-            transform: rotate(45deg);
-            
-            /* Visual Base */
-            background-color: #000;
-            border-top: 1px solid #fff;
-            border-bottom: 1px solid #fff;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            
-            /* Enable clicks on the actual ribbon */
-            pointer-events: auto;
-            
-            /* Flex layout for text */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden; /* Contain the stars */
-        }
-
-        /* The Moving Star Stream Background */
-        .star-stream {
-            position: absolute;
             top: 0;
             left: 0;
-            width: 200%;
-            height: 100%;
-            
-            /* White stars on transparent bg */
-            background-image: 
-                radial-gradient(white 1px, transparent 1px),
-                radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px);
-            background-size: 30px 30px, 70px 70px;
-            background-position: 0 0, 15px 15px;
-            
-            /* Flow Animation */
-            animation: cosmic-flow 4s linear infinite;
-            opacity: 0.5; /* Shimmer dimness */
-            z-index: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.6; /* Subtle blend */
+            pointer-events: none;
+            mix-blend-mode: multiply;
         }
 
-        @keyframes cosmic-flow {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
+        /* Text Selection */
+        ::selection {
+            background: var(--text-color);
+            color: var(--bg-color);
         }
 
-        .ribbon-text {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            width: 100%;
+        /* Hover Inversion Effect */
+        .hover-invert {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hover-invert:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
         }
 
-        .ribbon-text a {
-            text-decoration: none;
-            color: #fff;
-            font-family: 'Times New Roman', serif; /* Mystical Contrast Font */
-            display: block;
-            text-shadow: 0 0 4px #000, 0 0 10px #000; /* Legibility */
-            transition: all 0.3s;
+        /* Fade Up Animation Class */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .reveal-text.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .ribbon-text a:hover {
-            color: #ddd;
-            text-shadow: 0 0 8px #fff;
+        /* Marquee Animation */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
-        .ribbon-title {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .ribbon-subtitle {
-            display: block;
-            font-size: 0.7rem;
-            font-style: italic;
-            margin-top: 2px;
-            opacity: 0.9;
-        }
-
-        /* The Tiny Close Button */
-        #close-ribbon {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%) rotate(-45deg); /* Counter-rotate for upright X */
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.5);
-            color: #fff;
-            width: 18px;
-            height: 18px;
-            line-height: 16px;
-            text-align: center;
-            font-size: 10px;
-            cursor: pointer;
-            border-radius: 50%;
-            padding: 0;
-            z-index: 2;
-        }
-
-        #close-ribbon:hover {
-            background: #fff;
-            color: #000;
-        }
-
-        /* --- MOBILE ADJUSTMENTS --- */
-        @media (max-width: 1024px) {
-            .ribbon-container {
-                width: 180px;
-                height: 180px;
+        /* Mobile specific adjustments */
+        @media (max-width: 768px) {
+            .mobile-stack {
+                flex-direction: column;
             }
-            .ribbon-wrapper {
-                top: 25px;
-                right: -55px;
-                width: 240px;
-                height: 50px;
+            .mobile-border-top {
+                border-top: var(--grid-line);
             }
-            .ribbon-title { font-size: 0.65rem; }
-            .ribbon-subtitle { font-size: 0.6rem; }
-            #close-ribbon { left: 10px; }
+            .mobile-no-border-l {
+                border-left: none;
+            }
         }
     </style>
 </head>
-<body>
+<body class="antialiased selection:bg-black selection:text-white">
 
-    <canvas id="glCanvas"></canvas>
+    <!-- Three.js Background -->
+    <div id="canvas-container"></div>
 
-    <script type="x-shader/x-vertex" id="vertexShader">
-        attribute vec2 position;
-        void main() {
-            gl_Position = vec4(position, 0.0, 1.0);
-        }
-    </script>
-
-    <script type="x-shader/x-fragment" id="fragmentShader">
-        precision mediump float;
-
-        uniform vec2 u_resolution;
-        uniform float u_time;
-        
-        // Locked Parameters
-        const float ZOOM = 1.6;
-        const float CONTRAST = 1.0;
-
-        void main() {
-            // Normalized coordinates
-            vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-            
-            // Aspect Ratio Correction
-            uv = (uv - 0.5) * 2.0; 
-            uv.x *= u_resolution.x / u_resolution.y;
-            
-            // Apply Zoom
-            vec2 p = uv * ZOOM;
-            float x = p.x;
-            float y = p.y;
-            float t = u_time;
-
-            // The Formula
-            float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
-
-            // Normalize to 0-1 range for color
-            float brightness = 0.5 + 0.5 * val;
-            
-            // Apply Contrast
-            brightness = pow(brightness, CONTRAST);
-
-            // Output Grayscale
-            gl_FragColor = vec4(vec3(brightness), 1.0);
-        }
-    </script>
-    <div class="marquee-container uppercase">
-        <div class="marquee-content">
-            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
-            Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
+    <!-- Navigation / Header Bar -->
+    <header class="fixed top-0 w-full z-50 mix-blend-difference text-white border-b-black backdrop-blur-sm" style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+        <div class="flex justify-between items-center px-4 py-2 uppercase text-xs tracking-widest">
+            <div>Unsubscribe NYC LLC</div>
+            <div class="hidden md:block">Jesse Do / Paul Pissarro</div>
+            <div>[ Est. 2024 ]</div>
         </div>
-    </div>
-    
-    <div class="grid-container">
-        
-        <div class="content-col" role="main">
-            
-            <div class="logo-wrapper">
-                <img src="Logo.svg" alt="Unsubscribe LLC Logo" width="140">
-            </div>
+    </header>
 
-            <div class="section-block">
-                <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
-                <h1 class="uppercase">You are tired of being a genius.</h1>
-                <p>The world does not need another "creative." The world has enough paintings. It has enough screenplays. It has enough noise.</p>
-                <p><strong>What the world lacks is Structure.</strong></p>
-                <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
-                <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
-            </div>
+    <main class="relative z-10 pt-12">
 
-            <div class="section-block">
-                <div class="image-full-bleed">
-                    <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
-                </div>
-            </div>
-            <div class="section-block">
-                <h2 class="uppercase">The Offer</h2>
-                <p>The <strong>NCR-CAM Officer Certification Program</strong> is not a creative writing class. It is a hostile takeover of your own life.</p>
+        <!-- SECTION 1: HERO -->
+        <section class="min-h-screen flex flex-col justify-center items-center border-b-black relative px-6 py-20">
+            <div class="max-w-6xl w-full text-center reveal-text">
+                <p class="font-mono text-xs md:text-sm tracking-[0.2em] mb-8 text-gray-500 uppercase">
+                    Architects of the Invisible
+                </p>
+                <h1 class="font-serif text-3xl md:text-5xl lg:text-7xl leading-tight font-medium mb-12">
+                    "The secret behind all technologies and products is knowing their limitations, but the power of art is to go beyond limits and transcend them."
+                </h1>
                 
-                <ul class="week-list uppercase">
-                    <li><span>Week 1</span> <span>We kill the Artist</span></li>
-                    <li><span>Week 2</span> <span>We build the Corporation</span></li>
-                    <li><span>Week 3</span> <span>We write the Myth</span></li>
-                    <li><span>Week 4</span> <span>We collect the Rent</span></li>
-                </ul>
-            </div>
-
-            <div class="section-block">
-                <h2 class="uppercase">The Architect</h2>
-                <div class="dossier-container">
-                    <div class="mugshot-wrapper">
-                        <img src="paul.jpeg" alt="Paul Pissarro" width="280" height="370">
-                    </div>
-                    <div class="dossier-data">
-                        
-                        <div class="data-row">
-                            <span class="data-label uppercase">Name / Rank</span>
-                            <h3>PAUL PISSARRO</h3>
-                            <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
-                            <div style="font-size: 0.75rem; font-weight: bold; margin-top: 4px;">CLEARANCE: EXECUTIVE DIRECTOR</div>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label uppercase">The Profile</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 5px;">
-                                Great-great-grandson of Impressionist architect Camille Pissarro. He carries a lineage of disruption—but he has traded the canvas for the corporation.
-                            </p>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label uppercase">Operational History</span>
-                            <ul class="ops-list">
-                                <li>
-                                    <strong>Strategic Acquisition</strong>
-                                    Formerly Int'l Acquisitions Lead for major private art collections (S. Cohen), executing multi-million dollar asset transfers.
-                                </li>
-                                <li>
-                                    <strong>Production & Direction</strong>
-                                    Founder of An Arm & A Leg Production Co., securing $250k+ in client contracts and capitalizing independent film projects.
-                                </li>
-                                <li>
-                                    <strong>Tactical Execution</strong>
-                                    Former Chef and Master Butcher (L'Ambroisie, Paris). He understands that execution is not an art; it is a discipline of steel and fire.
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label uppercase">The Mandate</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 10px;">
-                                Pissarro does not teach "art." He teaches Structural Sovereignty. He is the architect of the Neo-Classical Revival Corporate Art Movement (NCR-CAM).
-                            </p>
-                            <p style="font-size: 0.85rem; margin-bottom: 0;">
-                                <strong>Objective:</strong> Replace the fragile "Artist" model with the durable "Asset Manager" model.
-                            </p>
-                        </div>
-
-                        <div class="data-row">
-                            <span class="data-label uppercase">Current Deployment</span>
-                            <p style="font-size: 0.85rem; margin-bottom: 0;">
-                                <span class="alert-text-color">LOCATION: ROME.</span> Building the legal and financial infrastructure for the next century of cultural production.
-                            </p>
-                        </div>
-
-                    </div>
+                <div class="animate-bounce mt-12">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M12 19L5 12M12 19L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+                    </svg>
                 </div>
             </div>
+            
+            <div class="absolute bottom-4 left-4 font-mono text-[10px] md:text-xs">
+                COORD: 40.7128° N, 74.0060° W
+            </div>
+        </section>
 
-            <div class="section-block" style="margin-bottom: 0;">
-                <h2 class="uppercase">The Source Code</h2>
-                <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
+        <!-- SECTION 2: THE PREAMBLE -->
+        <section class="grid grid-cols-1 md:grid-cols-12 min-h-[50vh] border-b-black">
+            <!-- Empty Space (Breathing Room) -->
+            <div class="md:col-span-4 border-r-black hidden md:block relative bg-[#F2F2F2] bg-opacity-50">
+                <div class="absolute bottom-4 left-4 rotate-90 origin-bottom-left text-xs tracking-widest text-gray-400">
+                    // CULTURAL_SYNTHESIS_V1.0
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="md:col-span-8 p-8 md:p-16 lg:p-24 flex flex-col justify-center reveal-text bg-[#F2F2F2] bg-opacity-80 backdrop-blur-md">
+                <h2 class="font-mono text-xs uppercase tracking-widest mb-4">The Manifesto</h2>
+                <h3 class="font-serif text-4xl mb-8 italic">For the Age of Cultural Synthesis</h3>
+                <p class="font-mono text-sm md:text-base leading-relaxed mb-6">
+                    In the dying light of old paradigms and the dawn of new consciousness, where technology and art perform their final dance of separation before inevitable union, we stand at the edge of history's greatest transformation.
+                </p>
+                <p class="font-serif text-xl md:text-2xl leading-relaxed">
+                    This is not merely another revolution—it is the moment when revolution itself evolves.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: THE CONVERGENCE (Split Screen) -->
+        <section class="border-b-black bg-white">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <!-- Death -->
+                <div class="p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black hover-invert group">
+                    <h4 class="font-mono text-xs uppercase tracking-widest mb-8 text-gray-500 group-hover:text-gray-300">I. The Death Of</h4>
+                    <ul class="font-serif text-lg md:text-2xl space-y-4">
+                        <li class="reveal-text">Artificial scarcity</li>
+                        <li class="reveal-text">Traditional trust</li>
+                        <li class="reveal-text">Fixed reality</li>
+                        <li class="reveal-text">Hierarchical power</li>
+                        <li class="reveal-text">Linear time</li>
+                    </ul>
+                </div>
+
+                <!-- Birth -->
+                <div class="p-8 md:p-16 hover-invert group">
+                    <h4 class="font-mono text-xs uppercase tracking-widest mb-8 text-gray-500 group-hover:text-gray-300">II. The Birth Of</h4>
+                    <ul class="font-serif text-lg md:text-2xl space-y-4 text-right md:text-left">
+                        <li class="reveal-text">Conscious commerce</li>
+                        <li class="reveal-text">Mystical technology</li>
+                        <li class="reveal-text">Fluid identity</li>
+                        <li class="reveal-text">Collective creativity</li>
+                        <li class="reveal-text">Art as OS</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: THE TEN SACRED PRINCIPLES (1x10 Formatting) -->
+        <section class="border-b-black bg-[#F2F2F2]">
+            <div class="w-full border-b-black p-4 md:p-8 flex justify-between items-end bg-black text-white">
+                <h2 class="font-serif text-3xl md:text-5xl italic">The Ten Sacred Principles</h2>
+                <span class="font-mono text-xs">[ 10 ITEMS ]</span>
+            </div>
+
+            <!-- The List: 1x10 Grid Style -->
+            <div class="flex flex-col">
                 
-                <div class="warning-box uppercase">
-                    WARNING: This is High-Frequency Identity Engineering. Do not apply if you want to be "understood." Apply only if you want to be Solvent.
-                </div>
-            </div>
-
-        </div>
-
-        <div class="sidebar-col" role="complementary">
-            <div class="transfer-terminal">
-                <div class="terminal-header uppercase">
-                    <div>Founding Cohort Application</div>
-                    <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">10 Seats Available</div>
-                </div>
-
-                <form action="https://formspree.io/f/xpwvlwyk" method="POST" class="input-group" role="form">
-                    
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 1.2rem; font-weight: 900; border-bottom: 2px solid var(--border); padding-bottom: 10px;">
-                        <span>PRICE</span>
-                        <div style="text-align: right;">
-                            <span style="text-decoration: line-through; font-size: 0.9rem; opacity: 0.5; margin-right: 10px;">$2,500</span>
-                            <span class="alert-text-color">$2,000</span>
-                        </div>
+                <!-- Principle 1 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">01</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">No NDAs</h3>
                     </div>
-
-                    <label for="legal-name" class="uppercase">Legal Name</label>
-                    <input type="text" id="legal-name" name="name" required placeholder="LAST, FIRST">
-
-                    <label for="email-address" class="uppercase">Email Address</label>
-                    <input type="email" id="email-address" name="email" required placeholder="CONTACT@DOMAIN.COM">
-
-                    <label for="select-role" class="uppercase">Select Role</label>
-                    <select id="select-role" name="role" required>
-                        <option value="officer">OFFICER CANDIDATE ($2,000)</option>
-                    </select>
-
-                    <label for="statement-of-intent" class="uppercase">Statement of Intent (Optional)</label>
-                    <input type="text" id="statement-of-intent" name="statement" placeholder="Why are you tired?">
-
-                    <input type="text" name="_gotcha" style="display:none" />
-
-                    <button type="submit" class="submit-btn">
-                        COMMIT TO SOLVENCY
-                    </button>
-                    
-                    <div class="payment-note uppercase">
-                        NO PAYMENT COLLECTED NOW.<br>
-                        THIS IS A COMMITMENT OF INTEREST.<br>
-                        PAYMENT REQUIRED UPON ACCEPTANCE.
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">The Art of Sacred Trust</div>
+                        <p class="font-serif text-lg italic">Ideas flow like water—trying to own them is like trying to own the rain.</p>
                     </div>
-                    
-                    <p class="fine-print uppercase" style="text-align: center; margin-top: 15px;">
-                        By applying, you confirm your ability to pay the $2,000 fee.
-                    </p>
-                </form>
+                </div>
 
-                <div class="timer-bar">
-                    <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
+                <!-- Principle 2 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">02</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">Map ≠ Territory</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">Navigate by Wonder</div>
+                        <p class="font-serif text-lg italic">Reality laughs at documentation. We navigate by starlight.</p>
+                    </div>
+                </div>
+
+                <!-- Principle 3 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">03</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">Everything is Fair Game</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">Beyond the Law</div>
+                        <p class="font-serif text-lg italic">We operate not outside the law but beyond it, where imagination transcends limitation.</p>
+                    </div>
+                </div>
+
+                <!-- Principle 4 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">04</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">Conjure with Systems</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">The Art of Pattern Magic</div>
+                        <p class="font-serif text-lg italic">Every protocol is an incantation, every platform a portal.</p>
+                    </div>
+                </div>
+
+                <!-- Principle 5 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">05</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">Friendship Above All</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">The Network of Light</div>
+                        <p class="font-serif text-lg italic">Our network is our power, our community our compass.</p>
+                    </div>
+                </div>
+
+                 <!-- Principle 6 -->
+                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">06</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">The Future is Female</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">The Power of Creation</div>
+                        <p class="font-serif text-lg italic">Power flows through nurture, not force. Cyclical over linear.</p>
+                    </div>
+                </div>
+
+                <!-- Principle 7 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">07</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">Never Reveal the Trick</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">Word is Bond</div>
+                        <p class="font-serif text-lg italic">Mystery is not deception but the womb of meaning.</p>
+                    </div>
+                </div>
+
+                <!-- Principle 8 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">08</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">Codify and Control</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">The Cosmic Joke</div>
+                        <p class="font-serif text-lg italic">We create systems while laughing at their limitations.</p>
+                    </div>
+                </div>
+
+                <!-- Principle 9 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">09</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">We Can't Help</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">The Power of Limits</div>
+                        <p class="font-serif text-lg italic">Not every problem seeks solution. Wisdom knows when to witness.</p>
+                    </div>
+                </div>
+
+                <!-- Principle 10 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 hover-invert group min-h-[150px]">
+                    <div class="md:col-span-2 p-6 font-mono text-xl md:text-4xl border-b-black md:border-b-0 md:border-r-black opacity-30 group-hover:opacity-100 transition-opacity">10</div>
+                    <div class="md:col-span-4 p-6 border-b-black md:border-b-0 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl font-bold uppercase">Respect</h3>
+                    </div>
+                    <div class="md:col-span-6 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-xs uppercase mb-2 text-gray-500 group-hover:text-gray-400">The Eternal Law</div>
+                        <p class="font-serif text-lg italic">The foundation of all creation. The key to lasting impact.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 5: SYNTHESIS (Columns) -->
+        <section class="border-b-black bg-white p-8 md:p-16 lg:p-24">
+            <h2 class="font-mono text-xs uppercase tracking-widest mb-16 text-center">III. Cultural Synthesis</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+                <!-- Artists -->
+                <div class="space-y-4 reveal-text">
+                    <h3 class="font-mono text-xl border-b-black pb-4">FOR ARTISTS</h3>
+                    <p class="font-serif italic">Your craft is not your product but your operating system.</p>
+                    <p class="font-serif italic">Your audience is not your market but your co-creators.</p>
+                    <p class="font-serif italic">Your work is not output but invocation.</p>
+                </div>
+
+                <!-- Business -->
+                <div class="space-y-4 reveal-text" style="transition-delay: 0.2s;">
+                    <h3 class="font-mono text-xl border-b-black pb-4">FOR BUSINESS</h3>
+                    <p class="font-serif italic">Your transactions are acts of creation.</p>
+                    <p class="font-serif italic">Your profit is a medium of transformation.</p>
+                    <p class="font-serif italic">Your market is a canvas of consciousness.</p>
+                </div>
+
+                <!-- Society -->
+                <div class="space-y-4 reveal-text" style="transition-delay: 0.4s;">
+                    <h3 class="font-mono text-xl border-b-black pb-4">FOR SOCIETY</h3>
+                    <p class="font-serif italic">Culture is not consumed but conjured.</p>
+                    <p class="font-serif italic">Value is not measured but manifested.</p>
+                    <p class="font-serif italic">Progress is not linear but quantum.</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-    </div>
-
-    <!-- NEW: COSMIC CORNER RIBBON -->
-    <div id="cosmic-ribbon" class="ribbon-container">
-        <div class="ribbon-wrapper">
-            <div class="star-stream"></div>
-            <div class="ribbon-text">
-                <button id="close-ribbon" aria-label="Dismiss">×</button>
-                <a href="https://www.unsubscribe.llc/2025ws.html">
-                    <span class="ribbon-title">THE SOLSTICE PROTOCOL</span>
-                    <span class="ribbon-subtitle">Initiate Sequence &rarr;</span>
-                </a>
+        <!-- SECTION 6: THE DECLARATION (Marquee) -->
+        <section class="border-b-black py-8 bg-[#F2F2F2] overflow-hidden">
+             <div class="marquee-container font-mono text-xs uppercase tracking-widest">
+                <div class="marquee-content">
+                    Unsubscribe from dying stories — Subscribe to eternal innovation — Transcend false boundaries — Embrace conscious evolution — Unsubscribe from dying stories — Subscribe to eternal innovation — Transcend false boundaries — Embrace conscious evolution —
+                </div>
+                 <div class="marquee-content" aria-hidden="true">
+                    Unsubscribe from dying stories — Subscribe to eternal innovation — Transcend false boundaries — Embrace conscious evolution — Unsubscribe from dying stories — Subscribe to eternal innovation — Transcend false boundaries — Embrace conscious evolution —
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
+        <!-- SECTION 7: THE FOOTER -->
+        <footer class="bg-black text-white min-h-screen flex flex-col justify-between p-8 md:p-16">
+            <div class="flex-grow flex flex-col justify-center items-center text-center reveal-text">
+                <div class="font-mono text-xs uppercase tracking-widest mb-8 text-gray-500">VI. The Declaration</div>
+                <h2 class="font-serif text-4xl md:text-6xl lg:text-8xl leading-none mb-8">
+                    THIS IS NOT<br>A COMPANY.
+                </h2>
+                <p class="font-mono text-sm md:text-lg text-gray-400 max-w-2xl">
+                    THIS IS A CULTURAL REVOLUTION DISGUISED AS ONE.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono text-[10px] uppercase tracking-widest pt-12 border-t border-white/20">
+                <div>
+                    <span class="block text-gray-500 mb-2">Architects</span>
+                    Jesse Do<br>Paul Pissarro
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Status</span>
+                    2024 - ∞<br>Beyond Limits
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Location</span>
+                    New York City<br>Planet Earth
+                </div>
+                <div class="text-right flex flex-col justify-between">
+                    <span class="block text-gray-500 mb-2">Action</span>
+                    <a href="#" class="hover:text-[#FF2A2A] transition-colors underline decoration-1 underline-offset-4">Join The Emergence</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
 
     <script>
-        // --- SECTION 1: WebGL Background Logic ---
-        const canvas = document.getElementById('glCanvas');
-        const gl = canvas.getContext('webgl');
-        const SPEED = 1.3;
+        // --- THREE.JS BACKGROUND ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            
+            // Scene Setup
+            const scene = new THREE.Scene();
+            // Fog to fade out distance
+            scene.fog = new THREE.FogExp2(0xF2F2F2, 0.0015);
 
-        if (!gl) {
-            console.error('WebGL not supported');
-        } else {
-            function createShader(gl, type, source) {
-                const shader = gl.createShader(type);
-                gl.shaderSource(shader, source);
-                gl.compileShader(shader);
-                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                    console.error(gl.getShaderInfoLog(shader));
-                    gl.deleteShader(shader);
-                    return null;
-                }
-                return shader;
-            }
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
 
-            const vertexSrc = document.getElementById('vertexShader').textContent;
-            const fragmentSrc = document.getElementById('fragmentShader').textContent;
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Performance opt
+            container.appendChild(renderer.domElement);
 
-            const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexSrc);
-            const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+            // Geometry - Deformed Grid
+            const geometry = new THREE.PlaneGeometry(20, 20, 40, 40);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x000000, 
+                wireframe: true, 
+                transparent: true,
+                opacity: 0.08 
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            plane.rotation.x = -Math.PI / 3;
+            scene.add(plane);
 
-            const program = gl.createProgram();
-            gl.attachShader(program, vertShader);
-            gl.attachShader(program, fragShader);
-            gl.linkProgram(program);
-
-            gl.useProgram(program);
-
-            const posBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-                -1.0,  1.0,
-                 1.0,  1.0,
-                -1.0, -1.0,
-                 1.0, -1.0,
-            ]), gl.STATIC_DRAW);
-
-            const posLoc = gl.getAttribLocation(program, "position");
-            gl.enableVertexAttribArray(posLoc);
-            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-            const resLoc = gl.getUniformLocation(program, "u_resolution");
-            const timeLoc = gl.getUniformLocation(program, "u_time");
-
-            function resize() {
-                const displayWidth  = canvas.clientWidth;
-                const displayHeight = canvas.clientHeight;
-
-                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
-                    canvas.width  = displayWidth;
-                    canvas.height = displayHeight;
-                    gl.viewport(0, 0, canvas.width, canvas.height);
-                }
-            }
-            window.addEventListener('resize', resize);
-
+            // Animation Variables
             let time = 0;
-            let lastTime = 0;
+            
+            // Mouse Interaction
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
 
-            function render(now) {
-                now *= 0.001; 
-                const deltaTime = now - lastTime;
-                lastTime = now;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
 
-                resize(); 
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX) * 0.001;
+                mouseY = (event.clientY - windowHalfY) * 0.001;
+            });
 
-                time += deltaTime * SPEED;
+            // Animation Loop
+            const animate = () => {
+                requestAnimationFrame(animate);
 
-                gl.uniform2f(resLoc, canvas.width, canvas.height);
-                gl.uniform1f(timeLoc, time);
+                time += 0.002;
 
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                // Deform the mesh based on sine waves
+                const positionAttribute = geometry.attributes.position;
+                const vertex = new THREE.Vector3();
 
-                requestAnimationFrame(render);
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    vertex.fromBufferAttribute(positionAttribute, i);
+                    
+                    // Complex wave function for organic movement
+                    const waveX1 = 0.5 * Math.sin(vertex.x * 2 + time);
+                    const waveX2 = 0.25 * Math.sin(vertex.x * 3 + time * 2);
+                    const waveY1 = 0.1 * Math.sin(vertex.y + time);
+                    
+                    vertex.z = (waveX1 + waveX2 + waveY1) * 1.5;
+                    
+                    positionAttribute.setZ(i, vertex.z);
+                }
+                
+                positionAttribute.needsUpdate = true;
+
+                // Smooth Camera Movement
+                targetX = mouseX * 0.5;
+                targetY = mouseY * 0.5;
+                
+                plane.rotation.z += 0.0005;
+                plane.rotation.x += (targetY - plane.rotation.x) * 0.05 - (Math.PI/3); // Return to base tilt
+                plane.rotation.y += (targetX - plane.rotation.y) * 0.05;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Resize Handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // --- OBSERVER FOR TEXT REVEALS ---
+        const initObserver = () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-text').forEach(el => {
+                observer.observe(el);
+            });
+        };
+
+        // --- INITIALIZATION ---
+        window.addEventListener('load', () => {
+            try {
+                initThreeJS();
+            } catch (e) {
+                console.log("WebGL not supported or ThreeJS error, falling back to CSS background.");
+                document.getElementById('canvas-container').style.background = 
+                    "radial-gradient(circle at center, #f2f2f2 0%, #e0e0e0 100%)";
             }
-            requestAnimationFrame(render);
-        }
-
-        // --- SECTION 2: Existing Site Logic ---
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
-
-        const toggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        const logo = document.querySelector('.logo-wrapper img');
-
-        function applyTheme(isDark) {
-            if (isDark) {
-                body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-            }
-        }
-
-        // Initial load
-        if (localStorage.getItem('theme') === 'dark') {
-            applyTheme(true);
-        } else {
-            applyTheme(false);
-        }
-
-        toggle.addEventListener('click', () => {
-            const isDark = !body.classList.contains('dark-mode');
-            applyTheme(isDark);
+            initObserver();
         });
 
-        // --- SECTION 3: Cosmic Ribbon Logic ---
-        const EXPIRATION_DATE = new Date('2025-12-22T23:59:59').getTime();
-        const NOW = new Date().getTime();
-        const RIBBON_KEY = 'ribbon_dismissed_v1';
-
-        if (NOW < EXPIRATION_DATE && !localStorage.getItem(RIBBON_KEY)) {
-            const ribbon = document.getElementById('cosmic-ribbon');
-            
-            // Allow CSS animations to init
-            setTimeout(() => {
-                ribbon.style.display = 'block';
-            }, 500);
-
-            document.getElementById('close-ribbon').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                ribbon.style.display = 'none';
-                localStorage.setItem(RIBBON_KEY, 'true');
-            });
-        }
     </script>
 </body>
 </html>
+
