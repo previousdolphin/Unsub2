@@ -1,999 +1,440 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>UNSUBSCRIBE LLC | NCR-CAM</title>
-    <meta name="description" content="The NCR-CAM Officer Certification Program: Kill the Artist, Build the Corporation. Join the founding cohort for Structural Sovereignty.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNSUBSCRIBE NYC LLC | Manifesto</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
-        /* --- CORE RESET & VARS --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-        /* Modified to RGBA for Glassmorphism effect over the canvas */
-        --bg: rgba(244, 244, 244, 0.92);
-        --bg-solid: #f4f4f4; /* Fallback for solid elements */
-        --text: #050505;
-        --border: #000000;
-        --alert: #ff2a00;
-        --alert-text-light: #d62400; 
-        --font-main: 'Courier New', Courier, monospace;
-        --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        --sidebar-width: 440px;
-        --ticker-height: 42px;
-    }
-
-    body.dark-mode {
-        /* Modified to RGBA for Glassmorphism effect over the canvas */
-        --bg: rgba(10, 10, 10, 0.92);
-        --bg-solid: #0a0a0a;
-        --text: #e0e0e0;
-        --border: #333333;
-        --alert: #ff2a00;
-        --alert-text-dark: #ff5e40;
-    }
-
-    /* --- OVERLAY STYLES --- */
-    .info-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.75);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-
-    .info-overlay:hover {
-        background: rgba(0, 0, 0, 0.85);
-    }
-
-    .overlay-content {
-        text-align: center;
-        color: white;
-        padding: 40px;
-        max-width: 800px;
-    }
-
-    .overlay-content h2 {
-        font-size: clamp(2rem, 4vw, 3.5rem);
-        font-weight: 900;
-        letter-spacing: -1px;
-        margin-bottom: 20px;
-        background: none;
-        color: white;
-        display: block;
-        padding: 0;
-        text-transform: uppercase;
-    }
-
-    .overlay-content p {
-        font-size: clamp(1rem, 2vw, 1.5rem);
-        font-weight: bold;
-        letter-spacing: 1px;
-        margin-bottom: 0;
-        opacity: 0.9;
-    }
-
-    .overlay-arrow {
-        font-size: 3rem;
-        margin-top: 20px;
-        animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: translateY(0); }
-        50% { opacity: 0.5; transform: translateY(10px); }
-    }
-
-    /* --- ON HOLD BANNER --- */
-    .on-hold-banner {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: var(--alert);
-        color: white;
-        text-align: center;
-        padding: 25px 20px;
-        font-weight: 900;
-        font-size: 1.5rem;
-        letter-spacing: 2px;
-        z-index: 9999;
-        border-bottom: 4px solid var(--border);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .on-hold-banner .subtitle {
-        font-size: 0.8rem;
-        font-weight: bold;
-        margin-top: 8px;
-        opacity: 0.9;
-        letter-spacing: 1px;
-    }
-
-    /* Adjust body padding to account for fixed banner */
-    body {
-        padding-top: 110px;
-    }
-
-    /* Redacted date styling */
-    .redacted {
-        background: var(--text);
-        color: transparent;
-        user-select: none;
-        padding: 2px 8px;
-        display: inline-block;
-        position: relative;
-    }
-
-    .redacted::before {
-        content: '[REDACTED]';
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        color: var(--bg-solid);
-        font-weight: bold;
-        font-size: 0.75em;
-        letter-spacing: 1px;
-    }
-
-    /* --- BACKGROUND CANVAS STYLES --- */
-    canvas#glCanvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: -9999; 
-        transition: filter 0.5s ease, opacity 0.5s ease;
-    }
-
-    /* LIGHT MODE CANVAS: Invert colors to make it white smoke, lower opacity */
-    body:not(.dark-mode) canvas#glCanvas {
-        filter: invert(1);
-        opacity: 0.4;
-    }
-    
-    /* DARK MODE CANVAS: Native dark nebula */
-    body.dark-mode canvas#glCanvas {
-        filter: none;
-        opacity: 1;
-    }
-
-    body {
-        background-color: transparent; 
-        color: var(--text);
-        font-family: var(--font-main);
-        width: 100vw;
-        min-height: 100vh;
-        overflow-x: hidden;
-        transition: color 0.3s;
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
-    }
-
-    .uppercase { text-transform: uppercase; }
-    
-    /* --- TYPOGRAPHY --- */
-    h1 {
-        font-size: clamp(2.5rem, 3.5vw, 4.5rem); 
-        line-height: 0.9;
-        letter-spacing: -2px;
-        margin-bottom: 25px;
-        font-weight: 900;
-        max-width: 18ch; 
-    }
-
-    h2 {
-        font-size: 1rem;
-        font-weight: bold;
-        margin-bottom: 15px;
-        background: var(--text);
-        color: var(--bg-solid);
-        display: inline-block;
-        padding: 4px 8px;
-    }
-
-    h3 {
-        font-size: 1.2rem;
-        font-weight: 900;
-        margin-bottom: 5px;
-        letter-spacing: -1px;
-    }
-
-    p { 
-        margin-bottom: 20px; 
-        font-size: 1rem; 
-        max-width: 60ch; 
-    }
-
-    .fine-print { font-size: 0.75rem; opacity: 0.7; }
-
-    /* --- MARQUEE --- */
-    .marquee-container {
-        width: 100%;
-        height: var(--ticker-height);
-        overflow: hidden;
-        white-space: nowrap;
-        border-bottom: 2px solid var(--border);
-        background: var(--text);
-        color: var(--bg-solid);
-        font-weight: bold;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        position: relative;
-        z-index: 20;
-    }
-
-    .marquee-content {
-        display: inline-block;
-        animation: scroll 30s linear infinite;
-        padding-left: 100%;
-    }
-
-    @keyframes scroll {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-100%); }
-    }
-
-    /* --- LAYOUT GRID --- */
-    .grid-container {
-        display: grid;
-        grid-template-columns: 1fr var(--sidebar-width); 
-        min-height: calc(100vh - var(--ticker-height));
-    }
-
-    .content-col {
-        border-right: 2px solid var(--border);
-        padding: 60px 80px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        background-color: var(--bg); 
-        backdrop-filter: blur(2px);
-    }
-
-    .sidebar-col {
-        position: sticky;
-        top: 110px;
-        height: calc(100vh - 110px); 
-        overflow-y: auto; 
-        border-left: 0;
-        background-color: var(--bg);
-        backdrop-filter: blur(2px);
-    }
-
-    /* --- IMAGES --- */
-    .logo-wrapper {
-        margin-bottom: 40px;
-        display: block;
-    }
-    
-    .logo-wrapper img {
-        width: 240px;
-        height: auto;
-        display: block;
-        mix-blend-mode: normal; 
-    }
-
-    body.dark-mode .logo-wrapper img {
-        mix-blend-mode: normal; 
-    }
-
-    .image-full-bleed {
-        width: calc(100% + 160px); 
-        margin-left: -80px; 
-        margin-right: -80px;
-        display: block;
-        filter: invert(1);
-        mix-blend-mode: multiply;
-        opacity: 0.8; 
-    }
-    
-    .image-full-bleed img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-    
-    body.dark-mode .image-full-bleed {
-        filter: none;
-        mix-blend-mode: screen; 
-        opacity: 1; 
-    }
-
-    .alert-text-color {
-        color: var(--alert-text-light); 
-    }
-
-    body.dark-mode .alert-text-color {
-        color: var(--alert-text-dark);
-    }
-
-    /* --- SECTIONS --- */
-    .section-block {
-        margin-bottom: 60px;
-    }
-
-    .week-list {
-        list-style: none;
-        margin-top: 20px;
-        border: 2px solid var(--border);
-    }
-
-    .week-list li {
-        padding: 15px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        font-weight: bold;
-        font-size: 0.85rem;
-    }
-    
-    .week-header {
-        display: flex; 
-        justify-content: space-between; 
-        width: 100%;
-        margin-bottom: 5px;
-    }
-    .week-detail {
-        font-size: 0.75rem;
-        opacity: 0.8;
-        font-weight: normal;
-    }
-
-    .week-list li:last-child { border-bottom: none; }
-
-    /* --- OBJECTIVES LIST (NEW) --- */
-    .obj-list {
-        list-style: none;
-        margin-top: 15px;
-    }
-    .obj-list li {
-        margin-bottom: 20px;
-        padding-left: 20px;
-        border-left: 2px solid var(--alert);
-    }
-    .obj-title {
-        font-weight: 900;
-        font-size: 1rem;
-        display: block;
-        margin-bottom: 5px;
-    }
-    .obj-desc {
-        font-size: 0.85rem;
-        opacity: 0.8;
-    }
-
-    /* --- INSTRUCTOR DOSSIER --- */
-    .dossier-container {
-        border: 2px solid var(--border);
-        padding: 25px;
-        background: rgba(125, 125, 125, 0.05); 
-        display: grid;
-        grid-template-columns: 180px 1fr;
-        gap: 30px;
-        align-items: start;
-    }
-
-    .mugshot-wrapper img {
-        width: 100%;
-        height: auto;
-        border: 1px solid var(--border);
-        filter: grayscale(100%) contrast(120%);
-        display: block;
-    }
-
-    .dossier-data {
-        font-size: 0.9rem;
-    }
-
-    .data-row {
-        margin-bottom: 20px;
-        border-bottom: 1px dashed var(--border);
-        padding-bottom: 15px;
-    }
-    .data-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
-
-    .data-label {
-        font-size: 0.7rem;
-        font-weight: 900;
-        letter-spacing: 1px;
-        display: block;
-        margin-bottom: 6px;
-        opacity: 0.6;
-    }
-    
-    .quote-block {
-        font-style: italic;
-        border-left: 2px solid var(--text);
-        padding-left: 15px;
-        margin: 15px 0;
-        font-size: 0.85rem;
-        opacity: 0.8;
-    }
-
-    /* --- WARNING BOX --- */
-    .warning-box {
-        border: 2px solid var(--alert);
-        color: var(--alert);
-        padding: 20px;
-        margin-top: 30px;
-        font-weight: bold;
-        font-size: 0.85rem;
-        line-height: 1.4;
-        background: rgba(255, 42, 0, 0.05);
-    }
-
-    /* --- TERMINAL / SIDEBAR STYLES --- */
-    .transfer-terminal {
-        min-height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .terminal-header {
-        background: var(--text);
-        color: var(--bg-solid);
-        padding: 15px;
-        text-align: center;
-        font-weight: bold;
-        border-bottom: 2px solid var(--border);
-        flex-shrink: 0;
-    }
-
-    .terminal-body {
-        padding: 30px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .info-block {
-        margin-bottom: 25px;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 15px;
-    }
-    .info-block:last-of-type { border-bottom: none; }
-
-    .info-label {
-        display: block;
-        font-size: 0.7rem;
-        font-weight: 900;
-        letter-spacing: 1px;
-        margin-bottom: 5px;
-        opacity: 0.6;
-    }
-
-    .info-value {
-        font-size: 1rem;
-        font-weight: bold;
-    }
-    
-    .maven-btn {
-        display: block;
-        width: 100%;
-        padding: 20px;
-        background: var(--alert);
-        color: white; 
-        text-decoration: none;
-        text-align: center;
-        font-family: inherit;
-        font-weight: 900;
-        font-size: 1.1rem;
-        cursor: pointer;
-        text-transform: uppercase;
-        transition: opacity 0.2s;
-        margin-top: 20px;
-        border: none;
-    }
-
-    .maven-btn:hover { opacity: 0.8; }
-    
-    .cohort-status {
-        margin-top: 15px;
-        border: 1px solid var(--alert);
-        color: var(--alert);
-        padding: 10px;
-        font-size: 0.7rem;
-        font-weight: bold;
-        text-align: center;
-        line-height: 1.4;
-    }
-
-    .timer-bar {
-        padding: 15px; 
-        border-top: 2px solid var(--border); 
-        text-align: center; 
-        background: var(--text); 
-        color: var(--bg-solid);
-        margin-top: auto;
-        flex-shrink: 0;
-    }
-
-    /* --- THEME TOGGLE --- */
-    #theme-toggle {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 100;
-        background: var(--bg-solid);
-        border: 2px solid var(--text);
-        padding: 8px 12px;
-        cursor: pointer;
-        color: var(--text);
-        font-family: inherit;
-        font-weight: bold;
-        font-size: 0.75rem;
-        box-shadow: 3px 3px 0px var(--text);
-    }
-    
-    #theme-toggle:active {
-        transform: translate(2px, 2px);
-        box-shadow: 1px 1px 0px var(--text);
-    }
-
-    /* --- MOBILE --- */
-    @media (max-width: 1024px) {
-        .on-hold-banner {
-            font-size: 1.2rem;
-            padding: 20px 15px;
+        :root {
+            --bg-color: #F2F2F2;
+            --text-color: #0F0F0F;
+            --grid-line: 1px solid #0F0F0F;
         }
 
         body {
-            padding-top: 100px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: crosshair;
         }
 
-        .sidebar-col {
-            top: 100px;
-            height: calc(100vh - 100px);
+        /* Typography */
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        /* Borders */
+        .border-b-black { border-bottom: var(--grid-line); }
+        .border-t-black { border-top: var(--grid-line); }
+        .border-r-black { border-right: var(--grid-line); }
+        .border-black { border: var(--grid-line); }
+
+        /* Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+            mix-blend-mode: multiply;
         }
 
-        .grid-container { display: block; }
-        
-        .content-col { 
-            border-right: none; 
-            border-bottom: 2px solid var(--border); 
-            padding: 40px 20px;
+        /* Reveal Animation */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal-text.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .sidebar-col {
-            position: relative;
-            height: auto;
-            overflow: visible;
-            border-left: 2px solid var(--border);
+        /* Hover Inversion */
+        .hover-invert {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .hover-invert:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
         }
 
-        h1 { font-size: 2.5rem; }
-        .logo-wrapper img { 
-            width: 120px; 
-            height: 78px;
-            margin: 0 auto 30px auto; 
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
         }
-        .logo-wrapper { text-align: center; }
-        
-        .dossier-container {
-            grid-template-columns: 1fr;
-            gap: 20px;
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+            padding-right: 2rem;
         }
-        .mugshot-wrapper img {
-            max-width: 200px;
-        }
-        
-        .terminal-body { padding: 20px; }
-        
-        .image-full-bleed {
-            width: calc(100% + 40px); 
-            margin-left: -20px; 
-            margin-right: -20px;
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
         }
 
-        .overlay-content h2 {
-            font-size: 2rem;
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .mobile-stack { flex-direction: column; }
+            .mobile-border-b { border-bottom: var(--grid-line); }
+            .mobile-no-border-r { border-right: none; }
         }
-
-        .overlay-content p {
-            font-size: 1rem;
-        }
-    }
-</style>
-
-
+    </style>
 </head>
-<body>
+<body class="selection:bg-black selection:text-white relative">
 
+    <!-- Three.js Background -->
+    <div id="canvas-container"></div>
 
-<!-- SEMI-TRANSPARENT OVERLAY -->
-<div class="info-overlay" onclick="window.location.href='index2.html'">
-    <div class="overlay-content">
-        <h2>Click Here to See More Info About Unsubscribe LLC</h2>
-        <p>ENTER THE SYSTEM</p>
-        <div class="overlay-arrow">↓</div>
-    </div>
-</div>
-
-<!-- ON HOLD BANNER -->
-<div class="on-hold-banner uppercase">
-    ⚠ PROGRAM ON HOLD ⚠
-    <div class="subtitle">OPERATIONS SUSPENDED // STANDBY FOR RELAUNCH</div>
-</div>
-
-<canvas id="glCanvas"></canvas>
-
-<script type="x-shader/x-vertex" id="vertexShader">
-    attribute vec2 position;
-    void main() {
-        gl_Position = vec4(position, 0.0, 1.0);
-    }
-</script>
-
-<script type="x-shader/x-fragment" id="fragmentShader">
-    precision mediump float;
-
-    uniform vec2 u_resolution;
-    uniform float u_time;
-    
-    // Locked Parameters
-    const float ZOOM = 1.6;
-    const float CONTRAST = 1.0;
-
-    void main() {
-        vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-        uv = (uv - 0.5) * 2.0; 
-        uv.x *= u_resolution.x / u_resolution.y;
-        
-        vec2 p = uv * ZOOM;
-        float x = p.x;
-        float y = p.y;
-        float t = u_time;
-
-        float val = sin(sqrt(x*x + y*y)*5.0 - t) * cos((x - y)*3.0 + t*0.5);
-
-        float brightness = 0.5 + 0.5 * val;
-        brightness = pow(brightness, CONTRAST);
-
-        gl_FragColor = vec4(vec3(brightness), 1.0);
-    }
-</script>
-<div class="marquee-container uppercase">
-    <div class="marquee-content">
-        Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
-        Unsubscribe LLC /// Status: SOLVENT /// The World has enough paintings /// Stop trying to beat the System /// Be the System /// NCR-CAM Certification Open /// Kill the Artist /// Build the Corporation /// &nbsp;
-    </div>
-</div>
-
-<div class="grid-container">
-    
-    <div class="content-col" role="main">
-        
-        <div class="logo-wrapper">
-            <img src="Logo.svg" alt="Unsubscribe LLC Logo" width="140">
-        </div>
-
-        <div class="section-block">
-            <div class="fine-print uppercase" style="margin-bottom: 15px; letter-spacing: 1px;">Memo: 004-Beta // Re: Genius Fatigue</div>
-            <h1 class="uppercase">You are tired of being a genius.</h1>
-            <p>You are exhausted because you are playing a game that was designed for you to lose. You are trading your soul for "exposure" while the Institution trades your output for tax credits.</p>
-            <p class="uppercase" style="border-left: 4px solid var(--alert); padding-left: 15px;">Stop trying to beat the System. Be the System.</p>
-        </div>
-
-        <div class="section-block">
-            <div class="image-full-bleed">
-                <img src="architecture-of-immunity.jpeg" alt="The Architecture of Immunity (The Void) graphic" width="1600" height="900">
+    <!-- Header: Fixed, High Z-Index, Explicit Background for visibility -->
+    <header class="fixed top-0 w-full z-50 border-b-black bg-[#F2F2F2]/90 backdrop-blur-md">
+        <div class="flex justify-between items-center px-4 md:px-6 py-3 uppercase text-[10px] md:text-xs tracking-widest font-bold">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-black rounded-full inline-block animate-pulse"></span>
+                Unsubscribe NYC LLC
             </div>
+            <div class="hidden md:block">P. Pissarro / J. Do</div>
+            <div class="text-right whitespace-nowrap">[ 2026 ]</div>
         </div>
+    </header>
 
-        <div class="section-block">
-            <h2 class="uppercase">The Service Model is Dead</h2>
-            <p>The creative industry is collapsing into two tiers: The "Algorithms" (who work for free) and the "Institutions" (who set the price). If you are still operating as a freelancer selling your time, you are racing to the bottom.</p>
-            <p>"Talent" is no longer a moat. To survive 2026, you do not need better art; you need a better container.</p>
-            <p>This course matters because it is the only operational framework that treats the Artist not as a "Vendor," but as a <strong>Distressed Asset</strong> that needs a structural turnaround.</p>
-        </div>
+    <!-- Main Content wrapper to ensure z-index above canvas -->
+    <main class="relative z-10 pt-12 md:pt-14">
 
-        <div class="section-block">
-            <h2 class="uppercase">Operational Objectives</h2>
-            <p>This is not a creative writing class. It is the installation of the <strong>Asset Manager Operating System.</strong></p>
-            
-            <ul class="obj-list">
-                <li>
-                    <span class="obj-title uppercase">1. Install the Asset Manager OS</span>
-                    <span class="obj-desc">Liquidate the "Starving Artist" ego. Adopt the "Middle Mind" framework to prioritize execution over "Überthink." Perform the "Vow of Severance."</span>
-                </li>
-                <li>
-                    <span class="obj-title uppercase">2. Construct the Financial Cloister</span>
-                    <span class="obj-desc">Design the "Architecture of Immunity" using the LLC, S-Corp, or 501(c)(3). Implement the "One-Way Valve" to separate Profane income from Sacred assets.</span>
-                </li>
-                <li>
-                    <span class="obj-title uppercase">3. Execute the "Red Pen" Audit</span>
-                    <span class="obj-desc">Categorize every active commitment as either a Liability or an Asset. Apply the "Triad of Value" (Liquidity, Signal, Provenance) to your projects.</span>
-                </li>
-                <li>
-                    <span class="obj-title uppercase">4. Engineer the "Retro-Causal" Myth</span>
-                    <span class="obj-desc">Write your history backward so your current success looks inevitable. Stop selling the "Product" (the paper) and start selling the "Transaction."</span>
-                </li>
-                <li>
-                    <span class="obj-title uppercase">5. Deploy "Radar Lock"</span>
-                    <span class="obj-desc">Master "Statements Before Questions." Treat the calendar invite as a "Summoning Circle" rather than a casual chat.</span>
-                </li>
-            </ul>
-        </div>
-
-        <div class="section-block">
-            <h2 class="uppercase">The Syllabus</h2>
-            <ul class="week-list uppercase">
-                <li>
-                    <div class="week-header"><span>WEEK 01</span> <span class="redacted">FEB 16 - FEB 22</span></div>
-                    <div class="week-detail">WE LIQUIDATE THE ARTIST: The Purge & The Asset Manager OS</div>
-                </li>
-                <li>
-                    <div class="week-header"><span>WEEK 02</span> <span class="redacted">FEB 23 - MAR 01</span></div>
-                    <div class="week-detail">WE BUILD THE CORPORATION: The Architecture of Immunity</div>
-                </li>
-                <li>
-                    <div class="week-header"><span>WEEK 03</span> <span class="redacted">MAR 02 - MAR 08</span></div>
-                    <div class="week-detail">WE WRITE THE MYTH: Engineering Retro-Causal History</div>
-                </li>
-                <li>
-                    <div class="week-header"><span>WEEK 04</span> <span class="redacted">MAR 09 - MAR 15</span></div>
-                    <div class="week-detail">WE COLLECT THE RENT: Deployment of the Radar Lock Signal</div>
-                </li>
-            </ul>
-        </div>
-
-        <div class="section-block">
-            <h2 class="uppercase">The Architect</h2>
-            <div class="dossier-container">
-                <div class="mugshot-wrapper">
-                    <img src="paul.jpeg" alt="Paul Pissarro" width="280" height="370">
-                </div>
-                <div class="dossier-data">
-                    
-                    <div class="data-row">
-                        <span class="data-label uppercase">Name / Rank</span>
-                        <h3>PAUL PISSARRO</h3>
-                        <div class="alert-text-color" style="font-weight: bold; font-size: 0.8rem;">FOUNDING STRATEGIST (NCR-CAM)</div>
-                    </div>
-
-                    <div class="data-row">
-                        <span class="data-label uppercase">Origin Story</span>
-                        <div class="quote-block">
-                            "I didn't build the Asset Manager OS because I wanted to be a teacher. I built it because I needed to survive myself."
-                        </div>
-                        <p style="font-size: 0.85rem; margin-bottom: 5px;">
-                            For years, Pissarro bought into the myth of the "Starving Artist"—the idea that chaos was the fuel for creativity. He paid for that lie with addiction, homelessness, and years of entropy.
-                        </p>
-                        <p style="font-size: 0.85rem; margin-bottom: 0;">
-                            <strong>Compassion without structure spills.</strong> Today, he runs Unsubscribe.llc, a venture studio that treats Art as a transaction and the Artist as an Institution.
-                        </p>
-                    </div>
-
-                    <div class="data-row">
-                        <span class="data-label uppercase">Career Highlights</span>
-                        <ul class="ops-list">
-                            <li>
-                                <strong>Founder, Unsubscribe.llc</strong>
-                                The Holding Company / Venture Studio.
-                            </li>
-                            <li>
-                                <strong>Director of Strategy, CoCA</strong>
-                                The Church of Conceptual Art (The Institutional Authority).
-                            </li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="section-block" style="margin-bottom: 0;">
-            <h2 class="uppercase">The Source Code</h2>
-            <p>This program is built on the CoCA Bible, a proprietary text that merges 501(c)(3) tax law, high-level metaphysics, and brutalist corporate strategy.</p>
-            
-            <div class="warning-box uppercase">
-                WARNING: This is High-Frequency Identity Engineering. Do not apply if you want to be "understood." Apply only if you want to be Solvent.
-            </div>
-        </div>
-
-    </div>
-
-    <div class="sidebar-col" role="complementary">
-        <div class="transfer-terminal">
-            <div class="terminal-header uppercase">
-                <div>Cohort Status: On Hold</div>
-                <div style="font-size: 0.7rem; font-weight: normal; margin-top: 5px; opacity: 0.8;">Secure Transmission</div>
-            </div>
-
-            <div class="terminal-body">
+        <!-- SECTION 1: HERO -->
+        <section class="min-h-[85vh] flex flex-col justify-center items-center border-b-black relative px-4 py-20">
+            <div class="max-w-5xl w-full text-center reveal-text space-y-8 md:space-y-12">
+                <p class="font-mono text-[10px] md:text-xs tracking-[0.2em] text-gray-500 uppercase">
+                    Architects of the Invisible
+                </p>
                 
-                <div class="info-block uppercase">
-                    <span class="info-label">Program</span>
-                    <div class="info-value">NCR-CAM Officer Certification</div>
-                    <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">Level 1</div>
+                <!-- Main Statement -->
+                <h1 class="font-serif text-3xl md:text-6xl lg:text-7xl leading-[1.1] font-medium px-2">
+                    "The secret behind all technologies and products is knowing their limitations, but the power of art is to go beyond limits and transcend them."
+                </h1>
+                
+                <div class="pt-8">
+                    <svg class="w-6 h-6 mx-auto animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 5V19M12 19L5 12M12 19L19 12" stroke-linecap="square"/>
+                    </svg>
                 </div>
+            </div>
+            
+            <div class="absolute bottom-4 left-4 font-mono text-[9px] md:text-[10px] text-gray-400">
+                System Status: Online
+            </div>
+        </section>
 
-                <div class="info-block uppercase">
-                    <span class="info-label">Active Schedule</span>
-                    <div class="info-value"><span class="redacted">Feb 16 — Mar 09, 2026</span></div>
-                    <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;">4 Live Sessions • 4 Projects</div>
+        <!-- SECTION 2: THE PREAMBLE -->
+        <section class="grid grid-cols-1 md:grid-cols-12 border-b-black bg-white/80 backdrop-blur-sm">
+            <!-- Left Column (Breathing Room) -->
+            <div class="hidden md:block md:col-span-4 border-r-black relative min-h-[400px]">
+                <div class="absolute bottom-6 left-6 -rotate-90 origin-bottom-left text-[10px] tracking-[0.2em] text-gray-400 whitespace-nowrap">
+                    MANIFESTO_V1.0
                 </div>
-
-                <div class="info-block uppercase">
-                    <span class="info-label">Tuition</span>
-                    <div class="info-value">$2,000 USD</div>
-                    <div class="info-value" style="font-size: 0.8rem; margin-top: 5px; color: var(--alert);">Covered by Maven Guarantee</div>
-                </div>
-
-                <div class="info-block uppercase">
-                    <span class="info-label">Live Ops Timing</span>
-                    <div class="info-value"><span class="redacted">Mondays</span></div>
-                    <div class="info-value" style="font-size: 0.8rem; margin-top: 5px;"><span class="redacted">18:00 — 21:00 EST</span></div>
+            </div>
+            
+            <!-- Right Column (Content) -->
+            <div class="md:col-span-8 p-6 md:p-16 lg:p-24 flex flex-col justify-center reveal-text">
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="h-[1px] w-8 bg-black"></span>
+                    <h2 class="font-mono text-[10px] uppercase tracking-widest">The Manifesto</h2>
                 </div>
                 
-                <div class="info-block uppercase">
-                    <span class="info-label">Target Profile</span>
-                    <ul style="list-style: none; font-size: 0.8rem; line-height: 1.4;">
-                        <li style="margin-bottom: 10px;">
-                            <strong>The Burned-Out CD:</strong> 10+ years experience. Bank account fluctuates wildly.
-                        </li>
-                        <li style="margin-bottom: 10px;">
-                            <strong>The Boutique Owner:</strong> High-paid servant. 90% time spent managing emotions.
-                        </li>
-                        <li>
-                            <strong>The Senior Operator:</strong> Stuck in the "Waiting Room" for permission.
-                        </li>
+                <h3 class="font-serif text-3xl md:text-5xl mb-8 italic leading-tight">
+                    For the Age of Cultural Synthesis
+                </h3>
+                
+                <div class="space-y-6 max-w-2xl">
+                    <p class="font-mono text-xs md:text-sm leading-relaxed">
+                        In the dying light of old paradigms and the dawn of new consciousness, where technology and art perform their final dance of separation before inevitable union, we stand at the edge of history's greatest transformation.
+                    </p>
+                    <p class="font-serif text-lg md:text-2xl leading-relaxed border-l-2 border-black pl-6">
+                        This is not merely another revolution—it is the moment when revolution itself evolves.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: THE CONVERGENCE (Split Screen) -->
+        <section class="border-b-black bg-white">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <!-- Death (Left/Top) -->
+                <div class="p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black hover-invert group transition-all duration-300">
+                    <h4 class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">I. The Death Of</h4>
+                    <ul class="font-serif text-xl md:text-3xl space-y-4 leading-tight">
+                        <li class="reveal-text">Artificial scarcity</li>
+                        <li class="reveal-text">Traditional trust</li>
+                        <li class="reveal-text">Fixed reality</li>
+                        <li class="reveal-text">Hierarchical power</li>
+                        <li class="reveal-text">Linear time</li>
                     </ul>
                 </div>
 
-                <a href="https://maven.com/unsub/ncr-cam-officer-certification-program-level-1" target="_blank" class="maven-btn" style="opacity: 0.5; pointer-events: none;">
-                    ENROLLMENT SUSPENDED
-                </a>
+                <!-- Birth (Right/Bottom) -->
+                <div class="p-8 md:p-16 hover-invert group transition-all duration-300">
+                    <div class="flex justify-end md:justify-start">
+                        <h4 class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">II. The Birth Of</h4>
+                    </div>
+                    <ul class="font-serif text-xl md:text-3xl space-y-4 leading-tight text-right md:text-left">
+                        <li class="reveal-text">Conscious commerce</li>
+                        <li class="reveal-text">Mystical technology</li>
+                        <li class="reveal-text">Fluid identity</li>
+                        <li class="reveal-text">Collective creativity</li>
+                        <li class="reveal-text">Art as Operating System</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-                <div class="cohort-status uppercase" style="background: rgba(255, 42, 0, 0.1);">
-                    PROGRAM ON HOLD.<br>
-                    CHECK BACK FOR UPDATES.<br>
-                    DO NOT EXECUTE TRANSFER.
+        <!-- SECTION 4: THE TEN SACRED PRINCIPLES -->
+        <section class="border-b-black bg-[#F2F2F2]">
+            <!-- Header fix: Align items-end to bottom align text, justify-between pushes them apart -->
+            <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
+                <h2 class="font-serif text-2xl md:text-4xl italic pr-4">The Ten Sacred Principles</h2>
+                <!-- Fix: whitespace-nowrap prevents breaking -->
+                <span class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1">[ 10 ITEMS ]</span>
+            </div>
+
+            <div class="flex flex-col">
+                <!-- Helper for grid rows -->
+                <script>
+                    const principles = [
+                        { id: '01', title: 'No NDAs', sub: 'The Art of Sacred Trust', desc: 'Ideas flow like water—trying to own them is like trying to own the rain.' },
+                        { id: '02', title: 'Map ≠ Territory', sub: 'Navigate by Wonder', desc: 'Reality laughs at documentation. We navigate by starlight and intuition.' },
+                        { id: '03', title: 'Everything is Fair Game', sub: 'Beyond the Law', desc: 'We operate not outside the law but beyond it, where innovation outpaces regulation.' },
+                        { id: '04', title: 'Conjure with Systems', sub: 'The Art of Pattern Magic', desc: 'Every protocol is an incantation, every platform a portal.' },
+                        { id: '05', title: 'Friendship Above All', sub: 'The Network of Light', desc: 'We forge bonds not through corporate structure but through resonance of vision.' },
+                        { id: '06', title: 'The Future is Female', sub: 'The Power of Creation', desc: 'Power flows through nurture, not force. Cyclical over linear.' },
+                        { id: '07', title: 'Never Reveal the Trick', sub: 'Word is Bond', desc: 'Mystery is not deception but the womb of meaning.' },
+                        { id: '08', title: 'Codify and Control', sub: 'The Cosmic Joke', desc: 'We create systems while laughing at their limitations.' },
+                        { id: '09', title: 'We Can\'t Help', sub: 'The Power of Limits', desc: 'Not every problem seeks solution. Wisdom knows when to act and when to witness.' },
+                        { id: '10', title: 'Respect', sub: 'The Eternal Law', desc: 'The foundation of all creation. The key to lasting impact.' }
+                    ];
+
+                    const container = document.currentScript.parentElement;
+                    
+                    principles.forEach(p => {
+                        container.innerHTML += `
+                        <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[140px] transition-colors duration-200">
+                            <!-- Number -->
+                            <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                                <span class="font-mono text-xs opacity-40 group-hover:opacity-100">${p.id}</span>
+                            </div>
+                            
+                            <!-- Mobile Number (Visible only on small screens) -->
+                            <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">${p.id}</div>
+
+                            <!-- Title -->
+                            <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
+                                <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">${p.title}</h3>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="md:col-span-7 p-6 flex flex-col justify-center">
+                                <div class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">${p.sub}</div>
+                                <p class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">${p.desc}</p>
+                            </div>
+                        </div>
+                        `;
+                    });
+                </script>
+            </div>
+        </section>
+
+        <!-- SECTION 5: CULTURAL SYNTHESIS -->
+        <section class="border-b-black bg-white p-6 md:p-20">
+            <div class="text-center mb-16 reveal-text">
+                <span class="inline-block border border-black px-3 py-1 font-mono text-[10px] uppercase tracking-widest rounded-full mb-4">III. Synthesis</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="space-y-6 reveal-text">
+                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">ARTISTS</h3>
+                    <div class="font-serif text-xl space-y-4">
+                        <p>Craft is not product;<br>it is operating system.</p>
+                        <p>Work is not output;<br>it is invocation.</p>
+                    </div>
                 </div>
 
+                <div class="space-y-6 reveal-text delay-100">
+                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">BUSINESS</h3>
+                    <div class="font-serif text-xl space-y-4">
+                        <p>Transactions are<br>acts of creation.</p>
+                        <p>Profit is a medium<br>of transformation.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6 reveal-text delay-200">
+                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">SOCIETY</h3>
+                    <div class="font-serif text-xl space-y-4">
+                        <p>Culture is not consumed;<br>it is conjured.</p>
+                        <p>Progress is not linear;<br>it is quantum.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: MARQUEE -->
+        <section class="border-b-black py-6 bg-[#F2F2F2]">
+             <div class="marquee-container font-mono text-[10px] md:text-xs uppercase tracking-[0.3em]">
+                <div class="marquee-content">
+                    Unsubscribe from dying stories — Subscribe to eternal innovation — Transcend false boundaries — Embrace conscious evolution — Unsubscribe from dying stories —
+                </div>
+                <div class="marquee-content" aria-hidden="true">
+                    Unsubscribe from dying stories — Subscribe to eternal innovation — Transcend false boundaries — Embrace conscious evolution — Unsubscribe from dying stories —
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: FOOTER -->
+        <footer class="bg-black text-white min-h-[80vh] flex flex-col justify-between p-6 md:p-16">
+            <div class="flex-grow flex flex-col justify-center items-center text-center reveal-text space-y-8">
+                <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-4 py-1 rounded-full">VI. The Declaration</div>
+                <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl leading-[0.9]">
+                    THIS IS NOT<br>JUST A COMPANY.
+                </h2>
+                <p class="font-mono text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
+                    // SYSTEM MESSAGE:<br>
+                    THIS IS A CULTURAL REVOLUTION DISGUISED AS ONE.
+                </p>
             </div>
 
-            <div class="timer-bar">
-                <p class="uppercase" id="timer" style="margin:0; font-weight: bold; font-size: 0.8rem;">EST: 00:00:00</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono text-[10px] uppercase tracking-widest pt-12 border-t border-white/20">
+                <div>
+                    <span class="block text-gray-500 mb-2">Architects</span>
+                    Jesse Do<br>Paul Pissarro
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Cycle</span>
+                    2024 - ∞<br>Beyond Limits
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Origin</span>
+                    New York City<br>40.7128° N
+                </div>
+                <div class="text-right flex flex-col justify-between">
+                    <span class="block text-gray-500 mb-2">Input</span>
+                    <a href="mailto:office@unsubscribe.llc" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Connect_</a>
+                </div>
             </div>
-        </div>
-    </div>
+        </footer>
 
-</div>
+    </main>
 
-<button id="theme-toggle" class="uppercase">[ TOGGLE MODE ]</button>
+    <script>
+        // --- THREE.JS BACKGROUND ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0xF2F2F2, 0.002);
 
-<script>
-    // --- SECTION 1: WebGL Background Logic ---
-    const canvas = document.getElementById('glCanvas');
-    const gl = canvas.getContext('webgl');
-    const SPEED = 1.3;
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
 
-    if (!gl) {
-        console.error('WebGL not supported');
-    } else {
-        function createShader(gl, type, source) {
-            const shader = gl.createShader(type);
-            gl.shaderSource(shader, source);
-            gl.compileShader(shader);
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                console.error(gl.getShaderInfoLog(shader));
-                gl.deleteShader(shader);
-                return null;
-            }
-            return shader;
-        }
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
 
-        const vertexSrc = document.getElementById('vertexShader').textContent;
-        const fragmentSrc = document.getElementById('fragmentShader').textContent;
+            // Wireframe Terrain
+            const geometry = new THREE.PlaneGeometry(24, 24, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x000000, 
+                wireframe: true, 
+                transparent: true,
+                opacity: 0.08,
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            plane.rotation.x = -Math.PI / 2.5;
+            scene.add(plane);
 
-        const vertShader = createShader(gl, gl.VERTEX_SHADER, vertexSrc);
-        const fragShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSrc);
+            let time = 0;
+            let mouseX = 0;
+            let mouseY = 0;
 
-        const program = gl.createProgram();
-        gl.attachShader(program, vertShader);
-        gl.attachShader(program, fragShader);
-        gl.linkProgram(program);
+            // Touch support for mobile
+            const handleInput = (x, y) => {
+                mouseX = (x - window.innerWidth / 2) * 0.001;
+                mouseY = (y - window.innerHeight / 2) * 0.001;
+            };
 
-        gl.useProgram(program);
+            document.addEventListener('mousemove', (e) => handleInput(e.clientX, e.clientY));
+            document.addEventListener('touchmove', (e) => {
+                if(e.touches.length > 0) {
+                    handleInput(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
 
-        const posBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            -1.0,  1.0,
-             1.0,  1.0,
-            -1.0, -1.0,
-             1.0, -1.0,
-        ]), gl.STATIC_DRAW);
+            const animate = () => {
+                requestAnimationFrame(animate);
+                time += 0.002;
 
-        const posLoc = gl.getAttribLocation(program, "position");
-        gl.enableVertexAttribArray(posLoc);
-        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+                const positionAttribute = geometry.attributes.position;
+                const vertex = new THREE.Vector3();
 
-        const resLoc = gl.getUniformLocation(program, "u_resolution");
-        const timeLoc = gl.getUniformLocation(program, "u_time");
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    vertex.fromBufferAttribute(positionAttribute, i);
+                    // Organic wave motion
+                    const wave1 = 0.5 * Math.sin(vertex.x * 0.5 + time);
+                    const wave2 = 0.3 * Math.sin(vertex.y * 0.8 + time * 1.5);
+                    const wave3 = 0.1 * Math.sin(vertex.x * 2 + vertex.y * 0.5 + time);
+                    vertex.z = (wave1 + wave2 + wave3) * 1.2;
+                    positionAttribute.setZ(i, vertex.z);
+                }
+                positionAttribute.needsUpdate = true;
 
-        function resize() {
-            const displayWidth  = canvas.clientWidth;
-            const displayHeight = canvas.clientHeight;
+                // Subtle camera float
+                plane.rotation.z += 0.0005;
+                plane.rotation.x += (mouseY * 0.5 - plane.rotation.x - Math.PI/2.5) * 0.05;
+                plane.rotation.y += (mouseX * 0.5 - plane.rotation.y) * 0.05;
 
-            if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
-                canvas.width  = displayWidth;
-                canvas.height = displayHeight;
-                gl.viewport(0, 0, canvas.width, canvas.height);
-            }
-        }
-        window.addEventListener('resize', resize);
+                renderer.render(scene, camera);
+            };
 
-        let time = 0;
-        let lastTime = 0;
+            animate();
 
-        function render(now) {
-            now *= 0.001; 
-            const deltaTime = now - lastTime;
-            lastTime = now;
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
 
-            resize(); 
+        // --- OBSERVER ---
+        const initObserver = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
 
-            time += deltaTime * SPEED;
+            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
+        };
 
-            gl.uniform2f(resLoc, canvas.width, canvas.height);
-            gl.uniform1f(timeLoc, time);
-
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-            requestAnimationFrame(render);
-        }
-        requestAnimationFrame(render);
-    }
-
-    // --- SECTION 2: Existing Site Logic ---
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('timer').innerText = "EST: " + now.toLocaleTimeString('en-US', { timeZone: 'America/New_York' });
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
-
-    const toggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    
-    function applyTheme(isDark) {
-        if (isDark) {
-            body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
-        }
-    }
-
-    // Initial load
-    if (localStorage.getItem('theme') === 'dark') {
-        applyTheme(true);
-    } else {
-        applyTheme(false);
-    }
-
-    toggle.addEventListener('click', () => {
-        const isDark = !body.classList.contains('dark-mode');
-        applyTheme(isDark);
-    });
-</script>
-
+        window.addEventListener('load', () => {
+            try { initThreeJS(); } catch (e) { console.log('WebGL fallback'); }
+            initObserver();
+        });
+    </script>
 </body>
 </html>
