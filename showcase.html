@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribe LLC | Showcase</title>
+    <style>
+        :root {
+            /* --- THEME: LIGHT MODE DEFAULT --- */
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --bg-color: #f2f2f2;
+            --text-color: #111111;
+            --accent-color: #000000;
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-core: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-mono);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            touch-action: none;
+        }
+
+        /* --- UI Layer --- */
+        #ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            text-transform: uppercase;
+        }
+
+        .brand {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-top: 4px;
+        }
+
+        /* --- Floating Labels (3D Tracked) --- */
+        #labels-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-label {
+            position: absolute;
+            color: var(--text-color);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            pointer-events: none;
+            opacity: 0; 
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .floating-label::before {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 1px;
+            background-color: var(--text-color);
+            opacity: 0.5;
+        }
+
+        .floating-label .label-text {
+            background: rgba(255,255,255,0.8);
+            padding: 4px 8px;
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+        }
+
+        /* --- Full Screen Detail View --- */
+        #detail-view {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0); 
+            z-index: 20;
+            pointer-events: none; 
+            opacity: 0;
+            transition: opacity 0.5s ease, background 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(0px);
+        }
+
+        #detail-view.active {
+            pointer-events: auto;
+            opacity: 1;
+            backdrop-filter: blur(15px);
+            background: rgba(242, 242, 242, 0.95);
+            overflow-y: auto;
+        }
+
+        .detail-container {
+            width: 100%;
+            min-height: 100%;
+            padding: 6rem 10%;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease 0.3s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+        }
+
+        #detail-view.active .detail-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 4rem;
+            right: 4rem;
+            background: none;
+            border: 1px solid var(--text-color);
+            color: var(--text-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+            z-index: 50;
+        }
+        
+        .close-btn:hover {
+            transform: rotate(90deg);
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* --- Layout Templates --- */
+        .layout-cinematic { display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .video-placeholder {
+            width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #ddd;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;
+            position: relative; border: 1px solid var(--text-color); background-size: cover; background-position: center;
+        }
+        .play-btn {
+            width: 80px; height: 80px; border: 2px solid var(--text-color); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--text-color);
+            cursor: pointer; transition: scale 0.2s;
+        }
+        .play-btn:hover { scale: 1.1; background: var(--text-color); color: var(--bg-color); }
+
+        .layout-carousel { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+        .photo-strip { display: flex; flex-direction: column; gap: 20px; }
+        .photo-item { width: 100%; aspect-ratio: 4/3; background: #ddd; border: 1px solid var(--glass-border); object-fit: cover; }
+        .sticky-info { position: sticky; top: 6rem; }
+
+        .layout-manifesto {
+            max-width: 800px; margin: 0 auto; text-align: center; padding: 4rem 0;
+            border-left: 1px solid var(--text-color); border-right: 1px solid var(--text-color);
+        }
+        .big-type { font-size: 3rem; line-height: 1.1; font-family: var(--font-sans); margin-bottom: 2rem; font-weight: 800; text-transform: uppercase; }
+
+        .layout-terminal { font-family: 'Courier New', monospace; color: #000; max-width: 900px; margin: 0 auto; }
+        .terminal-header { border-bottom: 1px solid #000; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; }
+
+        h1 { font-family: var(--font-sans); font-size: 3rem; margin-bottom: 1rem; letter-spacing: -2px; color: var(--text-color); }
+        p { line-height: 1.6; margin-bottom: 1rem; opacity: 0.8; color: var(--text-color); }
+        .meta-tag { font-family: var(--font-mono); font-size: 0.8rem; border: 1px solid var(--text-color); padding: 4px 8px; display: inline-block; margin-bottom: 1rem; color: var(--text-color); }
+
+        @media (max-width: 768px) {
+            .layout-carousel { grid-template-columns: 1fr; }
+            .sticky-info { position: static; margin-bottom: 2rem; }
+            .close-btn { top: 1rem; right: 1rem; }
+            #detail-view { padding-top: 4rem; }
+            h1 { font-size: 2rem; }
+            .big-type { font-size: 2rem; }
+        }
+
+        footer { display: flex; justify-content: space-between; font-size: 0.75rem; opacity: 0.5; width: 100%; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; cursor: grab; }
+        #canvas-container:active { cursor: grabbing; }
+        
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; z-index: 100; display: flex; justify-content: center; align-items: center;
+            color: #000; font-family: monospace; transition: opacity 1s ease;
+        }
+    </style>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="loader"><div>INITIALIZING V4.0 [LIGHT]...</div></div>
+
+    <!-- UI Overlay -->
+    <div id="ui-layer">
+        <header>
+            <div>
+                <div class="brand">UNSUBSCRIBE LLC</div>
+                <div class="subtitle">Showcase 2026</div>
+            </div>
+        </header>
+        
+        <div id="labels-container"></div>
+
+        <footer>
+            <div>[ ARROWS / DRAG / SCROLL ]</div>
+        </footer>
+    </div>
+
+    <!-- Full Screen Detail View -->
+    <div id="detail-view">
+        <button class="close-btn" id="close-btn">×</button>
+        <div class="detail-container" id="detail-content"></div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // ==========================================
+        // --- CONTENT CONFIGURATION TEMPLATE ---
+        // ==========================================
+        // Replace strings starting with "PLACEHOLDER" with real URLs.
+        // Use empty string "" to fallback to generated graphics.
+        
+        const projects = [
+            {
+                id: 0,
+                type: 'cinematic', // Layout type: 'cinematic' | 'carousel' | 'manifesto' | 'terminal'
+                title: "COCA USA / WORLDWIDE",
+                meta: "THEOLOGY // RELIC",
+                shortDesc: "Ideology IS…",
+                fullDesc: "We engineered a religion. This short film explores the creation of its bibles and dogma.",
+                color: 0xff0044,
+                assets: {
+                    poster: "", // [OPTIONAL] URL for the glass prism image. Leave empty for generated shape.
+                    videoThumb: "", // [OPTIONAL] URL for video placeholder image.
+                    videoUrl: ""    // [OPTIONAL] Link to video file or YouTube.
+                }
+            },
+            {
+                id: 1,
+                type: 'carousel',
+                title: "NAMEOFMY.COM",
+                meta: "COMMERCE // IDENTITY",
+                shortDesc: "The Storefront",
+                fullDesc: "A digital gallery for our works. minimal e-commerce engine. It rotates different “pop up shops” but currently houses CoCA materials and candles.",
+                color: 0x0044ff,
+                assets: {
+                    poster: "",
+                    gallery: [
+                        "", // [OPTIONAL] Image URL 1
+                        "", // [OPTIONAL] Image URL 2
+                        ""  // [OPTIONAL] Image URL 3
+                    ]
+                }
+            },
+            {
+                id: 2,
+                type: 'manifesto',
+                title: "THE ZINE BOOK",
+                meta: "MANIFESTO // PRINT",
+                shortDesc: "Physical Media",
+                fullDesc: "A limited run of physical artifacts containing the source code of our most dangerous ideas.",
+                color: 0x222222, // Dark grey for print
+                assets: {
+                    poster: ""
+                }
+            },
+            {
+                id: 3,
+                type: 'terminal',
+                title: "ZERO DOLLAR PROTOCOL",
+                meta: "FESTIVAL",
+                shortDesc: "Void Architecture - Film Festival",
+                fullDesc: "Submit your film to us. We own the rights, you get a chance to win a festival, win win?",
+                color: 0x00ff44,
+                assets: {
+                    poster: ""
+                }
+            }
+        ];
+
+        // --- Configuration ---
+        const config = {
+            baseRadius: 6.5, mobileRadius: 3.5,
+            baseCameraZ: 14, mobileCameraZ: 18,
+            lightSpeed: 0.15, lightIntensity: 180, 
+            glassThickness: 3.0, autoRotateSpeed: 0.001
+        };
+
+        // --- State ---
+        const state = {
+            currentRotation: 0,
+            targetRotation: 0,
+            isDragging: false,
+            startX: 0,
+            activeProject: null,
+            mode: 'carousel', // 'carousel' | 'detail'
+            lastInteractionTime: 0
+        };
+
+        // --- Helpers: Content Generators (Fallbacks) ---
+        
+        function createProductTexture(index, title, colorHex, customUrl) {
+            // If customUrl is provided, we would load it here. 
+            // For simplicity in this single file, we fallback to canvas if no URL or if loading fails.
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 768;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#ffffff'; // White paper background
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#' + new THREE.Color(colorHex).getHexString();
+            
+            // Abstract Shapes
+            ctx.beginPath();
+            if (index === 0) ctx.arc(256, 300, 140, 0, Math.PI * 2);
+            else if (index === 1) ctx.fillRect(136, 180, 240, 240);
+            else if (index === 2) { ctx.moveTo(256, 160); ctx.lineTo(396, 440); ctx.lineTo(116, 440); ctx.closePath(); }
+            else { ctx.arc(256, 300, 140, 0, Math.PI * 2); }
+            ctx.fill();
+
+            // Typography
+            ctx.fillStyle = '#111';
+            ctx.font = 'bold 80px Helvetica';
+            ctx.fillText(`0${index + 1}.`, 40, 100);
+            
+            ctx.font = 'bold 40px Courier New';
+            ctx.textAlign = 'center';
+            const words = title.split(' ');
+            let y = 580;
+            words.forEach(w => { ctx.fillText(w, 256, y); y += 45; });
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.anisotropy = 16;
+            return tex;
+        }
+
+        function createVideoPlaceholderURL() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1280; canvas.height = 720;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#f0f0f0'; ctx.fillRect(0,0,1280,720);
+            ctx.strokeStyle = '#ccc'; ctx.lineWidth = 10;
+            ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(1280,720); ctx.moveTo(1280,0); ctx.lineTo(0,720); ctx.stroke();
+            return canvas.toDataURL();
+        }
+
+        function createPhotoPlaceholderURL(color, index) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 800; canvas.height = 600;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#f4f4f4'; ctx.fillRect(0,0,800,600);
+            ctx.fillStyle = '#' + new THREE.Color(color).getHexString();
+            ctx.globalAlpha = 0.2;
+            ctx.fillRect(100 + (index*20), 100 + (index*20), 600 - (index*40), 400 - (index*40));
+            return canvas.toDataURL();
+        }
+
+        // --- DOM Builders ---
+        const detailContainer = document.getElementById('detail-content');
+        
+        function renderDetailView(project) {
+            if (!project) return;
+            
+            detailContainer.innerHTML = '';
+            
+            // Layout Logic
+            if (project.type === 'cinematic') {
+                // Use custom video thumb if provided, else generator
+                const bgUrl = project.assets.videoThumb ? project.assets.videoThumb : createVideoPlaceholderURL();
+                
+                const html = `
+                    <div class="layout-cinematic">
+                        <div class="meta-tag">${project.meta}</div>
+                        <h1>${project.title}</h1>
+                        <div class="video-placeholder" style="background-image: url('${bgUrl}');">
+                            <div class="play-btn">▶</div>
+                        </div>
+                        <p style="max-width: 600px;">${project.fullDesc}</p>
+                    </div>
+                `;
+                detailContainer.innerHTML = html;
+            } 
+            else if (project.type === 'carousel') {
+                // Use custom gallery images if provided
+                const imgs = [0,1,2].map(i => {
+                    if (project.assets.gallery && project.assets.gallery[i]) return project.assets.gallery[i];
+                    return createPhotoPlaceholderURL(project.color, i);
+                });
+                
+                const html = `
+                    <div class="layout-carousel">
+                        <div class="sticky-info">
+                            <div class="meta-tag">${project.meta}</div>
+                            <h1>${project.title}</h1>
+                            <p>${project.fullDesc}</p>
+                            <p>A procedural system for generating identity. No two storefronts are alike.</p>
+                        </div>
+                        <div class="photo-strip">
+                            <img class="photo-item" src="${imgs[0]}">
+                            <img class="photo-item" src="${imgs[1]}">
+                            <img class="photo-item" src="${imgs[2]}">
+                        </div>
+                    </div>
+                `;
+                detailContainer.innerHTML = html;
+            }
+            else if (project.type === 'manifesto') {
+                const html = `
+                    <div class="layout-manifesto">
+                        <div class="meta-tag" style="border-color: currentColor">${project.meta}</div>
+                        <div class="big-type">${project.title}</div>
+                        <div style="font-size: 1.2rem; text-align: justify; margin-top: 3rem;">
+                            <p>${project.fullDesc}</p>
+                            <p>WE DO NOT SUBSCRIBE TO THE IDEA THAT DATA IS INNOCENT. EVERY BYTE CARRIES WEIGHT. EVERY PIXEL IS POLITICS.</p>
+                            <p>THE BOOK IS SEALED. THE INK IS CONDUCTIVE. THE MESSAGE IS FINAL.</p>
+                        </div>
+                    </div>
+                `;
+                detailContainer.innerHTML = html;
+            }
+            else if (project.type === 'terminal') {
+                const html = `
+                    <div class="layout-terminal">
+                        <div class="terminal-header">
+                            <span>USER: GHOST</span>
+                            <span>STATUS: CONNECTED</span>
+                        </div>
+                        <h1>> ${project.title}</h1>
+                        <p>> ACCESSING SECURE VAULT...</p>
+                        <p>> ${project.fullDesc}</p>
+                        <br>
+                        <p>> LOADING MODULES:</p>
+                        <p>[X] CORE_LOGIC</p>
+                        <p>[X] VOID_RENDERER</p>
+                        <p>[ ] HUMAN_INTERFACE (SKIPPED)</p>
+                    </div>
+                `;
+                detailContainer.innerHTML = html;
+            }
+        }
+
+        // --- Setup 3D ---
+        const container = document.getElementById('canvas-container');
+        const labelsContainer = document.getElementById('labels-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf2f2f2); // Light background
+        scene.fog = new THREE.FogExp2(0xf2f2f2, 0.04);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); scene.add(ambientLight);
+        const lightGroup = new THREE.Group(); scene.add(lightGroup);
+
+        const createLight = (color) => {
+            const l = new THREE.PointLight(color, config.lightIntensity, 60);
+            l.castShadow = true;
+            return l;
+        };
+        const rL = createLight(0xff0044); const bL = createLight(0x0044ff); const gL = createLight(0x00ff44);
+        lightGroup.add(rL, bL, gL);
+
+        const rimLight = new THREE.DirectionalLight(0xffffff, 2);
+        rimLight.position.set(0, 5, 2); scene.add(rimLight);
+        const backLight = new THREE.DirectionalLight(0xffffff, 1);
+        backLight.position.set(0, 2, -10); scene.add(backLight);
+
+        // Objects
+        const carouselGroup = new THREE.Group(); scene.add(carouselGroup);
+        const geometry = new THREE.BoxGeometry(3, 4.5, 0.4);
+        const glassMat = new THREE.MeshPhysicalMaterial({
+            color: 0xffffff, metalness: 0.0, roughness: 0.05, transmission: 1.0,
+            thickness: config.glassThickness, ior: 1.6, clearcoat: 1.0, side: THREE.DoubleSide
+        });
+
+        const meshes = [];
+        const labelElements = []; 
+
+        projects.forEach((proj, index) => {
+            const wrapper = new THREE.Group();
+            
+            const mesh = new THREE.Mesh(geometry, glassMat.clone());
+            mesh.userData = { id: index };
+            mesh.castShadow = true; mesh.receiveShadow = true;
+
+            // Poster
+            const tex = createProductTexture(index, proj.title, proj.color, proj.assets.poster);
+            const poster = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3.6), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }));
+            poster.position.z = 0;
+            mesh.add(poster);
+
+            // Edges (Dark for light mode visibility)
+            const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.15 }));
+            mesh.add(edges);
+            mesh.userData.edges = edges;
+
+            wrapper.add(mesh);
+            carouselGroup.add(wrapper);
+            meshes.push(mesh);
+
+            // Create DOM Label
+            const label = document.createElement('div');
+            label.className = 'floating-label';
+            label.innerHTML = `<span class="label-text">${proj.title}</span>`;
+            labelsContainer.appendChild(label);
+            labelElements.push(label);
+        });
+
+        // --- Positioning ---
+        let currentRadius = config.baseRadius;
+        function updatePositions() {
+            const isMobile = window.innerWidth < 768;
+            currentRadius = isMobile ? config.mobileRadius : config.baseRadius;
+            camera.position.z = isMobile ? config.mobileCameraZ : config.baseCameraZ;
+
+            carouselGroup.children.forEach((wrapper, index) => {
+                const angle = (index / projects.length) * Math.PI * 2;
+                wrapper.position.x = Math.cos(angle) * currentRadius;
+                wrapper.position.z = Math.sin(angle) * currentRadius;
+                wrapper.rotation.y = -angle + Math.PI / 2;
+            });
+        }
+
+        // --- Interactions ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Input Handlers
+        function handleStart(x) {
+            if (state.mode !== 'carousel') return;
+            state.isDragging = true;
+            state.startX = x;
+            state.lastInteractionTime = Date.now();
+            container.style.cursor = 'grabbing';
+        }
+        function handleMove(x) {
+            if (state.isDragging && state.mode === 'carousel') {
+                state.targetRotation += (x - state.startX) * 0.005;
+                state.startX = x;
+                state.lastInteractionTime = Date.now();
+            }
+        }
+        function handleEnd() {
+            state.isDragging = false;
+            container.style.cursor = 'grab';
+        }
+
+        window.addEventListener('mousedown', e => handleStart(e.clientX));
+        window.addEventListener('mousemove', e => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            handleMove(e.clientX);
+        });
+        window.addEventListener('mouseup', handleEnd);
+        
+        window.addEventListener('touchstart', e => { if(e.touches.length) handleStart(e.touches[0].clientX); }, {passive: false});
+        window.addEventListener('touchmove', e => { 
+            if(e.touches.length) {
+                mouse.x = (e.touches[0].clientX/window.innerWidth)*2-1;
+                mouse.y = -(e.touches[0].clientY/window.innerHeight)*2+1;
+                handleMove(e.touches[0].clientX); 
+            }
+        }, {passive: false});
+        window.addEventListener('touchend', handleEnd);
+
+        // Arrow Key Navigation (Restored)
+        window.addEventListener('keydown', (e) => {
+            if (state.mode !== 'carousel') return;
+            
+            if (e.key === 'ArrowLeft') {
+                state.targetRotation += 0.5; // Rotate left
+                state.lastInteractionTime = Date.now();
+            }
+            if (e.key === 'ArrowRight') {
+                state.targetRotation -= 0.5; // Rotate right
+                state.lastInteractionTime = Date.now();
+            }
+        });
+
+        // Click Logic
+        let clickStartRotation = 0;
+        container.addEventListener('mousedown', () => clickStartRotation = state.currentRotation);
+        container.addEventListener('click', (e) => {
+            if (Math.abs(state.currentRotation - clickStartRotation) < 0.1 && state.mode === 'carousel') {
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(meshes);
+                
+                if (intersects.length > 0) {
+                    const obj = intersects[0].object;
+                    if (obj && typeof obj.userData.id !== 'undefined') {
+                        expandProject(obj.userData.id);
+                    }
+                }
+            }
+        });
+
+        const detailView = document.getElementById('detail-view');
+        const closeBtn = document.getElementById('close-btn');
+
+        function expandProject(index) {
+            if (!projects[index]) return;
+            state.mode = 'detail';
+            state.activeProject = index;
+            renderDetailView(projects[index]);
+            detailView.classList.add('active');
+            labelsContainer.style.opacity = '0'; 
+        }
+
+        function closeProject() {
+            state.mode = 'carousel';
+            state.activeProject = null;
+            detailView.classList.remove('active');
+            labelsContainer.style.opacity = '1';
+            state.lastInteractionTime = Date.now();
+        }
+
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeProject();
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            updatePositions();
+        });
+
+        // --- Animation ---
+        updatePositions();
+        const clock = new THREE.Clock();
+        const dummyV = new THREE.Vector3();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+            
+            // Carousel Logic
+            if (state.mode === 'carousel') {
+                if (!state.isDragging && (Date.now() - state.lastInteractionTime > 2000)) {
+                    state.targetRotation += config.autoRotateSpeed;
+                }
+                
+                state.currentRotation += (state.targetRotation - state.currentRotation) * 0.05;
+                carouselGroup.rotation.y = state.currentRotation;
+                carouselGroup.position.y = Math.sin(time * 0.8) * 0.3;
+
+                meshes.forEach((mesh, i) => {
+                    mesh.rotation.y += 0.003; 
+                    mesh.rotation.x = Math.sin(time * 0.5 + i) * 0.1;
+                });
+                
+                const targetZ = (window.innerWidth < 768) ? config.mobileCameraZ : config.baseCameraZ;
+                camera.position.lerp(new THREE.Vector3(0, 0, targetZ), 0.05);
+                camera.lookAt(0,0,0);
+            } 
+            else if (state.mode === 'detail') {
+                // Ensure activeMesh exists before accessing properties
+                const activeMesh = meshes[state.activeProject];
+                if (activeMesh) {
+                    activeMesh.rotation.y += 0.001; 
+                    activeMesh.getWorldPosition(dummyV);
+                    const targetCam = dummyV.clone();
+                    targetCam.z += 5; // Zoom in
+                    camera.position.lerp(targetCam, 0.05);
+                    camera.lookAt(dummyV);
+                }
+            }
+
+            // Update Floating Labels
+            if (state.mode === 'carousel') {
+                meshes.forEach((mesh, i) => {
+                    if (!labelElements[i]) return;
+
+                    mesh.updateWorldMatrix(true, false);
+                    mesh.getWorldPosition(dummyV);
+                    dummyV.x += 1.8; 
+                    dummyV.project(camera);
+
+                    if (dummyV.z > 1) { 
+                         labelElements[i].style.opacity = 0;
+                         return;
+                    }
+
+                    const x = (dummyV.x * .5 + .5) * window.innerWidth;
+                    const y = (dummyV.y * -.5 + .5) * window.innerHeight;
+
+                    const el = labelElements[i];
+                    el.style.transform = `translate(${x}px, ${y}px)`;
+                    
+                    mesh.getWorldPosition(dummyV);
+                    const dist = dummyV.distanceTo(camera.position);
+                    const opacity = Math.max(0, 1 - (dist - 10)/10); 
+                    
+                    el.style.opacity = opacity > 0.1 ? 1 : 0;
+                });
+            }
+
+            // Lights
+            const lTime = time * config.lightSpeed;
+            rL.position.set(Math.sin(lTime*0.7)*15, Math.sin(lTime*0.3)*8, Math.cos(lTime*0.7)*15);
+            bL.position.set(Math.sin(lTime*0.5+2)*18, Math.cos(lTime*0.4)*6, Math.cos(lTime*0.5+2)*18);
+            gL.position.set(Math.sin(lTime*0.3+4)*12, Math.sin(lTime*0.6)*10, Math.cos(lTime*0.3+4)*12);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        setTimeout(() => {
+            const l = document.getElementById('loader');
+            if (l) {
+                l.style.opacity = 0;
+                setTimeout(() => l.remove(), 1000);
+            }
+        }, 800);
+    </script>
+</body>
+</html>
+
