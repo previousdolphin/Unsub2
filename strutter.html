@@ -23,7 +23,7 @@
     <div id="dashboard" class="hidden min-h-screen p-8 max-w-7xl mx-auto">
         <header class="mb-10 flex justify-between items-end border-b border-zinc-800 pb-4">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight">Performance Overview</h1>
+                <h1 class="text-3xl font-bold tracking-tight text-indigo-400">Strutter Social Media Impact KPIs</h1>
                 <p class="text-zinc-400 mt-1">Tracking Authority, Engagement, Conversion, and Studio Notes</p>
             </div>
             <button onclick="location.reload()" class="text-sm text-zinc-400 hover:text-white transition-colors">Lock</button>
@@ -60,7 +60,8 @@
     </div>
 
     <script>
-        const const VALID_HASH = "cmV0dHVydHM="; // Base64 for "retturts"
+        // Updated Base64 hash for "retturts"
+        const VALID_HASH = "cmV0dHVydHM="; 
 
         function checkAuth() {
             const input = document.getElementById('passcode').value;
@@ -90,10 +91,8 @@
                     portViews: [], inquiries: [], winRate: [], searches: [], notes: []
                 };
 
-                // Parse the 9 columns based on the new markdown structure
                 for (let i = 1; i < tableRows.length; i++) {
                     const columns = tableRows[i].split('|').map(col => col.trim());
-                    // First array item is empty string because of the leading '|', so index starts at 1
                     if (columns.length >= 10) { 
                         data.labels.push(columns[1]);
                         data.followers.push(Number(columns[2]));
@@ -107,15 +106,11 @@
                     }
                 }
 
-                // Render Multi-Axis Chart for Social (Followers vs Saves)
                 renderDualAxisChart('chartSocial', data.labels, data.followers, 'Followers', '#818cf8', data.saves, 'Saves', '#34d399');
-                
-                // Render Single Line Charts
-                renderChart('chartViews', data.labels, data.portViews, '#fbbf24'); // Amber
-                renderChart('chartInquiries', data.labels, data.inquiries, '#f472b6'); // Pink
-                renderChart('chartWinRate', data.labels, data.winRate, '#a78bfa'); // Purple
+                renderChart('chartViews', data.labels, data.portViews, '#fbbf24'); 
+                renderChart('chartInquiries', data.labels, data.inquiries, '#f472b6'); 
+                renderChart('chartWinRate', data.labels, data.winRate, '#a78bfa'); 
 
-                // Render Qualitative Notes (Reversed so newest is at the top)
                 renderNotes(data.labels, data.notes);
 
             } catch (error) {
@@ -128,7 +123,6 @@
             const container = document.getElementById('notes-container');
             let html = '';
             
-            // Loop backwards to show the most recent notes at the top
             for (let i = labels.length - 1; i >= 0; i--) {
                 if(notes[i] && notes[i] !== '') {
                     html += `
