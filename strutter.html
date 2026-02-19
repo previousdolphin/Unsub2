@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strutter | KPI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-zinc-900 text-zinc-100 font-sans antialiased">
+
+    <div id="login-screen" class="min-h-screen flex items-center justify-center">
+        <div class="bg-zinc-800 p-8 rounded-lg shadow-xl max-w-sm w-full border border-zinc-700">
+            <h1 class="text-2xl font-bold mb-6 text-center tracking-tight">Strutter Lab</h1>
+            <input type="password" id="passcode" placeholder="Enter Passcode" class="w-full p-3 mb-4 bg-zinc-900 border border-zinc-600 rounded text-white focus:outline-none focus:border-indigo-500">
+            <button onclick="checkAuth()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded transition-colors">
+                Access Dashboard
+            </button>
+            <p id="error-msg" class="text-red-400 text-sm mt-3 hidden text-center">Incorrect passcode.</p>
+        </div>
+    </div>
+
+    <div id="dashboard" class="hidden min-h-screen p-8 max-w-7xl mx-auto">
+        <header class="mb-10 flex justify-between items-end border-b border-zinc-800 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight">Performance Overview</h1>
+                <p class="text-zinc-400 mt-1">Tracking Authority, Engagement, Conversion, and Studio Notes</p>
+            </div>
+            <button onclick="location.reload()" class="text-sm text-zinc-400 hover:text-white transition-colors">Lock</button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-zinc-800 p-5 rounded-lg border border-zinc-700">
+                    <h2 class="text-sm font-semibold mb-4 text-zinc-400 uppercase tracking-wide">Social Growth & Saves</h2>
+                    <canvas id="chartSocial"></canvas>
+                </div>
+                <div class="bg-zinc-800 p-5 rounded-lg border border-zinc-700">
+                    <h2 class="text-sm font-semibold mb-4 text-zinc-400 uppercase tracking-wide">Portfolio Views</h2>
+                    <canvas id="chartViews"></canvas>
+                </div>
+                <div class="bg-zinc-800 p-5 rounded-lg border border-zinc-700">
+                    <h2 class="text-sm font-semibold mb-4 text-zinc-400 uppercase tracking-wide">Lead Generation</h2>
+                    <canvas id="chartInquiries"></canvas>
+                </div>
+                <div class="bg-zinc-800 p-5 rounded-lg border border-zinc-700">
+                    <h2 class="text-sm font-semibold mb-4 text-zinc-400 uppercase tracking-wide">Win Rate (%)</h2>
+                    <canvas id="chartWinRate"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-zinc-800 p-6 rounded-lg border border-zinc-700 flex flex-col h-full">
+                <h2 class="text-lg font-bold mb-6 text-zinc-100 border-b border-zinc-700 pb-2">Qualitative Insights</h2>
+                <div id="notes-container" class="overflow-y-auto pr-2 space-y-6 flex-grow">
+                    </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const VALID_HASH = "Y3JlYXRpdmU="; // Base64 for "creative"
+
+        function checkAuth() {
+            const input = document.getElementById('passcode').value;
+            if (btoa(input) === VALID_HASH) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                loadData();
+            } else {
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('passcode').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkAuth();
+        });
+
+        async function loadData() {
+            try {
+                const response = await fetch('data.md');
+                const text = await response.text();
+                
+                const lines = text.split('\n');
+                const tableRows = lines.filter(line => line.trim().startsWith('|') && !line.includes('---|'));
+                
+                const data = {
+                    labels: [], followers: [], engRate: [], saves: [], 
+                    portViews: [], inquiries: [], winRate: [], searches: [], notes: []
+                };
+
+                // Parse the 9 columns based on the new markdown structure
+                for (let i = 1; i < tableRows.length; i++) {
+                    const columns = tableRows[i].split('|').map(col => col.trim());
+                    // First array item is empty string because of the leading '|', so index starts at 1
+                    if (columns.length >= 10) { 
+                        data.labels.push(columns[1]);
+                        data.followers.push(Number(columns[2]));
+                        data.engRate.push(Number(columns[3]));
+                        data.saves.push(Number(columns[4]));
+                        data.portViews.push(Number(columns[5]));
+                        data.inquiries.push(Number(columns[6]));
+                        data.winRate.push(Number(columns[7]));
+                        data.searches.push(Number(columns[8]));
+                        data.notes.push(columns[9]);
+                    }
+                }
+
+                // Render Multi-Axis Chart for Social (Followers vs Saves)
+                renderDualAxisChart('chartSocial', data.labels, data.followers, 'Followers', '#818cf8', data.saves, 'Saves', '#34d399');
+                
+                // Render Single Line Charts
+                renderChart('chartViews', data.labels, data.portViews, '#fbbf24'); // Amber
+                renderChart('chartInquiries', data.labels, data.inquiries, '#f472b6'); // Pink
+                renderChart('chartWinRate', data.labels, data.winRate, '#a78bfa'); // Purple
+
+                // Render Qualitative Notes (Reversed so newest is at the top)
+                renderNotes(data.labels, data.notes);
+
+            } catch (error) {
+                console.error("Error loading data.", error);
+                alert("Could not load data.md. Ensure you are running a local server.");
+            }
+        }
+
+        function renderNotes(labels, notes) {
+            const container = document.getElementById('notes-container');
+            let html = '';
+            
+            // Loop backwards to show the most recent notes at the top
+            for (let i = labels.length - 1; i >= 0; i--) {
+                if(notes[i] && notes[i] !== '') {
+                    html += `
+                        <div class="relative pl-4 border-l-2 border-indigo-500">
+                            <div class="absolute w-2 h-2 bg-indigo-500 rounded-full -left-[5px] top-1.5"></div>
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider block mb-1">${labels[i]}</span>
+                            <p class="text-sm text-zinc-300 leading-relaxed">${notes[i]}</p>
+                        </div>
+                    `;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function renderChart(canvasId, labels, dataArr, color) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataArr,
+                        borderColor: color,
+                        backgroundColor: color + '20',
+                        borderWidth: 2, fill: true, tension: 0.3,
+                        pointBackgroundColor: color, pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#3f3f46' }, ticks: { color: '#a1a1aa', font: {size: 10} } },
+                        x: { grid: { display: false }, ticks: { color: '#a1a1aa', font: {size: 10} } }
+                    }
+                }
+            });
+        }
+
+        function renderDualAxisChart(canvasId, labels, data1, label1, color1, data2, label2, color2) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: label1, data: data1, borderColor: color1, borderWidth: 2, tension: 0.3, yAxisID: 'y' },
+                        { label: label2, data: data2, borderColor: color2, borderWidth: 2, tension: 0.3, yAxisID: 'y1', borderDash: [5, 5] }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, labels: {color: '#a1a1aa', boxWidth: 12, font: {size: 10}} } },
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', grid: { color: '#3f3f46' }, ticks: { color: color1 } },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: color2 } },
+                        x: { grid: { display: false }, ticks: { color: '#a1a1aa', font: {size: 10} } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
