@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified OS (UOS) | Coming 2027</title>
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --surface: #12121a;
+            --surface-hover: #1a1a24;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #8a2be2;
+            --border-glow: rgba(0, 240, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- Header & Hero --- */
+        header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background: radial-gradient(circle at center, #1a1a2e 0%, var(--bg-dark) 70%);
+            position: relative;
+        }
+
+        .version-badge {
+            background: rgba(138, 43, 226, 0.2);
+            color: var(--accent-purple);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            border: 1px solid var(--accent-purple);
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin-bottom: 3rem;
+        }
+
+        .cta-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-weight: bold;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: transparent;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            box-shadow: 0 0 15px var(--border-glow);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--border-glow);
+        }
+
+        /* --- Sections Layout --- */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        /* --- Grid Cards (Features) --- */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s ease, background 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: var(--surface-hover);
+            border-color: rgba(0, 240, 255, 0.3);
+        }
+
+        .card h3 {
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* --- Architecture Diagram Mockup --- */
+        .arch-container {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 3rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .layer {
+            background: rgba(255,255,255,0.03);
+            border: 1px dashed var(--text-muted);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-radius: 8px;
+        }
+        
+        .layer.core { border-color: var(--accent-purple); color: var(--accent-purple); font-weight: bold; }
+        .layer.domains { display: flex; gap: 1rem; background: transparent; border: none; padding: 0;}
+        .domain-box { flex: 1; padding: 1.5rem; background: rgba(0, 240, 255, 0.05); border: 1px solid var(--accent-cyan); border-radius: 8px; text-align: center; }
+
+        /* --- Roadmap Timeline --- */
+        .timeline {
+            border-left: 2px solid var(--accent-purple);
+            padding-left: 2rem;
+            margin-left: 1rem;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.45rem;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-purple);
+            box-shadow: 0 0 10px var(--accent-purple);
+        }
+
+        .date { color: var(--accent-cyan); font-weight: bold; margin-bottom: 0.5rem; }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header id="hero">
+        <div class="version-badge">Draft v1.0 • Target GA: Sept 2027</div>
+        <h1>Unified OS</h1>
+        <p class="subtitle">A public, peer-reviewable compendium outlining the philosophy, architecture, and security model for a modular, AI-integrated, cross-device operating system designed to run everything.</p>
+        <div class="cta-container">
+            <a href="#features" class="btn btn-primary">Explore Features</a>
+            <a href="#architecture" class="btn btn-primary" style="border-color: var(--accent-purple); color: var(--accent-purple);">View Architecture</a>
+        </div>
+    </header>
+
+    <section id="features">
+        <div class="section-header">
+            <h2>Core Features</h2>
+            <p class="text-muted">Replacing all daily computing with one platform that swallows existing devices.</p>
+        </div>
+        <div class="grid-layout">
+            <div class="card">
+                <h3>Cross-Ecosystem Apps</h3>
+                <p>Run Windows, Linux, and Android apps side-by-side. Apps appear as native windows in the Unified GUI, sharing a common file space and clipboard.</p>
+            </div>
+            <div class="card">
+                <h3>System-Level AI Co-Pilot</h3>
+                <p>An AI assistant that executes multi-app workflows, summarizes activity, and generates ad-hoc interfaces, with local-first LLM services and strict tool guardrails.</p>
+            </div>
+            <div class="card">
+                <h3>Security by Isolation</h3>
+                <p>Blast-radius boundaries for every domain. Utilizing an object-capability model with no ambient authority—only per-app scoped handles.</p>
+            </div>
+            <div class="card">
+                <h3>The Device Mesh</h3>
+                <p>Personal devices authenticate into a unified mesh. Workloads seamlessly shift across your hardware under a global policy and identity.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture">
+        <div class="section-header">
+            <h2>System Architecture</h2>
+            <p class="text-muted">A layered model utilizing a hybrid microkernel + hypervisor core.</p>
+        </div>
+        <div class="arch-container">
+            <div class="layer"><strong>Unified GUI & UX</strong> • AI Co-Pilot • Policy & Telemetry</div>
+            <div class="layer"><strong>UOS Core Services:</strong> FS, Net, Identity (DID/Passkeys), Update, Crypt</div>
+            <div class="layer domains">
+                <div class="domain-box">Windows VM<br><small>(HW-accelerated)</small></div>
+                <div class="domain-box">Linux<br><small>(Native + Containers)</small></div>
+                <div class="domain-box">Android<br><small>(AOSP VM)</small></div>
+            </div>
+            <div class="layer core">Microkernel / Type-1 Hypervisor • Isolated Drivers • Secure Boot</div>
+        </div>
+    </section>
+
+    <section id="roadmap">
+        <div class="section-header">
+            <h2>Roadmap to 2027</h2>
+            <p class="text-muted">From bare-metal prototype to General Availability.</p>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="date">2025</div>
+                <h4>Bare-Metal Prototype</h4>
+                <p>Low-Fi build featuring dual-domain demo. Linux+KVM host with Windows and Android guests via remote window bridges.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="date">2026 H1</div>
+                <h4>Alpha Release</h4>
+                <p>Single session, multi-domain app windows. Early hardware support.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="date">2026 H2</div>
+                <h4>Beta Preparation</h4>
+                <p>Android runtime integration, data importer tools ("swallowing"), and AI co-pilot previews.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="date">September 2027</div>
+                <h4>General Availability 1.0</h4>
+                <p>Full stability, comprehensive documentation, partner images, and tuned type-1 hypervisor performance.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <h2>Open Peer Review</h2>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 1rem auto;">We are seeking public, expert peer review on security threat models, input latency, window remoting fidelity, and AI guardrails.</p>
+        <p style="margin-top: 2rem; font-size: 0.9rem; color: #555;">© 2027 UOS Foundation. Building the integration garden.</p>
+    </footer>
+
+</body>
+</html>
