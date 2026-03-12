@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNSUBSCRIBE THE GAME</title>
+    <title>UNSUBSCRIBE THE GAME: ROGUELIKE EDITION</title>
     <style>
         :root {
             --bg-color: #1a1a1a;
@@ -82,6 +82,8 @@
             user-select: none;
             transition: opacity 0.2s;
             z-index: 10;
+            /* FIX: Add a shadow to the emoji character so it’s visible on white backgrounds */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
         .egg:hover {
@@ -96,22 +98,21 @@
         <div id="depth-indicator">Max Menu Depth: 1</div>
     </div>
 
-    <!-- Container for the procedurally generated menus -->
     <div id="game-container"></div>
 
-    <!-- THE TRUE GOAL (Static Screen) -->
     <div id="screen-unsubscribe" class="screen">
         <h2>Egg Found.</h2>
         <p>System integrity compromised. Ready to descend.</p>
         <button onclick="loopGame()">UNSUBSCRIBE & DESCEND</button>
     </div>
 
-    <script>        let currentLevel = 1;
-        const maxClicks = 5; 
+    <script>
+        let currentLevel = 1;
+        const maxClicks = 5; // Capped at 5 clicks deep
 
         const themes = [
             { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace' }, 
-            { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif' },             
+            { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif' }, // The problematic white background             
             { bg: '#052000', text: '#2ed573', accent: '#ffa502', font: '"Lucida Console", Monaco, monospace' }, 
             { bg: '#2c2c54', text: '#ffb142', accent: '#ff5252', font: 'Tahoma, sans-serif' },
             { bg: '#300000', text: '#ff9ff3', accent: '#00d8d6', font: '"Comic Sans MS", cursive, sans-serif' } 
@@ -158,7 +159,6 @@
                     screenDiv.appendChild(sub);
                 }
 
-                // FIX: Explicitly handle the Main Menu so it doesn't generate unreachable rooms
                 if (current.id === 'main') {
                     let playBtn = document.createElement('button');
                     playBtn.innerText = "Play 'Indie Game Shell'";
@@ -182,7 +182,6 @@
                         queue.push({ id: childId, depth: current.depth + 1, title: 'Settings', parentId: current.id });
                     }
                 } 
-                // All other sub-menus branch normally
                 else {
                     let numChildren = 0;
                     if (current.depth < targetDepth) {
@@ -247,7 +246,6 @@
         }
 
         generateLevel();
-
     </script>
 </body>
 </html>
