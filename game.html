@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNSUBSCRIBE THE GAME</title>
+    <style>
+        /* CSS Variables make reskinning on each loop trivial */
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #ff4757;
+            --font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #level-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            opacity: 0.5;
+        }
+
+        /* The Game Container */
+        .screen {
+            display: none; /* Hidden by default */
+            text-align: center;
+            border: 2px solid var(--text-color);
+            padding: 40px;
+            width: 400px;
+            box-shadow: 10px 10px 0px var(--accent-color);
+        }
+
+        .screen.active {
+            display: block; /* Only show active screen */
+        }
+
+        button {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            width: 80%;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* The Hidden Egg */
+        .egg {
+            cursor: pointer;
+            opacity: 0.05; /* Almost invisible */
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            font-size: 24px;
+            user-select: none;
+        }
+        
+        .egg:hover {
+            opacity: 1;
+        }
+
+        .error-text {
+            color: var(--accent-color);
+            font-size: 12px;
+            height: 15px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="level-indicator">Layer: 1</div>
+
+    <!-- SCREEN 1: MAIN MENU -->
+    <div id="screen-main" class="screen active">
+        <h1>UNSUBSCRIBE</h1>
+        <p>The Game</p>
+        <div class="error-text" id="main-error"></div>
+        <button onclick="tryStart()">Play "Indie Game Shell"</button>
+        <button onclick="nav('screen-load')">Load Game</button>
+        <button onclick="nav('screen-settings')">Settings</button>
+    </div>
+
+    <!-- SCREEN 2: LOAD GAME -->
+    <div id="screen-load" class="screen">
+        <h2>Select Save Data</h2>
+        <div class="error-text" id="load-error"></div>
+        <button onclick="showLoadError()">Slot 1 (Corrupted)</button>
+        <button onclick="showLoadError()">Slot 2 (Empty)</button>
+        <button onclick="nav('screen-main')">Back</button>
+    </div>
+
+    <!-- SCREEN 3: SETTINGS (Where the egg lives) -->
+    <div id="screen-settings" class="screen">
+        <h2>Preferences</h2>
+        <button>Graphics</button>
+        <button>Audio</button>
+        <button onclick="nav('screen-main')">Back</button>
+        <!-- The hidden egg to progress -->
+        <div class="egg" onclick="findEgg()">🥚</div>
+    </div>
+
+    <!-- SCREEN 4: THE TRUE GOAL -->
+    <div id="screen-unsubscribe" class="screen">
+        <h2>Egg Found.</h2>
+        <p>To access the game, you must unsubscribe from reality.</p>
+        <button onclick="loopGame()">CONFIRM UNSUBSCRIBE</button>
+    </div>
+
+    <script>
+        let currentLevel = 1;
+
+        // The skins that apply each time you loop
+        const themes = [
+            { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace' }, // Base
+            { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif' },             // Light Mode
+            { bg: '#000000', text: '#2ed573', accent: '#ffa502', font: '"Lucida Console", Monaco, monospace' }, // Terminal
+            { bg: '#5f27cd', text: '#ff9ff3', accent: '#01a3a4', font: '"Comic Sans MS", cursive, sans-serif' } // Chaos
+        ];
+
+        // Navigation Router
+        function nav(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            // Clear errors on navigation
+            document.getElementById('main-error').innerText = "";
+            document.getElementById('load-error').innerText = "";
+        }
+
+        // Fake out the player trying to just click start
+        function tryStart() {
+            document.getElementById('main-error').innerText = "ERROR: No Save Data. Go to Load.";
+        }
+
+        function showLoadError() {
+            document.getElementById('load-error').innerText = "ERROR: Slot unavailable. Check Settings.";
+        }
+
+        // The player finds the egg
+        function findEgg() {
+            nav('screen-unsubscribe');
+        }
+
+        // Hatching into the next layer
+        function loopGame() {
+            currentLevel++;
+            document.getElementById('level-indicator').innerText = `Layer: ${currentLevel}`;
+            
+            // Apply new skin based on the current level (looping through themes array)
+            const themeIndex = (currentLevel - 1) % themes.length;
+            const newTheme = themes[themeIndex];
+            
+            document.documentElement.style.setProperty('--bg-color', newTheme.bg);
+            document.documentElement.style.setProperty('--text-color', newTheme.text);
+            document.documentElement.style.setProperty('--accent-color', newTheme.accent);
+            document.documentElement.style.setProperty('--font-family', newTheme.font);
+
+            // Move the egg somewhere random on the settings page to make the next loop harder
+            const egg = document.querySelector('.egg');
+            egg.style.bottom = Math.floor(Math.random() * 80) + 10 + "%";
+            egg.style.right = Math.floor(Math.random() * 80) + 10 + "%";
+
+            // Boot back to main menu
+            nav('screen-main');
+        }
+    </script>
+</body>
+</html>
