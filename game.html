@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNSUBSCRIBE THE GAME: ROGUELIKE EDITION</title>
     <style>
+        /* FIX: Ensures padding and borders are included in width calculations */
+        * {
+            box-sizing: border-box;
+        }
+
         :root {
-            /* Base Theme Variables */
             --bg-color: #1a1a1a;
             --text-color: #f0f0f0;
             --accent-color: #ff4757;
@@ -24,9 +28,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh; /* FIX: Allows scrolling if height exceeds viewport */
             margin: 0;
-            overflow: hidden;
+            overflow-x: hidden; /* Prevents horizontal scrolling */
             transition: all 0.5s ease;
         }
 
@@ -36,6 +40,7 @@
             left: 20px;
             opacity: 0.7;
             font-weight: bold;
+            z-index: 100;
         }
 
         .screen {
@@ -43,9 +48,12 @@
             text-align: center;
             border: var(--border-width) solid var(--text-color);
             border-radius: var(--border-radius);
-            padding: 40px;
-            width: 450px;
+            padding: 30px;
+            /* FIX: Responsive sizing so it scales down on mobile */
+            width: 90%; 
+            max-width: 450px;
             min-height: 300px;
+            margin: 40px auto; 
             box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--accent-color);
             position: relative; 
             background-color: var(--bg-color);
@@ -67,50 +75,51 @@
             color: var(--text-color);
             border: var(--border-width) solid var(--text-color);
             border-radius: var(--border-radius);
-            padding: 10px 20px;
-            margin: 8px;
+            padding: 12px 15px;
+            margin: 8px 0;
             cursor: pointer;
             font-family: inherit;
             font-size: 16px;
-            width: 80%;
+            width: 100%; /* Spans full container width nicely */
             transition: all 0.2s;
+            word-wrap: break-word;
         }
 
         button:hover {
             background: var(--text-color);
             color: var(--bg-color);
             border-color: var(--bg-color);
-            box-shadow: inset 0 0 0 50px var(--text-color); /* Fill effect */
+            box-shadow: inset 0 0 0 50px var(--text-color);
         }
 
-                .egg {
+        .egg {
             cursor: pointer;
             position: absolute;
             font-size: 24px;
             user-select: none;
             z-index: 10;
-            
-            /* --- THE VISIBILITY IMPROVEMENTS --- */
-            
-            /* 1. Base Opacity: Raised from 0.05 to 0.12 */
             opacity: 0.12; 
-            
-            /* 2. Character Shadow (retains outline for contrast) */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); 
-            
-            /* 3. Container Halo (crucial for light backgrounds) */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             box-shadow: 0px 0px 15px 5px rgba(255, 255, 255, 0.15);
-            
-            /* For the scaling animation */
-            transition: opacity 0.2s, transform 0.2s ease-out; 
-            transform: scale(1);
+            transition: opacity 0.2s, transform 0.2s;
         }
         
         .egg:hover {
-            opacity: 1; /* Fully visible on hover */
-            transform: scale(1.15); /* Slightly enlarge to confirm selection */
+            opacity: 1;
+            transform: scale(1.15);
         }
 
+        /* Styling for the hashed string */
+        .hash-string {
+            font-family: 'Courier New', monospace; /* Always monospaced for the hash */
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            word-break: break-all;
+            color: var(--accent-color);
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px dashed var(--text-color);
+        }
     </style>
 </head>
 <body>
@@ -132,7 +141,6 @@
         let currentLevel = 1;
         const maxClicks = 5; 
 
-        // The starting handcrafted themes you liked
         const baseThemes = [
             { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace', radius: '0px', bWidth: '2px', shadow: '10px' }, 
             { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif', radius: '8px', bWidth: '1px', shadow: '5px' },             
@@ -141,60 +149,69 @@
             { bg: '#300000', text: '#ff9ff3', accent: '#00d8d6', font: '"Comic Sans MS", cursive, sans-serif', radius: '30px', bWidth: '5px', shadow: '15px' } 
         ];
 
-        // A pool of web-safe fonts for the generator
         const fontPool = [
-            'Georgia, serif', '"Palatino Linotype", Book Antiqua, Palatino, serif', '"Times New Roman", Times, serif',
-            'Arial, Helvetica, sans-serif', '"Arial Black", Gadget, sans-serif', '"Comic Sans MS", cursive, sans-serif',
-            'Impact, Charcoal, sans-serif', '"Lucida Sans Unicode", "Lucida Grande", sans-serif', 'Tahoma, Geneva, sans-serif',
-            '"Trebuchet MS", Helvetica, sans-serif', 'Verdana, Geneva, sans-serif', '"Courier New", Courier, monospace',
-            '"Lucida Console", Monaco, monospace', 'Papyrus, fantasy', 'Brush Script MT, cursive'
+            'Georgia, serif', '"Palatino Linotype", serif', '"Times New Roman", serif', 'Arial, sans-serif', 
+            '"Arial Black", sans-serif', '"Comic Sans MS", cursive', 'Impact, sans-serif', 'Tahoma, sans-serif',
+            '"Trebuchet MS", sans-serif', 'Verdana, sans-serif', '"Courier New", monospace', '"Lucida Console", monospace'
         ];
 
+        // 100 Unique Menu Jargon Options
         const menuJargon = [
-            "Advanced Audio", "Graphics (Deprecated)", "Accessibility", "Keybinds 2", 
-            "Cloud Sync", "Developer Tools", "Network Config", "Misc Options", 
-            "V-Sync Settings", "Colorblind Mode", "Experimental Features", "Do Not Click"
+            "Advanced Audio", "Graphics (Deprecated)", "Accessibility", "Keybinds 2", "Cloud Sync", "Developer Tools", 
+            "Network Config", "Misc Options", "V-Sync Settings", "Colorblind Mode", "Experimental Features", "Do Not Click",
+            "FOV Slider", "Motion Blur", "Film Grain", "Chromatic Aberration", "Head Bob", "Streamer Mode", "Haptic Feedback", 
+            "Deadzone Tuning", "Invert X-Axis", "Invert Y-Axis", "Aim Assist", "Subtitle Background", "Text Size", "UI Scale", 
+            "Menu Animations", "Telemetry Data", "Analytics Opt-Out", "Hardware Acceleration", "Raytracing (Beta)", 
+            "DLSS Setting", "FSR Setting", "Texture Quality", "Shadow Resolution", "Anti-Aliasing", "Particle Effects", 
+            "Volumetric Lighting", "Water Physics", "Destruction Mesh", "Master Volume", "Dialogue Volume", "SFX Volume", 
+            "Music Volume", "UI Audio", "Audio Ducking", "Spatial Audio", "Binaural Mix", "Mic Input", "Push to Talk", 
+            "Crossplay Toggle", "Server Browser", "Ping Limits", "Matchmaking Region", "Nat Type Config", "Port Forwarding", 
+            "Legacy Controls", "Quick Save Setup", "Auto-Save Interval", "Cloud Save Sync", "Import Local Save", 
+            "Export Local Save", "Delete Save Data", "View Credits", "EULA Agreement", "Privacy Policy", "Mod Configuration", 
+            "Workshop Integration", "API Token", "Debug Overlay", "Framerate Cap", "Refresh Rate", "Window Mode", 
+            "HDR Calibration", "Brightness", "Gamma Adjustment", "Contrast", "Saturation Filter", "Daltonization", 
+            "Protanopia Settings", "Deuteranopia Settings", "Tritanopia Settings", "Screen Shake", "Flashbang Brightness", 
+            "Tinnitus Simulation", "Arachnophobia Mode", "Gore Toggle", "Profanity Filter", "Chat Visibility", "Block List", 
+            "Report Player", "Replay Viewer", "Ghost Data", "Leaderboards", "Weekly Challenges", "Daily Rewards", 
+            "Lootbox Odds", "Microtransaction Store", "Language Selection", "Hardware Benchmark"
         ];
 
-        // --- DETERMINISTIC RANDOM NUMBER GENERATOR ---
-        // This ensures the same level always yields the exact same "random" numbers
         function getDeterministicRandom(seed) {
             let x = Math.sin(seed) * 10000;
             return x - Math.floor(x);
         }
 
-        // --- THEME GENERATOR ALGORITHM ---
+        // Generates the 16 character hash based strictly on the level seed
+        function generateLevelHash(level) {
+            let seed = level * 9999;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let hash = '';
+            for (let i = 0; i < 16; i++) {
+                seed++;
+                let rand = getDeterministicRandom(seed);
+                hash += chars.charAt(Math.floor(rand * chars.length));
+            }
+            return hash;
+        }
+
         function getThemeForLevel(level) {
-            // First 5 levels are your hand-crafted favorites
             if (level <= baseThemes.length) {
                 return baseThemes[level - 1];
             }
-
-            // Level 6+ triggers procedural generation
             let seed = level * 1337; 
             let rand = () => { seed++; return getDeterministicRandom(seed); };
 
-            // 1. Color Palette Generation (Ensuring Contrast)
             let isDark = rand() > 0.5;
             let hue = Math.floor(rand() * 360);
-            
-            // Background is either very dark (< 15% lightness) or very bright (> 85%)
             let bgLightness = isDark ? 5 + Math.floor(rand() * 10) : 85 + Math.floor(rand() * 10);
-            // Text is the exact opposite lightness
             let textLightness = isDark ? 85 + Math.floor(rand() * 10) : 5 + Math.floor(rand() * 10);
             let saturation = 10 + Math.floor(rand() * 40);
-
-            // Accent color is mathematically offset to pop (Triadic/Complementary)
             let accentHue = (hue + 120 + Math.floor(rand() * 120)) % 360;
 
-            // 2. Shape & Feel Generation
             let radiusInt = Math.floor(rand() * 40); 
-            // 30% chance of hard-angles, otherwise curved
             let radius = rand() > 0.3 ? `${radiusInt}px` : '0px'; 
-            
-            let bWidth = Math.floor(rand() * 5) + 1 + 'px'; // 1px to 5px
-            let shadow = Math.floor(rand() * 20) + 'px'; // 0px to 20px
-            
+            let bWidth = Math.floor(rand() * 5) + 1 + 'px'; 
+            let shadow = Math.floor(rand() * 20) + 'px'; 
             let font = fontPool[Math.floor(rand() * fontPool.length)];
 
             return {
@@ -251,7 +268,36 @@
 
                     let loadBtn = document.createElement('button');
                     loadBtn.innerText = "Load Game";
-                    loadBtn.onclick = () => { loadBtn.innerText = "ERROR: Corrupted"; loadBtn.style.color = "var(--accent-color)"; };
+                    
+                    // LEVEL 10+ MECHANIC: The Load Button becomes active
+                    if (currentLevel >= 10) {
+                        let loadScreenId = 'screen-load-secret';
+                        loadBtn.onclick = () => nav(loadScreenId);
+                        
+                        // Generate the secret Load Screen payload
+                        let secretScreen = document.createElement('div');
+                        secretScreen.className = 'screen';
+                        secretScreen.id = loadScreenId;
+                        
+                        let secTitle = document.createElement('h2');
+                        secTitle.innerText = "LOCAL CACHE RECOVERED";
+                        secretScreen.appendChild(secTitle);
+                        
+                        let secHash = document.createElement('div');
+                        secHash.className = 'hash-string';
+                        secHash.innerText = generateLevelHash(currentLevel);
+                        secretScreen.appendChild(secHash);
+                        
+                        let secBack = document.createElement('button');
+                        secBack.innerText = "< Return";
+                        secBack.onclick = () => nav('screen-main');
+                        secretScreen.appendChild(secBack);
+                        
+                        container.appendChild(secretScreen);
+                    } else {
+                        // Pre-Level 10 behavior
+                        loadBtn.onclick = () => { loadBtn.innerText = "ERROR: Corrupted"; loadBtn.style.color = "var(--accent-color)"; };
+                    }
                     screenDiv.appendChild(loadBtn);
 
                     idCounter++;
@@ -276,7 +322,11 @@
                     for(let i=0; i < numChildren; i++) {
                         idCounter++;
                         let childId = 'menu_' + idCounter;
-                        let childTitle = menuJargon[Math.floor(Math.random() * menuJargon.length)];
+                        
+                        // Grab a deterministic pseudo-random name from our 100 item pool based on depth/id
+                        let randSeed = (currentLevel * 1000) + idCounter;
+                        let poolIndex = Math.floor(getDeterministicRandom(randSeed) * menuJargon.length);
+                        let childTitle = menuJargon[poolIndex];
                         
                         let btn = document.createElement('button');
                         btn.innerText = childTitle;
@@ -316,10 +366,8 @@
             currentLevel++;
             document.getElementById('level-indicator').innerText = `Layer: ${currentLevel}`;
             
-            // Get the theme for this level
             const newTheme = getThemeForLevel(currentLevel);
             
-            // Inject the new design specs into CSS Variables
             document.documentElement.style.setProperty('--bg-color', newTheme.bg);
             document.documentElement.style.setProperty('--text-color', newTheme.text);
             document.documentElement.style.setProperty('--accent-color', newTheme.accent);
