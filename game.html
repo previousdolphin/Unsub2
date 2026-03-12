@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNSUBSCRIBE THE GAME</title>
     <style>
-        /* CSS Variables make reskinning on each loop trivial */
         :root {
             --bg-color: #1a1a1a;
             --text-color: #f0f0f0;
@@ -24,28 +23,36 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
-            transition: all 0.5s ease;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        #level-indicator {
+        #ui-layer {
             position: absolute;
             top: 20px;
             left: 20px;
-            opacity: 0.5;
+            opacity: 0.7;
+            font-weight: bold;
         }
 
-        /* The Game Container */
         .screen {
-            display: none; /* Hidden by default */
+            display: none; 
             text-align: center;
             border: 2px solid var(--text-color);
             padding: 40px;
-            width: 400px;
+            width: 450px;
+            min-height: 300px;
             box-shadow: 10px 10px 0px var(--accent-color);
+            position: relative; /* So the egg can be absolute inside it */
         }
 
         .screen.active {
-            display: block; /* Only show active screen */
+            display: block; 
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         button {
@@ -53,7 +60,7 @@
             color: var(--text-color);
             border: 1px solid var(--text-color);
             padding: 10px 20px;
-            margin: 10px;
+            margin: 8px;
             cursor: pointer;
             font-family: inherit;
             font-size: 16px;
@@ -64,112 +71,177 @@
         button:hover {
             background: var(--text-color);
             color: var(--bg-color);
+            border-color: var(--bg-color);
         }
 
-        /* The Hidden Egg */
         .egg {
             cursor: pointer;
-            opacity: 0.05; /* Almost invisible */
+            opacity: 0.05; 
             position: absolute;
-            bottom: 30px;
-            right: 30px;
             font-size: 24px;
             user-select: none;
+            transition: opacity 0.2s;
+            z-index: 10;
         }
         
         .egg:hover {
             opacity: 1;
         }
-
-        .error-text {
-            color: var(--accent-color);
-            font-size: 12px;
-            height: 15px;
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
 
-    <div id="level-indicator">Layer: 1</div>
-
-    <!-- SCREEN 1: MAIN MENU -->
-    <div id="screen-main" class="screen active">
-        <h1>UNSUBSCRIBE</h1>
-        <p>The Game</p>
-        <div class="error-text" id="main-error"></div>
-        <button onclick="tryStart()">Play "Indie Game Shell"</button>
-        <button onclick="nav('screen-load')">Load Game</button>
-        <button onclick="nav('screen-settings')">Settings</button>
+    <div id="ui-layer">
+        <div id="level-indicator">Layer: 1</div>
+        <div id="depth-indicator">Max Menu Depth: 1</div>
     </div>
 
-    <!-- SCREEN 2: LOAD GAME -->
-    <div id="screen-load" class="screen">
-        <h2>Select Save Data</h2>
-        <div class="error-text" id="load-error"></div>
-        <button onclick="showLoadError()">Slot 1 (Corrupted)</button>
-        <button onclick="showLoadError()">Slot 2 (Empty)</button>
-        <button onclick="nav('screen-main')">Back</button>
-    </div>
+    <!-- Container for the procedurally generated menus -->
+    <div id="game-container"></div>
 
-    <!-- SCREEN 3: SETTINGS (Where the egg lives) -->
-    <div id="screen-settings" class="screen">
-        <h2>Preferences</h2>
-        <button>Graphics</button>
-        <button>Audio</button>
-        <button onclick="nav('screen-main')">Back</button>
-        <!-- The hidden egg to progress -->
-        <div class="egg" onclick="findEgg()">🥚</div>
-    </div>
-
-    <!-- SCREEN 4: THE TRUE GOAL -->
+    <!-- THE TRUE GOAL (Static Screen) -->
     <div id="screen-unsubscribe" class="screen">
         <h2>Egg Found.</h2>
-        <p>To access the game, you must unsubscribe from reality.</p>
-        <button onclick="loopGame()">CONFIRM UNSUBSCRIBE</button>
+        <p>System integrity compromised. Ready to descend.</p>
+        <button onclick="loopGame()">UNSUBSCRIBE & DESCEND</button>
     </div>
 
     <script>
         let currentLevel = 1;
+        const maxClicks = 5; // Capped at 5 clicks deep
 
-        // The skins that apply each time you loop
         const themes = [
-            { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace' }, // Base
-            { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif' },             // Light Mode
-            { bg: '#000000', text: '#2ed573', accent: '#ffa502', font: '"Lucida Console", Monaco, monospace' }, // Terminal
-            { bg: '#5f27cd', text: '#ff9ff3', accent: '#01a3a4', font: '"Comic Sans MS", cursive, sans-serif' } // Chaos
+            { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace' }, 
+            { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif' },             
+            { bg: '#052000', text: '#2ed573', accent: '#ffa502', font: '"Lucida Console", Monaco, monospace' }, 
+            { bg: '#2c2c54', text: '#ffb142', accent: '#ff5252', font: 'Tahoma, sans-serif' },
+            { bg: '#300000', text: '#ff9ff3', accent: '#00d8d6', font: '"Comic Sans MS", cursive, sans-serif' } 
         ];
 
-        // Navigation Router
+        const menuJargon = [
+            "Advanced Audio", "Graphics (Deprecated)", "Accessibility", "Keybinds 2", 
+            "Cloud Sync", "Developer Tools", "Network Config", "Misc Options", 
+            "V-Sync Settings", "Colorblind Mode", "Experimental Features", "Do Not Click"
+        ];
+
+        // Core Router
         function nav(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            
-            // Clear errors on navigation
-            document.getElementById('main-error').innerText = "";
-            document.getElementById('load-error').innerText = "";
+            const target = document.getElementById(screenId);
+            if(target) target.classList.add('active');
         }
 
-        // Fake out the player trying to just click start
-        function tryStart() {
-            document.getElementById('main-error').innerText = "ERROR: No Save Data. Go to Load.";
+        function generateLevel() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = ""; // Clear old menus
+
+            // Determine difficulty: Depth scales with level, caps at maxClicks (5)
+            const targetDepth = Math.min(currentLevel, maxClicks);
+            document.getElementById('depth-indicator').innerText = `Max Menu Depth: ${targetDepth}`;
+
+            let idCounter = 0;
+            let queue = [{ id: 'main', depth: 0, title: 'UNSUBSCRIBE', subtitle: 'The Game' }];
+            let leafNodes = []; // Track nodes at targetDepth to place the egg
+
+            // Breadth-First Generation of the Menu Tree
+            while(queue.length > 0) {
+                let current = queue.shift();
+                
+                // Create the DOM element for this menu
+                let screenDiv = document.createElement('div');
+                screenDiv.className = 'screen';
+                screenDiv.id = 'screen-' + current.id;
+                if(current.id === 'main') screenDiv.classList.add('active');
+                
+                let title = document.createElement('h2');
+                title.innerText = current.title;
+                screenDiv.appendChild(title);
+
+                if(current.subtitle) {
+                    let sub = document.createElement('p');
+                    sub.innerText = current.subtitle;
+                    screenDiv.appendChild(sub);
+                }
+
+                // Determine how many sub-menus this screen has
+                let numChildren = 0;
+                if (current.depth < targetDepth) {
+                    // Main menu always has 3 options. Sub-menus have 1-3 random options to prevent exponential explosion.
+                    numChildren = current.id === 'main' ? 3 : Math.floor(Math.random() * 3) + 1;
+                } else if (current.depth === targetDepth) {
+                    // We've reached the bottom of this branch
+                    leafNodes.push(screenDiv); 
+                }
+
+                let childrenIds = [];
+                for(let i=0; i < numChildren; i++) {
+                    idCounter++;
+                    let childId = 'menu_' + idCounter;
+                    childrenIds.push(childId);
+                    
+                    let childTitle = "";
+                    if (current.id === 'main') {
+                        if (i === 0) childTitle = "Play 'Indie Game Shell'";
+                        if (i === 1) childTitle = "Load Game";
+                        if (i === 2) childTitle = "Settings";
+                    } else {
+                        // Grab a random indie dev menu name
+                        childTitle = menuJargon[Math.floor(Math.random() * menuJargon.length)];
+                    }
+                    
+                    queue.push({ id: childId, depth: current.depth + 1, title: childTitle, parentId: current.id });
+                }
+
+                // Render the buttons
+                childrenIds.forEach((cId, index) => {
+                    let btn = document.createElement('button');
+                    let childNode = queue.find(q => q.id === cId);
+                    btn.innerText = childNode.title;
+                    
+                    if (current.id === 'main' && index === 0) {
+                         btn.onclick = () => { btn.innerText = "ERROR: File Missing"; btn.style.color = "var(--accent-color)"; };
+                    } else if (current.id === 'main' && index === 1) {
+                         btn.onclick = () => { btn.innerText = "ERROR: Corrupted"; btn.style.color = "var(--accent-color)"; };
+                    } else {
+                         btn.onclick = () => nav('screen-' + cId);
+                    }
+                    screenDiv.appendChild(btn);
+                });
+
+                // Add a Back Button if it's not the main menu
+                if (current.parentId) {
+                    let backBtn = document.createElement('button');
+                    backBtn.innerText = "< Back";
+                    backBtn.onclick = () => nav('screen-' + current.parentId);
+                    screenDiv.appendChild(backBtn);
+                }
+
+                container.appendChild(screenDiv);
+            }
+
+            // --- HIDE THE EGG ---
+            // Pick a random leaf node (a menu at the maximum depth generated)
+            if (leafNodes.length > 0) {
+                let targetScreen = leafNodes[Math.floor(Math.random() * leafNodes.length)];
+                
+                let egg = document.createElement('div');
+                egg.className = 'egg';
+                egg.innerText = '🥚';
+                egg.onclick = () => nav('screen-unsubscribe');
+                
+                // Randomize position within the screen
+                egg.style.bottom = Math.floor(Math.random() * 70) + 10 + "%";
+                egg.style.right = Math.floor(Math.random() * 70) + 10 + "%";
+                
+                targetScreen.appendChild(egg);
+            }
         }
 
-        function showLoadError() {
-            document.getElementById('load-error').innerText = "ERROR: Slot unavailable. Check Settings.";
-        }
-
-        // The player finds the egg
-        function findEgg() {
-            nav('screen-unsubscribe');
-        }
-
-        // Hatching into the next layer
         function loopGame() {
             currentLevel++;
             document.getElementById('level-indicator').innerText = `Layer: ${currentLevel}`;
             
-            // Apply new skin based on the current level (looping through themes array)
+            // Reskin the shell
             const themeIndex = (currentLevel - 1) % themes.length;
             const newTheme = themes[themeIndex];
             
@@ -178,14 +250,13 @@
             document.documentElement.style.setProperty('--accent-color', newTheme.accent);
             document.documentElement.style.setProperty('--font-family', newTheme.font);
 
-            // Move the egg somewhere random on the settings page to make the next loop harder
-            const egg = document.querySelector('.egg');
-            egg.style.bottom = Math.floor(Math.random() * 80) + 10 + "%";
-            egg.style.right = Math.floor(Math.random() * 80) + 10 + "%";
-
-            // Boot back to main menu
+            // Re-roll the entire menu tree for the new level
+            generateLevel();
             nav('screen-main');
         }
+
+        // Boot the game
+        generateLevel();
     </script>
 </body>
 </html>
