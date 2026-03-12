@@ -6,10 +6,14 @@
     <title>UNSUBSCRIBE THE GAME: ROGUELIKE EDITION</title>
     <style>
         :root {
+            /* Base Theme Variables */
             --bg-color: #1a1a1a;
             --text-color: #f0f0f0;
             --accent-color: #ff4757;
             --font-family: 'Courier New', Courier, monospace;
+            --border-radius: 0px;
+            --border-width: 2px;
+            --shadow-offset: 10px;
         }
 
         body {
@@ -23,7 +27,7 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
-            transition: background-color 0.5s ease, color 0.5s ease;
+            transition: all 0.5s ease;
         }
 
         #ui-layer {
@@ -37,12 +41,15 @@
         .screen {
             display: none; 
             text-align: center;
-            border: 2px solid var(--text-color);
+            border: var(--border-width) solid var(--text-color);
+            border-radius: var(--border-radius);
             padding: 40px;
             width: 450px;
             min-height: 300px;
-            box-shadow: 10px 10px 0px var(--accent-color);
-            position: relative; /* So the egg can be absolute inside it */
+            box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--accent-color);
+            position: relative; 
+            background-color: var(--bg-color);
+            transition: all 0.3s ease;
         }
 
         .screen.active {
@@ -58,7 +65,8 @@
         button {
             background: transparent;
             color: var(--text-color);
-            border: 1px solid var(--text-color);
+            border: var(--border-width) solid var(--text-color);
+            border-radius: var(--border-radius);
             padding: 10px 20px;
             margin: 8px;
             cursor: pointer;
@@ -72,6 +80,7 @@
             background: var(--text-color);
             color: var(--bg-color);
             border-color: var(--bg-color);
+            box-shadow: inset 0 0 0 50px var(--text-color); /* Fill effect */
         }
 
         .egg {
@@ -82,7 +91,6 @@
             user-select: none;
             transition: opacity 0.2s;
             z-index: 10;
-            /* FIX: Add a shadow to the emoji character so it’s visible on white backgrounds */
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
@@ -108,14 +116,24 @@
 
     <script>
         let currentLevel = 1;
-        const maxClicks = 5; // Capped at 5 clicks deep
+        const maxClicks = 5; 
 
-        const themes = [
-            { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace' }, 
-            { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif' }, // The problematic white background             
-            { bg: '#052000', text: '#2ed573', accent: '#ffa502', font: '"Lucida Console", Monaco, monospace' }, 
-            { bg: '#2c2c54', text: '#ffb142', accent: '#ff5252', font: 'Tahoma, sans-serif' },
-            { bg: '#300000', text: '#ff9ff3', accent: '#00d8d6', font: '"Comic Sans MS", cursive, sans-serif' } 
+        // The starting handcrafted themes you liked
+        const baseThemes = [
+            { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace', radius: '0px', bWidth: '2px', shadow: '10px' }, 
+            { bg: '#f0f0f0', text: '#1a1a1a', accent: '#3742fa', font: 'Arial, sans-serif', radius: '8px', bWidth: '1px', shadow: '5px' },             
+            { bg: '#052000', text: '#2ed573', accent: '#ffa502', font: '"Lucida Console", Monaco, monospace', radius: '0px', bWidth: '3px', shadow: '0px' }, 
+            { bg: '#2c2c54', text: '#ffb142', accent: '#ff5252', font: 'Tahoma, sans-serif', radius: '15px', bWidth: '4px', shadow: '8px' },
+            { bg: '#300000', text: '#ff9ff3', accent: '#00d8d6', font: '"Comic Sans MS", cursive, sans-serif', radius: '30px', bWidth: '5px', shadow: '15px' } 
+        ];
+
+        // A pool of web-safe fonts for the generator
+        const fontPool = [
+            'Georgia, serif', '"Palatino Linotype", Book Antiqua, Palatino, serif', '"Times New Roman", Times, serif',
+            'Arial, Helvetica, sans-serif', '"Arial Black", Gadget, sans-serif', '"Comic Sans MS", cursive, sans-serif',
+            'Impact, Charcoal, sans-serif', '"Lucida Sans Unicode", "Lucida Grande", sans-serif', 'Tahoma, Geneva, sans-serif',
+            '"Trebuchet MS", Helvetica, sans-serif', 'Verdana, Geneva, sans-serif', '"Courier New", Courier, monospace',
+            '"Lucida Console", Monaco, monospace', 'Papyrus, fantasy', 'Brush Script MT, cursive'
         ];
 
         const menuJargon = [
@@ -123,6 +141,58 @@
             "Cloud Sync", "Developer Tools", "Network Config", "Misc Options", 
             "V-Sync Settings", "Colorblind Mode", "Experimental Features", "Do Not Click"
         ];
+
+        // --- DETERMINISTIC RANDOM NUMBER GENERATOR ---
+        // This ensures the same level always yields the exact same "random" numbers
+        function getDeterministicRandom(seed) {
+            let x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // --- THEME GENERATOR ALGORITHM ---
+        function getThemeForLevel(level) {
+            // First 5 levels are your hand-crafted favorites
+            if (level <= baseThemes.length) {
+                return baseThemes[level - 1];
+            }
+
+            // Level 6+ triggers procedural generation
+            let seed = level * 1337; 
+            let rand = () => { seed++; return getDeterministicRandom(seed); };
+
+            // 1. Color Palette Generation (Ensuring Contrast)
+            let isDark = rand() > 0.5;
+            let hue = Math.floor(rand() * 360);
+            
+            // Background is either very dark (< 15% lightness) or very bright (> 85%)
+            let bgLightness = isDark ? 5 + Math.floor(rand() * 10) : 85 + Math.floor(rand() * 10);
+            // Text is the exact opposite lightness
+            let textLightness = isDark ? 85 + Math.floor(rand() * 10) : 5 + Math.floor(rand() * 10);
+            let saturation = 10 + Math.floor(rand() * 40);
+
+            // Accent color is mathematically offset to pop (Triadic/Complementary)
+            let accentHue = (hue + 120 + Math.floor(rand() * 120)) % 360;
+
+            // 2. Shape & Feel Generation
+            let radiusInt = Math.floor(rand() * 40); 
+            // 30% chance of hard-angles, otherwise curved
+            let radius = rand() > 0.3 ? `${radiusInt}px` : '0px'; 
+            
+            let bWidth = Math.floor(rand() * 5) + 1 + 'px'; // 1px to 5px
+            let shadow = Math.floor(rand() * 20) + 'px'; // 0px to 20px
+            
+            let font = fontPool[Math.floor(rand() * fontPool.length)];
+
+            return {
+                bg: `hsl(${hue}, ${saturation}%, ${bgLightness}%)`,
+                text: `hsl(${hue}, ${saturation}%, ${textLightness}%)`,
+                accent: `hsl(${accentHue}, 80%, 60%)`,
+                font: font,
+                radius: radius,
+                bWidth: bWidth,
+                shadow: shadow
+            };
+        }
 
         function nav(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -177,7 +247,6 @@
                     settingsBtn.onclick = () => nav('screen-' + childId);
                     screenDiv.appendChild(settingsBtn);
 
-                    // Only branch off Settings
                     if (current.depth < targetDepth) {
                         queue.push({ id: childId, depth: current.depth + 1, title: 'Settings', parentId: current.id });
                     }
@@ -233,13 +302,17 @@
             currentLevel++;
             document.getElementById('level-indicator').innerText = `Layer: ${currentLevel}`;
             
-            const themeIndex = (currentLevel - 1) % themes.length;
-            const newTheme = themes[themeIndex];
+            // Get the theme for this level
+            const newTheme = getThemeForLevel(currentLevel);
             
+            // Inject the new design specs into CSS Variables
             document.documentElement.style.setProperty('--bg-color', newTheme.bg);
             document.documentElement.style.setProperty('--text-color', newTheme.text);
             document.documentElement.style.setProperty('--accent-color', newTheme.accent);
             document.documentElement.style.setProperty('--font-family', newTheme.font);
+            document.documentElement.style.setProperty('--border-radius', newTheme.radius);
+            document.documentElement.style.setProperty('--border-width', newTheme.bWidth);
+            document.documentElement.style.setProperty('--shadow-offset', newTheme.shadow);
 
             generateLevel();
             nav('screen-main');
