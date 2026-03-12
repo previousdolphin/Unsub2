@@ -106,9 +106,8 @@
         <button onclick="loopGame()">UNSUBSCRIBE & DESCEND</button>
     </div>
 
-    <script>
-        let currentLevel = 1;
-        const maxClicks = 5; // Capped at 5 clicks deep
+    <script>        let currentLevel = 1;
+        const maxClicks = 5; 
 
         const themes = [
             { bg: '#1a1a1a', text: '#f0f0f0', accent: '#ff4757', font: '"Courier New", Courier, monospace' }, 
@@ -124,7 +123,6 @@
             "V-Sync Settings", "Colorblind Mode", "Experimental Features", "Do Not Click"
         ];
 
-        // Core Router
         function nav(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             const target = document.getElementById(screenId);
@@ -133,21 +131,18 @@
 
         function generateLevel() {
             const container = document.getElementById('game-container');
-            container.innerHTML = ""; // Clear old menus
+            container.innerHTML = ""; 
 
-            // Determine difficulty: Depth scales with level, caps at maxClicks (5)
             const targetDepth = Math.min(currentLevel, maxClicks);
             document.getElementById('depth-indicator').innerText = `Max Menu Depth: ${targetDepth}`;
 
             let idCounter = 0;
             let queue = [{ id: 'main', depth: 0, title: 'UNSUBSCRIBE', subtitle: 'The Game' }];
-            let leafNodes = []; // Track nodes at targetDepth to place the egg
+            let leafNodes = []; 
 
-            // Breadth-First Generation of the Menu Tree
             while(queue.length > 0) {
                 let current = queue.shift();
                 
-                // Create the DOM element for this menu
                 let screenDiv = document.createElement('div');
                 screenDiv.className = 'screen';
                 screenDiv.id = 'screen-' + current.id;
@@ -163,52 +158,53 @@
                     screenDiv.appendChild(sub);
                 }
 
-                // Determine how many sub-menus this screen has
-                let numChildren = 0;
-                if (current.depth < targetDepth) {
-                    // Main menu always has 3 options. Sub-menus have 1-3 random options to prevent exponential explosion.
-                    numChildren = current.id === 'main' ? 3 : Math.floor(Math.random() * 3) + 1;
-                } else if (current.depth === targetDepth) {
-                    // We've reached the bottom of this branch
-                    leafNodes.push(screenDiv); 
-                }
+                // FIX: Explicitly handle the Main Menu so it doesn't generate unreachable rooms
+                if (current.id === 'main') {
+                    let playBtn = document.createElement('button');
+                    playBtn.innerText = "Play 'Indie Game Shell'";
+                    playBtn.onclick = () => { playBtn.innerText = "ERROR: File Missing"; playBtn.style.color = "var(--accent-color)"; };
+                    screenDiv.appendChild(playBtn);
 
-                let childrenIds = [];
-                for(let i=0; i < numChildren; i++) {
+                    let loadBtn = document.createElement('button');
+                    loadBtn.innerText = "Load Game";
+                    loadBtn.onclick = () => { loadBtn.innerText = "ERROR: Corrupted"; loadBtn.style.color = "var(--accent-color)"; };
+                    screenDiv.appendChild(loadBtn);
+
                     idCounter++;
                     let childId = 'menu_' + idCounter;
-                    childrenIds.push(childId);
-                    
-                    let childTitle = "";
-                    if (current.id === 'main') {
-                        if (i === 0) childTitle = "Play 'Indie Game Shell'";
-                        if (i === 1) childTitle = "Load Game";
-                        if (i === 2) childTitle = "Settings";
-                    } else {
-                        // Grab a random indie dev menu name
-                        childTitle = menuJargon[Math.floor(Math.random() * menuJargon.length)];
+                    let settingsBtn = document.createElement('button');
+                    settingsBtn.innerText = "Settings";
+                    settingsBtn.onclick = () => nav('screen-' + childId);
+                    screenDiv.appendChild(settingsBtn);
+
+                    // Only branch off Settings
+                    if (current.depth < targetDepth) {
+                        queue.push({ id: childId, depth: current.depth + 1, title: 'Settings', parentId: current.id });
                     }
-                    
-                    queue.push({ id: childId, depth: current.depth + 1, title: childTitle, parentId: current.id });
+                } 
+                // All other sub-menus branch normally
+                else {
+                    let numChildren = 0;
+                    if (current.depth < targetDepth) {
+                        numChildren = Math.floor(Math.random() * 3) + 1; 
+                    } else if (current.depth === targetDepth) {
+                        leafNodes.push(screenDiv); 
+                    }
+
+                    for(let i=0; i < numChildren; i++) {
+                        idCounter++;
+                        let childId = 'menu_' + idCounter;
+                        let childTitle = menuJargon[Math.floor(Math.random() * menuJargon.length)];
+                        
+                        let btn = document.createElement('button');
+                        btn.innerText = childTitle;
+                        btn.onclick = () => nav('screen-' + childId);
+                        screenDiv.appendChild(btn);
+                        
+                        queue.push({ id: childId, depth: current.depth + 1, title: childTitle, parentId: current.id });
+                    }
                 }
 
-                // Render the buttons
-                childrenIds.forEach((cId, index) => {
-                    let btn = document.createElement('button');
-                    let childNode = queue.find(q => q.id === cId);
-                    btn.innerText = childNode.title;
-                    
-                    if (current.id === 'main' && index === 0) {
-                         btn.onclick = () => { btn.innerText = "ERROR: File Missing"; btn.style.color = "var(--accent-color)"; };
-                    } else if (current.id === 'main' && index === 1) {
-                         btn.onclick = () => { btn.innerText = "ERROR: Corrupted"; btn.style.color = "var(--accent-color)"; };
-                    } else {
-                         btn.onclick = () => nav('screen-' + cId);
-                    }
-                    screenDiv.appendChild(btn);
-                });
-
-                // Add a Back Button if it's not the main menu
                 if (current.parentId) {
                     let backBtn = document.createElement('button');
                     backBtn.innerText = "< Back";
@@ -219,8 +215,6 @@
                 container.appendChild(screenDiv);
             }
 
-            // --- HIDE THE EGG ---
-            // Pick a random leaf node (a menu at the maximum depth generated)
             if (leafNodes.length > 0) {
                 let targetScreen = leafNodes[Math.floor(Math.random() * leafNodes.length)];
                 
@@ -229,7 +223,6 @@
                 egg.innerText = '🥚';
                 egg.onclick = () => nav('screen-unsubscribe');
                 
-                // Randomize position within the screen
                 egg.style.bottom = Math.floor(Math.random() * 70) + 10 + "%";
                 egg.style.right = Math.floor(Math.random() * 70) + 10 + "%";
                 
@@ -241,7 +234,6 @@
             currentLevel++;
             document.getElementById('level-indicator').innerText = `Layer: ${currentLevel}`;
             
-            // Reskin the shell
             const themeIndex = (currentLevel - 1) % themes.length;
             const newTheme = themes[themeIndex];
             
@@ -250,13 +242,12 @@
             document.documentElement.style.setProperty('--accent-color', newTheme.accent);
             document.documentElement.style.setProperty('--font-family', newTheme.font);
 
-            // Re-roll the entire menu tree for the new level
             generateLevel();
             nav('screen-main');
         }
 
-        // Boot the game
         generateLevel();
+
     </script>
 </body>
 </html>
