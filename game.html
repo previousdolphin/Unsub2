@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNSUBSCRIBE THE GAME: ROGUELIKE EDITION</title>
+    <title>UNSUBSCRIBE THE GAME</title>
     <style>
-        /* FIX: Ensures padding and borders are included in width calculations */
         * {
             box-sizing: border-box;
         }
@@ -28,19 +27,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh; /* FIX: Allows scrolling if height exceeds viewport */
+            min-height: 100vh; 
             margin: 0;
-            overflow-x: hidden; /* Prevents horizontal scrolling */
+            overflow-x: hidden; 
             transition: all 0.5s ease;
-        }
-
-        #ui-layer {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            opacity: 0.7;
-            font-weight: bold;
-            z-index: 100;
         }
 
         .screen {
@@ -49,7 +39,6 @@
             border: var(--border-width) solid var(--text-color);
             border-radius: var(--border-radius);
             padding: 30px;
-            /* FIX: Responsive sizing so it scales down on mobile */
             width: 90%; 
             max-width: 450px;
             min-height: 300px;
@@ -80,7 +69,7 @@
             cursor: pointer;
             font-family: inherit;
             font-size: 16px;
-            width: 100%; /* Spans full container width nicely */
+            width: 100%; 
             transition: all 0.2s;
             word-wrap: break-word;
         }
@@ -109,9 +98,8 @@
             transform: scale(1.15);
         }
 
-        /* Styling for the hashed string */
         .hash-string {
-            font-family: 'Courier New', monospace; /* Always monospaced for the hash */
+            font-family: 'Courier New', monospace; 
             font-size: 1.2rem;
             letter-spacing: 2px;
             word-break: break-all;
@@ -123,11 +111,6 @@
     </style>
 </head>
 <body>
-
-    <div id="ui-layer">
-        <div id="level-indicator">Layer: 1</div>
-        <div id="depth-indicator">Max Menu Depth: 1</div>
-    </div>
 
     <div id="game-container"></div>
 
@@ -155,7 +138,6 @@
             '"Trebuchet MS", sans-serif', 'Verdana, sans-serif', '"Courier New", monospace', '"Lucida Console", monospace'
         ];
 
-        // 100 Unique Menu Jargon Options
         const menuJargon = [
             "Advanced Audio", "Graphics (Deprecated)", "Accessibility", "Keybinds 2", "Cloud Sync", "Developer Tools", 
             "Network Config", "Misc Options", "V-Sync Settings", "Colorblind Mode", "Experimental Features", "Do Not Click",
@@ -176,12 +158,28 @@
             "Lootbox Odds", "Microtransaction Store", "Language Selection", "Hardware Benchmark"
         ];
 
+        // --- ROMAN NUMERAL CONVERTER ---
+        function toRoman(num) {
+            let result = '';
+            const roman = [
+                {v: 1000, s: 'M'}, {v: 900, s: 'CM'}, {v: 500, s: 'D'}, {v: 400, s: 'CD'},
+                {v: 100, s: 'C'}, {v: 90, s: 'XC'}, {v: 50, s: 'L'}, {v: 40, s: 'XL'},
+                {v: 10, s: 'X'}, {v: 9, s: 'IX'}, {v: 5, s: 'V'}, {v: 4, s: 'IV'}, {v: 1, s: 'I'}
+            ];
+            for (let i = 0; i < roman.length; i++) {
+                while (num >= roman[i].v) {
+                    result += roman[i].s;
+                    num -= roman[i].v;
+                }
+            }
+            return result;
+        }
+
         function getDeterministicRandom(seed) {
             let x = Math.sin(seed) * 10000;
             return x - Math.floor(x);
         }
 
-        // Generates the 16 character hash based strictly on the level seed
         function generateLevelHash(level) {
             let seed = level * 9999;
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -236,10 +234,12 @@
             container.innerHTML = ""; 
 
             const targetDepth = Math.min(currentLevel, maxClicks);
-            document.getElementById('depth-indicator').innerText = `Max Menu Depth: ${targetDepth}`;
+
+            // Construct the title using the Roman Numeral function
+            let mainTitle = currentLevel === 1 ? "UNSUBSCRIBE" : "UNSUBSCRIBE " + toRoman(currentLevel);
 
             let idCounter = 0;
-            let queue = [{ id: 'main', depth: 0, title: 'UNSUBSCRIBE', subtitle: 'The Game' }];
+            let queue = [{ id: 'main', depth: 0, title: mainTitle, subtitle: 'The Game' }];
             let leafNodes = []; 
 
             while(queue.length > 0) {
@@ -269,12 +269,10 @@
                     let loadBtn = document.createElement('button');
                     loadBtn.innerText = "Load Game";
                     
-                    // LEVEL 10+ MECHANIC: The Load Button becomes active
                     if (currentLevel >= 10) {
                         let loadScreenId = 'screen-load-secret';
                         loadBtn.onclick = () => nav(loadScreenId);
                         
-                        // Generate the secret Load Screen payload
                         let secretScreen = document.createElement('div');
                         secretScreen.className = 'screen';
                         secretScreen.id = loadScreenId;
@@ -295,7 +293,6 @@
                         
                         container.appendChild(secretScreen);
                     } else {
-                        // Pre-Level 10 behavior
                         loadBtn.onclick = () => { loadBtn.innerText = "ERROR: Corrupted"; loadBtn.style.color = "var(--accent-color)"; };
                     }
                     screenDiv.appendChild(loadBtn);
@@ -323,7 +320,6 @@
                         idCounter++;
                         let childId = 'menu_' + idCounter;
                         
-                        // Grab a deterministic pseudo-random name from our 100 item pool based on depth/id
                         let randSeed = (currentLevel * 1000) + idCounter;
                         let poolIndex = Math.floor(getDeterministicRandom(randSeed) * menuJargon.length);
                         let childTitle = menuJargon[poolIndex];
@@ -364,7 +360,6 @@
 
         function loopGame() {
             currentLevel++;
-            document.getElementById('level-indicator').innerText = `Layer: ${currentLevel}`;
             
             const newTheme = getThemeForLevel(currentLevel);
             
