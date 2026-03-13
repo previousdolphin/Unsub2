@@ -74,11 +74,15 @@
             word-wrap: break-word;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background: var(--text-color);
             color: var(--bg-color);
             border-color: var(--bg-color);
             box-shadow: inset 0 0 0 50px var(--text-color);
+        }
+
+        button:disabled {
+            cursor: wait;
         }
 
         .egg {
@@ -104,9 +108,16 @@
             letter-spacing: 2px;
             word-break: break-all;
             color: var(--accent-color);
-            margin: 20px 0;
+            margin: 10px 0 20px 0;
             padding: 15px;
             border: 1px dashed var(--text-color);
+        }
+        
+        .hash-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 20px;
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -138,27 +149,39 @@
             '"Trebuchet MS", sans-serif', 'Verdana, sans-serif', '"Courier New", monospace', '"Lucida Console", monospace'
         ];
 
-        const menuJargon = [
-            "Advanced Audio", "Graphics (Deprecated)", "Accessibility", "Keybinds 2", "Cloud Sync", "Developer Tools", 
-            "Network Config", "Misc Options", "V-Sync Settings", "Colorblind Mode", "Experimental Features", "Do Not Click",
-            "FOV Slider", "Motion Blur", "Film Grain", "Chromatic Aberration", "Head Bob", "Streamer Mode", "Haptic Feedback", 
-            "Deadzone Tuning", "Invert X-Axis", "Invert Y-Axis", "Aim Assist", "Subtitle Background", "Text Size", "UI Scale", 
-            "Menu Animations", "Telemetry Data", "Analytics Opt-Out", "Hardware Acceleration", "Raytracing (Beta)", 
-            "DLSS Setting", "FSR Setting", "Texture Quality", "Shadow Resolution", "Anti-Aliasing", "Particle Effects", 
-            "Volumetric Lighting", "Water Physics", "Destruction Mesh", "Master Volume", "Dialogue Volume", "SFX Volume", 
-            "Music Volume", "UI Audio", "Audio Ducking", "Spatial Audio", "Binaural Mix", "Mic Input", "Push to Talk", 
-            "Crossplay Toggle", "Server Browser", "Ping Limits", "Matchmaking Region", "Nat Type Config", "Port Forwarding", 
-            "Legacy Controls", "Quick Save Setup", "Auto-Save Interval", "Cloud Save Sync", "Import Local Save", 
-            "Export Local Save", "Delete Save Data", "View Credits", "EULA Agreement", "Privacy Policy", "Mod Configuration", 
-            "Workshop Integration", "API Token", "Debug Overlay", "Framerate Cap", "Refresh Rate", "Window Mode", 
-            "HDR Calibration", "Brightness", "Gamma Adjustment", "Contrast", "Saturation Filter", "Daltonization", 
-            "Protanopia Settings", "Deuteranopia Settings", "Tritanopia Settings", "Screen Shake", "Flashbang Brightness", 
-            "Tinnitus Simulation", "Arachnophobia Mode", "Gore Toggle", "Profanity Filter", "Chat Visibility", "Block List", 
-            "Report Player", "Replay Viewer", "Ghost Data", "Leaderboards", "Weekly Challenges", "Daily Rewards", 
-            "Lootbox Odds", "Microtransaction Store", "Language Selection", "Hardware Benchmark"
+        // --- SEMANTIC MENU HIERARCHY ---
+        // Level 1: Categories
+        const categories = ["Audio", "Video", "Gameplay", "Controls", "Accessibility", "UI/HUD", "Network"];
+        
+        // Level 2: Subcategories (Contextual)
+        const subCategories = {
+            "Audio": ["Master Mix", "Output Device", "Spatial Audio", "Voice Chat", "Volume Levels"],
+            "Video": ["Display Mode", "Graphics Quality", "Post-Processing", "Advanced Rendering", "Refresh Rates"],
+            "Gameplay": ["Difficulty Tuning", "Camera Setup", "Game Rules", "Progression Sync"],
+            "Controls": ["Keybinds", "Mouse/Keyboard", "Controller Config", "Deadzone Tuning", "Haptic Setup"],
+            "Accessibility": ["Visual Aids", "Audio Aids", "Motor Aids", "Colorblind Filters", "Subtitle Config"],
+            "UI/HUD": ["Crosshair Config", "Mini-map Scale", "Telemetry Overlay", "Menu Animations"],
+            "Network": ["Matchmaking Region", "Server Browser", "Ping Limits", "Port Forwarding"]
+        };
+
+        // Level 3+: Specific Leaf Options
+        const leafOptions = {
+            "Audio": ["Master Volume", "SFX Volume", "Music Volume", "Dialogue Volume", "Audio Ducking", "Binaural Mix", "Mic Input", "Push to Talk"],
+            "Video": ["Resolution", "V-Sync", "DLSS Setting", "FSR Setting", "Raytracing (Beta)", "Texture Quality", "Shadow Resolution", "Anti-Aliasing", "Particle Effects", "Volumetric Lighting", "FOV Slider", "Motion Blur", "Film Grain", "Chromatic Aberration", "HDR Calibration", "Gamma Adjustment"],
+            "Gameplay": ["Aim Assist", "Auto-Save Interval", "Gore Toggle", "Profanity Filter", "Streamer Mode", "Head Bob"],
+            "Controls": ["Invert X-Axis", "Invert Y-Axis", "Sensitivity", "Legacy Controls", "Hardware Acceleration"],
+            "Accessibility": ["Daltonization", "Protanopia Filters", "Deuteranopia Filters", "Tritanopia Filters", "Tinnitus Simulation", "Arachnophobia Mode", "Screen Shake", "Flashbang Brightness"],
+            "UI/HUD": ["Text Size", "UI Scale", "Chat Visibility", "Damage Numbers", "Subtitle Background"],
+            "Network": ["Crossplay Toggle", "Nat Type Config", "Block List", "Report Player", "Cloud Save Sync"]
+        };
+
+        // Generic Abstract Options (Can appear anywhere deep)
+        const genericOptions = [
+            "Advanced Configuration", "Debug Overlay", "Experimental Features", "Restore Defaults", 
+            "Sync to Cloud", "Telemetry Data", "Analytics Opt-Out", "Hardware Benchmark", 
+            "API Token", "Misc Options", "Do Not Click"
         ];
 
-        // --- ROMAN NUMERAL CONVERTER ---
         function toRoman(num) {
             let result = '';
             const roman = [
@@ -234,14 +257,52 @@
             container.innerHTML = ""; 
 
             const targetDepth = Math.min(currentLevel, maxClicks);
-
-            // Construct the title using the Roman Numeral function
             let mainTitle = currentLevel === 1 ? "UNSUBSCRIBE" : "UNSUBSCRIBE " + toRoman(currentLevel);
 
             let idCounter = 0;
-            let queue = [{ id: 'main', depth: 0, title: mainTitle, subtitle: 'The Game' }];
+            // semType tracks the semantic path of the menu branch
+            let queue = [{ id: 'main', depth: 0, title: mainTitle, subtitle: 'The Game', semType: 'main' }];
             let leafNodes = []; 
 
+            // --- BUILD STATIC LOAD SCREEN ---
+            let loadScreen = document.createElement('div');
+            loadScreen.className = 'screen';
+            loadScreen.id = 'screen-load';
+            
+            let loadTitle = document.createElement('h2');
+            loadTitle.innerText = "Select Save Data";
+            loadScreen.appendChild(loadTitle);
+
+            for(let i=1; i<=3; i++) {
+                let slotBtn = document.createElement('button');
+                slotBtn.innerText = `Save Slot ${i} - [Empty]`;
+                slotBtn.onclick = () => {
+                    slotBtn.innerText = `ERROR: Slot ${i} Corrupted`;
+                    slotBtn.style.color = "var(--accent-color)";
+                };
+                loadScreen.appendChild(slotBtn);
+            }
+
+            if (currentLevel >= 10) {
+                let secLabel = document.createElement('p');
+                secLabel.className = 'hash-label';
+                secLabel.innerText = "LOCAL CACHE RECOVERED:";
+                loadScreen.appendChild(secLabel);
+                
+                let secHash = document.createElement('div');
+                secHash.className = 'hash-string';
+                secHash.innerText = generateLevelHash(currentLevel);
+                loadScreen.appendChild(secHash);
+            }
+
+            let loadBack = document.createElement('button');
+            loadBack.innerText = "< Return";
+            loadBack.onclick = () => nav('screen-main');
+            loadScreen.appendChild(loadBack);
+            container.appendChild(loadScreen);
+
+
+            // --- BUILD DYNAMIC MENU TREE ---
             while(queue.length > 0) {
                 let current = queue.shift();
                 
@@ -261,42 +322,36 @@
                 }
 
                 if (current.id === 'main') {
+                    // 1. Play Button Logic (Interactive Loading)
                     let playBtn = document.createElement('button');
                     playBtn.innerText = "Play 'Indie Game Shell'";
-                    playBtn.onclick = () => { playBtn.innerText = "ERROR: File Missing"; playBtn.style.color = "var(--accent-color)"; };
+                    playBtn.onclick = () => {
+                        if (playBtn.disabled) return;
+                        playBtn.innerText = "Loading...";
+                        playBtn.disabled = true;
+                        playBtn.style.opacity = "0.7";
+                        
+                        setTimeout(() => {
+                            playBtn.innerText = "ERROR: File Missing";
+                            playBtn.style.color = "var(--accent-color)";
+                            playBtn.style.opacity = "1";
+                            
+                            setTimeout(() => {
+                                playBtn.innerText = "Play 'Indie Game Shell'";
+                                playBtn.style.color = "var(--text-color)";
+                                playBtn.disabled = false;
+                            }, 1500); 
+                        }, 800);
+                    };
                     screenDiv.appendChild(playBtn);
 
-                    let loadBtn = document.createElement('button');
-                    loadBtn.innerText = "Load Game";
-                    
-                    if (currentLevel >= 10) {
-                        let loadScreenId = 'screen-load-secret';
-                        loadBtn.onclick = () => nav(loadScreenId);
-                        
-                        let secretScreen = document.createElement('div');
-                        secretScreen.className = 'screen';
-                        secretScreen.id = loadScreenId;
-                        
-                        let secTitle = document.createElement('h2');
-                        secTitle.innerText = "LOCAL CACHE RECOVERED";
-                        secretScreen.appendChild(secTitle);
-                        
-                        let secHash = document.createElement('div');
-                        secHash.className = 'hash-string';
-                        secHash.innerText = generateLevelHash(currentLevel);
-                        secretScreen.appendChild(secHash);
-                        
-                        let secBack = document.createElement('button');
-                        secBack.innerText = "< Return";
-                        secBack.onclick = () => nav('screen-main');
-                        secretScreen.appendChild(secBack);
-                        
-                        container.appendChild(secretScreen);
-                    } else {
-                        loadBtn.onclick = () => { loadBtn.innerText = "ERROR: Corrupted"; loadBtn.style.color = "var(--accent-color)"; };
-                    }
-                    screenDiv.appendChild(loadBtn);
+                    // 2. Load Button
+                    let mainLoadBtn = document.createElement('button');
+                    mainLoadBtn.innerText = "Load Game";
+                    mainLoadBtn.onclick = () => nav('screen-load');
+                    screenDiv.appendChild(mainLoadBtn);
 
+                    // 3. Settings Button & Root Branching
                     idCounter++;
                     let childId = 'menu_' + idCounter;
                     let settingsBtn = document.createElement('button');
@@ -305,13 +360,16 @@
                     screenDiv.appendChild(settingsBtn);
 
                     if (current.depth < targetDepth) {
-                        queue.push({ id: childId, depth: current.depth + 1, title: 'Settings', parentId: current.id });
+                        queue.push({ id: childId, depth: current.depth + 1, title: 'Settings', parentId: current.id, semType: 'settings_root' });
+                    } else if (current.depth === targetDepth) {
+                        // Edge case if depth is 0 (won't happen with min level 1, but safe)
+                        leafNodes.push(screenDiv); 
                     }
                 } 
                 else {
                     let numChildren = 0;
                     if (current.depth < targetDepth) {
-                        numChildren = Math.floor(Math.random() * 3) + 1; 
+                        numChildren = Math.floor(getDeterministicRandom(currentLevel * 1000 + idCounter) * 3) + 1; 
                     } else if (current.depth === targetDepth) {
                         leafNodes.push(screenDiv); 
                     }
@@ -319,21 +377,45 @@
                     for(let i=0; i < numChildren; i++) {
                         idCounter++;
                         let childId = 'menu_' + idCounter;
+                        let childTitle = "";
+                        let childSemType = current.semType;
                         
-                        let randSeed = (currentLevel * 1000) + idCounter;
-                        let poolIndex = Math.floor(getDeterministicRandom(randSeed) * menuJargon.length);
-                        let childTitle = menuJargon[poolIndex];
-                        
+                        let randSeed = (currentLevel * 10000) + idCounter + i;
+                        let randVal = getDeterministicRandom(randSeed);
+
+                        // Semantic Routing Logic
+                        if (current.semType === 'settings_root') {
+                            // First layer under settings: pick a Category
+                            childSemType = categories[Math.floor(randVal * categories.length)];
+                            childTitle = childSemType;
+                        } 
+                        else if (categories.includes(current.semType)) {
+                            // Deeper layers: branch out based on parent Category
+                            if (current.depth === 2) {
+                                // Depth 2 usually maps to subcategories
+                                let subPool = subCategories[current.semType];
+                                childTitle = subPool[Math.floor(randVal * subPool.length)];
+                            } else {
+                                // Depth 3+ maps to specific settings or generic abstract garbage
+                                if (randVal > 0.8) {
+                                    childTitle = genericOptions[Math.floor(randVal * genericOptions.length)];
+                                } else {
+                                    let leafPool = leafOptions[current.semType];
+                                    childTitle = leafPool[Math.floor(randVal * leafPool.length)];
+                                }
+                            }
+                        }
+
                         let btn = document.createElement('button');
                         btn.innerText = childTitle;
                         btn.onclick = () => nav('screen-' + childId);
                         screenDiv.appendChild(btn);
                         
-                        queue.push({ id: childId, depth: current.depth + 1, title: childTitle, parentId: current.id });
+                        queue.push({ id: childId, depth: current.depth + 1, title: childTitle, parentId: current.id, semType: childSemType });
                     }
                 }
 
-                if (current.parentId) {
+                if (current.parentId && current.id !== 'screen-load') {
                     let backBtn = document.createElement('button');
                     backBtn.innerText = "< Back";
                     backBtn.onclick = () => nav('screen-' + current.parentId);
@@ -343,6 +425,7 @@
                 container.appendChild(screenDiv);
             }
 
+            // --- HIDE THE EGG ---
             if (leafNodes.length > 0) {
                 let targetScreen = leafNodes[Math.floor(Math.random() * leafNodes.length)];
                 
