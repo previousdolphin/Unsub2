@@ -40,9 +40,9 @@
             <a href="#reviews" class="hover:text-[#4A5D44] transition-colors">Reviews</a>
             <a href="https://www.markjosefsberg.com" target="_blank" class="hover:text-[#4A5D44] transition-colors">Website</a>
         </div>
-        <button class="bg-[#4A5D44] text-white px-6 py-2.5 rounded-full font-body text-sm font-medium hover:bg-[#3a4935] transition-all shadow-sm hover:shadow-md">
+        <a href="#purchase" class="bg-[#4A5D44] text-white px-6 py-2.5 rounded-full font-body text-sm font-medium hover:bg-[#3a4935] transition-all shadow-sm hover:shadow-md inline-block">
             Get the Book
-        </button>
+        </a>
     </nav>
 
     <!-- DESKTOP SPLIT LAYOUT WRAPPER -->
@@ -106,9 +106,9 @@
                     Decades of bad posture left me with debilitating nerve pain. After trying every doctor and therapist, the Alexander Technique finally healed me. Now, I've distilled 25 years of teaching into 29 lighthearted, practical lessons.
                 </p>
                 <div class="flex flex-col sm:flex-row items-center gap-4">
-                    <button class="bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-medium hover:bg-[#1a2836] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 w-full sm:w-auto justify-center">
-                        Start Healing <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
+                    <a href="#purchase" class="bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-medium hover:bg-[#1a2836] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 w-full sm:w-auto justify-center">
+                        Get the Book <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                    </a>
                     <a href="#story" class="bg-white text-[#2C4258] border border-[#D9EBF2] px-8 py-4 rounded-full font-body font-medium hover:bg-[#F9F8F3] transition-all shadow-sm w-full sm:w-auto text-center block">
                         Read My Story
                     </a>
@@ -356,23 +356,39 @@
             </div>
         </section>
 
-        <!-- Footer CTA -->
-        <footer class="bg-gradient-to-b from-[#F9F8F3] to-[#D9EBF2] py-24 px-6 text-center relative overflow-hidden">
-            <div class="max-w-3xl mx-auto relative z-10">
-                <h2 class="font-playful text-4xl md:text-5xl text-[#2C4258] mb-6">Ready to lighten UP?</h2>
+        <!-- Footer CTA & Purchase Options -->
+        <footer id="purchase" class="bg-gradient-to-b from-[#F9F8F3] to-[#D9EBF2] py-24 px-6 text-center relative overflow-hidden">
+            <div class="max-w-4xl mx-auto relative z-10">
+                <h2 class="font-playful text-4xl md:text-5xl text-[#2C4258] mb-4">Ready to lighten UP?</h2>
                 <p class="font-body text-slate-600 font-light mb-10 text-lg max-w-xl mx-auto">
-                    Get the book, lose the tension, and discover a simpler way to move, sit, and live.
+                    Get the book, lose the tension, and discover a simpler way to move, sit, and live. Choose your preferred retailer below:
                 </p>
-                <button class="bg-[#4A5D44] text-white px-12 py-5 rounded-full font-body font-bold text-lg hover:bg-[#3a4935] transition-all shadow-xl transform hover:-translate-y-1">
-                    I WANT A COPY!
-                </button>
+                
+                <div class="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 mt-8">
+                    <!-- Amazon -->
+                    <a href="https://www.amazon.com/Lighten-UP-Playful-Alexander-Technique/dp/B0CJ6CZD5F" target="_blank" class="w-full sm:w-auto bg-[#4A5D44] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#3a4935] transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
+                        <span>Amazon</span>
+                        <span class="text-xs font-normal opacity-80 mt-1">Print & eBook</span>
+                    </a>
+                    
+                    <!-- BookBaby -->
+                    <a href="https://store.bookbaby.com/book/lighten-up?srsltid=AfmBOoqAekZWk_WAkEPYazuA_ar0AKnjFdOz8Q129K7UmLBd2DxFoJnG" target="_blank" class="w-full sm:w-auto bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#1a2836] transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
+                        <span>BookBaby</span>
+                        <span class="text-xs font-normal opacity-80 mt-1">Print & eBook</span>
+                    </a>
+                    
+                    <!-- Barnes & Noble -->
+                    <a href="https://www.barnesandnoble.com/w/lighten-up-mark-josefsberg/1144068268" target="_blank" class="w-full sm:w-auto bg-[#6B8068] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#576854] transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
+                        <span>Barnes & Noble</span>
+                        <span class="text-xs font-normal opacity-80 mt-1">eBook Only</span>
+                    </a>
+                </div>
                 
                 <div class="mt-20 pt-8 border-t border-slate-300 flex flex-col md:flex-row justify-between items-center text-slate-500 font-body text-sm">
                     <p>© 2026 Mark Josefsberg. All rights reserved.</p>
                     <div class="flex gap-6 mt-4 md:mt-0 font-medium">
                         <a href="https://www.markjosefsberg.com" target="_blank" class="hover:text-[#2C4258] transition-colors">Website</a>
-                        <a href="#" class="hover:text-[#2C4258] transition-colors">Instagram</a>
-                        <a href="#" class="hover:text-[#2C4258] transition-colors">Contact</a>
+                        <a href="mailto:Mark@MarkJosefsberg.com" class="hover:text-[#2C4258] transition-colors">Contact</a>
                     </div>
                 </div>
             </div>
