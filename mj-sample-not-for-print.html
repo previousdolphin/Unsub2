@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lighten Up - Mark Josefsberg</title>
+    <title>Lighten UP - Mark Josefsberg</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,12 +32,13 @@
     <nav class="fixed top-0 w-full px-6 py-6 md:px-12 flex justify-between items-center z-50 bg-white/80 backdrop-blur-md border-b border-[#D9EBF2]/50 transition-all">
         <div class="text-[#2C4258] font-playful font-semibold text-2xl tracking-wide flex items-center gap-2">
             <i data-lucide="feather" class="w-6 h-6 text-[#4A5D44]"></i>
-            Lighten Up
+            Lighten UP
         </div>
         <div class="hidden md:flex gap-8 text-[#2C4258] font-body text-sm font-medium">
             <a href="#story" class="hover:text-[#4A5D44] transition-colors">My Story</a>
             <a href="#approach" class="hover:text-[#4A5D44] transition-colors">The Book</a>
             <a href="#reviews" class="hover:text-[#4A5D44] transition-colors">Reviews</a>
+            <a href="https://www.markjosefsberg.com" target="_blank" class="hover:text-[#4A5D44] transition-colors">Website</a>
         </div>
         <button class="bg-[#4A5D44] text-white px-6 py-2.5 rounded-full font-body text-sm font-medium hover:bg-[#3a4935] transition-all shadow-sm hover:shadow-md">
             Get the Book
@@ -56,15 +57,28 @@
                 
                 <!-- Mobile 3D Book -->
                 <div id="mobile-book" class="relative w-[260px] sm:w-[320px] h-[390px] sm:h-[480px] mx-auto cursor-pointer group perspective-[1500px]">
-                    <div class="book-inner w-full h-full relative preserve-3d transition-transform duration-400" style="transform: rotateX(5deg) rotateY(-15deg);">
+                    <div class="absolute z-20 bottom-4 right-4 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-[#2C4258] shadow flex items-center gap-1 pointer-events-none">
+                        <i data-lucide="rotate-cw" class="w-3 h-3"></i> Click to flip
+                    </div>
+                    <div class="book-inner w-full h-full relative preserve-3d transition-transform duration-500" style="transform: rotateX(5deg) rotateY(-15deg);">
+                        <!-- Front Cover -->
                         <div class="absolute inset-0 rounded-r-lg overflow-hidden bg-white shadow-[inset_4px_0_10px_rgba(0,0,0,0.1)] backface-hidden" style="transform: translateZ(25px)">
-                            <img src="https://www.markjosefsberg.com/wp-content/uploads/2024/01/Cover2-1-600x953.png" alt="Lighten Up Book Cover" class="w-full h-full object-cover" />
+                            <img src="https://www.markjosefsberg.com/wp-content/uploads/2024/01/Cover2-1-600x953.png" alt="Lighten UP Book Cover" class="w-full h-full object-cover" />
                             <div class="book-glare absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 mix-blend-overlay transition-transform duration-200"></div>
                         </div>
-                        <div class="absolute inset-0 rounded-l-lg bg-[#2C4258]" style="transform: translateZ(-25px) rotateY(180deg)"></div>
+                        <!-- Back Cover -->
+                        <div class="absolute inset-0 rounded-l-lg overflow-hidden bg-white shadow-[inset_-4px_0_10px_rgba(0,0,0,0.1)] backface-hidden" style="transform: translateZ(-25px) rotateY(180deg)">
+                            <img src="IMG_4724.jpeg" alt="Lighten UP Back Cover" class="w-full h-full object-cover" />
+                            <div class="book-glare absolute inset-0 bg-gradient-to-tl from-white/0 via-white/10 to-white/0 mix-blend-overlay transition-transform duration-200"></div>
+                        </div>
+                        <!-- Spine -->
                         <div class="absolute top-0 left-0 w-[50px] h-full bg-[#cce3ee] shadow-[inset_-2px_0_10px_rgba(0,0,0,0.15)] rounded-l-sm" style="transform-origin: left; transform: rotateY(-90deg)">
                             <div class="absolute inset-0 bg-gradient-to-r from-black/5 to-transparent"></div>
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90 text-[#2C4258] font-playful tracking-widest text-xl opacity-60 whitespace-nowrap">
+                                LIGHTEN UP
+                            </div>
                         </div>
+                        <!-- Pages -->
                         <div class="absolute top-[3px] right-0 w-[50px] h-[calc(100%-6px)] bg-[#f4f4f0]" style="transform-origin: right; transform: rotateY(90deg)">
                              <div class="w-full h-full bg-[repeating-linear-gradient(to_bottom,transparent,transparent_2px,#e5e5e0_2px,#e5e5e0_4px)] opacity-80"></div>
                         </div>
@@ -86,10 +100,10 @@
                 </p>
                 <h1 class="font-playful text-5xl md:text-6xl lg:text-7xl text-[#2C4258] leading-tight mb-8">
                     Get rid of your pain. <br />
-                    <span class="text-[#4A5D44]">Lighten up.</span>
+                    <span class="text-[#4A5D44]">Lighten UP.</span>
                 </h1>
                 <p class="font-body text-lg md:text-xl text-slate-600 mb-10 max-w-lg font-light leading-relaxed">
-                    Decades of bad posture left me with debilitating nerve pain. After trying every doctor and therapist, the Alexander Technique finally healed me. Now, I've distilled 20 years of teaching into 29 lighthearted, practical lessons.
+                    Decades of bad posture left me with debilitating nerve pain. After trying every doctor and therapist, the Alexander Technique finally healed me. Now, I've distilled 25 years of teaching into 29 lighthearted, practical lessons.
                 </p>
                 <div class="flex flex-col sm:flex-row items-center gap-4">
                     <button class="bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-medium hover:bg-[#1a2836] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 w-full sm:w-auto justify-center">
@@ -108,6 +122,7 @@
                     <div class="flex items-center gap-2"><i data-lucide="building-2" class="w-5 h-5"></i> Columbia Univ.</div>
                     <div class="flex items-center gap-2"><i data-lucide="award" class="w-5 h-5"></i> Hospital for Special Surgery</div>
                     <div class="flex items-center gap-2"><i data-lucide="building-2" class="w-5 h-5"></i> Beth Israel Med Center</div>
+                    <div class="flex items-center gap-2"><i data-lucide="building-2" class="w-5 h-5"></i> New York Presbyterian Hospital</div>
                 </div>
             </section>
 
@@ -116,10 +131,10 @@
                 <h2 class="font-playful text-4xl text-[#2C4258] mb-8">The Alexander Technique, my posture, and my neck pain.</h2>
                 <div class="font-body text-slate-600 font-light text-lg space-y-6 leading-relaxed max-w-2xl">
                     <p>I had bad posture for decades. I slumped over my musical instrument, and then slumped everywhere else.</p>
-                    <p>In the late 1990’s, I began experiencing pain and numbness in my right hand. An MRI showed bone spurs in my neck pinching a nerve. By the time I walked—or rather, slumped—into my first Alexander Technique lesson, the pain was debilitating. My neurosurgeon wanted to give it six more weeks before scheduling the cervical spine operation.</p>
-                    <p>After studying the Alexander Technique for a relatively short time, the pain began to diminish. I was no longer causing it. My body began to heal.</p>
+                    <p>In the late 1990’s, I began experiencing pain and numbness in my right hand, and after several weeks, there was significant pain in my neck. An MRI showed bone spurs in my neck pinching a nerve. By the time I walked—or rather, slumped—into my first Alexander Technique lesson, the neck pain was debilitating. My neurosurgeon wanted to give it six more weeks before scheduling the cervical spine operation.</p>
+                    <p>After studying the Alexander Technique for a relatively short time, my neck and hand pain began to diminish. I was no longer causing it. My body began to heal.</p>
                     <p class="font-medium text-[#2C4258] text-xl mt-8 p-6 bg-[#F9F8F3] rounded-2xl border-l-4 border-[#4A5D44]">
-                        Twenty years after I was certified as an AT teacher, I wrote <em>Lighten UP</em>. It helped me get rid of my neck pain, and this book shows how.
+                        Twenty-five years after I was certified as an AT teacher, I wrote <em>Lighten UP</em>. It helped me get rid of my neck pain, and this book shows how.
                     </p>
                 </div>
             </section>
@@ -151,7 +166,7 @@
                         <div>
                             <h3 class="font-playful text-2xl text-[#2C4258] mb-2">Visual Learning</h3>
                             <p class="font-body text-slate-600 font-light leading-relaxed">
-                                Featuring charming, whimsical illustrations by Ricky Castillo that show you exactly what to do, without overcrowding the page.
+                                Featuring charming, whimsical illustrations by Ricky Castillo that perfectly complement the humor of the lessons. They add a lighthearted touch to the stories and jokes without overcrowding the page.
                             </p>
                         </div>
                     </div>
@@ -179,21 +194,31 @@
                 <div class="absolute bottom-1/4 left-10 w-64 h-64 bg-[#4A5D44]/5 rounded-full filter blur-3xl"></div>
                 
                 <!-- The Desktop Book centered in the viewport -->
-                <div class="w-full h-full flex items-center justify-center">
+                <div class="w-full h-full flex flex-col items-center justify-center relative">
                     
                     <div id="desktop-book" class="relative w-[260px] lg:w-[360px] h-[390px] lg:h-[540px] mx-auto cursor-pointer group" style="perspective: 1500px;">
-                        <div class="book-inner w-full h-full relative preserve-3d transition-transform duration-400">
+                        <div class="absolute z-20 -right-16 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-[#2C4258] shadow flex items-center gap-1 pointer-events-none transition-opacity opacity-0 group-hover:opacity-100">
+                            <i data-lucide="rotate-cw" class="w-3 h-3"></i> Click to flip
+                        </div>
+                        <div class="book-inner w-full h-full relative preserve-3d transition-transform duration-500">
+                            <!-- Front Cover -->
                             <div class="absolute inset-0 rounded-r-lg overflow-hidden bg-white shadow-[inset_4px_0_10px_rgba(0,0,0,0.1)] backface-hidden" style="transform: translateZ(25px)">
-                                <img src="https://www.markjosefsberg.com/wp-content/uploads/2024/01/Cover2-1-600x953.png" alt="Lighten Up Book Cover" class="w-full h-full object-cover" />
+                                <img src="https://www.markjosefsberg.com/wp-content/uploads/2024/01/Cover2-1-600x953.png" alt="Lighten UP Book Cover" class="w-full h-full object-cover" />
                                 <div class="book-glare absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 mix-blend-overlay transition-transform duration-200"></div>
                             </div>
-                            <div class="absolute inset-0 rounded-l-lg bg-[#2C4258]" style="transform: translateZ(-25px) rotateY(180deg)"></div>
+                            <!-- Back Cover -->
+                            <div class="absolute inset-0 rounded-l-lg overflow-hidden bg-white shadow-[inset_-4px_0_10px_rgba(0,0,0,0.1)] backface-hidden" style="transform: translateZ(-25px) rotateY(180deg)">
+                                <img src="IMG_4724.jpeg" alt="Lighten UP Back Cover" class="w-full h-full object-cover" />
+                                <div class="book-glare absolute inset-0 bg-gradient-to-tl from-white/0 via-white/10 to-white/0 mix-blend-overlay transition-transform duration-200"></div>
+                            </div>
+                            <!-- Spine -->
                             <div class="absolute top-0 left-0 w-[50px] h-full bg-[#cce3ee] shadow-[inset_-2px_0_10px_rgba(0,0,0,0.15)] rounded-l-sm" style="transform-origin: left; transform: rotateY(-90deg)">
                                 <div class="absolute inset-0 bg-gradient-to-r from-black/5 to-transparent"></div>
                                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-90 text-[#2C4258] font-playful tracking-widest text-xl opacity-60 whitespace-nowrap">
                                     LIGHTEN UP
                                 </div>
                             </div>
+                            <!-- Pages -->
                             <div class="absolute top-[3px] right-0 w-[50px] h-[calc(100%-6px)] bg-[#f4f4f0]" style="transform-origin: right; transform: rotateY(90deg)">
                                  <div class="w-full h-full bg-[repeating-linear-gradient(to_bottom,transparent,transparent_2px,#e5e5e0_2px,#e5e5e0_4px)] opacity-80"></div>
                             </div>
@@ -249,7 +274,7 @@
                             <i data-lucide="star" class="w-5 h-5 fill-current"></i>
                         </div>
                         <p class="font-body text-slate-300 font-light leading-relaxed mb-6">
-                            "I've taken in-person Alexander lessons before, but *Lighten Up* is the best refresher I've found. It breaks down complex physical habits into 5-minute thoughts you can practice while making coffee. My lower back hasn't felt this good in years."
+                            "I've taken in-person Alexander lessons before, but *Lighten UP* is the best refresher I've found. It breaks down complex physical habits into 5-minute thoughts you can practice while making coffee. My lower back hasn't felt this good in years."
                         </p>
                         <p class="font-playful text-white font-medium">— David R., Musician</p>
                     </div>
@@ -289,7 +314,10 @@
                         </div>
                         <h3 class="font-playful text-2xl text-[#2C4258] mb-1">Mark Josefsberg</h3>
                         <p class="font-script text-xl text-[#4A5D44] mb-2">Author & Instructor</p>
-                        <p class="font-body text-slate-500 text-sm font-medium mb-4">Certified Professional Coach (CPC)</p>
+                        <div class="font-body text-slate-500 text-sm font-medium mb-4 flex flex-col gap-1">
+                            <p>Certified teacher of the Alexander Technique<br>(M.AmSAT)</p>
+                            <p>Certified Professional Coach<br>(CPC)</p>
+                        </div>
                         <div class="font-body text-slate-600 font-light text-sm space-y-3 px-4">
                             <p>Certified by ACAT and AmSAT in 2003, Mark has been teaching full-time ever since. He is a former ACAT faculty member and regularly receives referrals from top medical directors and neurosurgeons in NYC.</p>
                         </div>
@@ -321,7 +349,7 @@
                         <h3 class="font-playful text-2xl text-[#2C4258] mb-1">Ricky Castillo</h3>
                         <p class="font-script text-xl text-[#4A5D44] mb-4">Illustrator</p>
                         <div class="font-body text-slate-600 font-light text-sm space-y-3 px-4 mt-8">
-                            <p>Ricky's playful, minimalist style brings the 29 lessons of <em>Lighten Up</em> to life. His illustrations ensure that complex anatomical concepts translate into visuals that feel approachable and fun.</p>
+                            <p>Ricky's playful, minimalist style brings the 29 lessons of <em>Lighten UP</em> to life. His whimsical artwork perfectly complements the book's stories and jokes, making the reading experience even more approachable and fun.</p>
                         </div>
                     </div>
                 </div>
@@ -331,7 +359,7 @@
         <!-- Footer CTA -->
         <footer class="bg-gradient-to-b from-[#F9F8F3] to-[#D9EBF2] py-24 px-6 text-center relative overflow-hidden">
             <div class="max-w-3xl mx-auto relative z-10">
-                <h2 class="font-playful text-4xl md:text-5xl text-[#2C4258] mb-6">Ready to lighten up?</h2>
+                <h2 class="font-playful text-4xl md:text-5xl text-[#2C4258] mb-6">Ready to lighten UP?</h2>
                 <p class="font-body text-slate-600 font-light mb-10 text-lg max-w-xl mx-auto">
                     Get the book, lose the tension, and discover a simpler way to move, sit, and live.
                 </p>
@@ -342,9 +370,9 @@
                 <div class="mt-20 pt-8 border-t border-slate-300 flex flex-col md:flex-row justify-between items-center text-slate-500 font-body text-sm">
                     <p>© 2026 Mark Josefsberg. All rights reserved.</p>
                     <div class="flex gap-6 mt-4 md:mt-0 font-medium">
+                        <a href="https://www.markjosefsberg.com" target="_blank" class="hover:text-[#2C4258] transition-colors">Website</a>
                         <a href="#" class="hover:text-[#2C4258] transition-colors">Instagram</a>
                         <a href="#" class="hover:text-[#2C4258] transition-colors">Contact</a>
-                        <a href="#" class="hover:text-[#2C4258] transition-colors">Press</a>
                     </div>
                 </div>
             </div>
@@ -369,6 +397,7 @@
             let tiltX = 0;
             let tiltY = 0;
             let isHovering = false;
+            let isFlipped = false; // Tracks if the book is turned around
 
             const updateTransform = () => {
                 // Base rotation driven by scroll (only for desktop)
@@ -377,13 +406,22 @@
                 const floatY = isMobile ? 0 : Math.sin(scrollY * 0.005) * 15;
 
                 const finalX = baseRotateX + tiltX;
-                const finalY = baseRotateY + tiltY;
+                // Add 180 degrees if flipped
+                const finalY = baseRotateY + tiltY + (isFlipped ? 180 : 0);
 
                 inner.style.transform = `translateY(${floatY}px) rotateX(${finalX}deg) rotateY(${finalY}deg)`;
+                
+                // Adjust shadow offset depending on flip state
                 shadow.style.transform = `translateX(${finalY * -1.5}px) scale(${isHovering ? 1.05 : 1})`;
                 shadow.style.opacity = isHovering ? '0.5' : '0.3';
                 if(glare) glare.style.transform = `translateX(${finalY * 2}px) translateY(${finalX * 2}px)`;
             };
+
+            // Toggle flip state on click
+            container.addEventListener('click', () => {
+                isFlipped = !isFlipped;
+                updateTransform();
+            });
 
             // Mouse interactions
             if (!isMobile) {
@@ -410,7 +448,7 @@
                 isHovering = false;
                 tiltX = 0;
                 tiltY = 0;
-                inner.style.transition = 'transform 0.4s ease-out';
+                inner.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
                 updateTransform();
             });
 
