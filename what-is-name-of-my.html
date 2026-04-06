@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What is Name of My _?</title>
+    <title>Fill-in-the-Blank</title>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
-
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            background-color: #050505; /* Deep off-black background */
+            background-color: #050505;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,9 +28,10 @@
             max-width: 100%;
             max-height: 100%;
             background-color: #FFFFFF;
+            /* Allows cursor to be updated dynamically via JS */
+            cursor: default; 
         }
 
-        /* Loading state to prevent flash of unstyled text */
         #loader {
             position: absolute;
             color: #FFF;
@@ -49,13 +52,13 @@
     const ctx = canvas.getContext('2d');
     const loader = document.getElementById('loader');
 
-    // Strict 9:16 aspect ratio grid
     const POSTER_WIDTH = 1080;
     const POSTER_HEIGHT = 1920;
 
-    // Stark Monochrome Palette
     const COLOR_BG = '#FFFFFF';
     const COLOR_FG = '#000000';
+
+    let interactiveAreas = [];
 
     function resizeCanvas() {
         const windowRatio = window.innerWidth / window.innerHeight;
@@ -82,36 +85,32 @@
         drawPoster();
     }
 
-    // A strictly geometric drawing function to ensure perfect centering
     function drawBoxedText(text, x, y, fontSize, align = 'left', invert = false) {
         ctx.font = `900 ${fontSize}px 'Inter', sans-serif`;
         const textWidth = ctx.measureText(text).width;
         
-        // Locked padding ratios based on font size
         const padX = fontSize * 0.3;
         const padY = fontSize * 0.15;
         
         const boxW = textWidth + (padX * 2);
-        const boxH = fontSize * 1.25; // Strict uniform line height
+        const boxH = fontSize * 1.25; 
         
         let boxX = x;
         if (align === 'center') {
-            boxX = (POSTER_WIDTH / 2) - (boxW / 2); // Absolute grid center
+            boxX = (POSTER_WIDTH / 2) - (boxW / 2);
         } else if (align === 'right') {
             boxX = x - boxW;
         }
 
-        // 1. Draw solid block
         ctx.fillStyle = invert ? COLOR_FG : COLOR_BG;
         ctx.fillRect(boxX, y, boxW, boxH);
         
-        // 2. Draw text mathematically locked to the center of the block
         ctx.fillStyle = invert ? COLOR_BG : COLOR_FG;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
         const textX = boxX + (boxW / 2);
-        const textY = y + (boxH / 2) + (fontSize * 0.04); // Optical bump for Inter font cap height
+        const textY = y + (boxH / 2) + (fontSize * 0.04);
         
         ctx.fillText(text, textX, textY);
         
@@ -119,84 +118,64 @@
     }
 
     function drawDynamicBlankLine(x, y, fontSize, maxBoxWidth) {
-        // Measure the question mark box first to know remaining space
         const qMetrics = drawBoxedText("?", 0, -1000, fontSize); 
         const qBoxW = qMetrics.w;
-        const gap = fontSize * 0.15; // Gap between blank and ?
+        const gap = fontSize * 0.15; 
         
         const blankBoxW = maxBoxWidth - qBoxW - gap;
         const boxH = fontSize * 1.25;
         
-        // Draw the blank black box
         ctx.fillStyle = COLOR_FG;
         ctx.fillRect(x, y, blankBoxW, boxH);
         
-        // Draw strict, sharp white underline inside the blank box
         ctx.fillStyle = COLOR_BG;
         const linePadX = fontSize * 0.25;
         const lineHeight = fontSize * 0.08;
         ctx.fillRect(x + linePadX, y + boxH - (fontSize * 0.25), blankBoxW - (linePadX * 2), lineHeight);
         
-        // Draw ? box
         drawBoxedText("?", x + blankBoxW + gap, y, fontSize, 'left', true);
         
         return { bottom: y + boxH };
     }
 
-    function drawMockQR(centerX, topY, size) {
+    function drawRealQR(centerX, topY, size) {
         // Clean white padding background
         ctx.fillStyle = COLOR_BG;
         ctx.fillRect(centerX - size/2 - 10, topY - 10, size + 20, size + 20);
 
-        ctx.fillStyle = COLOR_FG;
-        const squareSize = size / 21;
+        // Generate actual QR Code pointing to the URL
+        const qr = new QRious({
+            value: 'https://nameofmy.com',
+            size: size,
+            background: COLOR_BG,
+            foreground: COLOR_FG,
+            level: 'H' // High error correction for aesthetics and scannability
+        });
 
-        // Draw 3 positional anchors perfectly squared
-        function drawAnchor(x, y) {
-            ctx.fillRect(x, y, squareSize * 7, squareSize * 7);
-            ctx.fillStyle = COLOR_BG;
-            ctx.fillRect(x + squareSize, y + squareSize, squareSize * 5, squareSize * 5);
-            ctx.fillStyle = COLOR_FG;
-            ctx.fillRect(x + squareSize * 2, y + squareSize * 2, squareSize * 3, squareSize * 3);
-        }
+        // Draw the generated QR code onto our main canvas
+        ctx.drawImage(qr.canvas, centerX - size/2, topY, size, size);
 
-        const startX = centerX - size/2;
-        const startY = topY;
-
-        drawAnchor(startX, startY);
-        drawAnchor(startX + size - squareSize * 7, startY);
-        drawAnchor(startX, startY + size - squareSize * 7);
-
-        // Deterministic scatter for the QR data
-        const seed = [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0];
-        let seedIndex = 0;
-
-        for (let row = 0; row < 21; row++) {
-            for (let col = 0; col < 21; col++) {
-                // Avoid overwriting anchors
-                if ((row < 8 && col < 8) || (row < 8 && col > 12) || (row > 12 && col < 8)) continue;
-                
-                seedIndex = (seedIndex + 1) % seed.length;
-                if ((seed[seedIndex] + (row * col) % 5) % 2 === 0) {
-                    ctx.fillRect(startX + col * squareSize, startY + row * squareSize, squareSize, squareSize);
-                }
-            }
-        }
+        // Register interactive area for clicking
+        interactiveAreas.push({
+            x: centerX - size/2,
+            y: topY,
+            w: size,
+            h: size,
+            url: 'https://nameofmy.com'
+        });
     }
 
     function drawPoster() {
-        // Base Canvas
+        interactiveAreas = []; // Reset on redraw
+        
         ctx.fillStyle = COLOR_BG;
         ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
 
         const margin = 80;
         const maxSafeWidth = POSTER_WIDTH - (margin * 2);
         
-        // --- 1. DYNAMIC SCALING FOR MASSIVE TEXT ---
-        // Find the absolute maximum font size that ensures "THE NAME" fits
         let massiveSize = 250; 
         ctx.font = `900 ${massiveSize}px 'Inter', sans-serif`;
-        // include the padding factor used in drawBoxedText (0.3 * 2 = 0.6)
         while (ctx.measureText("THE NAME").width + (massiveSize * 0.6) > maxSafeWidth) {
             massiveSize--;
             ctx.font = `900 ${massiveSize}px 'Inter', sans-serif`;
@@ -205,7 +184,6 @@
         let currentY = 160;
         const massiveGap = 16;
 
-        // Draw Top Blocks
         let bounds;
         bounds = drawBoxedText("WHAT IS", margin, currentY, massiveSize, 'left', true);
         currentY = bounds.bottom + massiveGap;
@@ -216,56 +194,102 @@
         bounds = drawBoxedText("OF MY", margin, currentY, massiveSize, 'left', true);
         currentY = bounds.bottom + massiveGap;
 
-        // Draw exact-fit blank line and question mark
         bounds = drawDynamicBlankLine(margin, currentY, massiveSize, maxSafeWidth);
 
-
-        // --- 2. BOTTOM ALIGNMENT ---
         currentY = 1250;
         const normalSize = 50;
         const normalGap = 12;
 
-        // Centered Highlighted Text
         bounds = drawBoxedText("We have the object.", POSTER_WIDTH / 2, currentY, normalSize, 'center', true);
         currentY = bounds.bottom + normalGap;
 
         bounds = drawBoxedText("You hold the definition.", POSTER_WIDTH / 2, currentY, normalSize, 'center', true);
-        currentY = bounds.bottom + 120; // Big jump before URL
+        currentY = bounds.bottom + 120; 
 
-        // --- 3. URL AND CTA ---
+        // URL and CTA
         const urlSize = 75;
-        // Draw unboxed, clean URL text
         ctx.font = `900 ${urlSize}px 'Inter', sans-serif`;
         ctx.fillStyle = COLOR_FG;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
-        // Emulate letter-spacing for standard modern browsers, fallback gracefully
-        if ('letterSpacing' in ctx) {
-            ctx.letterSpacing = "2px"; 
-        }
-        
+        if ('letterSpacing' in ctx) ctx.letterSpacing = "2px"; 
         ctx.fillText("NAMEOFMY.COM", POSTER_WIDTH / 2, currentY);
-        
-        // Reset letter spacing to avoid affecting other draws if refactored later
-        if ('letterSpacing' in ctx) {
-            ctx.letterSpacing = "0px"; 
-        }
+        if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; 
 
-        // Clean underline locked to text width
         const urlWidth = ctx.measureText("NAMEOFMY.COM").width;
         ctx.fillRect((POSTER_WIDTH / 2) - (urlWidth / 2), currentY + (urlSize * 0.6), urlWidth, urlSize * 0.1);
 
+        // Register interactive area for URL
+        interactiveAreas.push({
+            x: (POSTER_WIDTH / 2) - (urlWidth / 2) - 20,
+            y: currentY - (urlSize / 2) - 20,
+            w: urlWidth + 40,
+            h: urlSize + 40,
+            url: 'https://nameofmy.com'
+        });
+
         currentY += 120;
 
-        // QR Code
-        drawMockQR(POSTER_WIDTH / 2, currentY, 260);
+        // Real QR Code
+        drawRealQR(POSTER_WIDTH / 2, currentY, 260);
     }
 
-    // Wait strictly for the Google Font to load before measuring or drawing
+    // Interactive Logic
+    function getMousePos(evt) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = POSTER_WIDTH / rect.width;
+        const scaleY = POSTER_HEIGHT / rect.height;
+        
+        // Handle both mouse and touch events
+        let clientX = evt.clientX;
+        let clientY = evt.clientY;
+        
+        if (evt.touches && evt.touches.length > 0) {
+            clientX = evt.touches[0].clientX;
+            clientY = evt.touches[0].clientY;
+        }
+
+        return {
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY
+        };
+    }
+
+    function handleInteraction(evt) {
+        const pos = getMousePos(evt);
+        for (let area of interactiveAreas) {
+            if (pos.x >= area.x && pos.x <= area.x + area.w &&
+                pos.y >= area.y && pos.y <= area.y + area.h) {
+                window.open(area.url, '_blank');
+                break;
+            }
+        }
+    }
+
+    canvas.addEventListener('click', handleInteraction);
+    canvas.addEventListener('touchend', (e) => {
+        // Prevent default to stop mouse event firing after touch
+        e.preventDefault();
+        handleInteraction(e.changedTouches[0]);
+    });
+
+    canvas.addEventListener('mousemove', (evt) => {
+        const pos = getMousePos(evt);
+        let hovering = false;
+        for (let area of interactiveAreas) {
+            if (pos.x >= area.x && pos.x <= area.x + area.w &&
+                pos.y >= area.y && pos.y <= area.y + area.h) {
+                hovering = true;
+                break;
+            }
+        }
+        canvas.style.cursor = hovering ? 'pointer' : 'default';
+    });
+
     document.fonts.ready.then(() => {
         loader.style.display = 'none';
-        canvas.style.opacity = 1; // Fade in gracefully
+        canvas.style.opacity = 1; 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
     });
@@ -273,3 +297,4 @@
 
 </body>
 </html>
+
