@@ -28,7 +28,6 @@
             max-width: 100%;
             max-height: 100%;
             background-color: #FFFFFF;
-            /* Allows cursor to be updated dynamically via JS */
             cursor: default; 
         }
 
@@ -139,23 +138,19 @@
     }
 
     function drawRealQR(centerX, topY, size) {
-        // Clean white padding background
         ctx.fillStyle = COLOR_BG;
         ctx.fillRect(centerX - size/2 - 10, topY - 10, size + 20, size + 20);
 
-        // Generate actual QR Code pointing to the URL
         const qr = new QRious({
             value: 'https://nameofmy.com',
             size: size,
             background: COLOR_BG,
             foreground: COLOR_FG,
-            level: 'H' // High error correction for aesthetics and scannability
+            level: 'H' 
         });
 
-        // Draw the generated QR code onto our main canvas
         ctx.drawImage(qr.canvas, centerX - size/2, topY, size, size);
 
-        // Register interactive area for clicking
         interactiveAreas.push({
             x: centerX - size/2,
             y: topY,
@@ -163,10 +158,12 @@
             h: size,
             url: 'https://nameofmy.com'
         });
+        
+        return { bottom: topY + size };
     }
 
     function drawPoster() {
-        interactiveAreas = []; // Reset on redraw
+        interactiveAreas = []; 
         
         ctx.fillStyle = COLOR_BG;
         ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
@@ -196,18 +193,32 @@
 
         bounds = drawDynamicBlankLine(margin, currentY, massiveSize, maxSafeWidth);
 
-        currentY = 1250;
+        // --- Calculate Dynamic Bottom Alignment for perfect breathing room ---
+        const topBlockBottom = bounds.bottom;
+        const bottomMargin = 80;
+        
         const normalSize = 50;
         const normalGap = 12;
+        const urlGap = 120;
+        const urlSize = 75;
+        const qrGap = 100;
+        const qrSize = 300;
+        
+        const textH = normalSize * 1.25; 
+        const bottomClusterHeight = textH + normalGap + textH + urlGap + urlSize + qrGap + qrSize;
+        
+        // Vertically center the bottom content in the remaining space
+        const remainingSpace = POSTER_HEIGHT - topBlockBottom - bottomMargin;
+        currentY = topBlockBottom + (remainingSpace / 2) - (bottomClusterHeight / 2);
 
+        // Render Bottom Cluster
         bounds = drawBoxedText("We have the object.", POSTER_WIDTH / 2, currentY, normalSize, 'center', true);
         currentY = bounds.bottom + normalGap;
 
         bounds = drawBoxedText("You hold the definition.", POSTER_WIDTH / 2, currentY, normalSize, 'center', true);
-        currentY = bounds.bottom + 120; 
+        currentY = bounds.bottom + urlGap; 
 
         // URL and CTA
-        const urlSize = 75;
         ctx.font = `900 ${urlSize}px 'Inter', sans-serif`;
         ctx.fillStyle = COLOR_FG;
         ctx.textAlign = 'center';
@@ -220,7 +231,6 @@
         const urlWidth = ctx.measureText("NAMEOFMY.COM").width;
         ctx.fillRect((POSTER_WIDTH / 2) - (urlWidth / 2), currentY + (urlSize * 0.6), urlWidth, urlSize * 0.1);
 
-        // Register interactive area for URL
         interactiveAreas.push({
             x: (POSTER_WIDTH / 2) - (urlWidth / 2) - 20,
             y: currentY - (urlSize / 2) - 20,
@@ -229,10 +239,10 @@
             url: 'https://nameofmy.com'
         });
 
-        currentY += 120;
+        currentY += qrGap;
 
         // Real QR Code
-        drawRealQR(POSTER_WIDTH / 2, currentY, 300);
+        drawRealQR(POSTER_WIDTH / 2, currentY, qrSize);
     }
 
     // Interactive Logic
@@ -241,7 +251,6 @@
         const scaleX = POSTER_WIDTH / rect.width;
         const scaleY = POSTER_HEIGHT / rect.height;
         
-        // Handle both mouse and touch events
         let clientX = evt.clientX;
         let clientY = evt.clientY;
         
@@ -269,7 +278,6 @@
 
     canvas.addEventListener('click', handleInteraction);
     canvas.addEventListener('touchend', (e) => {
-        // Prevent default to stop mouse event firing after touch
         e.preventDefault();
         handleInteraction(e.changedTouches[0]);
     });
@@ -297,4 +305,3 @@
 
 </body>
 </html>
-
