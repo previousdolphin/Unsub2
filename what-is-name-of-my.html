@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Fill-in-the-Blank Guerrilla Ad</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        canvas {
+            display: block;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="posterCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('posterCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Virtual resolution for the poster (9:16 aspect ratio)
+    const POSTER_WIDTH = 1080;
+    const POSTER_HEIGHT = 1920;
+
+    // Kruger Palette
+    const COLOR_RED = '#E3000F';
+    const COLOR_BLACK = '#000000';
+    const COLOR_WHITE = '#FFFFFF';
+
+    function resizeCanvas() {
+        const windowRatio = window.innerWidth / window.innerHeight;
+        const posterRatio = POSTER_WIDTH / POSTER_HEIGHT;
+
+        let displayWidth, displayHeight;
+
+        if (windowRatio < posterRatio) {
+            // Window is taller than the poster ratio
+            displayWidth = window.innerWidth;
+            displayHeight = window.innerWidth / posterRatio;
+        } else {
+            // Window is wider than the poster ratio
+            displayHeight = window.innerHeight;
+            displayWidth = window.innerHeight * posterRatio;
+        }
+
+        // Handle high DPI displays for crisp text
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = POSTER_WIDTH * dpr;
+        canvas.height = POSTER_HEIGHT * dpr;
+        
+        canvas.style.width = `${displayWidth}px`;
+        canvas.style.height = `${displayHeight}px`;
+
+        ctx.scale(dpr, dpr);
+        drawPoster();
+    }
+
+    function drawKrugerText(text, x, y, fontSize, align = 'left', style = 'italic 900') {
+        ctx.font = `${style} ${fontSize}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+        ctx.textBaseline = 'top';
+
+        const metrics = ctx.measureText(text);
+        const textWidth = metrics.width;
+        // Approximation for height in canvas
+        const textHeight = fontSize; 
+        
+        const paddingX = fontSize * 0.3;
+        const paddingY = fontSize * 0.2;
+
+        let boxX = x;
+        if (align === 'center') {
+            boxX = x - (textWidth / 2) - paddingX;
+        } else if (align === 'right') {
+            boxX = x - textWidth - (paddingX * 2);
+        }
+
+        const boxY = y;
+        const boxWidth = textWidth + (paddingX * 2);
+        const boxHeight = textHeight + (paddingY * 2);
+
+        // Draw Black Box
+        ctx.fillStyle = COLOR_BLACK;
+        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+        // Draw White Text
+        ctx.fillStyle = COLOR_WHITE;
+        let textX = boxX + paddingX;
+        // Nudge text down slightly for visual centering in the box
+        let textY = boxY + paddingY + (fontSize * 0.05); 
+        
+        ctx.fillText(text, textX, textY);
+        
+        // Return bounds for layout stacking
+        return { width: boxWidth, height: boxHeight, y: boxY, bottom: boxY + boxHeight };
+    }
+
+    function drawMockQR(centerX, topY, size) {
+        // Draw white background block for contrast
+        ctx.fillStyle = COLOR_WHITE;
+        ctx.fillRect(centerX - size/2 - 20, topY - 20, size + 40, size + 40);
+
+        ctx.fillStyle = COLOR_BLACK;
+        const squareSize = size / 21; // QR code grid size approximation
+
+        // Helper to draw position anchors
+        function drawAnchor(x, y) {
+            ctx.fillRect(x, y, squareSize * 7, squareSize * 7);
+            ctx.fillStyle = COLOR_WHITE;
+            ctx.fillRect(x + squareSize, y + squareSize, squareSize * 5, squareSize * 5);
+            ctx.fillStyle = COLOR_BLACK;
+            ctx.fillRect(x + squareSize * 2, y + squareSize * 2, squareSize * 3, squareSize * 3);
+        }
+
+        const startX = centerX - size/2;
+        const startY = topY;
+
+        // Draw 3 anchors
+        drawAnchor(startX, startY);
+        drawAnchor(startX + size - squareSize * 7, startY);
+        drawAnchor(startX, startY + size - squareSize * 7);
+
+        // Pseudo-random deterministic blocks
+        const seed = [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0];
+        let seedIndex = 0;
+
+        for (let row = 0; row < 21; row++) {
+            for (let col = 0; col < 21; col++) {
+                // Skip anchor areas
+                if ((row < 8 && col < 8) || (row < 8 && col > 12) || (row > 12 && col < 8)) continue;
+                
+                seedIndex = (seedIndex + 1) % seed.length;
+                // Add some math to scatter the deterministic pattern
+                if ((seed[seedIndex] + (row * col) % 3) % 2 === 0) {
+                    ctx.fillRect(startX + col * squareSize, startY + row * squareSize, squareSize, squareSize);
+                }
+            }
+        }
+    }
+
+    function drawPoster() {
+        // 1. Background
+        ctx.fillStyle = COLOR_RED;
+        ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
+
+        // 2. Top Half (Massive Font)
+        const leftMargin = 80;
+        let currentY = 150;
+        const massiveSize = 160;
+        const gap = 20;
+
+        let bounds;
+        bounds = drawKrugerText("WHAT IS", leftMargin, currentY, massiveSize);
+        currentY = bounds.bottom + gap;
+
+        bounds = drawKrugerText("THE NAME", leftMargin, currentY, massiveSize);
+        currentY = bounds.bottom + gap;
+
+        bounds = drawKrugerText("OF MY", leftMargin, currentY, massiveSize);
+        currentY = bounds.bottom + gap;
+
+        // The "Glitch" blank space
+        bounds = drawKrugerText("_____________ ?", leftMargin, currentY, massiveSize);
+
+
+        // 3. Bottom Half (Normal Font, but still Kruger styled)
+        currentY = 1250;
+        const normalSize = 65;
+        const normalGap = 15;
+
+        bounds = drawKrugerText("We have the object.", POSTER_WIDTH / 2, currentY, normalSize, 'center');
+        currentY = bounds.bottom + normalGap;
+
+        bounds = drawKrugerText("You hold the definition.", POSTER_WIDTH / 2, currentY, normalSize, 'center');
+        currentY = bounds.bottom + normalGap + 80;
+
+
+        // 4. URL
+        const urlSize = 85;
+        bounds = drawKrugerText("NAMEOFMY.COM", POSTER_WIDTH / 2, currentY, urlSize, 'center', '900');
+        currentY = bounds.bottom + 60;
+
+
+        // 5. QR Code Area
+        drawMockQR(POSTER_WIDTH / 2, currentY, 220);
+    }
+
+    // Wait for fonts to load before initial draw, otherwise metrics are off
+    document.fonts.ready.then(() => {
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    });
+</script>
+
+</body>
+</html>
+
