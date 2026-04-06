@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNSUBSCRIBE NAMEOFMY STORE | TERMS & PRIVACY</title>
+    <style>
+        :root {
+            --brand-red: #ff3333;
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --border-color: #000000;
+        }
+        body.dark-mode {
+            --bg-color: #050505;
+            --text-color: #e0e0e0;
+            --border-color: #333333;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.6;
+            padding: 60px 20px;
+            max-width: 750px;
+            margin: 0 auto;
+            text-transform: uppercase;
+        }
+        nav { margin-bottom: 60px; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; }
+        h1 { font-size: 1.5rem; font-weight: bold; color: var(--brand-red); margin-top: 50px; }
+        h2 { font-size: 1rem; margin-top: 30px; border-bottom: 1px solid var(--border-color); display: inline-block; }
+        p { margin: 15px 0; font-size: 0.9rem; }
+        .back-link { text-decoration: none; color: var(--text-color); font-weight: bold; border: 2px solid var(--border-color); padding: 8px 15px; transition: 0.2s; }
+        .back-link:hover { background: var(--text-color); color: var(--bg-color); }
+        hr { border: none; border-top: 2px solid var(--border-color); margin: 60px 0; }
+        footer { margin-top: 80px; font-size: 0.7rem; opacity: 0.4; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="tsoh.html" class="back-link">← BACK TO SHIRTS</a>
+    </nav>
+
+    <h1>Terms of Service</h1>
+
+    <section>
+        <h2>1. Orders & Payments</h2>
+        <p>By placing an order, you represent that all information provided is accurate. All payments are processed via Stripe. We do not store credit card data. Payments are subject to Stripe's terms and conditions.</p>
+
+        <h2>2. Shipping & Delivery</h2>
+        <p>Shipping times are estimates. We are not responsible for delays caused by carriers or international customs. You are responsible for any import duties or local taxes.</p>
+
+        <h2>3. Refunds & Out of Stock</h2>
+        <p>All sales are final. However, if an item is found to be out of stock after an order is placed, a full refund will be issued to the original payment method. If you receive a damaged item, contact us within 48 hours of delivery.</p>
+
+        <h2>4. Governing Law</h2>
+        <p>These terms are governed by the laws of the State of New York. Any disputes shall be settled in the courts of New York City.</p>
+    </section>
+
+    <hr>
+
+    <h1>Privacy Policy</h1>
+
+    <section>
+        <h2>1. Data Collection</h2>
+        <p>We collect your name, email, and shipping address through Stripe to fulfill your order. We may use your email to provide updates regarding your shipment.</p>
+
+        <h2>2. Third Parties</h2>
+        <p>We do not sell or trade your personal information. We share data with Stripe for payment processing and our logistics partners for delivery purposes only.</p>
+
+        <h2>3. Cookies</h2>
+        <p>Stripe may use cookies to ensure the security of the payment session and to prevent fraudulent transactions.</p>
+
+        <h2>4. Data Rights</h2>
+        <p>You may request a copy of the data we hold or request its deletion by contacting our support email.</p>
+    </section>
+
+    <footer>
+        UNSUBSCRIBE LLC / NYC / 2026
+    </footer>
+
+    <script>
+        // Optional: Sync theme with main page if using localStorage
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>
