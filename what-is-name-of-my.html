@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fill-in-the-Blank</title>
+    <title>Fill-in-the-Blank Flyer</title>
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
     <!-- QR Code Generator -->
@@ -39,11 +39,63 @@
             text-transform: uppercase;
             z-index: 10;
         }
+
+        #printBtn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #FFFFFF;
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 20;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        #printBtn:hover {
+            transform: scale(1.05);
+            background: #E0E0E0;
+        }
+
+        /* STRICT PRINTING RULES FOR 8.5x11 */
+        @media print {
+            body, html {
+                background-color: transparent !important;
+                display: block;
+            }
+            
+            #printBtn, #loader {
+                display: none !important;
+            }
+            
+            canvas {
+                box-shadow: none !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                max-width: 100% !important;
+                max-height: 100% !important;
+                object-fit: contain;
+                margin: 0;
+            }
+
+            @page {
+                size: letter portrait;
+                margin: 0; /* Forces the printer to edge-to-edge if supported */
+            }
+        }
     </style>
 </head>
 <body>
 
 <div id="loader">Loading Assets...</div>
+<button id="printBtn" onclick="window.print()">Print Flyer</button>
 <canvas id="posterCanvas" style="opacity: 0; transition: opacity 0.3s ease;"></canvas>
 
 <script>
@@ -51,8 +103,9 @@
     const ctx = canvas.getContext('2d');
     const loader = document.getElementById('loader');
 
-    const POSTER_WIDTH = 1080;
-    const POSTER_HEIGHT = 1920;
+    // Base units exactly matching 8.5 x 11 aspect ratio
+    const POSTER_WIDTH = 850;
+    const POSTER_HEIGHT = 1100;
 
     const COLOR_BG = '#FFFFFF';
     const COLOR_FG = '#000000';
@@ -73,6 +126,7 @@
             displayWidth = window.innerHeight * posterRatio;
         }
 
+        // Keep high DPI scaling for crispness on screen, but it natively scales down nicely for print
         const dpr = window.devicePixelRatio || 1;
         canvas.width = POSTER_WIDTH * dpr;
         canvas.height = POSTER_HEIGHT * dpr;
@@ -168,18 +222,18 @@
         ctx.fillStyle = COLOR_BG;
         ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
 
-        const margin = 80;
+        const margin = 50;
         const maxSafeWidth = POSTER_WIDTH - (margin * 2);
         
-        let massiveSize = 250; 
+        let massiveSize = 300; 
         ctx.font = `900 ${massiveSize}px 'Inter', sans-serif`;
         while (ctx.measureText("THE NAME").width + (massiveSize * 0.6) > maxSafeWidth) {
             massiveSize--;
             ctx.font = `900 ${massiveSize}px 'Inter', sans-serif`;
         }
 
-        let currentY = 160;
-        const massiveGap = 14;
+        let currentY = 70;
+        const massiveGap = 12;
 
         let bounds;
         bounds = drawBoxedText("WHAT IS", margin, currentY, massiveSize, 'left', true);
@@ -195,14 +249,15 @@
 
         // --- Calculate Dynamic Bottom Alignment for perfect breathing room ---
         const topBlockBottom = bounds.bottom;
-        const bottomMargin = 80;
+        const bottomMargin = 70;
         
-        const normalSize = 50;
-        const normalGap = 12;
-        const urlGap = 120;
-        const urlSize = 75;
-        const qrGap = 100;
-        const qrSize = 300;
+        // Tuned layout variables for 8.5x11 scale
+        const normalSize = 40;
+        const normalGap = 10;
+        const urlGap = 60;
+        const urlSize = 65;
+        const qrGap = 60;
+        const qrSize = 250;
         
         const textH = normalSize * 1.25; 
         const bottomClusterHeight = textH + normalGap + textH + urlGap + urlSize + qrGap + qrSize;
