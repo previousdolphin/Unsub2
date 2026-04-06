@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fill-in-the-Blank Flyer</title>
+    <title>What is the Name of My _?</title>
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
     <!-- QR Code Generator -->
@@ -40,54 +40,28 @@
             z-index: 10;
         }
 
-        #printBtn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #FFFFFF;
-            color: #000000;
-            border: none;
-            padding: 10px 20px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 900;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 20;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        #printBtn:hover {
-            transform: scale(1.05);
-            background: #E0E0E0;
-        }
-
-        /* STRICT PRINTING RULES FOR 8.5x11 */
+        /* STRICT PRINTING RULES: Forces 8.5x11 Edge-to-Edge */
         @media print {
-            body, html {
-                background-color: transparent !important;
-                display: block;
+            @page {
+                size: 8.5in 11in;
+                margin: 0 !important;
             }
-            
-            #printBtn, #loader {
+            body, html {
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: #FFFFFF !important;
+            }
+            #loader {
                 display: none !important;
             }
-            
             canvas {
+                width: 8.5in !important;
+                height: 11in !important;
+                max-width: none !important;
+                max-height: none !important;
                 box-shadow: none !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                max-width: 100% !important;
-                max-height: 100% !important;
+                margin: 0 !important;
                 object-fit: contain;
-                margin: 0;
-            }
-
-            @page {
-                size: letter portrait;
-                margin: 0; /* Forces the printer to edge-to-edge if supported */
             }
         }
     </style>
@@ -95,7 +69,6 @@
 <body>
 
 <div id="loader">Loading Assets...</div>
-<button id="printBtn" onclick="window.print()">Print Flyer</button>
 <canvas id="posterCanvas" style="opacity: 0; transition: opacity 0.3s ease;"></canvas>
 
 <script>
@@ -103,9 +76,9 @@
     const ctx = canvas.getContext('2d');
     const loader = document.getElementById('loader');
 
-    // Base units exactly matching 8.5 x 11 aspect ratio
-    const POSTER_WIDTH = 850;
-    const POSTER_HEIGHT = 1100;
+    // High-Resolution Base exactly matching 8.5 x 11 aspect ratio
+    const POSTER_WIDTH = 1700;
+    const POSTER_HEIGHT = 2200;
 
     const COLOR_BG = '#FFFFFF';
     const COLOR_FG = '#000000';
@@ -126,7 +99,6 @@
             displayWidth = window.innerHeight * posterRatio;
         }
 
-        // Keep high DPI scaling for crispness on screen, but it natively scales down nicely for print
         const dpr = window.devicePixelRatio || 1;
         canvas.width = POSTER_WIDTH * dpr;
         canvas.height = POSTER_HEIGHT * dpr;
@@ -143,8 +115,6 @@
         const textWidth = ctx.measureText(text).width;
         
         const padX = fontSize * 0.3;
-        const padY = fontSize * 0.15;
-        
         const boxW = textWidth + (padX * 2);
         const boxH = fontSize * 1.25; 
         
@@ -222,18 +192,46 @@
         ctx.fillStyle = COLOR_BG;
         ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
 
-        const margin = 50;
+        const margin = 140;
         const maxSafeWidth = POSTER_WIDTH - (margin * 2);
         
-        let massiveSize = 300; 
+        // STRICT BOTTOM-UP MATH TO PREVENT OVERLAP
+        const qrSize = 350;
+        const qrGap = 120;
+        const urlSize = 100;
+        const urlGap = 120;
+        const normalSize = 65;
+        const normalGap = 20;
+        const normalBoxH = normalSize * 1.25;
+
+        // Calculate absolute Y positions anchored to the bottom margin
+        const qrY = POSTER_HEIGHT - margin - qrSize;
+        const urlY = qrY - qrGap - urlSize;
+        const text2Y = urlY - urlGap - normalBoxH;
+        const text1Y = text2Y - normalGap - normalBoxH;
+
+        // DYNAMIC TOP TEXT MATH
+        // Top block has exactly the space from the top margin down to 100px above text1
+        const maxTopBlockHeight = text1Y - margin - 100;
+        
+        let massiveSize = 400; 
         ctx.font = `900 ${massiveSize}px 'Inter', sans-serif`;
+        
+        // Scale down until it fits width
         while (ctx.measureText("THE NAME").width + (massiveSize * 0.6) > maxSafeWidth) {
             massiveSize--;
             ctx.font = `900 ${massiveSize}px 'Inter', sans-serif`;
         }
+        
+        // Scale down until it fits the calculated safe height (4 boxes + 3 gaps)
+        const totalHeightRatio = (4 * 1.25) + (3 * 0.15); // 5.45 times the font size
+        while ((massiveSize * totalHeightRatio) > maxTopBlockHeight) {
+            massiveSize--;
+        }
 
-        let currentY = 70;
-        const massiveGap = 12;
+        // Draw Top Block
+        let currentY = margin;
+        const massiveGap = massiveSize * 0.15;
 
         let bounds;
         bounds = drawBoxedText("WHAT IS", margin, currentY, massiveSize, 'left', true);
@@ -245,59 +243,32 @@
         bounds = drawBoxedText("OF MY", margin, currentY, massiveSize, 'left', true);
         currentY = bounds.bottom + massiveGap;
 
-        bounds = drawDynamicBlankLine(margin, currentY, massiveSize, maxSafeWidth);
+        drawDynamicBlankLine(margin, currentY, massiveSize, maxSafeWidth);
 
-        // --- Calculate Dynamic Bottom Alignment for perfect breathing room ---
-        const topBlockBottom = bounds.bottom;
-        const bottomMargin = 70;
-        
-        // Tuned layout variables for 8.5x11 scale
-        const normalSize = 40;
-        const normalGap = 10;
-        const urlGap = 60;
-        const urlSize = 65;
-        const qrGap = 60;
-        const qrSize = 250;
-        
-        const textH = normalSize * 1.25; 
-        const bottomClusterHeight = textH + normalGap + textH + urlGap + urlSize + qrGap + qrSize;
-        
-        // Vertically center the bottom content in the remaining space
-        const remainingSpace = POSTER_HEIGHT - topBlockBottom - bottomMargin;
-        currentY = topBlockBottom + (remainingSpace / 2) - (bottomClusterHeight / 2);
+        // Draw Bottom Block
+        drawBoxedText("We have the object.", POSTER_WIDTH / 2, text1Y, normalSize, 'center', true);
+        drawBoxedText("You hold the definition.", POSTER_WIDTH / 2, text2Y, normalSize, 'center', true);
 
-        // Render Bottom Cluster
-        bounds = drawBoxedText("We have the object.", POSTER_WIDTH / 2, currentY, normalSize, 'center', true);
-        currentY = bounds.bottom + normalGap;
-
-        bounds = drawBoxedText("You hold the definition.", POSTER_WIDTH / 2, currentY, normalSize, 'center', true);
-        currentY = bounds.bottom + urlGap; 
-
-        // URL and CTA
+        // Draw URL
         ctx.font = `900 ${urlSize}px 'Inter', sans-serif`;
         ctx.fillStyle = COLOR_FG;
         ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        if ('letterSpacing' in ctx) ctx.letterSpacing = "2px"; 
-        ctx.fillText("NAMEOFMY.COM", POSTER_WIDTH / 2, currentY);
-        if ('letterSpacing' in ctx) ctx.letterSpacing = "0px"; 
+        ctx.textBaseline = 'top';
+        ctx.fillText("NAMEOFMY.COM", POSTER_WIDTH / 2, urlY);
 
         const urlWidth = ctx.measureText("NAMEOFMY.COM").width;
-        ctx.fillRect((POSTER_WIDTH / 2) - (urlWidth / 2), currentY + (urlSize * 0.6), urlWidth, urlSize * 0.1);
+        ctx.fillRect((POSTER_WIDTH / 2) - (urlWidth / 2), urlY + urlSize, urlWidth, urlSize * 0.1);
 
         interactiveAreas.push({
             x: (POSTER_WIDTH / 2) - (urlWidth / 2) - 20,
-            y: currentY - (urlSize / 2) - 20,
+            y: urlY - 20,
             w: urlWidth + 40,
             h: urlSize + 40,
             url: 'https://nameofmy.com'
         });
 
-        currentY += qrGap;
-
-        // Real QR Code
-        drawRealQR(POSTER_WIDTH / 2, currentY, qrSize);
+        // Draw Real QR Code
+        drawRealQR(POSTER_WIDTH / 2, qrY, qrSize);
     }
 
     // Interactive Logic
