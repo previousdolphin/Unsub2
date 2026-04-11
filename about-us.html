@@ -91,6 +91,13 @@
             100% { transform: translateX(-100%); }
         }
 
+        /* Language Select */
+        select option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
+        }
+
         /* Mobile Adjustments */
         @media (max-width: 768px) {
             .mobile-stack { flex-direction: column; }
@@ -112,7 +119,23 @@
                 UNSUBSCRIBE LLC // CoCA
             </div>
             <div class="hidden md:block">J. DO + P. PISSARRO</div>
-            <div class="text-right whitespace-nowrap">[ EST. 2026 ]</div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Language Toggle -->
+                <div class="relative group">
+                    <select id="lang-switcher" class="bg-transparent border-none outline-none cursor-pointer uppercase font-mono text-[10px] md:text-xs text-right appearance-none hover:text-gray-500 transition-colors">
+                        <option value="en">[ EN ]</option>
+                        <option value="fr">[ FR ]</option>
+                        <option value="de">[ DE ]</option>
+                        <option value="es">[ ES ]</option>
+                        <option value="ja">[ JA ]</option>
+                        <option value="zh">[ ZH ]</option>
+                        <option value="hi">[ HI ]</option>
+                        <option value="ru">[ RU ]</option>
+                    </select>
+                </div>
+                <div class="hidden md:block whitespace-nowrap">[ EST. 2026 ]</div>
+            </div>
         </div>
     </header>
 
@@ -122,11 +145,11 @@
         <!-- SECTION 1: HERO -->
         <section class="min-h-[85vh] flex flex-col justify-center items-center border-b-black relative px-4 py-20">
             <div class="max-w-5xl w-full text-center reveal-text space-y-8 md:space-y-12">
-                <p class="font-mono text-[10px] md:text-xs tracking-[0.2em] text-gray-500 uppercase">
+                <p data-i18n="hero_sub" class="font-mono text-[10px] md:text-xs tracking-[0.2em] text-gray-500 uppercase">
                     Artist Statement / Institutional Brief
                 </p>
                 
-                <h1 class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.2] font-medium px-2">
+                <h1 data-i18n="hero_quote" class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.2] font-medium px-2">
                     "Do and Pissarro are not asking the question. <br>
                     <span class="italic">They are building the institution that answers it.</span>"
                 </h1>
@@ -138,7 +161,7 @@
                 </div>
             </div>
             
-            <div class="absolute bottom-4 left-4 font-mono text-[9px] md:text-[10px] text-gray-400">
+            <div data-i18n="location" class="absolute bottom-4 left-4 font-mono text-[9px] md:text-[10px] text-gray-400 uppercase">
                 Location: NY · HAM · BER
             </div>
         </section>
@@ -146,7 +169,7 @@
         <!-- SECTION 2: THE LINEAGE -->
         <section class="grid grid-cols-1 md:grid-cols-12 border-b-black bg-white/80 backdrop-blur-sm">
             <div class="hidden md:block md:col-span-4 border-r-black relative min-h-[400px]">
-                <div class="absolute bottom-6 left-6 -rotate-90 origin-bottom-left text-[10px] tracking-[0.2em] text-gray-400 whitespace-nowrap">
+                <div data-i18n="lin_badge" class="absolute bottom-6 left-6 -rotate-90 origin-bottom-left text-[10px] tracking-[0.2em] text-gray-400 whitespace-nowrap uppercase">
                     THE LINEAGE
                 </div>
             </div>
@@ -154,20 +177,20 @@
             <div class="md:col-span-8 p-6 md:p-16 lg:p-24 flex flex-col justify-center reveal-text">
                 <div class="flex items-center gap-4 mb-6">
                     <span class="h-[1px] w-8 bg-black"></span>
-                    <h2 class="font-mono text-[10px] uppercase tracking-widest">Historical Precedent</h2>
+                    <h2 data-i18n="lin_title" class="font-mono text-[10px] uppercase tracking-widest">Historical Precedent</h2>
                 </div>
                 
-                <h3 class="font-serif text-2xl md:text-4xl mb-8 italic leading-tight">
+                <h3 data-i18n="lin_sub" class="font-serif text-2xl md:text-4xl mb-8 italic leading-tight">
                     There is a lineage.
                 </h3>
                 
                 <div class="space-y-6 max-w-2xl">
-                    <p class="font-mono text-xs md:text-sm leading-relaxed">
+                    <p data-i18n="lin_p1" class="font-mono text-xs md:text-sm leading-relaxed">
                         Duchamp placed a urinal in a gallery and called it art. The institution authenticated it. 
                         Koons cast a balloon dog in stainless steel and sold it for $58 million. The market authenticated it. 
                         Hirst put a shark in formaldehyde. Cattelan taped a banana to a wall. Banksy shredded his own canvas at auction.
                     </p>
-                    <p class="font-serif text-lg md:text-2xl leading-relaxed border-l-2 border-black pl-6">
+                    <p data-i18n="lin_p2" class="font-serif text-lg md:text-2xl leading-relaxed border-l-2 border-black pl-6">
                         Each time, the same question was asked: is this art? <br>
                         Each time, the answer was the same: the institution decides.
                     </p>
@@ -175,28 +198,26 @@
             </div>
         </section>
 
-        <!-- SECTION 3: THE PRACTICE (Split Screen) -->
+        <!-- SECTION 3: THE PRACTICE -->
         <section class="border-b-black bg-white">
             <div class="grid grid-cols-1 md:grid-cols-2">
                 <!-- NCR-CAM -->
                 <div class="p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black hover-invert group transition-all duration-300">
-                    <h4 class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">I. The Methodology</h4>
+                    <h4 data-i18n="meth_badge" class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">I. The Methodology</h4>
                     <div class="font-serif text-xl md:text-3xl space-y-6 leading-tight">
-                        <p class="reveal-text"><span class="font-bold">NCR-CAM</span><br>(Neo-Classical Revival Corporate Art Movement)</p>
-                        <p class="reveal-text text-lg">Aggressively appropriating the language, structures, and tools of modern corporate ecosystems, recontextualizing them as spiritual and aesthetic artifacts.</p>
-                        <p class="reveal-text text-lg italic">It does not interrogate the art object. It interrogates the system that assigns the object its value.</p>
+                        <p data-i18n="meth_p1" class="reveal-text">Jesse Do and Paul Pissarro operate as a single conceptual entity — structural architects working within the host body of the luxury market.</p>
+                        <p data-i18n="meth_p2" class="reveal-text text-lg">Their methodology, <span class="font-bold">NCR-CAM</span> (Neo-Classical Revival Corporate Art Movement), does not interrogate the art object. It interrogates the system that assigns the object its value.</p>
                     </div>
                 </div>
 
-                <!-- Deep Institutional Reality -->
+                <!-- The Question -->
                 <div class="p-8 md:p-16 hover-invert group transition-all duration-300">
                     <div class="flex justify-end md:justify-start">
-                        <h4 class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">II. Institutional Reality</h4>
+                        <h4 data-i18n="quest_badge" class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">II. The Question</h4>
                     </div>
                     <div class="font-serif text-xl md:text-3xl space-y-6 leading-tight text-right md:text-left">
-                        <p class="reveal-text">Forged from operational fluency.</p>
-                        <p class="reveal-text text-lg">Do’s background in systems engineering and tenure in the highest echelons of risk management—as a Principal Risk Analyst at Capital One and Senior Strategist at Google—provides the fluency required to manipulate complex systems.</p>
-                        <p class="reveal-text text-lg italic">Compliance pipelines and risk frameworks are not tools for mitigation; they are the raw materials of the art itself.</p>
+                        <p data-i18n="quest_p1" class="reveal-text">Where Duchamp asked what is art, Do and Pissarro ask what is the minimum viable institution required to make belief economically self-sustaining?</p>
+                        <p data-i18n="quest_p2" class="reveal-text text-lg italic">The answer is The Church of Conceptual Art.</p>
                     </div>
                 </div>
             </div>
@@ -205,8 +226,8 @@
         <!-- SECTION 4: THE INSTITUTION -->
         <section class="border-b-black bg-[#F2F2F2]">
             <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
-                <h2 class="font-serif text-2xl md:text-4xl italic pr-4">Church of Conceptual Art (CoCA)</h2>
-                <span class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1">[ THE MOAT ]</span>
+                <h2 data-i18n="inst_title" class="font-serif text-2xl md:text-4xl italic pr-4">Church of Conceptual Art (CoCA)</h2>
+                <span data-i18n="inst_badge" class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1 uppercase">[ THE MOAT ]</span>
             </div>
 
             <div class="flex flex-col">
@@ -217,11 +238,11 @@
                     </div>
                     <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">01</div>
                     <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
-                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Legal Architecture</h3>
+                        <h3 data-i18n="arch_title" class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Legal Architecture</h3>
                     </div>
                     <div class="md:col-span-7 p-6 flex flex-col justify-center">
-                        <div class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">The Divine Act</div>
-                        <p class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">CoCA is a legally registered religious organization and cultural holding company. By operating as a church, CoCA claims the highest available legal immunity—the same tax architecture used by the Catholic Church, applied to the contemporary art market.</p>
+                        <div data-i18n="arch_sub" class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">The Divine Act</div>
+                        <p data-i18n="arch_p" class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">CoCA is a legally registered religious organization and cultural holding company. By operating as a church, CoCA claims the highest available legal immunity — the same tax architecture used by the Catholic Church, applied to the contemporary art market. The concept is the divine act. The institution precedes the work.</p>
                     </div>
                 </div>
 
@@ -232,11 +253,11 @@
                     </div>
                     <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">02</div>
                     <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
-                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Historical Legacy</h3>
+                        <h3 data-i18n="leg_title" class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Historical Legacy</h3>
                     </div>
                     <div class="md:col-span-7 p-6 flex flex-col justify-center">
-                        <div class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">The Founding Asset</div>
-                        <p class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">Paul Pissarro is the great-great-grandson of Camille Pissarro—founding Impressionist, anarchist, and architect of the independent exhibition model that permanently altered the relationship between art and institution in 1874. The lineage is not decorative. It is the founding asset.</p>
+                        <div data-i18n="leg_sub" class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">The Founding Asset</div>
+                        <p data-i18n="leg_p" class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">Paul Pissarro is the great-great-grandson of Camille Pissarro — founding Impressionist, anarchist, and architect of the independent exhibition model that permanently altered the relationship between art and institution in 1874. The lineage is not decorative. It is the founding asset.</p>
                     </div>
                 </div>
 
@@ -247,11 +268,11 @@
                     </div>
                     <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">03</div>
                     <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
-                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Conceptual Instruments</h3>
+                        <h3 data-i18n="ins_title" class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Conceptual Instruments</h3>
                     </div>
                     <div class="md:col-span-7 p-6 flex flex-col justify-center">
-                        <div class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">Physical Covenants</div>
-                        <p class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">CoCA does not produce aesthetic goods. It engineers conceptual financial instruments and compliance mechanisms—physical objects governed by permanent legal covenants that run with the work regardless of who holds it.</p>
+                        <div data-i18n="ins_sub" class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">Physical Covenants</div>
+                        <p data-i18n="ins_p" class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">It does not produce aesthetic goods. It engineers conceptual financial instruments and compliance mechanisms — physical objects governed by permanent legal covenants that run with the work regardless of who holds it. This is not a philosophical position. It is a structural moat.</p>
                     </div>
                 </div>
             </div>
@@ -260,21 +281,23 @@
         <!-- SECTION 5: THE GENESIS ARTIFACT -->
         <section class="border-b-black bg-black text-white p-6 md:p-20">
             <div class="text-center mb-16 reveal-text">
-                <span class="inline-block border border-white px-3 py-1 font-mono text-[10px] uppercase tracking-widest rounded-full mb-4">The Object</span>
+                <span data-i18n="obj_badge" class="inline-block border border-white px-3 py-1 font-mono text-[10px] uppercase tracking-widest rounded-full mb-4">The Object</span>
             </div>
             
             <div class="max-w-4xl mx-auto space-y-12 text-center reveal-text">
                 <h3 class="font-serif text-4xl md:text-6xl font-bold uppercase">UNSUB-GEN-001.</h3>
-                <p class="font-mono text-xl md:text-2xl tracking-widest text-gray-400">1 OF 10. $15,000.</p>
+                <p data-i18n="obj_price" class="font-mono text-xl md:text-2xl tracking-widest text-gray-400">1 OF 10. $15,000.</p>
                 
                 <div class="font-serif text-xl md:text-2xl space-y-6 leading-relaxed max-w-3xl mx-auto border-t border-b border-gray-800 py-12">
-                    <p>An unlicensed Canal Street Rolex — $200 at point of purchase — permanently encased in archival resin, etched with the CoCA institutional mark.</p>
-                    <p class="italic text-gray-400">Still ticking inside the block.</p>
-                    <p>The acquisition is governed by a resale covenant: 50% of any future sale remits permanently to the artists, regardless of who holds the work, regardless of venue. The covenant runs with the object. It cannot be severed.</p>
+                    <p data-i18n="obj_p1">An unlicensed Canal Street Rolex — $200 at point of purchase — permanently encased in archival resin, etched with the CoCA institutional mark.</p>
+                    <p data-i18n="obj_p2" class="italic text-gray-400">Still ticking inside the block.</p>
+                    <p data-i18n="obj_p3">The acquisition is governed by a resale covenant: 50% of any future sale remits permanently to the artists, regardless of who holds the work, regardless of venue. The covenant runs with the object. It cannot be severed.</p>
                 </div>
 
-                <div class="font-mono text-sm uppercase text-gray-400 max-w-2xl mx-auto leading-loose">
-                    This is not a watch. It is not a sculpture. It is a conceptual financial instrument that monetizes institutional provenance rather than material utility. The $200 object is worth $15,000 because the institution says so.
+                <div class="font-mono text-sm uppercase text-gray-400 max-w-2xl mx-auto leading-loose space-y-4">
+                    <p data-i18n="obj_f1">This is not a watch. It is not a sculpture. It is a conceptual financial instrument — the first of its kind — that monetizes institutional provenance rather than material utility.</p>
+                    <p data-i18n="obj_f2" class="text-white">The $200 object is worth $15,000 because the institution says so.</p>
+                    <p data-i18n="obj_f3">Koons understood this. Hirst understood this. Cattelan understood this. The difference is that Do and Pissarro have built the institution themselves.</p>
                 </div>
             </div>
         </section>
@@ -282,31 +305,31 @@
         <!-- SECTION 6: THE OPPORTUNITY -->
         <section class="border-b-black bg-white p-6 md:p-20">
             <div class="text-center mb-16 reveal-text">
-                <span class="inline-block border border-black px-3 py-1 font-mono text-[10px] uppercase tracking-widest rounded-full mb-4">The Opportunity</span>
+                <span data-i18n="opp_badge" class="inline-block border border-black px-3 py-1 font-mono text-[10px] uppercase tracking-widest rounded-full mb-4">The Opportunity</span>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div class="space-y-6 reveal-text">
-                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">THE COVENANT</h3>
+                    <h3 data-i18n="opp_cov_title" class="font-mono text-lg border-b-black pb-2 inline-block uppercase">THE COVENANT</h3>
                     <div class="font-serif text-xl space-y-4">
-                        <p>The Genesis Artifact series comprises 10 works. The edition is controlled.</p>
-                        <p>The resale royalty architecture has no precedent in the primary market at this price point.</p>
+                        <p data-i18n="opp_cov_1">The Genesis Artifact series comprises 10 works. The edition is controlled.</p>
+                        <p data-i18n="opp_cov_2">The covenant structure means the artists participate permanently in the work’s appreciation — a resale royalty architecture that has no precedent in the primary market at this price point.</p>
                     </div>
                 </div>
 
                 <div class="space-y-6 reveal-text delay-100">
-                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">THE BIBLE</h3>
+                    <h3 data-i18n="opp_bib_title" class="font-mono text-lg border-b-black pb-2 inline-block uppercase">THE BIBLE</h3>
                     <div class="font-serif text-xl space-y-4">
-                        <p>CoCA is in active institutional development.</p>
-                        <p>The CoCA Bible—a hardcover institutional text—is currently available at $1,200.</p>
+                        <p data-i18n="opp_bib_1">CoCA is in active institutional development.</p>
+                        <p data-i18n="opp_bib_2">The body of work includes physical artifacts, garments, publications, and a hardcover institutional text — The CoCA Bible — currently available at $1,200.</p>
                     </div>
                 </div>
 
                 <div class="space-y-6 reveal-text delay-200">
-                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">THE NODES</h3>
+                    <h3 data-i18n="opp_nod_title" class="font-mono text-lg border-b-black pb-2 inline-block uppercase">THE NODES</h3>
                     <div class="font-serif text-xl space-y-4">
-                        <p>Do and Pissarro are not seeking representation. They are identifying aligned institutional nodes.</p>
-                        <p>The dealer who places the Genesis Artifact is not selling a work. They are entering a covenant.</p>
+                        <p data-i18n="opp_nod_1">Do and Pissarro are not seeking representation in the traditional sense. They are identifying aligned institutional nodes.</p>
+                        <p data-i18n="opp_nod_2">The dealer who places the Genesis Artifact is not selling a work. They are entering a covenant.</p>
                     </div>
                 </div>
             </div>
@@ -315,10 +338,10 @@
         <!-- SECTION 7: MARQUEE -->
         <section class="border-b-black py-6 bg-[#F2F2F2]">
              <div class="marquee-container font-mono text-[10px] md:text-xs uppercase tracking-[0.3em]">
-                <div class="marquee-content">
+                <div data-i18n="marquee" class="marquee-content">
                     WHAT IS THE MINIMUM VIABLE INSTITUTION REQUIRED TO MAKE BELIEF ECONOMICALLY SELF-SUSTAINING? — 
                 </div>
-                <div class="marquee-content" aria-hidden="true">
+                <div data-i18n="marquee" class="marquee-content" aria-hidden="true">
                     WHAT IS THE MINIMUM VIABLE INSTITUTION REQUIRED TO MAKE BELIEF ECONOMICALLY SELF-SUSTAINING? — 
                 </div>
             </div>
@@ -327,11 +350,11 @@
         <!-- SECTION 8: FOOTER -->
         <footer class="bg-black text-white min-h-[80vh] flex flex-col justify-between p-6 md:p-16">
             <div class="flex-grow flex flex-col justify-center items-center text-center reveal-text space-y-8">
-                <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-4 py-1 rounded-full">Contact</div>
-                <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl leading-[0.9]">
+                <div data-i18n="ft_badge" class="font-mono text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-4 py-1 rounded-full">Contact</div>
+                <h2 data-i18n="ft_title" class="font-serif text-4xl md:text-7xl lg:text-8xl leading-[0.9] uppercase">
                     THE CHURCH OF<br>CONCEPTUAL ART
                 </h2>
-                <p class="font-mono text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
+                <p data-i18n="ft_sys" class="font-mono text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed uppercase">
                     // SYSTEM MESSAGE:<br>
                     THE INSTITUTION PRECEDES THE WORK.
                 </p>
@@ -339,19 +362,19 @@
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono text-[10px] uppercase tracking-widest pt-12 border-t border-white/20">
                 <div>
-                    <span class="block text-gray-500 mb-2">Architects</span>
-                    Jesse Do<br>Paul Pissarro
+                    <span data-i18n="ft_dir" class="block text-gray-500 mb-2">Director</span>
+                    Paul Pissarro<br>Unsubscribe LLC / CoCA
                 </div>
                 <div>
-                    <span class="block text-gray-500 mb-2">Entities</span>
+                    <span data-i18n="ft_ent" class="block text-gray-500 mb-2">Entities</span>
                     Unsubscribe LLC<br>CoCA
                 </div>
                 <div>
-                    <span class="block text-gray-500 mb-2">Locations</span>
+                    <span data-i18n="ft_loc" class="block text-gray-500 mb-2">Locations</span>
                     New York<br>Hamburg<br>Berlin
                 </div>
                 <div class="text-right flex flex-col justify-between">
-                    <span class="block text-gray-500 mb-2">Network</span>
+                    <span data-i18n="ft_net" class="block text-gray-500 mb-2">Network</span>
                     <a href="mailto:ppissarro@unsubscribe.llc" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4 mb-2">ppissarro@unsubscribe.llc</a>
                     <a href="http://nameofmy.com" class="hover:text-red-500 transition-colors">nameofmy.com</a>
                     <a href="http://cocausa.org" class="hover:text-red-500 transition-colors">cocausa.org</a>
@@ -361,7 +384,465 @@
 
     </main>
 
+    <!-- TRANSLATION SCRIPT -->
     <script>
+        const translations = {
+            en: {
+                hero_sub: "Artist Statement / Institutional Brief",
+                hero_quote: "\"Do and Pissarro are not asking the question. <br><span class='italic'>They are building the institution that answers it.</span>\"",
+                location: "Location: NY · HAM · BER",
+                lin_badge: "THE LINEAGE",
+                lin_title: "Historical Precedent",
+                lin_sub: "There is a lineage.",
+                lin_p1: "Duchamp placed a urinal in a gallery and called it art. The institution authenticated it. Koons cast a balloon dog in stainless steel and sold it for $58 million. The market authenticated it. Hirst put a shark in formaldehyde. Cattelan taped a banana to a wall. Banksy shredded his own canvas at auction.",
+                lin_p2: "Each time, the same question was asked: is this art? <br>Each time, the answer was the same: the institution decides.",
+                meth_badge: "I. The Methodology",
+                meth_p1: "Jesse Do and Paul Pissarro operate as a single conceptual entity — structural architects working within the host body of the luxury market.",
+                meth_p2: "Their methodology, <span class='font-bold'>NCR-CAM</span> (Neo-Classical Revival Corporate Art Movement), does not interrogate the art object. It interrogates the system that assigns the object its value.",
+                quest_badge: "II. The Question",
+                quest_p1: "Where Duchamp asked what is art, Do and Pissarro ask what is the minimum viable institution required to make belief economically self-sustaining?",
+                quest_p2: "The answer is The Church of Conceptual Art.",
+                inst_title: "Church of Conceptual Art (CoCA)",
+                inst_badge: "[ THE MOAT ]",
+                arch_title: "Legal Architecture",
+                arch_sub: "The Divine Act",
+                arch_p: "CoCA is a legally registered religious organization and cultural holding company. By operating as a church, CoCA claims the highest available legal immunity — the same tax architecture used by the Catholic Church, applied to the contemporary art market. The concept is the divine act. The institution precedes the work.",
+                leg_title: "Historical Legacy",
+                leg_sub: "The Founding Asset",
+                leg_p: "Paul Pissarro is the great-great-grandson of Camille Pissarro — founding Impressionist, anarchist, and architect of the independent exhibition model that permanently altered the relationship between art and institution in 1874. The lineage is not decorative. It is the founding asset.",
+                ins_title: "Conceptual Instruments",
+                ins_sub: "Physical Covenants",
+                ins_p: "It does not produce aesthetic goods. It engineers conceptual financial instruments and compliance mechanisms — physical objects governed by permanent legal covenants that run with the work regardless of who holds it. This is not a philosophical position. It is a structural moat.",
+                obj_badge: "The Object",
+                obj_price: "1 OF 10. $15,000.",
+                obj_p1: "An unlicensed Canal Street Rolex — $200 at point of purchase — permanently encased in archival resin, etched with the CoCA institutional mark.",
+                obj_p2: "Still ticking inside the block.",
+                obj_p3: "The acquisition is governed by a resale covenant: 50% of any future sale remits permanently to the artists, regardless of who holds the work, regardless of venue. The covenant runs with the object. It cannot be severed.",
+                obj_f1: "This is not a watch. It is not a sculpture. It is a conceptual financial instrument — the first of its kind — that monetizes institutional provenance rather than material utility.",
+                obj_f2: "The $200 object is worth $15,000 because the institution says so.",
+                obj_f3: "Koons understood this. Hirst understood this. Cattelan understood this. The difference is that Do and Pissarro have built the institution themselves.",
+                opp_badge: "The Opportunity",
+                opp_cov_title: "THE COVENANT",
+                opp_cov_1: "The Genesis Artifact series comprises 10 works. The edition is controlled.",
+                opp_cov_2: "The covenant structure means the artists participate permanently in the work’s appreciation — a resale royalty architecture that has no precedent in the primary market at this price point.",
+                opp_bib_title: "THE BIBLE",
+                opp_bib_1: "CoCA is in active institutional development.",
+                opp_bib_2: "The body of work includes physical artifacts, garments, publications, and a hardcover institutional text — The CoCA Bible — currently available at $1,200.",
+                opp_nod_title: "THE NODES",
+                opp_nod_1: "Do and Pissarro are not seeking representation in the traditional sense. They are identifying aligned institutional nodes.",
+                opp_nod_2: "The dealer who places the Genesis Artifact is not selling a work. They are entering a covenant.",
+                marquee: "WHAT IS THE MINIMUM VIABLE INSTITUTION REQUIRED TO MAKE BELIEF ECONOMICALLY SELF-SUSTAINING? — ",
+                ft_badge: "Contact",
+                ft_title: "THE CHURCH OF<br>CONCEPTUAL ART",
+                ft_sys: "// SYSTEM MESSAGE:<br>THE INSTITUTION PRECEDES THE WORK.",
+                ft_dir: "Director",
+                ft_ent: "Entities",
+                ft_loc: "Locations",
+                ft_net: "Network"
+            },
+            fr: {
+                hero_sub: "Déclaration d'Artiste / Dossier Institutionnel",
+                hero_quote: "\"Do et Pissarro ne posent pas la question. <br><span class='italic'>Ils construisent l'institution qui y répond.</span>\"",
+                location: "Lieu : NY · HAM · BER",
+                lin_badge: "LA LIGNÉE",
+                lin_title: "Précédent Historique",
+                lin_sub: "Il y a une lignée.",
+                lin_p1: "Duchamp a placé un urinoir dans une galerie et l'a appelé art. L'institution l'a authentifié. Koons a coulé un chien en ballon en acier inoxydable et l'a vendu 58 millions de dollars. Le marché l'a authentifié. Hirst a mis un requin dans le formol. Cattelan a scotché une banane à un mur. Banksy a déchiqueté sa propre toile aux enchères.",
+                lin_p2: "À chaque fois, la même question a été posée : est-ce de l'art ? <br>À chaque fois, la réponse fut la même : c'est l'institution qui décide.",
+                meth_badge: "I. La Méthodologie",
+                meth_p1: "Jesse Do et Paul Pissarro opèrent comme une seule entité conceptuelle — des architectes structurels travaillant au sein du corps hôte du marché du luxe.",
+                meth_p2: "Leur méthodologie, <span class='font-bold'>NCR-CAM</span> (Mouvement d'Art d'Entreprise de Renouveau Néo-Classique), n'interroge pas l'objet d'art. Elle interroge le système qui attribue sa valeur à l'objet.",
+                quest_badge: "II. La Question",
+                quest_p1: "Là où Duchamp demandait ce qu'est l'art, Do et Pissarro demandent quelle est l'institution viable minimale requise pour rendre la croyance économiquement autonome ?",
+                quest_p2: "La réponse est L'Église de l'Art Conceptuel.",
+                inst_title: "Église de l'Art Conceptuel (CoCA)",
+                inst_badge: "[ LE FOSSÉ ]",
+                arch_title: "Architecture Légale",
+                arch_sub: "L'Acte Divin",
+                arch_p: "CoCA est une organisation religieuse et une société holding culturelle légalement enregistrée. En opérant comme une église, CoCA revendique la plus haute immunité légale disponible — la même architecture fiscale utilisée par l'Église catholique, appliquée au marché de l'art contemporain. Le concept est l'acte divin. L'institution précède l'œuvre.",
+                leg_title: "Héritage Historique",
+                leg_sub: "L'Actif Fondateur",
+                leg_p: "Paul Pissarro est l'arrière-arrière-petit-fils de Camille Pissarro — fondateur impressionniste, anarchiste et architecte du modèle d'exposition indépendant qui a définitivement modifié la relation entre l'art et l'institution en 1874. La lignée n'est pas décorative. C'est l'actif fondateur.",
+                ins_title: "Instruments Conceptuels",
+                ins_sub: "Alliances Physiques",
+                ins_p: "Elle ne produit pas de biens esthétiques. Elle conçoit des instruments financiers conceptuels et des mécanismes de conformité — des objets physiques régis par des alliances légales permanentes qui accompagnent l'œuvre quel que soit son détenteur. Ce n'est pas une position philosophique. C'est un fossé structurel.",
+                obj_badge: "L'Objet",
+                obj_price: "1 SUR 10. 15 000 $.",
+                obj_p1: "Une Rolex de Canal Street non sous licence — 200 $ à l'achat — enfermée en permanence dans une résine d'archives, gravée de la marque institutionnelle CoCA.",
+                obj_p2: "Fait toujours tic-tac à l'intérieur du bloc.",
+                obj_p3: "L'acquisition est régie par une alliance de revente : 50 % de toute vente future revient en permanence aux artistes, quel que soit le détenteur de l'œuvre, quel que soit le lieu. L'alliance accompagne l'objet. Elle ne peut être rompue.",
+                obj_f1: "Ce n'est pas une montre. Ce n'est pas une sculpture. C'est un instrument financier conceptuel — le premier du genre — qui monétise la provenance institutionnelle plutôt que l'utilité matérielle.",
+                obj_f2: "L'objet de 200 $ vaut 15 000 $ parce que l'institution le dit.",
+                obj_f3: "Koons l'a compris. Hirst l'a compris. Cattelan l'a compris. La différence est que Do et Pissarro ont construit l'institution eux-mêmes.",
+                opp_badge: "L'Opportunité",
+                opp_cov_title: "L'ALLIANCE",
+                opp_cov_1: "La série Genesis Artifact comprend 10 œuvres. L'édition est contrôlée.",
+                opp_cov_2: "La structure de l'alliance signifie que les artistes participent de façon permanente à l'appréciation de l'œuvre — une architecture de droits de suite qui n'a aucun précédent sur le marché primaire à ce niveau de prix.",
+                opp_bib_title: "LA BIBLE",
+                opp_bib_1: "CoCA est en développement institutionnel actif.",
+                opp_bib_2: "Le corpus d'œuvres comprend des artefacts physiques, des vêtements, des publications et un texte institutionnel relié — La Bible CoCA — actuellement disponible à 1 200 $.",
+                opp_nod_title: "LES NŒUDS",
+                opp_nod_1: "Do et Pissarro ne cherchent pas de représentation au sens traditionnel. Ils identifient des nœuds institutionnels alignés.",
+                opp_nod_2: "Le marchand qui place le Genesis Artifact ne vend pas une œuvre. Il conclut une alliance.",
+                marquee: "QUELLE EST L'INSTITUTION VIABLE MINIMALE REQUISE POUR RENDRE LA CROYANCE ÉCONOMIQUEMENT AUTONOME ? — ",
+                ft_badge: "Contact",
+                ft_title: "L'ÉGLISE DE<br>L'ART CONCEPTUEL",
+                ft_sys: "// MESSAGE SYSTÈME :<br>L'INSTITUTION PRÉCÈDE L'ŒUVRE.",
+                ft_dir: "Directeur",
+                ft_ent: "Entités",
+                ft_loc: "Emplacements",
+                ft_net: "Réseau"
+            },
+            de: {
+                hero_sub: "Künstlererklärung / Institutionelles Briefing",
+                hero_quote: "\"Do und Pissarro stellen nicht die Frage. <br><span class='italic'>Sie bauen die Institution, die sie beantwortet.</span>\"",
+                location: "Standort: NY · HAM · BER",
+                lin_badge: "DIE ABSTAMMUNG",
+                lin_title: "Historischer Präzedenzfall",
+                lin_sub: "Es gibt eine Abstammung.",
+                lin_p1: "Duchamp stellte ein Urinal in eine Galerie und nannte es Kunst. Die Institution authentifizierte es. Koons goss einen Ballonhund aus Edelstahl und verkaufte ihn für 58 Millionen Dollar. Der Markt authentifizierte es. Hirst legte einen Hai in Formaldehyd. Cattelan klebte eine Banane an eine Wand. Banksy zerschredderte seine eigene Leinwand bei einer Auktion.",
+                lin_p2: "Jedes Mal wurde dieselbe Frage gestellt: Ist das Kunst? <br>Jedes Mal war die Antwort dieselbe: Die Institution entscheidet.",
+                meth_badge: "I. Die Methodik",
+                meth_p1: "Jesse Do und Paul Pissarro agieren als eine einzige konzeptionelle Entität — Strukturarchitekten, die innerhalb des Wirtskörpers des Luxusmarktes arbeiten.",
+                meth_p2: "Ihre Methodik, <span class='font-bold'>NCR-CAM</span> (Neo-Classical Revival Corporate Art Movement), hinterfragt nicht das Kunstobjekt. Sie hinterfragt das System, das dem Objekt seinen Wert zuweist.",
+                quest_badge: "II. Die Frage",
+                quest_p1: "Wo Duchamp fragte, was Kunst ist, fragen Do und Pissarro, was die minimal funktionsfähige Institution ist, die erforderlich ist, um den Glauben wirtschaftlich selbsttragend zu machen?",
+                quest_p2: "Die Antwort ist Die Kirche der Konzeptkunst.",
+                inst_title: "Kirche der Konzeptkunst (CoCA)",
+                inst_badge: "[ DER BURGGRABEN ]",
+                arch_title: "Rechtliche Architektur",
+                arch_sub: "Der Göttliche Akt",
+                arch_p: "CoCA ist eine gesetzlich registrierte religiöse Organisation und kulturelle Holdinggesellschaft. Indem CoCA als Kirche operiert, beansprucht sie die höchste verfügbare rechtliche Immunität — dieselbe Steuerarchitektur, die von der katholischen Kirche genutzt wird, angewendet auf den zeitgenössischen Kunstmarkt. Das Konzept ist der göttliche Akt. Die Institution geht dem Werk voraus.",
+                leg_title: "Historisches Erbe",
+                leg_sub: "Das Gründungsvermögen",
+                leg_p: "Paul Pissarro ist der Ururenkel von Camille Pissarro — Gründungs-Impressionist, Anarchist und Architekt des unabhängigen Ausstellungsmodells, das die Beziehung zwischen Kunst und Institution 1874 dauerhaft veränderte. Die Abstammung ist nicht dekorativ. Sie ist das Gründungsvermögen.",
+                ins_title: "Konzeptionelle Instrumente",
+                ins_sub: "Physische Bündnisse",
+                ins_p: "Sie produziert keine ästhetischen Güter. Sie konstruiert konzeptionelle Finanzinstrumente und Compliance-Mechanismen — physische Objekte, die durch permanente rechtliche Bündnisse geregelt sind, die mit dem Werk laufen, unabhängig davon, wer es hält. Dies ist keine philosophische Position. Es ist ein struktureller Burggraben.",
+                obj_badge: "Das Objekt",
+                obj_price: "1 VON 10. 15.000 $.",
+                obj_p1: "Eine nicht lizenzierte Canal Street Rolex — 200 $ beim Kauf — dauerhaft in Archivharz eingeschlossen, geätzt mit der institutionellen Marke CoCA.",
+                obj_p2: "Tickt immer noch im Block.",
+                obj_p3: "Der Erwerb unterliegt einem Wiederverkaufsbündnis: 50 % jedes zukünftigen Verkaufs gehen dauerhaft an die Künstler zurück, unabhängig davon, wer das Werk hält, unabhängig vom Ort. Das Bündnis läuft mit dem Objekt. Es kann nicht getrennt werden.",
+                obj_f1: "Dies ist keine Uhr. Es ist keine Skulptur. Es ist ein konzeptionelles Finanzinstrument — das erste seiner Art — das die institutionelle Herkunft anstelle des materiellen Nutzens monetarisiert.",
+                obj_f2: "Das 200-Dollar-Objekt ist 15.000 Dollar wert, weil die Institution es sagt.",
+                obj_f3: "Koons hat das verstanden. Hirst hat das verstanden. Cattelan hat das verstanden. Der Unterschied ist, dass Do und Pissarro die Institution selbst gebaut haben.",
+                opp_badge: "Die Gelegenheit",
+                opp_cov_title: "DAS BÜNDNIS",
+                opp_cov_1: "Die Genesis Artifact Serie umfasst 10 Werke. Die Edition ist kontrolliert.",
+                opp_cov_2: "Die Bündnisstruktur bedeutet, dass die Künstler dauerhaft an der Wertsteigerung des Werkes beteiligt sind — eine Folgerechtsarchitektur, für die es auf dem Primärmarkt zu diesem Preispunkt keinen Präzedenzfall gibt.",
+                opp_bib_title: "DIE BIBEL",
+                opp_bib_1: "CoCA befindet sich in aktiver institutioneller Entwicklung.",
+                opp_bib_2: "Das Werk umfasst physische Artefakte, Kleidung, Publikationen und einen gebundenen institutionellen Text — Die CoCA-Bibel — derzeit für 1.200 $ erhältlich.",
+                opp_nod_title: "DIE KNOTEN",
+                opp_nod_1: "Do und Pissarro suchen keine Repräsentation im traditionellen Sinne. Sie identifizieren ausgerichtete institutionelle Knoten.",
+                opp_nod_2: "Der Händler, der das Genesis Artifact platziert, verkauft kein Werk. Er geht ein Bündnis ein.",
+                marquee: "WAS IST DIE MINIMAL FUNKTIONSFÄHIGE INSTITUTION, DIE ERFORDERLICH IST, UM DEN GLAUBEN WIRTSCHAFTLICH SELBSTTRAGEND ZU MACHEN? — ",
+                ft_badge: "Kontakt",
+                ft_title: "DIE KIRCHE DER<br>KONZEPTKUNST",
+                ft_sys: "// SYSTEMNACHRICHT:<br>DIE INSTITUTION GEHT DEM WERK VORAUS.",
+                ft_dir: "Direktor",
+                ft_ent: "Entitäten",
+                ft_loc: "Standorte",
+                ft_net: "Netzwerk"
+            },
+            es: {
+                hero_sub: "Declaración del Artista / Resumen Institucional",
+                hero_quote: "\"Do y Pissarro no se hacen la pregunta. <br><span class='italic'>Están construyendo la institución que la responde.</span>\"",
+                location: "Ubicación: NY · HAM · BER",
+                lin_badge: "EL LINAJE",
+                lin_title: "Precedente Histórico",
+                lin_sub: "Hay un linaje.",
+                lin_p1: "Duchamp colocó un urinario en una galería y lo llamó arte. La institución lo autentificó. Koons fundió un perro globo en acero inoxidable y lo vendió por 58 millones de dólares. El mercado lo autentificó. Hirst puso un tiburón en formaldehído. Cattelan pegó una banana a una pared. Banksy trituró su propio lienzo en una subasta.",
+                lin_p2: "Cada vez, se hizo la misma pregunta: ¿es esto arte? <br>Cada vez, la respuesta fue la misma: la institución decide.",
+                meth_badge: "I. La Metodología",
+                meth_p1: "Jesse Do y Paul Pissarro operan como una única entidad conceptual: arquitectos estructurales que trabajan dentro del cuerpo anfitrión del mercado del lujo.",
+                meth_p2: "Su metodología, <span class='font-bold'>NCR-CAM</span> (Movimiento de Arte Corporativo de Renacimiento Neoclásico), no interroga al objeto de arte. Interroga al sistema que le asigna su valor.",
+                quest_badge: "II. La Pregunta",
+                quest_p1: "Allí donde Duchamp preguntó qué es el arte, Do y Pissarro preguntan ¿cuál es la institución viable mínima requerida para hacer que la creencia sea económicamente autosuficiente?",
+                quest_p2: "La respuesta es La Iglesia del Arte Conceptual.",
+                inst_title: "Iglesia del Arte Conceptual (CoCA)",
+                inst_badge: "[ EL FOSO ]",
+                arch_title: "Arquitectura Legal",
+                arch_sub: "El Acto Divino",
+                arch_p: "CoCA es una organización religiosa y un holding cultural registrado legalmente. Al operar como iglesia, CoCA reclama la inmunidad legal más alta disponible: la misma arquitectura fiscal utilizada por la Iglesia Católica, aplicada al mercado del arte contemporáneo. El concepto es el acto divino. La institución precede a la obra.",
+                leg_title: "Legado Histórico",
+                leg_sub: "El Activo Fundacional",
+                leg_p: "Paul Pissarro es el tataranieto de Camille Pissarro: fundador impresionista, anarquista y arquitecto del modelo de exposición independiente que alteró permanentemente la relación entre el arte y la institución en 1874. El linaje no es decorativo. Es el activo fundacional.",
+                ins_title: "Instrumentos Conceptuales",
+                ins_sub: "Pactos Físicos",
+                ins_p: "No produce bienes estéticos. Diseña instrumentos financieros conceptuales y mecanismos de cumplimiento: objetos físicos regidos por pactos legales permanentes que acompañan a la obra independientemente de quién la posea. Esta no es una posición filosófica. Es un foso estructural.",
+                obj_badge: "El Objeto",
+                obj_price: "1 DE 10. $15,000.",
+                obj_p1: "Un Rolex de Canal Street sin licencia ($200 en el punto de compra) encerrado permanentemente en resina de archivo, grabado con la marca institucional CoCA.",
+                obj_p2: "Sigue haciendo tictac dentro del bloque.",
+                obj_p3: "La adquisición se rige por un pacto de reventa: el 50% de cualquier venta futura se remite permanentemente a los artistas, sin importar quién tenga la obra, sin importar el lugar. El pacto acompaña al objeto. No se puede cortar.",
+                obj_f1: "Esto no es un reloj. No es una escultura. Es un instrumento financiero conceptual (el primero de su tipo) que monetiza la procedencia institucional en lugar de la utilidad material.",
+                obj_f2: "El objeto de $200 vale $15,000 porque la institución lo dice.",
+                obj_f3: "Koons entendió esto. Hirst lo entendió. Cattelan lo entendió. La diferencia es que Do y Pissarro han construido la institución ellos mismos.",
+                opp_badge: "La Oportunidad",
+                opp_cov_title: "EL PACTO",
+                opp_cov_1: "La serie Genesis Artifact consta de 10 obras. La edición está controlada.",
+                opp_cov_2: "La estructura del pacto significa que los artistas participan permanentemente en la apreciación de la obra: una arquitectura de regalías de reventa que no tiene precedentes en el mercado primario a este nivel de precios.",
+                opp_bib_title: "LA BIBLIA",
+                opp_bib_1: "CoCA se encuentra en desarrollo institucional activo.",
+                opp_bib_2: "El cuerpo de trabajo incluye artefactos físicos, prendas, publicaciones y un texto institucional de tapa dura, La Biblia CoCA, actualmente disponible a $1,200.",
+                opp_nod_title: "LOS NODOS",
+                opp_nod_1: "Do y Pissarro no buscan representación en el sentido tradicional. Están identificando nodos institucionales alineados.",
+                opp_nod_2: "El marchante que coloca el Genesis Artifact no está vendiendo una obra. Está entrando en un pacto.",
+                marquee: "¿CUÁL ES LA INSTITUCIÓN VIABLE MÍNIMA REQUERIDA PARA HACER QUE LA CREENCIA SEA ECONÓMICAMENTE AUTOSUFICIENTE? — ",
+                ft_badge: "Contacto",
+                ft_title: "LA IGLESIA DEL<br>ARTE CONCEPTUAL",
+                ft_sys: "// MENSAJE DEL SISTEMA:<br>LA INSTITUCIÓN PRECEDE A LA OBRA.",
+                ft_dir: "Director",
+                ft_ent: "Entidades",
+                ft_loc: "Ubicaciones",
+                ft_net: "Red"
+            },
+            ja: {
+                hero_sub: "アーティストステートメント / 組織概要",
+                hero_quote: "「DoとPissarroは問いを立てない。<br><span class='italic'>彼らはそれに答える組織を構築している。</span>」",
+                location: "所在地：NY · HAM · BER",
+                lin_badge: "血統",
+                lin_title: "歴史的前例",
+                lin_sub: "血統が存在する。",
+                lin_p1: "デュシャンは便器をギャラリーに置き、それをアートと呼んだ。組織がそれを認証した。クーンズはバルーンドッグをステンレス鋼で鋳造し、5,800万ドルで売却した。市場がそれを認証した。ハーストはサメをホルムアルデヒド漬けにした。カテランはバナナを壁にテープで貼り付けた。バンクシーはオークションで自身のキャンバスを切り裂いた。",
+                lin_p2: "その都度、同じ問いが投げかけられた。これはアートか？<br>その都度、答えは同じだった。組織が決める。",
+                meth_badge: "I. 方法論",
+                meth_p1: "Jesse DoとPaul Pissarroは単一の概念的実体として機能する—高級品市場という宿主の内部で働く構造的建築家である。",
+                meth_p2: "彼らの方法論、<span class='font-bold'>NCR-CAM</span>（新古典主義復興企業アート運動）は、アートの対象を問い詰めない。対象に価値を割り当てるシステムを問い詰める。",
+                quest_badge: "II. 問い",
+                quest_p1: "デュシャンが「アートとは何か」と問うたのに対し、DoとPissarroは「信念を経済的に自立させるために必要な最小限の組織とは何か」と問う。",
+                quest_p2: "その答えがコンセプチュアル・アート教会である。",
+                inst_title: "コンセプチュアル・アート教会（CoCA）",
+                inst_badge: "[ 堀 ]",
+                arch_title: "法的構造",
+                arch_sub: "神聖なる行為",
+                arch_p: "CoCAは法的に登録された宗教団体および文化的持株会社である。教会として運営することで、CoCAは利用可能な最高の法的免除—カトリック教会が使用するのと同じ税制構造—を現代アート市場に適用する。概念こそが神聖な行為である。組織は作品に先行する。",
+                leg_title: "歴史的遺産",
+                leg_sub: "創設資産",
+                leg_p: "Paul PissarroはCamille Pissarroの玄孫である。Camilleは印象派の創始者であり、無政府主義者であり、1874年にアートと組織の関係を永久に変えた独立した展示モデルの建築家である。この血統は装飾ではない。それが創設資産である。",
+                ins_title: "概念的手段",
+                ins_sub: "物理的誓約",
+                ins_p: "美的財を生産するのではない。概念的な金融商品とコンプライアンス・メカニズム—誰が保有しようとも作品と共に存在する永続的な法的誓約に支配される物理的対象—を設計する。これは哲学的立場ではない。構造的な堀である。",
+                obj_badge: "対象",
+                obj_price: "1 OF 10. $15,000.",
+                obj_p1: "キャナル・ストリートの無許可ロレックス—購入時200ドル—が永久にアーカイブ用樹脂に封入され、CoCAの組織マークが刻印されている。",
+                obj_p2: "ブロックの中でまだ時を刻んでいる。",
+                obj_p3: "取得は再販誓約に支配される：将来の販売の50%は、誰が作品を保有しようと、どこであろうと、永久にアーティストに還元される。誓約は対象と共に存在する。切り離すことはできない。",
+                obj_f1: "これは時計ではない。彫刻でもない。物質的な有用性ではなく組織的由来を収益化する、この種の最初の概念的金融商品である。",
+                obj_f2: "組織がそう言うから、200ドルの対象が15,000ドルの価値を持つ。",
+                obj_f3: "クーンズはこれを理解していた。ハーストも理解していた。カテランも理解していた。違いは、DoとPissarroが組織そのものを自分たちで構築したことだ。",
+                opp_badge: "機会",
+                opp_cov_title: "誓約",
+                opp_cov_1: "Genesis Artifactシリーズは10作品で構成される。エディションは管理されている。",
+                opp_cov_2: "誓約構造は、アーティストが作品の価値上昇に永久に参加することを意味する—この価格帯の一次市場には前例のない再販ロイヤルティ構造である。",
+                opp_bib_title: "バイブル",
+                opp_bib_1: "CoCAは積極的な組織開発の段階にある。",
+                opp_bib_2: "作品群には、物理的アーティファクト、衣服、出版物、そしてハードカバーの組織的テキスト—CoCAバイブル—が含まれ、現在1,200ドルで入手可能である。",
+                opp_nod_title: "ノード",
+                opp_nod_1: "DoとPissarroは伝統的な意味での代理人を求めていない。足並みの揃った組織的ノードを特定している。",
+                opp_nod_2: "Genesis Artifactを配置するディーラーは作品を販売しているのではない。誓約を結んでいるのだ。",
+                marquee: "信念を経済的に自立させるために必要な最小限の組織とは何か？ — ",
+                ft_badge: "連絡先",
+                ft_title: "コンセプチュアル<br>アート教会",
+                ft_sys: "// システムメッセージ：<br>組織は作品に先行する。",
+                ft_dir: "ディレクター",
+                ft_ent: "実体",
+                ft_loc: "所在地",
+                ft_net: "ネットワーク"
+            },
+            zh: {
+                hero_sub: "艺术家声明 / 机构简报",
+                hero_quote: "\"Do和Pissarro没有提出问题。<br><span class='italic'>他们正在建立回答该问题的机构。</span>\"",
+                location: "地点：纽约 · 汉堡 · 柏林",
+                lin_badge: "血统",
+                lin_title: "历史先例",
+                lin_sub: "有一种血统。",
+                lin_p1: "杜尚将一个小便池放在画廊里，并称之为艺术。机构对其进行了认证。昆斯用不锈钢铸造了一个气球狗，并以5800万美元的价格售出。市场对其进行了认证。赫斯特将一条鲨鱼放入甲醛中。卡特兰将一根香蕉用胶带粘在墙上。班克斯在拍卖会上切碎了自己的画布。",
+                lin_p2: "每一次，都提出了同样的问题：这是艺术吗？<br>每一次，答案都是一样的：由机构决定。",
+                meth_badge: "I. 方法论",
+                meth_p1: "Jesse Do和Paul Pissarro作为一个单一的概念实体运作——在奢侈品市场宿主内部工作的结构建筑师。",
+                meth_p2: "他们的方法论，<span class='font-bold'>NCR-CAM</span>（新古典主义复兴企业艺术运动），不审问艺术对象。它审问赋予对象价值的系统。",
+                quest_badge: "II. 问题",
+                quest_p1: "杜尚问什么是艺术，Do和Pissarro问：使信仰在经济上自给自足所需的最小可行机构是什么？",
+                quest_p2: "答案是概念艺术教会。",
+                inst_title: "概念艺术教会 (CoCA)",
+                inst_badge: "[ 护城河 ]",
+                arch_title: "法律架构",
+                arch_sub: "神圣之举",
+                arch_p: "CoCA是一个合法注册的宗教组织和文化控股公司。通过作为教会运作，CoCA声称拥有最高级别的法律豁免权——天主教会使用的相同税收架构，被应用于当代艺术市场。概念就是神圣之举。机构先于作品。",
+                leg_title: "历史遗产",
+                leg_sub: "创始资产",
+                leg_p: "Paul Pissarro是Camille Pissarro的玄孙——印象派创始人、无政府主义者以及1874年永久改变艺术与机构关系的独立展览模式的建筑师。这种血统不是装饰性的。它是创始资产。",
+                ins_title: "概念工具",
+                ins_sub: "物理契约",
+                ins_p: "它不生产美学商品。它设计概念性金融工具和合规机制——受永久法律契约约束的物理对象，无论谁持有，该契约都与作品同在。这不是一个哲学立场。这是一条结构护城河。",
+                obj_badge: "物品",
+                obj_price: "1 OF 10. $15,000.",
+                obj_p1: "一块无授权的运河街劳力士——购买时200美元——被永久包裹在档案树脂中，并刻有CoCA机构标志。",
+                obj_p2: "在块内仍在滴答作响。",
+                obj_p3: "该收购受转售契约管辖：未来任何销售的50%将永久汇给艺术家，无论谁持有作品，无论场地在哪里。该契约与物品同在。它不能被切断。",
+                obj_f1: "这不是一块手表。它不是一座雕塑。它是一种概念性的金融工具——同类中的第一个——将机构来源而非物质效用货币化。",
+                obj_f2: "200美元的物品价值15,000美元，因为机构是这么说的。",
+                obj_f3: "昆斯明白这一点。赫斯特明白这一点。卡特兰明白这一点。区别在于，Do和Pissarro自己建立了这个机构。",
+                opp_badge: "机会",
+                opp_cov_title: "契约",
+                opp_cov_1: "创世纪神器系列包含10件作品。版本受控。",
+                opp_cov_2: "契约结构意味着艺术家将永久参与作品的增值——这种转售版税架构在此价格点的一级市场中史无前例。",
+                opp_bib_title: "圣经",
+                opp_bib_1: "CoCA正处于活跃的机构发展阶段。",
+                opp_bib_2: "作品体系包括物理神器、服装、出版物和一本精装的机构文本——CoCA圣经——目前售价1,200美元。",
+                opp_nod_title: "节点",
+                opp_nod_1: "Do和Pissarro并不寻求传统意义上的代理。他们正在寻找对齐的机构节点。",
+                opp_nod_2: "放置创世纪神器的经销商不是在推销一件作品。他们正在进入一个契约。",
+                marquee: "使信仰在经济上自给自足所需的最小可行机构是什么？ — ",
+                ft_badge: "联系方式",
+                ft_title: "概念艺术<br>教会",
+                ft_sys: "// 系统消息：<br>机构先于作品。",
+                ft_dir: "总监",
+                ft_ent: "实体",
+                ft_loc: "地点",
+                ft_net: "网络"
+            },
+            hi: {
+                hero_sub: "कलाकार वक्तव्य / संस्थागत विवरण",
+                hero_quote: "\"Do और Pissarro सवाल नहीं पूछ रहे हैं। <br><span class='italic'>वे वह संस्था बना रहे हैं जो इसका उत्तर देती है।</span>\"",
+                location: "स्थान: न्यूयॉर्क · हैम्बर्ग · बर्लिन",
+                lin_badge: "वंशावली",
+                lin_title: "ऐतिहासिक मिसाल",
+                lin_sub: "एक वंशावली है।",
+                lin_p1: "Duchamp ने गैलरी में एक यूरिनल रखा और उसे कला कहा। संस्था ने इसे प्रमाणित किया। Koons ने स्टेनलेस स्टील में एक बैलून डॉग डाला और उसे 58 मिलियन डॉलर में बेचा। बाज़ार ने इसे प्रमाणित किया। Hirst ने एक शार्क को फॉर्मलाडेहाइड में रखा। Cattelan ने एक दीवार पर केले को टेप किया। Banksy ने नीलामी में अपना ही कैनवास फाड़ दिया।",
+                lin_p2: "हर बार, वही सवाल पूछा गया: क्या यह कला है? <br>हर बार, जवाब वही था: संस्था तय करती है।",
+                meth_badge: "I. कार्यप्रणाली",
+                meth_p1: "Jesse Do और Paul Pissarro एक एकल वैचारिक इकाई के रूप में काम करते हैं - लक्जरी बाजार के मेजबान शरीर के भीतर काम करने वाले संरचनात्मक वास्तुकार।",
+                meth_p2: "उनकी कार्यप्रणाली, <span class='font-bold'>NCR-CAM</span> (नव-शास्त्रीय पुनरुद्धार कॉर्पोरेट कला आंदोलन), कला वस्तु से पूछताछ नहीं करती है। यह उस प्रणाली से पूछताछ करती है जो वस्तु को उसका मूल्य प्रदान करती है।",
+                quest_badge: "II. सवाल",
+                quest_p1: "जहां Duchamp ने पूछा कि कला क्या है, Do और Pissarro पूछते हैं कि विश्वास को आर्थिक रूप से आत्मनिर्भर बनाने के लिए आवश्यक न्यूनतम व्यवहार्य संस्था क्या है?",
+                quest_p2: "उत्तर है चर्च ऑफ कांसेप्चुअल आर्ट।",
+                inst_title: "वैचारिक कला का चर्च (CoCA)",
+                inst_badge: "[ खाई ]",
+                arch_title: "कानूनी वास्तुकला",
+                arch_sub: "दिव्य कार्य",
+                arch_p: "CoCA एक कानूनी रूप से पंजीकृत धार्मिक संगठन और सांस्कृतिक होल्डिंग कंपनी है। एक चर्च के रूप में काम करके, CoCA उच्चतम उपलब्ध कानूनी प्रतिरक्षा का दावा करता है - समकालीन कला बाजार में लागू कैथोलिक चर्च द्वारा उपयोग की जाने वाली समान कर वास्तुकला। अवधारणा दिव्य कार्य है। संस्था काम से पहले आती है।",
+                leg_title: "ऐतिहासिक विरासत",
+                leg_sub: "संस्थापक संपत्ति",
+                leg_p: "Paul Pissarro, Camille Pissarro के परपोते हैं - संस्थापक प्रभाववादी, अराजकतावादी, और 1874 में कला और संस्था के बीच संबंधों को स्थायी रूप से बदलने वाले स्वतंत्र प्रदर्शनी मॉडल के वास्तुकार। वंशावली सजावटी नहीं है। यह संस्थापक संपत्ति है।",
+                ins_title: "वैचारिक उपकरण",
+                ins_sub: "भौतिक अनुबंध",
+                ins_p: "यह सौंदर्य वस्तुओं का उत्पादन नहीं करता है। यह वैचारिक वित्तीय साधनों और अनुपालन तंत्र को इंजीनियर करता है - स्थायी कानूनी अनुबंधों द्वारा शासित भौतिक वस्तुएं जो काम के साथ चलती हैं, भले ही इसे कोई भी रखे। यह कोई दार्शनिक स्थिति नहीं है। यह एक संरचनात्मक खाई है।",
+                obj_badge: "वस्तु",
+                obj_price: "10 में से 1. $15,000.",
+                obj_p1: "एक बिना लाइसेंस वाली कैनाल स्ट्रीट रोलेक्स - खरीद के बिंदु पर $200 - अभिलेखीय राल में स्थायी रूप से संलग्न, CoCA संस्थागत चिह्न के साथ उत्कीर्ण।",
+                obj_p2: "ब्लॉक के अंदर अभी भी टिक-टिक कर रहा है।",
+                obj_p3: "अधिग्रहण एक पुनर्विक्रय अनुबंध द्वारा शासित होता है: भविष्य की किसी भी बिक्री का 50% स्थायी रूप से कलाकारों को प्रेषित होता है, भले ही काम किसी के पास हो, स्थान की परवाह किए बिना। अनुबंध वस्तु के साथ चलता है। इसे तोड़ा नहीं जा सकता।",
+                obj_f1: "यह कोई घड़ी नहीं है। यह कोई मूर्ति नहीं है। यह एक वैचारिक वित्तीय साधन है - अपनी तरह का पहला - जो भौतिक उपयोगिता के बजाय संस्थागत उत्पत्ति का मुद्रीकरण करता है।",
+                obj_f2: "$200 की वस्तु की कीमत $15,000 है क्योंकि संस्था ऐसा कहती है।",
+                obj_f3: "Koons ने इसे समझा। Hirst ने इसे समझा। Cattelan ने इसे समझा। अंतर यह है कि Do और Pissarro ने संस्था का निर्माण स्वयं किया है।",
+                opp_badge: "अवसर",
+                opp_cov_title: "अनुबंध",
+                opp_cov_1: "जेनेसिस आर्टिफैक्ट श्रृंखला में 10 कार्य शामिल हैं। संस्करण नियंत्रित है।",
+                opp_cov_2: "अनुबंध संरचना का अर्थ है कि कलाकार काम की सराहना में स्थायी रूप से भाग लेते हैं - एक पुनर्विक्रय रॉयल्टी वास्तुकला जिसका इस मूल्य बिंदु पर प्राथमिक बाजार में कोई मिसाल नहीं है।",
+                opp_bib_title: "बाइबिल",
+                opp_bib_1: "CoCA सक्रिय संस्थागत विकास में है।",
+                opp_bib_2: "कार्य के निकाय में भौतिक कलाकृतियां, वस्त्र, प्रकाशन और एक हार्डकवर संस्थागत पाठ - द CoCA बाइबिल - शामिल है, जो वर्तमान में $1,200 में उपलब्ध है।",
+                opp_nod_title: "नोड्स",
+                opp_nod_1: "Do और Pissarro पारंपरिक अर्थों में प्रतिनिधित्व की तलाश नहीं कर रहे हैं। वे संरेखित संस्थागत नोड्स की पहचान कर रहे हैं।",
+                opp_nod_2: "जेनेसिस आर्टिफैक्ट रखने वाला डीलर कोई काम नहीं बेच रहा है। वे एक अनुबंध में प्रवेश कर रहे हैं।",
+                marquee: "विश्वास को आर्थिक रूप से आत्मनिर्भर बनाने के लिए आवश्यक न्यूनतम व्यवहार्य संस्था क्या है? — ",
+                ft_badge: "संपर्क",
+                ft_title: "वैचारिक कला का<br>चर्च",
+                ft_sys: "// सिस्टम संदेश:<br>संस्था काम से पहले आती है।",
+                ft_dir: "निदेशक",
+                ft_ent: "संस्थाएं",
+                ft_loc: "स्थान",
+                ft_net: "नेटवर्क"
+            },
+            ru: {
+                hero_sub: "Заявление Художника / Институциональный Бриф",
+                hero_quote: "\"Do и Pissarro не задают вопрос. <br><span class='italic'>Они строят институт, который на него отвечает.</span>\"",
+                location: "Локация: NY · HAM · BER",
+                lin_badge: "ПРЕЕМСТВЕННОСТЬ",
+                lin_title: "Исторический Прецедент",
+                lin_sub: "Существует преемственность.",
+                lin_p1: "Дюшан поместил писсуар в галерею и назвал это искусством. Институт подтвердил это. Кунс отлил собаку из воздушных шариков из нержавеющей стали и продал ее за 58 миллионов долларов. Рынок подтвердил это. Херст поместил акулу в формальдегид. Каттелан приклеил банан скотчем к стене. Бэнкси изрезал свой собственный холст на аукционе.",
+                lin_p2: "Каждый раз задавался один и тот же вопрос: искусство ли это? <br>Каждый раз ответ был одним и тем же: решает институт.",
+                meth_badge: "I. Методология",
+                meth_p1: "Jesse Do и Paul Pissarro действуют как единая концептуальная сущность — структурные архитекторы, работающие внутри тела-хозяина рынка роскоши.",
+                meth_p2: "Их методология, <span class='font-bold'>NCR-CAM</span> (Неоклассическое возрождение корпоративного искусства), не исследует арт-объект. Она исследует систему, которая присваивает объекту его ценность.",
+                quest_badge: "II. Вопрос",
+                quest_p1: "В то время как Дюшан спрашивал, что такое искусство, Do и Pissarro спрашивают: каков минимально жизнеспособный институт, необходимый для того, чтобы сделать веру экономически самоокупаемой?",
+                quest_p2: "Ответ — Церковь Концептуального Искусства.",
+                inst_title: "Церковь Концептуального Искусства (CoCA)",
+                inst_badge: "[ РОВ ]",
+                arch_title: "Правовая Архитектура",
+                arch_sub: "Божественный Акт",
+                arch_p: "CoCA является юридически зарегистрированной религиозной организацией и культурной холдинговой компанией. Действуя как церковь, CoCA претендует на высший доступный юридический иммунитет — ту же налоговую архитектуру, которую использует Католическая церковь, применяемую к рынку современного искусства. Концепция — это божественный акт. Институт предшествует произведению.",
+                leg_title: "Историческое Наследие",
+                leg_sub: "Учредительный Актив",
+                leg_p: "Paul Pissarro является праправнуком Camille Pissarro — основателя импрессионизма, анархиста и архитектора модели независимых выставок, которая навсегда изменила отношения между искусством и институтом в 1874 году. Эта преемственность не является декоративной. Это учредительный актив.",
+                ins_title: "Концептуальные Инструменты",
+                ins_sub: "Физические Ковенанты",
+                ins_p: "Она не производит эстетических товаров. Она разрабатывает концептуальные финансовые инструменты и механизмы соответствия — физические объекты, регулируемые постоянными юридическими ковенантами, которые следуют за произведением независимо от того, кто им владеет. Это не философская позиция. Это структурный ров.",
+                obj_badge: "Объект",
+                obj_price: "1 ИЗ 10. $15,000.",
+                obj_p1: "Нелицензионный Rolex с Канал-стрит — 200 долларов на момент покупки — навсегда заключенный в архивную смолу, с выгравированным институциональным знаком CoCA.",
+                obj_p2: "Все еще тикает внутри блока.",
+                obj_p3: "Приобретение регулируется ковенантом перепродажи: 50% от любой будущей продажи постоянно перечисляются художникам, независимо от того, кто владеет произведением, независимо от места проведения. Ковенант следует за объектом. Его нельзя разорвать.",
+                obj_f1: "Это не часы. Это не скульптура. Это концептуальный финансовый инструмент — первый в своем роде — который монетизирует институциональное происхождение, а не материальную полезность.",
+                obj_f2: "Объект за 200 долларов стоит 15 000 долларов, потому что так говорит институт.",
+                obj_f3: "Кунс понимал это. Херст понимал это. Каттелан понимал это. Разница в том, что Do и Pissarro сами построили институт.",
+                opp_badge: "Возможность",
+                opp_cov_title: "КОВЕНАНТ",
+                opp_cov_1: "Серия Genesis Artifact состоит из 10 работ. Тираж контролируется.",
+                opp_cov_2: "Структура ковенанта означает, что художники постоянно участвуют в повышении ценности произведения — архитектура роялти при перепродаже, не имеющая прецедентов на первичном рынке по такой цене.",
+                opp_bib_title: "БИБЛИЯ",
+                opp_bib_1: "CoCA находится в стадии активного институционального развития.",
+                opp_bib_2: "Объем работ включает физические артефакты, одежду, публикации и институциональный текст в твердом переплете — Библию CoCA — в настоящее время доступный за 1200 долларов.",
+                opp_nod_title: "УЗЛЫ",
+                opp_nod_1: "Do и Pissarro не ищут представительства в традиционном смысле. Они выявляют согласованные институциональные узлы.",
+                opp_nod_2: "Дилер, размещающий Genesis Artifact, не продает работу. Он вступает в ковенант.",
+                marquee: "КАКОВ МИНИМАЛЬНО ЖИЗНЕСПОСОБНЫЙ ИНСТИТУТ, НЕОБХОДИМЫЙ ДЛЯ ТОГО, ЧТОБЫ СДЕЛАТЬ ВЕРУ ЭКОНОМИЧЕСКИ САМООКУПАЕМОЙ? — ",
+                ft_badge: "Контакт",
+                ft_title: "ЦЕРКОВЬ КОНЦЕПТУАЛЬНОГО<br>ИСКУССТВА",
+                ft_sys: "// СИСТЕМНОЕ СООБЩЕНИЕ:<br>ИНСТИТУТ ПРЕДШЕСТВУЕТ ПРОИЗВЕДЕНИЮ.",
+                ft_dir: "Директор",
+                ft_ent: "Сущности",
+                ft_loc: "Локации",
+                ft_net: "Сеть"
+            }
+        };
+
+        const langSwitcher = document.getElementById('lang-switcher');
+
+        function setLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            document.documentElement.lang = lang;
+            
+            // Re-trigger observer animations for fresh look
+            document.querySelectorAll('.reveal-text').forEach(el => {
+                el.classList.remove('visible');
+                setTimeout(() => el.classList.add('visible'), 50);
+            });
+        }
+
+        langSwitcher.addEventListener('change', (e) => {
+            setLanguage(e.target.value);
+            // Update the display text to show current selection
+            const val = e.target.value.toUpperCase();
+            Array.from(e.target.options).forEach(opt => {
+                opt.text = opt.value === e.target.value ? `[ ${val} ]` : opt.value.toUpperCase();
+            });
+        });
+
+        // Initialize display text
+        langSwitcher.dispatchEvent(new Event('change'));
+
         // --- THREE.JS BACKGROUND ---
         const initThreeJS = () => {
             const container = document.getElementById('canvas-container');
@@ -377,7 +858,6 @@
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
-            // Wireframe Terrain
             const geometry = new THREE.PlaneGeometry(24, 24, 32, 32);
             const material = new THREE.MeshBasicMaterial({ 
                 color: 0x000000, 
@@ -393,7 +873,6 @@
             let mouseX = 0;
             let mouseY = 0;
 
-            // Touch support for mobile
             const handleInput = (x, y) => {
                 mouseX = (x - window.innerWidth / 2) * 0.001;
                 mouseY = (y - window.innerHeight / 2) * 0.001;
@@ -415,7 +894,6 @@
 
                 for (let i = 0; i < positionAttribute.count; i++) {
                     vertex.fromBufferAttribute(positionAttribute, i);
-                    // Organic wave motion
                     const wave1 = 0.5 * Math.sin(vertex.x * 0.5 + time);
                     const wave2 = 0.3 * Math.sin(vertex.y * 0.8 + time * 1.5);
                     const wave3 = 0.1 * Math.sin(vertex.x * 2 + vertex.y * 0.5 + time);
@@ -424,7 +902,6 @@
                 }
                 positionAttribute.needsUpdate = true;
 
-                // Subtle camera float
                 plane.rotation.z += 0.0005;
                 plane.rotation.x += (mouseY * 0.5 - plane.rotation.x - Math.PI/2.5) * 0.05;
                 plane.rotation.y += (mouseX * 0.5 - plane.rotation.y) * 0.05;
@@ -441,7 +918,6 @@
             });
         };
 
-        // --- OBSERVER ---
         const initObserver = () => {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
