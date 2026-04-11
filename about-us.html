@@ -816,6 +816,9 @@
         const langSwitcher = document.getElementById('lang-switcher');
 
         function setLanguage(lang) {
+            // Fallback to English if the language isn't supported
+            if (!translations[lang]) lang = 'en';
+
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang] && translations[lang][key]) {
@@ -823,25 +826,35 @@
                 }
             });
             document.documentElement.lang = lang;
+            langSwitcher.value = lang;
             
             // Re-trigger observer animations for fresh look
             document.querySelectorAll('.reveal-text').forEach(el => {
                 el.classList.remove('visible');
                 setTimeout(() => el.classList.add('visible'), 50);
             });
+
+            // Update URL without reloading the page
+            const url = new URL(window.location);
+            url.searchParams.set('lang', lang);
+            window.history.replaceState({}, '', url);
+
+            // Update the display text to show current selection
+            Array.from(langSwitcher.options).forEach(opt => {
+                opt.text = opt.value === lang ? `[ ${lang.toUpperCase()} ]` : `[ ${opt.value.toUpperCase()} ]`;
+            });
         }
 
         langSwitcher.addEventListener('change', (e) => {
             setLanguage(e.target.value);
-            // Update the display text to show current selection
-            const val = e.target.value.toUpperCase();
-            Array.from(e.target.options).forEach(opt => {
-                opt.text = opt.value === e.target.value ? `[ ${val} ]` : opt.value.toUpperCase();
-            });
         });
 
-        // Initialize display text
-        langSwitcher.dispatchEvent(new Event('change'));
+        // Initialize language from URL parameters or default to 'en'
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        const initialLang = (urlLang && translations[urlLang]) ? urlLang : 'en';
+        
+        setLanguage(initialLang);
 
         // --- THREE.JS BACKGROUND ---
         const initThreeJS = () => {
