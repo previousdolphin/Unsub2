@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE ENTITY | J. DO + P. PISSARRO</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F2F2F2;
+            --text-color: #0F0F0F;
+            --grid-line: 1px solid #0F0F0F;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: crosshair;
+        }
+
+        /* Typography */
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        /* Borders */
+        .border-b-black { border-bottom: var(--grid-line); }
+        .border-t-black { border-top: var(--grid-line); }
+        .border-r-black { border-right: var(--grid-line); }
+        .border-black { border: var(--grid-line); }
+
+        /* Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+
+        /* Reveal Animation */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover Inversion */
+        .hover-invert {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .hover-invert:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+            padding-right: 2rem;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .mobile-stack { flex-direction: column; }
+            .mobile-border-b { border-bottom: var(--grid-line); }
+            .mobile-no-border-r { border-right: none; }
+        }
+    </style>
+</head>
+<body class="selection:bg-black selection:text-white relative">
+
+    <!-- Three.js Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 border-b-black bg-[#F2F2F2]/90 backdrop-blur-md">
+        <div class="flex justify-between items-center px-4 md:px-6 py-3 uppercase text-[10px] md:text-xs tracking-widest font-bold">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-black rounded-full inline-block animate-pulse"></span>
+                UNSUBSCRIBE LLC // CoCA
+            </div>
+            <div class="hidden md:block">J. DO + P. PISSARRO</div>
+            <div class="text-right whitespace-nowrap">[ EST. 2026 ]</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-12 md:pt-14">
+
+        <!-- SECTION 1: HERO -->
+        <section class="min-h-[85vh] flex flex-col justify-center items-center border-b-black relative px-4 py-20">
+            <div class="max-w-5xl w-full text-center reveal-text space-y-8 md:space-y-12">
+                <p class="font-mono text-[10px] md:text-xs tracking-[0.2em] text-gray-500 uppercase">
+                    Artist Statement / Institutional Brief
+                </p>
+                
+                <h1 class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.2] font-medium px-2">
+                    "Do and Pissarro are not asking the question. <br>
+                    <span class="italic">They are building the institution that answers it.</span>"
+                </h1>
+                
+                <div class="pt-8">
+                    <svg class="w-6 h-6 mx-auto animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 5V19M12 19L5 12M12 19L19 12" stroke-linecap="square"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-4 left-4 font-mono text-[9px] md:text-[10px] text-gray-400">
+                Location: NY · HAM · BER
+            </div>
+        </section>
+
+        <!-- SECTION 2: THE LINEAGE -->
+        <section class="grid grid-cols-1 md:grid-cols-12 border-b-black bg-white/80 backdrop-blur-sm">
+            <div class="hidden md:block md:col-span-4 border-r-black relative min-h-[400px]">
+                <div class="absolute bottom-6 left-6 -rotate-90 origin-bottom-left text-[10px] tracking-[0.2em] text-gray-400 whitespace-nowrap">
+                    THE LINEAGE
+                </div>
+            </div>
+            
+            <div class="md:col-span-8 p-6 md:p-16 lg:p-24 flex flex-col justify-center reveal-text">
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="h-[1px] w-8 bg-black"></span>
+                    <h2 class="font-mono text-[10px] uppercase tracking-widest">Historical Precedent</h2>
+                </div>
+                
+                <h3 class="font-serif text-2xl md:text-4xl mb-8 italic leading-tight">
+                    There is a lineage.
+                </h3>
+                
+                <div class="space-y-6 max-w-2xl">
+                    <p class="font-mono text-xs md:text-sm leading-relaxed">
+                        Duchamp placed a urinal in a gallery and called it art. The institution authenticated it. 
+                        Koons cast a balloon dog in stainless steel and sold it for $58 million. The market authenticated it. 
+                        Hirst put a shark in formaldehyde. Cattelan taped a banana to a wall. Banksy shredded his own canvas at auction.
+                    </p>
+                    <p class="font-serif text-lg md:text-2xl leading-relaxed border-l-2 border-black pl-6">
+                        Each time, the same question was asked: is this art? <br>
+                        Each time, the answer was the same: the institution decides.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: THE PRACTICE (Split Screen) -->
+        <section class="border-b-black bg-white">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <!-- NCR-CAM -->
+                <div class="p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black hover-invert group transition-all duration-300">
+                    <h4 class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">I. The Methodology</h4>
+                    <div class="font-serif text-xl md:text-3xl space-y-6 leading-tight">
+                        <p class="reveal-text"><span class="font-bold">NCR-CAM</span><br>(Neo-Classical Revival Corporate Art Movement)</p>
+                        <p class="reveal-text text-lg">Aggressively appropriating the language, structures, and tools of modern corporate ecosystems, recontextualizing them as spiritual and aesthetic artifacts.</p>
+                        <p class="reveal-text text-lg italic">It does not interrogate the art object. It interrogates the system that assigns the object its value.</p>
+                    </div>
+                </div>
+
+                <!-- Deep Institutional Reality -->
+                <div class="p-8 md:p-16 hover-invert group transition-all duration-300">
+                    <div class="flex justify-end md:justify-start">
+                        <h4 class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">II. Institutional Reality</h4>
+                    </div>
+                    <div class="font-serif text-xl md:text-3xl space-y-6 leading-tight text-right md:text-left">
+                        <p class="reveal-text">Forged from operational fluency.</p>
+                        <p class="reveal-text text-lg">Do’s background in systems engineering and tenure in the highest echelons of risk management—as a Principal Risk Analyst at Capital One and Senior Strategist at Google—provides the fluency required to manipulate complex systems.</p>
+                        <p class="reveal-text text-lg italic">Compliance pipelines and risk frameworks are not tools for mitigation; they are the raw materials of the art itself.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: THE INSTITUTION -->
+        <section class="border-b-black bg-[#F2F2F2]">
+            <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
+                <h2 class="font-serif text-2xl md:text-4xl italic pr-4">Church of Conceptual Art (CoCA)</h2>
+                <span class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1">[ THE MOAT ]</span>
+            </div>
+
+            <div class="flex flex-col">
+                <!-- Legal Architecture -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[140px] transition-colors duration-200">
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">01</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">01</div>
+                    <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Legal Architecture</h3>
+                    </div>
+                    <div class="md:col-span-7 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">The Divine Act</div>
+                        <p class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">CoCA is a legally registered religious organization and cultural holding company. By operating as a church, CoCA claims the highest available legal immunity—the same tax architecture used by the Catholic Church, applied to the contemporary art market.</p>
+                    </div>
+                </div>
+
+                <!-- Historical Legacy -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[140px] transition-colors duration-200">
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">02</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">02</div>
+                    <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Historical Legacy</h3>
+                    </div>
+                    <div class="md:col-span-7 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">The Founding Asset</div>
+                        <p class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">Paul Pissarro is the great-great-grandson of Camille Pissarro—founding Impressionist, anarchist, and architect of the independent exhibition model that permanently altered the relationship between art and institution in 1874. The lineage is not decorative. It is the founding asset.</p>
+                    </div>
+                </div>
+
+                <!-- Conceptual Instruments -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[140px] transition-colors duration-200">
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">03</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">03</div>
+                    <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Conceptual Instruments</h3>
+                    </div>
+                    <div class="md:col-span-7 p-6 flex flex-col justify-center">
+                        <div class="font-mono text-[10px] uppercase mb-2 text-gray-500 group-hover:text-gray-300 tracking-wider">Physical Covenants</div>
+                        <p class="font-serif text-lg md:text-xl italic leading-snug max-w-3xl">CoCA does not produce aesthetic goods. It engineers conceptual financial instruments and compliance mechanisms—physical objects governed by permanent legal covenants that run with the work regardless of who holds it.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: THE GENESIS ARTIFACT -->
+        <section class="border-b-black bg-black text-white p-6 md:p-20">
+            <div class="text-center mb-16 reveal-text">
+                <span class="inline-block border border-white px-3 py-1 font-mono text-[10px] uppercase tracking-widest rounded-full mb-4">The Object</span>
+            </div>
+            
+            <div class="max-w-4xl mx-auto space-y-12 text-center reveal-text">
+                <h3 class="font-serif text-4xl md:text-6xl font-bold uppercase">UNSUB-GEN-001.</h3>
+                <p class="font-mono text-xl md:text-2xl tracking-widest text-gray-400">1 OF 10. $15,000.</p>
+                
+                <div class="font-serif text-xl md:text-2xl space-y-6 leading-relaxed max-w-3xl mx-auto border-t border-b border-gray-800 py-12">
+                    <p>An unlicensed Canal Street Rolex — $200 at point of purchase — permanently encased in archival resin, etched with the CoCA institutional mark.</p>
+                    <p class="italic text-gray-400">Still ticking inside the block.</p>
+                    <p>The acquisition is governed by a resale covenant: 50% of any future sale remits permanently to the artists, regardless of who holds the work, regardless of venue. The covenant runs with the object. It cannot be severed.</p>
+                </div>
+
+                <div class="font-mono text-sm uppercase text-gray-400 max-w-2xl mx-auto leading-loose">
+                    This is not a watch. It is not a sculpture. It is a conceptual financial instrument that monetizes institutional provenance rather than material utility. The $200 object is worth $15,000 because the institution says so.
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: THE OPPORTUNITY -->
+        <section class="border-b-black bg-white p-6 md:p-20">
+            <div class="text-center mb-16 reveal-text">
+                <span class="inline-block border border-black px-3 py-1 font-mono text-[10px] uppercase tracking-widest rounded-full mb-4">The Opportunity</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="space-y-6 reveal-text">
+                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">THE COVENANT</h3>
+                    <div class="font-serif text-xl space-y-4">
+                        <p>The Genesis Artifact series comprises 10 works. The edition is controlled.</p>
+                        <p>The resale royalty architecture has no precedent in the primary market at this price point.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6 reveal-text delay-100">
+                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">THE BIBLE</h3>
+                    <div class="font-serif text-xl space-y-4">
+                        <p>CoCA is in active institutional development.</p>
+                        <p>The CoCA Bible—a hardcover institutional text—is currently available at $1,200.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6 reveal-text delay-200">
+                    <h3 class="font-mono text-lg border-b-black pb-2 inline-block">THE NODES</h3>
+                    <div class="font-serif text-xl space-y-4">
+                        <p>Do and Pissarro are not seeking representation. They are identifying aligned institutional nodes.</p>
+                        <p>The dealer who places the Genesis Artifact is not selling a work. They are entering a covenant.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: MARQUEE -->
+        <section class="border-b-black py-6 bg-[#F2F2F2]">
+             <div class="marquee-container font-mono text-[10px] md:text-xs uppercase tracking-[0.3em]">
+                <div class="marquee-content">
+                    WHAT IS THE MINIMUM VIABLE INSTITUTION REQUIRED TO MAKE BELIEF ECONOMICALLY SELF-SUSTAINING? — 
+                </div>
+                <div class="marquee-content" aria-hidden="true">
+                    WHAT IS THE MINIMUM VIABLE INSTITUTION REQUIRED TO MAKE BELIEF ECONOMICALLY SELF-SUSTAINING? — 
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: FOOTER -->
+        <footer class="bg-black text-white min-h-[80vh] flex flex-col justify-between p-6 md:p-16">
+            <div class="flex-grow flex flex-col justify-center items-center text-center reveal-text space-y-8">
+                <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-4 py-1 rounded-full">Contact</div>
+                <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl leading-[0.9]">
+                    THE CHURCH OF<br>CONCEPTUAL ART
+                </h2>
+                <p class="font-mono text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
+                    // SYSTEM MESSAGE:<br>
+                    THE INSTITUTION PRECEDES THE WORK.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono text-[10px] uppercase tracking-widest pt-12 border-t border-white/20">
+                <div>
+                    <span class="block text-gray-500 mb-2">Architects</span>
+                    Jesse Do<br>Paul Pissarro
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Entities</span>
+                    Unsubscribe LLC<br>CoCA
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Locations</span>
+                    New York<br>Hamburg<br>Berlin
+                </div>
+                <div class="text-right flex flex-col justify-between">
+                    <span class="block text-gray-500 mb-2">Network</span>
+                    <a href="mailto:ppissarro@unsubscribe.llc" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4 mb-2">ppissarro@unsubscribe.llc</a>
+                    <a href="http://nameofmy.com" class="hover:text-red-500 transition-colors">nameofmy.com</a>
+                    <a href="http://cocausa.org" class="hover:text-red-500 transition-colors">cocausa.org</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- THREE.JS BACKGROUND ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0xF2F2F2, 0.002);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Wireframe Terrain
+            const geometry = new THREE.PlaneGeometry(24, 24, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x000000, 
+                wireframe: true, 
+                transparent: true,
+                opacity: 0.08,
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            plane.rotation.x = -Math.PI / 2.5;
+            scene.add(plane);
+
+            let time = 0;
+            let mouseX = 0;
+            let mouseY = 0;
+
+            // Touch support for mobile
+            const handleInput = (x, y) => {
+                mouseX = (x - window.innerWidth / 2) * 0.001;
+                mouseY = (y - window.innerHeight / 2) * 0.001;
+            };
+
+            document.addEventListener('mousemove', (e) => handleInput(e.clientX, e.clientY));
+            document.addEventListener('touchmove', (e) => {
+                if(e.touches.length > 0) {
+                    handleInput(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                time += 0.002;
+
+                const positionAttribute = geometry.attributes.position;
+                const vertex = new THREE.Vector3();
+
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    vertex.fromBufferAttribute(positionAttribute, i);
+                    // Organic wave motion
+                    const wave1 = 0.5 * Math.sin(vertex.x * 0.5 + time);
+                    const wave2 = 0.3 * Math.sin(vertex.y * 0.8 + time * 1.5);
+                    const wave3 = 0.1 * Math.sin(vertex.x * 2 + vertex.y * 0.5 + time);
+                    vertex.z = (wave1 + wave2 + wave3) * 1.2;
+                    positionAttribute.setZ(i, vertex.z);
+                }
+                positionAttribute.needsUpdate = true;
+
+                // Subtle camera float
+                plane.rotation.z += 0.0005;
+                plane.rotation.x += (mouseY * 0.5 - plane.rotation.x - Math.PI/2.5) * 0.05;
+                plane.rotation.y += (mouseX * 0.5 - plane.rotation.y) * 0.05;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // --- OBSERVER ---
+        const initObserver = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
+        };
+
+        window.addEventListener('load', () => {
+            try { initThreeJS(); } catch (e) { console.log('WebGL fallback'); }
+            initObserver();
+        });
+    </script>
+</body>
+</html>
