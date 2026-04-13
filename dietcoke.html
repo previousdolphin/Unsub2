@@ -60,12 +60,18 @@
             pointer-events: none;
         }
 
-        /* Theme Toggle */
-        .theme-toggle {
+        /* Top Header Controls */
+        .top-controls {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 50;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .icon-btn {
             background: transparent;
             border: none;
             cursor: pointer;
@@ -75,9 +81,12 @@
             align-items: center;
             justify-content: center;
             transition: color 0.3s ease, transform 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
         }
 
-        .theme-toggle:hover {
+        .icon-btn:hover {
             color: #f40009;
             transform: scale(1.1);
         }
@@ -97,10 +106,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 450px; /* Static Minimum Height */
+            min-height: 450px; 
             scroll-snap-align: start;
             padding-bottom: 2rem;
-            pointer-events: none; /* Let mouse interact with canvas where empty */
+            pointer-events: none; 
         }
 
         .brand-container {
@@ -151,7 +160,7 @@
         .chat-section {
             flex: 0 0 auto;
             height: 55vh;
-            min-height: 450px; /* Static Minimum Height */
+            min-height: 450px; 
             position: relative;
             scroll-snap-align: start;
         }
@@ -305,22 +314,26 @@
 </head>
 <body>
 
-    <button class="theme-toggle" id="themeToggleBtn" title="Toggle Theme">
-        <svg id="moonIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-        <svg id="sunIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-    </button>
+    <div class="top-controls">
+        <button class="icon-btn" id="langToggleBtn" title="Language Protocol">EN</button>
+        
+        <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
+            <svg id="moonIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg id="sunIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+        </button>
+    </div>
 
     <canvas id="waveCanvas"></canvas>
 
@@ -329,7 +342,7 @@
         <div class="logo-section">
             <div class="brand-container">
                 <div class="logo-top">
-                    Coke <span class="logo-diet">Diet</span>
+                    <span id="cokeText">Coke</span> <span class="logo-diet">Diet</span>
                 </div>
                 <div class="oracle-text">ORACLE<br>SYSTEM</div>
                 <div class="sub-text">ai guide • llm</div>
@@ -363,14 +376,18 @@
     </div>
 
     <script>
-        // --- Theme Toggle Logic ---
+        // --- Header Controls Logic ---
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const moonIcon = document.getElementById('moonIcon');
         const sunIcon = document.getElementById('sunIcon');
+        const langToggleBtn = document.getElementById('langToggleBtn');
+        const cokeText = document.getElementById('cokeText');
+        
+        let isChinese = false;
 
+        // Theme Toggle
         themeToggleBtn.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
-            
             if (document.body.classList.contains('dark-mode')) {
                 moonIcon.style.display = 'none';
                 sunIcon.style.display = 'block';
@@ -380,13 +397,25 @@
             }
         });
 
+        // Language Toggle (Easter Egg)
+        langToggleBtn.addEventListener('click', () => {
+            isChinese = !isChinese;
+            if (isChinese) {
+                cokeText.textContent = '易經';
+                langToggleBtn.textContent = 'ZH';
+            } else {
+                cokeText.textContent = 'Coke';
+                langToggleBtn.textContent = 'EN';
+            }
+        });
+
         // --- Audio Context & Visualization Setup ---
         let audioContext;
         let analyser;
         let microphoneStream;
         let audioDataArray = new Uint8Array(0);
         let isMicVisualizing = false;
-        let isOutputVisualizing = false; // Used to fake visualization when AI talks
+        let isOutputVisualizing = false; 
 
         async function startAudioVisualizer() {
             try {
@@ -394,7 +423,7 @@
                 microphoneStream = stream;
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 128; // Lower bin count for smoother groupings
+                analyser.fftSize = 128; 
                 const source = audioContext.createMediaStreamSource(stream);
                 source.connect(analyser);
                 audioDataArray = new Uint8Array(analyser.frequencyBinCount);
@@ -476,22 +505,17 @@
                 // --- Calculate Audio Spikes ---
                 let audioSpike = 0;
                 if (isMicVisualizing && audioDataArray.length > 0) {
-                    // Map points symmetrically outward from the center of the screen
                     const centerIndex = points.length / 2;
                     const distanceFromCenter = Math.abs(index - centerIndex);
                     const normalizedDistance = distanceFromCenter / centerIndex;
                     
-                    // Map to lower frequencies (where voice lives)
                     let mappedIndex = Math.floor(normalizedDistance * (audioDataArray.length * 0.4));
                     let val = audioDataArray[mappedIndex] || 0;
                     
-                    // Create spike magnitude based on frequency bin volume
-                    audioSpike = Math.pow((val / 255), 2) * 120; // 120px max spike
+                    audioSpike = Math.pow((val / 255), 2) * 120; 
                 } 
                 else if (isOutputVisualizing) {
-                    // Simulated audio visualizer for AI TTS Output (Sine wave interference pattern)
                     let simVal = Math.sin(time * 18 + index * 0.6) * Math.sin(time * 12 - index * 0.2);
-                    // Add some erratic spikes
                     if(Math.random() > 0.95) simVal *= 1.5;
                     audioSpike = Math.abs(simVal) * 80;
                 }
@@ -566,14 +590,14 @@
 
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
+            recognition.continuous = false;
+            recognition.interimResults = false;
 
             recognition.onstart = () => {
                 isRecording = true;
                 micBtn.classList.add('recording');
                 chatInput.placeholder = "Listening...";
-                startAudioVisualizer(); // Trigger the wave spikes
+                startAudioVisualizer(); 
             };
 
             recognition.onresult = (event) => {
