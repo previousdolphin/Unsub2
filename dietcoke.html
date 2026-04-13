@@ -4,28 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diet Coke: Oracle System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            /* Light Theme Defaults */
+            --bg-color: #e2e2e2;
+            --text-main: #1a1a1a;
+            --text-muted: #555;
+            --chat-gradient: linear-gradient(to top, rgba(226,226,226,0.95) 0%, rgba(226,226,226,0) 100%);
+            --msg-user-bg: rgba(0, 0, 0, 0.05);
+            --msg-user-border: #1a1a1a;
+            --input-bg: rgba(255, 255, 255, 0.8);
+            --input-border: #ccc;
+            --toggle-color: #1a1a1a;
+        }
+
+        body.dark-mode {
+            /* Dark Theme Overrides */
+            --bg-color: #0a0a0a;
+            --text-main: #e2e2e2;
+            --text-muted: #888;
+            --chat-gradient: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+            --msg-user-bg: rgba(255, 255, 255, 0.1);
+            --msg-user-border: #e2e2e2;
+            --input-bg: rgba(20, 20, 20, 0.8);
+            --input-border: #333;
+            --toggle-color: #e2e2e2;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #e2e2e2; /* Diet Coke Silver/Gray */
+            background-color: var(--bg-color);
             font-family: 'Montserrat', sans-serif;
+            color: var(--text-main);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--toggle-color);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            color: #f40009;
+            transform: scale(1.1);
         }
 
         /* Branding Container */
         .brand-container {
             position: absolute;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 10;
-            pointer-events: none; /* Let mouse interact with canvas behind it */
-            color: #1a1a1a;
+            pointer-events: none;
         }
 
         .logo-top {
@@ -34,7 +83,7 @@
             font-weight: 700;
             letter-spacing: -2px;
             line-height: 0.8;
-            color: #f40009; /* Coke Red */
+            color: #f40009; 
             margin-bottom: 10px;
             display: flex;
             align-items: flex-start;
@@ -46,7 +95,8 @@
             font-style: italic;
             margin-bottom: 90px;
             margin-left: -90px;
-            color: #1a1a1a;
+            color: var(--text-main);
+            transition: color 0.4s ease;
         }
 
         .oracle-text {
@@ -54,7 +104,8 @@
             font-weight: 10;
             letter-spacing: 3px;
             line-height: .9;
-            color: #333;
+            color: var(--text-main);
+            transition: color 0.4s ease;
         }
 
         .sub-text {
@@ -62,7 +113,8 @@
             font-weight: 600;
             letter-spacing: 4px;
             margin-top: 10px;
-            color: #555;
+            color: var(--text-muted);
+            transition: color 0.4s ease;
         }
 
         canvas {
@@ -75,16 +127,167 @@
             z-index: 1;
         }
 
+        /* Chat Interface */
+        .chat-container {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 800px;
+            height: 45vh;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            background: var(--chat-gradient);
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background 0.4s ease;
+        }
+
+        .chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-right: 10px;
+        }
+
+        .chat-history::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-history::-webkit-scrollbar-thumb {
+            background: #f40009;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: var(--msg-user-bg);
+            color: var(--text-main);
+            border-right: 3px solid var(--msg-user-border);
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+
+        .message.oracle {
+            align-self: flex-start;
+            background-color: rgba(244, 0, 9, 0.1);
+            color: #f40009;
+            border-left: 3px solid #f40009;
+            font-weight: 600;
+        }
+
+        .message.error {
+            align-self: flex-start;
+            background-color: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            border-left: 3px solid #ffa500;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            padding: 10px 15px;
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: color 0.4s ease;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: color 0.4s ease;
+        }
+
+        .chat-input:disabled {
+            opacity: 0.5;
+        }
+
+        .btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .btn:hover:not(:disabled) {
+            color: #f40009;
+        }
+        
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .btn.recording {
+            color: #f40009;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
         /* Mobile Adjustments */
         @media (max-width: 768px) {
             .logo-top { font-size: 5rem; }
             .logo-diet { font-size: 2rem; }
             .oracle-text { font-size: 2.5rem; }
             .sub-text { font-size: 0.9rem; }
+            .chat-container { width: 95%; height: 50vh; }
         }
     </style>
 </head>
 <body>
+
+    <button class="theme-toggle" id="themeToggleBtn" title="Toggle Theme">
+        <svg id="moonIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg id="sunIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+    </button>
 
     <div class="brand-container">
         <div class="logo-top">
@@ -96,31 +299,64 @@
 
     <canvas id="waveCanvas"></canvas>
 
+    <div class="chat-container">
+        <div class="chat-history" id="chatHistory">
+            <div class="message oracle">STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
+        </div>
+        <div class="input-wrapper">
+            <button class="btn" id="micBtn" title="Talk to Enter">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                </svg>
+            </button>
+            <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters or speak..." autocomplete="off">
+            <button class="btn" id="sendBtn" title="Send">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <script>
+        // --- Theme Toggle Logic ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            } else {
+                moonIcon.style.display = 'block';
+                sunIcon.style.display = 'none';
+            }
+        });
+
+        // --- Canvas Wave Animation Logic ---
         const canvas = document.getElementById('waveCanvas');
         const ctx = canvas.getContext('2d');
-
         let width, height;
         let points = [];
-        const resolution = 20; // Distance between points
-
-        // Mouse interaction object
+        const resolution = 20; 
         const mouse = { x: -1000, y: -1000, radius: 200, isMoving: false };
 
-        // Point class for fluid spring physics
         class Point {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
                 this.baseY = y;
-                this.vy = 0; // velocity
+                this.vy = 0;
             }
-
             update(targetY) {
-                // Spring physics pushing towards the targetY
                 const stiffness = 0.04;
                 const friction = 0.85;
-
                 let dy = targetY - this.y;
                 this.vy += dy * stiffness;
                 this.vy *= friction;
@@ -128,12 +364,10 @@
             }
         }
 
-        function init() {
+        function initCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-
             points = [];
-            // Create points spanning slightly past the screen edges to hide hard cuts
             for (let x = -50; x <= width + 50; x += resolution) {
                 points.push({
                     top: new Point(x, height / 2),
@@ -143,119 +377,212 @@
         }
 
         let time = 0;
-
         function animate() {
             ctx.clearRect(0, 0, width, height);
+            time += 0.03; 
 
-            time += 0.03; // Wave speed
-
-            // Wave parameters
             const waveAmplitude1 = 40;
             const waveFrequency1 = 0.002;
             const waveAmplitude2 = 25;
             const waveFrequency2 = 0.005;
             const baseThickness = 80;
 
-            // Calculate targets and update points
             points.forEach((p, index) => {
                 const x = p.top.x;
-
-                // Mathematical undulating wave formula
                 const sineOffset = Math.sin(x * waveFrequency1 + time) * waveAmplitude1 +
                                    Math.sin(x * waveFrequency2 - time * 0.8) * waveAmplitude2;
-
-                // The ribbon's thickness changes as it rolls
                 const dynamicThickness = baseThickness + Math.sin(x * 0.003 + time * 1.5) * 40;
 
-                // Default resting Y positions
-                let targetTopY = (height * 0.65) + sineOffset - (dynamicThickness / 2);
-                let targetBottomY = (height * 0.65) + sineOffset + (dynamicThickness / 2);
+                let targetTopY = (height * 0.45) + sineOffset - (dynamicThickness / 2);
+                let targetBottomY = (height * 0.45) + sineOffset + (dynamicThickness / 2);
 
-                // Mouse Interaction Logic (Repel wave away from mouse)
                 const dx = mouse.x - x;
-                // Check distance to center of the wave ribbon at this x coordinate
                 const centerY = (targetTopY + targetBottomY) / 2;
                 const dy = mouse.y - centerY;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance < mouse.radius) {
-                    // Calculate repulsion force based on proximity
                     const force = (mouse.radius - distance) / mouse.radius;
-                    // Push down if mouse is above the wave, push up if below
                     const pushDirection = mouse.y < centerY ? 1 : -1;
                     const pushAmount = force * 120 * pushDirection;
-
                     targetTopY += pushAmount;
                     targetBottomY += pushAmount;
                 }
 
-                // Apply physics
                 p.top.update(targetTopY);
                 p.bottom.update(targetBottomY);
             });
 
-            // Draw Ribbon Shape
             ctx.beginPath();
-
-            // Draw Top Edge (Left to Right)
             ctx.moveTo(points[0].top.x, points[0].top.y);
             for (let i = 0; i < points.length - 1; i++) {
                 const xc = (points[i].top.x + points[i + 1].top.x) / 2;
                 const yc = (points[i].top.y + points[i + 1].top.y) / 2;
                 ctx.quadraticCurveTo(points[i].top.x, points[i].top.y, xc, yc);
             }
-            // Connect to last point
             ctx.lineTo(points[points.length - 1].top.x, points[points.length - 1].top.y);
-
-            // Draw Bottom Edge (Right to Left)
             ctx.lineTo(points[points.length - 1].bottom.x, points[points.length - 1].bottom.y);
             for (let i = points.length - 2; i >= 0; i--) {
                 const xc = (points[i].bottom.x + points[i + 1].bottom.x) / 2;
                 const yc = (points[i].bottom.y + points[i + 1].bottom.y) / 2;
                 ctx.quadraticCurveTo(points[i + 1].bottom.x, points[i + 1].bottom.y, xc, yc);
             }
-            // Connect back to the very first point of the bottom edge
             ctx.lineTo(points[0].bottom.x, points[0].bottom.y);
-
             ctx.closePath();
 
-            // Fill with Coke Red
+            // COCA Red
             ctx.fillStyle = '#F40009';
             ctx.fill();
 
             requestAnimationFrame(animate);
         }
 
-        // Event Listeners
-        window.addEventListener('resize', init);
+        window.addEventListener('resize', initCanvas);
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('touchmove', (e) => { if (e.touches.length > 0) { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; } }, { passive: true });
+        window.addEventListener('touchend', () => { mouse.x = -1000; mouse.y = -1000; });
+        window.addEventListener('mouseout', () => { mouse.x = -1000; mouse.y = -1000; });
 
-        // Mouse Handlers
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        // Touch Handlers for Mobile
-        window.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 0) {
-                mouse.x = e.touches[0].clientX;
-                mouse.y = e.touches[0].clientY;
-            }
-        }, { passive: true });
-
-        window.addEventListener('touchend', () => {
-            mouse.x = -1000;
-            mouse.y = -1000;
-        });
-
-        window.addEventListener('mouseout', () => {
-            mouse.x = -1000;
-            mouse.y = -1000;
-        });
-
-        // Start
-        init();
+        initCanvas();
         animate();
+
+        // --- Chat & Backend API Logic ---
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const micBtn = document.getElementById('micBtn');
+        const chatHistory = document.getElementById('chatHistory');
+        
+        // ** UPDATE THIS URL ONCE YOUR BACKEND IS READY **
+        const BACKEND_API_URL = 'https://api.your-backend.local/v1/oracle/chat';
+
+        // Setup Speech Recognition (Browser Native API for "Talk to Enter")
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isRecording = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                isRecording = true;
+                micBtn.classList.add('recording');
+                chatInput.placeholder = "Listening...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error', event.error);
+                resetMicUI();
+            };
+
+            recognition.onend = () => {
+                resetMicUI();
+                if(chatInput.value.trim() !== "") {
+                    handleSend(); 
+                }
+            };
+        } else {
+            micBtn.style.display = 'none'; 
+            console.warn("Speech Recognition API not supported in this browser.");
+        }
+
+        function resetMicUI() {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            chatInput.placeholder = "Enter parameters or speak...";
+        }
+
+        micBtn.addEventListener('click', () => {
+            if (!recognition) return;
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+
+        // Appending messages to the UI
+        function appendMessage(text, type) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', type);
+            msgDiv.textContent = text;
+            chatHistory.appendChild(msgDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // Frontend AI Voice Synthesis (Temporary text-to-speech fallback)
+        function speakResponse(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                const voices = window.speechSynthesis.getVoices();
+                utterance.voice = voices.find(v => v.name.includes('Google UK English Male')) || voices[0];
+                utterance.pitch = 0.8;
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function setLoadingState(isLoading) {
+            chatInput.disabled = isLoading;
+            sendBtn.disabled = isLoading;
+            if(isLoading) {
+                chatInput.placeholder = "Consulting architecture...";
+            } else {
+                chatInput.placeholder = "Enter parameters or speak...";
+                chatInput.focus();
+            }
+        }
+
+        // Main Send Handler with Fetch and Error Catching
+        async function handleSend() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, 'user');
+            chatInput.value = '';
+            setLoadingState(true);
+
+            try {
+                const response = await fetch(BACKEND_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: text })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const replyText = data.reply || "EMPTY RESPONSE GENERATED.";
+                
+                appendMessage(replyText, 'oracle');
+                speakResponse(replyText); 
+
+            } catch (error) {
+                console.error("Backend Connection Error:", error);
+                
+                if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
+                    appendMessage("[ERR: CONNECTION REFUSED] PLEASE ENSURE THE PRODUCT NODE IS ONLINE.", 'error');
+                } else {
+                    appendMessage(`[ERR: SYSTEM] INTERNAL ARCHITECTURE ERROR. CANNOT PROCESS REQUEST.`, 'error');
+                }
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+
     </script>
 </body>
 </html>
