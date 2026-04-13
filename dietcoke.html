@@ -42,18 +42,18 @@
         }
 
         .logo-diet {
-            font-size: 3.5rem;
+            font-size: 2.6rem;
             font-style: italic;
-            margin-bottom: 10px;
-            margin-left: -120px;
+            margin-bottom: 90px;
+            margin-left: -90px;
             color: #1a1a1a;
         }
 
         .oracle-text {
             font-size: 4rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            line-height: 1.1;
+            font-weight: 10;
+            letter-spacing: 3px;
+            line-height: .9;
             color: #333;
         }
 
@@ -103,7 +103,7 @@
         let width, height;
         let points = [];
         const resolution = 20; // Distance between points
-        
+
         // Mouse interaction object
         const mouse = { x: -1000, y: -1000, radius: 200, isMoving: false };
 
@@ -120,7 +120,7 @@
                 // Spring physics pushing towards the targetY
                 const stiffness = 0.04;
                 const friction = 0.85;
-                
+
                 let dy = targetY - this.y;
                 this.vy += dy * stiffness;
                 this.vy *= friction;
@@ -131,7 +131,7 @@
         function init() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            
+
             points = [];
             // Create points spanning slightly past the screen edges to hide hard cuts
             for (let x = -50; x <= width + 50; x += resolution) {
@@ -146,7 +146,7 @@
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            
+
             time += 0.03; // Wave speed
 
             // Wave parameters
@@ -159,11 +159,11 @@
             // Calculate targets and update points
             points.forEach((p, index) => {
                 const x = p.top.x;
-                
+
                 // Mathematical undulating wave formula
-                const sineOffset = Math.sin(x * waveFrequency1 + time) * waveAmplitude1 + 
+                const sineOffset = Math.sin(x * waveFrequency1 + time) * waveAmplitude1 +
                                    Math.sin(x * waveFrequency2 - time * 0.8) * waveAmplitude2;
-                
+
                 // The ribbon's thickness changes as it rolls
                 const dynamicThickness = baseThickness + Math.sin(x * 0.003 + time * 1.5) * 40;
 
@@ -183,8 +183,8 @@
                     const force = (mouse.radius - distance) / mouse.radius;
                     // Push down if mouse is above the wave, push up if below
                     const pushDirection = mouse.y < centerY ? 1 : -1;
-                    const pushAmount = force * 120 * pushDirection; 
-                    
+                    const pushAmount = force * 120 * pushDirection;
+
                     targetTopY += pushAmount;
                     targetBottomY += pushAmount;
                 }
@@ -196,7 +196,7 @@
 
             // Draw Ribbon Shape
             ctx.beginPath();
-            
+
             // Draw Top Edge (Left to Right)
             ctx.moveTo(points[0].top.x, points[0].top.y);
             for (let i = 0; i < points.length - 1; i++) {
@@ -216,7 +216,7 @@
             }
             // Connect back to the very first point of the bottom edge
             ctx.lineTo(points[0].bottom.x, points[0].bottom.y);
-            
+
             ctx.closePath();
 
             // Fill with Coke Red
@@ -247,7 +247,7 @@
             mouse.x = -1000;
             mouse.y = -1000;
         });
-        
+
         window.addEventListener('mouseout', () => {
             mouse.x = -1000;
             mouse.y = -1000;
@@ -259,4 +259,3 @@
     </script>
 </body>
 </html>
-
