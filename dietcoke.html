@@ -1,0 +1,264 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Coke: Oracle System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #e2e2e2; /* Diet Coke Silver/Gray */
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Branding Container */
+        .brand-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none; /* Let mouse interact with canvas behind it */
+            color: #1a1a1a;
+        }
+
+        .logo-top {
+            font-family: 'Playfair Display', serif;
+            font-size: 8rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 0.8;
+            color: #f40009; /* Coke Red */
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .logo-diet {
+            font-size: 3.5rem;
+            font-style: italic;
+            margin-bottom: 30px;
+            margin-left: -10px;
+            color: #1a1a1a;
+        }
+
+        .oracle-text {
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            color: #333;
+        }
+
+        .sub-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 4px;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .logo-top { font-size: 5rem; }
+            .logo-diet { font-size: 2rem; }
+            .oracle-text { font-size: 2.5rem; }
+            .sub-text { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="brand-container">
+        <div class="logo-top">
+            Coke <span class="logo-diet">Diet</span>
+        </div>
+        <div class="oracle-text">ORACLE<br>SYSTEM</div>
+        <div class="sub-text">ai guide • llm</div>
+    </div>
+
+    <canvas id="waveCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let points = [];
+        const resolution = 20; // Distance between points
+        
+        // Mouse interaction object
+        const mouse = { x: -1000, y: -1000, radius: 200, isMoving: false };
+
+        // Point class for fluid spring physics
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.baseY = y;
+                this.vy = 0; // velocity
+            }
+
+            update(targetY) {
+                // Spring physics pushing towards the targetY
+                const stiffness = 0.04;
+                const friction = 0.85;
+                
+                let dy = targetY - this.y;
+                this.vy += dy * stiffness;
+                this.vy *= friction;
+                this.y += this.vy;
+            }
+        }
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            
+            points = [];
+            // Create points spanning slightly past the screen edges to hide hard cuts
+            for (let x = -50; x <= width + 50; x += resolution) {
+                points.push({
+                    top: new Point(x, height / 2),
+                    bottom: new Point(x, height / 2)
+                });
+            }
+        }
+
+        let time = 0;
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            time += 0.03; // Wave speed
+
+            // Wave parameters
+            const waveAmplitude1 = 40;
+            const waveFrequency1 = 0.002;
+            const waveAmplitude2 = 25;
+            const waveFrequency2 = 0.005;
+            const baseThickness = 80;
+
+            // Calculate targets and update points
+            points.forEach((p, index) => {
+                const x = p.top.x;
+                
+                // Mathematical undulating wave formula
+                const sineOffset = Math.sin(x * waveFrequency1 + time) * waveAmplitude1 + 
+                                   Math.sin(x * waveFrequency2 - time * 0.8) * waveAmplitude2;
+                
+                // The ribbon's thickness changes as it rolls
+                const dynamicThickness = baseThickness + Math.sin(x * 0.003 + time * 1.5) * 40;
+
+                // Default resting Y positions
+                let targetTopY = (height * 0.65) + sineOffset - (dynamicThickness / 2);
+                let targetBottomY = (height * 0.65) + sineOffset + (dynamicThickness / 2);
+
+                // Mouse Interaction Logic (Repel wave away from mouse)
+                const dx = mouse.x - x;
+                // Check distance to center of the wave ribbon at this x coordinate
+                const centerY = (targetTopY + targetBottomY) / 2;
+                const dy = mouse.y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < mouse.radius) {
+                    // Calculate repulsion force based on proximity
+                    const force = (mouse.radius - distance) / mouse.radius;
+                    // Push down if mouse is above the wave, push up if below
+                    const pushDirection = mouse.y < centerY ? 1 : -1;
+                    const pushAmount = force * 120 * pushDirection; 
+                    
+                    targetTopY += pushAmount;
+                    targetBottomY += pushAmount;
+                }
+
+                // Apply physics
+                p.top.update(targetTopY);
+                p.bottom.update(targetBottomY);
+            });
+
+            // Draw Ribbon Shape
+            ctx.beginPath();
+            
+            // Draw Top Edge (Left to Right)
+            ctx.moveTo(points[0].top.x, points[0].top.y);
+            for (let i = 0; i < points.length - 1; i++) {
+                const xc = (points[i].top.x + points[i + 1].top.x) / 2;
+                const yc = (points[i].top.y + points[i + 1].top.y) / 2;
+                ctx.quadraticCurveTo(points[i].top.x, points[i].top.y, xc, yc);
+            }
+            // Connect to last point
+            ctx.lineTo(points[points.length - 1].top.x, points[points.length - 1].top.y);
+
+            // Draw Bottom Edge (Right to Left)
+            ctx.lineTo(points[points.length - 1].bottom.x, points[points.length - 1].bottom.y);
+            for (let i = points.length - 2; i >= 0; i--) {
+                const xc = (points[i].bottom.x + points[i + 1].bottom.x) / 2;
+                const yc = (points[i].bottom.y + points[i + 1].bottom.y) / 2;
+                ctx.quadraticCurveTo(points[i + 1].bottom.x, points[i + 1].bottom.y, xc, yc);
+            }
+            // Connect back to the very first point of the bottom edge
+            ctx.lineTo(points[0].bottom.x, points[0].bottom.y);
+            
+            ctx.closePath();
+
+            // Fill with Coke Red
+            ctx.fillStyle = '#F40009';
+            ctx.fill();
+
+            requestAnimationFrame(animate);
+        }
+
+        // Event Listeners
+        window.addEventListener('resize', init);
+
+        // Mouse Handlers
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        // Touch Handlers for Mobile
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            mouse.x = -1000;
+            mouse.y = -1000;
+        });
+        
+        window.addEventListener('mouseout', () => {
+            mouse.x = -1000;
+            mouse.y = -1000;
+        });
+
+        // Start
+        init();
+        animate();
+    </script>
+</body>
+</html>
+
+```
