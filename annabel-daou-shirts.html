@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        :root { 
+        :root {
             --paper: #FDFDFB;
             --ink: #121212;
             --charcoal: #333333;
@@ -69,6 +69,16 @@
 </head>
 <body class="selection:bg-black selection:text-white">
 
+    <!-- Full Screen Image Modal -->
+    <div id="image-modal" class="fixed inset-0 z-50 hidden bg-white/95 flex items-center justify-center p-4 cursor-zoom-out opacity-0 transition-opacity duration-300">
+        <button id="close-modal" class="absolute top-6 right-6 text-gray-500 hover:text-black focus:outline-none transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <img id="modal-image" src="" alt="Expanded view" class="max-w-full max-h-full object-contain pointer-events-none shadow-2xl">
+    </div>
+
     <nav class="w-full p-6 md:p-12 flex justify-between items-start">
         <div class="text-sm tracking-widest uppercase text-gray-500">
             Limited Edition T-Shirt Drop
@@ -113,7 +123,7 @@
             <article class="flex flex-col">
                 <div class="aspect-[4/5] w-full img-placeholder mb-8">
                     <span>TSOH</span>
-                    <img src="BLACK-TSOH.png" alt="This Side of History T-Shirt" class="w-full h-full object-cover object-center" onerror="this.style.opacity='0'">
+                    <img src="BLACK-TSOH.png" alt="This Side of History T-Shirt" class="w-full h-full object-cover object-center cursor-zoom-in transition-transform duration-300 hover:scale-[1.02] zoomable-image" onerror="this.style.opacity='0'">
                 </div>
                 <div class="flex-grow">
                     <h3 class="font-serif-custom text-2xl md:text-3xl mb-3">"This Side of History"</h3>
@@ -136,7 +146,7 @@
             <article class="flex flex-col">
                 <div class="aspect-[4/5] w-full img-placeholder mb-8">
                     <span>Thistle</span>
-                      <img src="WHITE-THISTLE.png" alt="Thistle T-Shirt" class="w-full h-full object-cover object-center" onerror="this.style.opacity='0'">
+                      <img src="WHITE-THISTLE.png" alt="Thistle T-Shirt" class="w-full h-full object-cover object-center cursor-zoom-in transition-transform duration-300 hover:scale-[1.02] zoomable-image" onerror="this.style.opacity='0'">
                 </div>
                 <div class="flex-grow">
                     <h3 class="font-serif-custom text-2xl md:text-3xl mb-3">"Thistle"</h3>
@@ -159,7 +169,7 @@
             <article class="flex flex-col">
                 <div class="aspect-[4/5] w-full img-placeholder mb-8">
                     <span>I Prefer Not</span>
-                      <img src="I-PREFER-NOT.png" alt="I Prefer Not T-Shirt" class="w-full h-full object-cover object-center" onerror="this.style.opacity='0'">
+                      <img src="I-PREFER-NOT.png" alt="I Prefer Not T-Shirt" class="w-full h-full object-cover object-center cursor-zoom-in transition-transform duration-300 hover:scale-[1.02] zoomable-image" onerror="this.style.opacity='0'">
                 </div>
                 <div class="flex-grow">
                     <h3 class="font-serif-custom text-2xl md:text-3xl mb-3">"I Prefer Not"</h3>
@@ -207,6 +217,54 @@
             <a href="terms.html" class="hover:text-black transition-colors">Terms</a>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            const zoomableImages = document.querySelectorAll('.zoomable-image');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            function openModal(src) {
+                modalImg.src = src;
+                modal.classList.remove('hidden');
+                // Small delay to allow display:flex to apply before changing opacity for smooth fade in
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                }, 10);
+                document.body.style.overflow = 'hidden'; // Prevent page scrolling behind modal
+            }
+
+            function closeModal() {
+                modal.classList.add('opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modalImg.src = '';
+                }, 300); // Matches the duration-300 transition
+                document.body.style.overflow = ''; // Restore page scrolling
+            }
+
+            zoomableImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    openModal(img.src);
+                });
+            });
+
+            // Close modal when clicking anywhere on the modal background or the close button
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target === closeModalBtn || closeModalBtn.contains(e.target)) {
+                    closeModal();
+                }
+            });
+
+            // Close modal when pressing the Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
