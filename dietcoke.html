@@ -37,16 +37,32 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
             background-color: var(--bg-color);
             font-family: 'Montserrat', sans-serif;
             color: var(--text-main);
             transition: background-color 0.4s ease, color 0.4s ease;
+            
+            /* Enable scrolling with a soft lock */
+            overflow-x: hidden;
+            overflow-y: auto;
+            scroll-snap-type: y proximity;
+        }
+
+        /* Canvas remains fixed in the background */
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
         }
 
         /* Theme Toggle */
         .theme-toggle {
-            position: absolute;
+            position: fixed;
             top: 20px;
             right: 20px;
             z-index: 50;
@@ -66,16 +82,29 @@
             transform: scale(1.1);
         }
 
-        /* Branding Container */
-        .brand-container {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+        /* --- Layout Architecture --- */
+        .layout-wrapper {
+            position: relative;
             z-index: 10;
-            pointer-events: none;
-            width: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Logo Section */
+        .logo-section {
+            flex: 1 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 450px; /* Static Minimum Height */
+            scroll-snap-align: start;
+            padding-bottom: 2rem;
+            pointer-events: none; /* Let mouse interact with canvas where empty */
+        }
+
+        .brand-container {
+            text-align: center;
         }
 
         .logo-top {
@@ -118,31 +147,25 @@
             transition: color 0.4s ease;
         }
 
-        canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+        /* Chat Section */
+        .chat-section {
+            flex: 0 0 auto;
+            height: 55vh;
+            min-height: 450px; /* Static Minimum Height */
+            position: relative;
+            scroll-snap-align: start;
         }
 
-        /* Chat Interface */
         .chat-container {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
             width: 100%;
             max-width: 800px;
-            height: 45vh;
-            z-index: 20;
+            height: 100%;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
             background: var(--chat-gradient);
             padding: 20px;
-            padding-top: 40px; /* Push messages down slightly from the fade edge */
+            padding-top: 40px;
             box-sizing: border-box;
             transition: background 0.4s ease;
         }
@@ -206,7 +229,7 @@
             border: 1px solid var(--input-border);
             padding: 10px 15px;
             transition: background 0.4s ease, border-color 0.4s ease;
-            margin-bottom: env(safe-area-inset-bottom, 10px); /* iPhone notch/home bar safe area */
+            margin-bottom: env(safe-area-inset-bottom, 10px); 
         }
 
         .chat-input {
@@ -218,7 +241,7 @@
             font-size: 1rem;
             outline: none;
             transition: color 0.4s ease;
-            min-width: 0; /* Prevents input from blowing out flex container on mobile */
+            min-width: 0; 
         }
 
         .chat-input::placeholder {
@@ -266,44 +289,17 @@
             100% { transform: scale(1); }
         }
 
-        /* --- Mobile Adjustments --- */
+        /* Mobile Adjustments */
         @media (max-width: 768px) {
-            .brand-container { 
-                top: 25%; /* Shifted up to avoid collision */
-            }
-            .logo-top { 
-                font-size: 4.5rem; 
-            }
-            .logo-diet { 
-                font-size: 1.5rem; 
-                margin-bottom: 55px; 
-                margin-left: -50px; 
-            }
-            .oracle-text { 
-                font-size: 2.2rem; 
-            }
-            .sub-text { 
-                font-size: 0.85rem; 
-            }
-            .chat-container { 
-                width: 100%; 
-                height: 55vh; /* Fixed height for text area */
-                padding: 15px;
-                padding-top: 40px;
-            }
-            .message {
-                font-size: 0.85rem;
-                padding: 10px 14px;
-            }
-            .input-wrapper {
-                padding: 8px 12px;
-            }
-            .chat-input {
-                font-size: 0.9rem;
-            }
-            .chat-input::placeholder {
-                font-size: 0.7rem;
-            }
+            .logo-top { font-size: 4.5rem; }
+            .logo-diet { font-size: 1.5rem; margin-bottom: 55px; margin-left: -50px; }
+            .oracle-text { font-size: 2.2rem; }
+            .sub-text { font-size: 0.85rem; }
+            .chat-container { padding: 15px; padding-top: 40px; }
+            .message { font-size: 0.85rem; padding: 10px 14px; }
+            .input-wrapper { padding: 8px 12px; }
+            .chat-input { font-size: 0.9rem; }
+            .chat-input::placeholder { font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -326,36 +322,44 @@
         </svg>
     </button>
 
-    <div class="brand-container">
-        <div class="logo-top">
-            Coke <span class="logo-diet">Diet</span>
-        </div>
-        <div class="oracle-text">ORACLE<br>SYSTEM</div>
-        <div class="sub-text">ai guide • llm</div>
-    </div>
-
     <canvas id="waveCanvas"></canvas>
 
-    <div class="chat-container">
-        <div class="chat-history" id="chatHistory">
-            <div class="message oracle">STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
+    <div class="layout-wrapper">
+        
+        <div class="logo-section">
+            <div class="brand-container">
+                <div class="logo-top">
+                    Coke <span class="logo-diet">Diet</span>
+                </div>
+                <div class="oracle-text">ORACLE<br>SYSTEM</div>
+                <div class="sub-text">ai guide • llm</div>
+            </div>
         </div>
-        <div class="input-wrapper">
-            <button class="btn" id="micBtn" title="Talk to Enter">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
-                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" y1="19" x2="12" y2="22"></line>
-                </svg>
-            </button>
-            <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters or speak..." autocomplete="off">
-            <button class="btn" id="sendBtn" title="Send">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
+
+        <div class="chat-section">
+            <div class="chat-container">
+                <div class="chat-history" id="chatHistory">
+                    <div class="message oracle">STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
+                </div>
+                <div class="input-wrapper">
+                    <button class="btn" id="micBtn" title="Talk to Enter">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="22"></line>
+                        </svg>
+                    </button>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters or speak..." autocomplete="off">
+                    <button class="btn" id="sendBtn" title="Send">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
+
     </div>
 
     <script>
@@ -375,6 +379,40 @@
                 sunIcon.style.display = 'none';
             }
         });
+
+        // --- Audio Context & Visualization Setup ---
+        let audioContext;
+        let analyser;
+        let microphoneStream;
+        let audioDataArray = new Uint8Array(0);
+        let isMicVisualizing = false;
+        let isOutputVisualizing = false; // Used to fake visualization when AI talks
+
+        async function startAudioVisualizer() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                microphoneStream = stream;
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 128; // Lower bin count for smoother groupings
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                audioDataArray = new Uint8Array(analyser.frequencyBinCount);
+                isMicVisualizing = true;
+            } catch (err) {
+                console.warn("Could not start audio visualizer:", err);
+            }
+        }
+
+        function stopAudioVisualizer() {
+            isMicVisualizing = false;
+            if (microphoneStream) {
+                microphoneStream.getTracks().forEach(track => track.stop());
+            }
+            if (audioContext && audioContext.state !== 'closed') {
+                audioContext.close();
+            }
+        }
 
         // --- Canvas Wave Animation Logic ---
         const canvas = document.getElementById('waveCanvas');
@@ -418,6 +456,11 @@
             ctx.clearRect(0, 0, width, height);
             time += 0.03; 
 
+            // Grab audio frequencies if listening
+            if (isMicVisualizing && analyser) {
+                analyser.getByteFrequencyData(audioDataArray);
+            }
+
             const waveAmplitude1 = 40;
             const waveFrequency1 = 0.002;
             const waveAmplitude2 = 25;
@@ -430,9 +473,34 @@
                                    Math.sin(x * waveFrequency2 - time * 0.8) * waveAmplitude2;
                 const dynamicThickness = baseThickness + Math.sin(x * 0.003 + time * 1.5) * 40;
 
-                let targetTopY = (height * 0.45) + sineOffset - (dynamicThickness / 2);
-                let targetBottomY = (height * 0.45) + sineOffset + (dynamicThickness / 2);
+                // --- Calculate Audio Spikes ---
+                let audioSpike = 0;
+                if (isMicVisualizing && audioDataArray.length > 0) {
+                    // Map points symmetrically outward from the center of the screen
+                    const centerIndex = points.length / 2;
+                    const distanceFromCenter = Math.abs(index - centerIndex);
+                    const normalizedDistance = distanceFromCenter / centerIndex;
+                    
+                    // Map to lower frequencies (where voice lives)
+                    let mappedIndex = Math.floor(normalizedDistance * (audioDataArray.length * 0.4));
+                    let val = audioDataArray[mappedIndex] || 0;
+                    
+                    // Create spike magnitude based on frequency bin volume
+                    audioSpike = Math.pow((val / 255), 2) * 120; // 120px max spike
+                } 
+                else if (isOutputVisualizing) {
+                    // Simulated audio visualizer for AI TTS Output (Sine wave interference pattern)
+                    let simVal = Math.sin(time * 18 + index * 0.6) * Math.sin(time * 12 - index * 0.2);
+                    // Add some erratic spikes
+                    if(Math.random() > 0.95) simVal *= 1.5;
+                    audioSpike = Math.abs(simVal) * 80;
+                }
 
+                // Apply offsets
+                let targetTopY = (height * 0.40) + sineOffset - (dynamicThickness / 2) - audioSpike;
+                let targetBottomY = (height * 0.40) + sineOffset + (dynamicThickness / 2) + audioSpike;
+
+                // Mouse Repulsion
                 const dx = mouse.x - x;
                 const centerY = (targetTopY + targetBottomY) / 2;
                 const dy = mouse.y - centerY;
@@ -450,6 +518,7 @@
                 p.bottom.update(targetBottomY);
             });
 
+            // Draw Ribbon
             ctx.beginPath();
             ctx.moveTo(points[0].top.x, points[0].top.y);
             for (let i = 0; i < points.length - 1; i++) {
@@ -490,6 +559,7 @@
         
         const BACKEND_API_URL = 'https://api.your-backend.local/v1/oracle/chat';
 
+        // Setup Speech Recognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null;
         let isRecording = false;
@@ -503,6 +573,7 @@
                 isRecording = true;
                 micBtn.classList.add('recording');
                 chatInput.placeholder = "Listening...";
+                startAudioVisualizer(); // Trigger the wave spikes
             };
 
             recognition.onresult = (event) => {
@@ -523,13 +594,14 @@
             };
         } else {
             micBtn.style.display = 'none'; 
-            console.warn("Speech Recognition API not supported in this browser.");
+            console.warn("Speech Recognition API not supported.");
         }
 
         function resetMicUI() {
             isRecording = false;
             micBtn.classList.remove('recording');
             chatInput.placeholder = "Enter parameters or speak...";
+            stopAudioVisualizer();
         }
 
         micBtn.addEventListener('click', () => {
@@ -556,6 +628,12 @@
                 utterance.voice = voices.find(v => v.name.includes('Google UK English Male')) || voices[0];
                 utterance.pitch = 0.8;
                 utterance.rate = 0.9;
+                
+                // Trigger AI Visualizer Spikes
+                utterance.onstart = () => { isOutputVisualizing = true; };
+                utterance.onend = () => { isOutputVisualizing = false; };
+                utterance.onerror = () => { isOutputVisualizing = false; };
+
                 window.speechSynthesis.speak(utterance);
             }
         }
@@ -578,6 +656,10 @@
             appendMessage(text, 'user');
             chatInput.value = '';
             setLoadingState(true);
+
+            // Cancel any ongoing AI speech so they don't overlap
+            window.speechSynthesis.cancel();
+            isOutputVisualizing = false;
 
             try {
                 const response = await fetch(BACKEND_API_URL, {
