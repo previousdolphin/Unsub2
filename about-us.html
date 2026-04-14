@@ -103,7 +103,7 @@
         }
     </style>
 </head>
-<body class="selection:bg-black selection:text-white relative">
+<body class="selection:bg-black selection:text-white relative" dir="ltr">
 
     <div id="canvas-container"></div>
 
@@ -117,7 +117,7 @@
             
             <div class="flex items-center gap-4">
                 <div class="relative group">
-                    <select id="lang-switcher" class="bg-transparent border-none outline-none cursor-pointer uppercase font-mono text-[10px] md:text-xs text-right appearance-none hover:text-gray-500 transition-colors">
+                    <select id="lang-switcher" class="bg-transparent border-none outline-none cursor-pointer uppercase font-mono text-[10px] md:text-xs appearance-none hover:text-gray-500 transition-colors" style="text-align-last: right;">
                         <option value="en">[ EN ]</option>
                         <option value="fr">[ FR ]</option>
                         <option value="de">[ DE ]</option>
@@ -130,6 +130,7 @@
                         <option value="hi">[ HI ]</option>
                         <option value="ru">[ RU ]</option>
                         <option value="ar">[ AR ]</option>
+                        <option value="he">[ HE ]</option>
                     </select>
                 </div>
                 <div class="hidden md:block whitespace-nowrap">[ EST. 2026 ]</div>
@@ -164,7 +165,7 @@
 
         <section class="grid grid-cols-1 md:grid-cols-12 border-b-black bg-white/80 backdrop-blur-sm">
             <div class="hidden md:block md:col-span-4 border-r-black relative min-h-[400px]">
-                <div data-i18n="lin_badge" class="absolute bottom-6 left-6 -rotate-90 origin-bottom-left text-[10px] tracking-[0.2em] text-gray-400 whitespace-nowrap uppercase">
+                <div data-i18n="lin_badge" class="absolute bottom-6 left-6 ltr:-rotate-90 rtl:rotate-90 origin-bottom-left text-[10px] tracking-[0.2em] text-gray-400 whitespace-nowrap uppercase">
                     THE LINEAGE
                 </div>
             </div>
@@ -185,7 +186,7 @@
                         Koons cast a balloon dog in stainless steel and sold it for $58 million. The market authenticated it. 
                         Hirst put a shark in formaldehyde. Cattelan taped a banana to a wall. Banksy shredded his own canvas at auction.
                     </p>
-                    <p data-i18n="lin_p2" class="font-serif text-lg md:text-2xl leading-relaxed border-l-2 border-black pl-6">
+                    <p data-i18n="lin_p2" class="font-serif text-lg md:text-2xl leading-relaxed ltr:border-l-2 rtl:border-r-2 border-black ltr:pl-6 rtl:pr-6">
                         Each time, the same question was asked: is this art? <br>
                         Each time, the answer was the same: the institution decides.
                     </p>
@@ -195,7 +196,7 @@
 
         <section class="border-b-black bg-white">
             <div class="grid grid-cols-1 md:grid-cols-2">
-                <div class="p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black hover-invert group transition-all duration-300">
+                <div class="p-8 md:p-16 border-b-black md:border-b-0 ltr:md:border-r-black rtl:md:border-l-black hover-invert group transition-all duration-300">
                     <h4 data-i18n="meth_badge" class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">I. The Methodology</h4>
                     <div class="font-serif text-xl md:text-3xl space-y-6 leading-tight">
                         <p data-i18n="meth_p1" class="reveal-text">Jesse Do and Paul Pissarro operate as a single conceptual entity — structural architects working within the host body of the luxury market.</p>
@@ -204,10 +205,10 @@
                 </div>
 
                 <div class="p-8 md:p-16 hover-invert group transition-all duration-300">
-                    <div class="flex justify-end md:justify-start">
+                    <div class="flex justify-end ltr:md:justify-start rtl:md:justify-end">
                         <h4 data-i18n="quest_badge" class="font-mono text-[10px] uppercase tracking-widest mb-10 text-gray-400 group-hover:text-white/70">II. The Question</h4>
                     </div>
-                    <div class="font-serif text-xl md:text-3xl space-y-6 leading-tight text-right md:text-left">
+                    <div class="font-serif text-xl md:text-3xl space-y-6 leading-tight ltr:text-right rtl:text-left ltr:md:text-left rtl:md:text-right">
                         <p data-i18n="quest_p1" class="reveal-text">Where Duchamp asked what is art, Do and Pissarro ask what is the minimum viable institution required to make belief economically self-sustaining?</p>
                         <p data-i18n="quest_p2" class="reveal-text text-lg italic">The answer is The Church of Conceptual Art.</p>
                     </div>
@@ -223,11 +224,11 @@
 
             <div class="flex flex-col">
                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[140px] transition-colors duration-200">
-                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                    <div class="hidden md:flex md:col-span-1 p-6 ltr:border-r-black rtl:border-l-black items-start justify-center">
                         <span class="font-mono text-xs opacity-40 group-hover:opacity-100">01</span>
                     </div>
                     <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">01</div>
-                    <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
+                    <div class="md:col-span-4 p-6 ltr:md:border-r-black rtl:md:border-l-black flex items-center">
                         <h3 data-i18n="arch_title" class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Legal Architecture</h3>
                     </div>
                     <div class="md:col-span-7 p-6 flex flex-col justify-center">
@@ -237,11 +238,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[140px] transition-colors duration-200">
-                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                    <div class="hidden md:flex md:col-span-1 p-6 ltr:border-r-black rtl:border-l-black items-start justify-center">
                         <span class="font-mono text-xs opacity-40 group-hover:opacity-100">02</span>
                     </div>
                     <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">02</div>
-                    <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
+                    <div class="md:col-span-4 p-6 ltr:md:border-r-black rtl:md:border-l-black flex items-center">
                         <h3 data-i18n="leg_title" class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Historical Legacy</h3>
                     </div>
                     <div class="md:col-span-7 p-6 flex flex-col justify-center">
@@ -251,11 +252,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[140px] transition-colors duration-200">
-                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                    <div class="hidden md:flex md:col-span-1 p-6 ltr:border-r-black rtl:border-l-black items-start justify-center">
                         <span class="font-mono text-xs opacity-40 group-hover:opacity-100">03</span>
                     </div>
                     <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">03</div>
-                    <div class="md:col-span-4 p-6 md:border-r-black flex items-center">
+                    <div class="md:col-span-4 p-6 ltr:md:border-r-black rtl:md:border-l-black flex items-center">
                         <h3 data-i18n="ins_title" class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none">Conceptual Instruments</h3>
                     </div>
                     <div class="md:col-span-7 p-6 flex flex-col justify-center">
@@ -322,7 +323,7 @@
         </section>
 
         <section class="border-b-black py-6 bg-[#F2F2F2]">
-             <div class="marquee-container font-mono text-[10px] md:text-xs uppercase tracking-[0.3em]">
+             <div class="marquee-container font-mono text-[10px] md:text-xs uppercase tracking-[0.3em]" dir="ltr">
                 <div data-i18n="marquee" class="marquee-content">
                     WHAT IS THE MINIMUM VIABLE INSTITUTION REQUIRED TO MAKE BELIEF ECONOMICALLY SELF-SUSTAINING? — 
                 </div>
@@ -357,7 +358,7 @@
                     <span data-i18n="ft_loc" class="block text-gray-500 mb-2">Locations</span>
                     New York<br>Hamburg<br>Berlin
                 </div>
-                <div class="text-right flex flex-col justify-between">
+                <div class="text-right rtl:text-left flex flex-col justify-between" dir="ltr">
                     <span data-i18n="ft_net" class="block text-gray-500 mb-2">Network</span>
                     <a href="mailto:ppissarro@unsubscribe.llc" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4 mb-2">ppissarro@unsubscribe.llc</a>
                     <a href="http://nameofmy.com" class="hover:text-red-500 transition-colors">nameofmy.com</a>
@@ -626,7 +627,7 @@
                 opp_nod_title: "OS NÓS",
                 opp_nod_1: "Do e Pissarro não buscam representação no sentido tradicional. Eles estão identificando nós institucionais alinhados.",
                 opp_nod_2: "O negociante que coloca o Genesis Artifact não está vendendo uma obra. Ele está entrando em um pacto.",
-                marquee: "QUAL É A INSTITUIÇÃO MÍNIMA VIÁVEL NECESSÁRIA PARA TORNAR A CRENÇA ECONOMICAMENTE AUTOSSUSTENTÁVEL? — ",
+                marquee: "QUAL É A INSTITUIÇÃO MÍNIMA VIÁVEL NECESSARIA PARA TORNAR A CRENÇA ECONOMICAMENTE AUTOSSUSTENTÁVEL? — ",
                 ft_badge: "Contato",
                 ft_title: "A IGREJA DA<br>ARTE CONCEITUAL",
                 ft_sys: "// MENSAGEM DO SISTEMA:<br>A INSTITUIÇÃO PRECEDE A OBRA.",
@@ -1005,6 +1006,59 @@
                 ft_ent: "الكيانات",
                 ft_loc: "المواقع",
                 ft_net: "الشبكة"
+            },
+            he: {
+                hero_sub: "הצהרת אמן / תקציר מוסדי",
+                hero_quote: "\"דו ופיסארו לא שואלים את השאלה. <br><span class='italic'>הם בונים את המוסד שעונה עליה.</span>\"",
+                location: "מיקום: ניו יורק · המבורג · ברלין",
+                lin_badge: "השושלת",
+                lin_title: "תקדים היסטורי",
+                lin_sub: "יש שושלת.",
+                lin_p1: "דושאן הציב משתנה בגלריה וקרא לה אמנות. המוסד אימת את זה. קונס יצק כלב בלון מפלדת אל-חלד ומכר אותו ב-58 מיליון דולר. השוק אימת את זה. הירסט שם כריש בפורמלדהיד. קטלן הדביק בננה לקיר בסלוטייפ. בנקסי גרס את הקנבס שלו במכירה פומבית.",
+                lin_p2: "בכל פעם נשאלה אותה שאלה: האם זו אמנות? <br>בכל פעם התשובה הייתה זהה: המוסד קובע.",
+                meth_badge: "I. המתודולוגיה",
+                meth_p1: "ג'סי דו ופול פיסארו פועלים כישות מושגית אחת - אדריכלים מבניים העובדים בתוך הגוף המארח של שוק היוקרה.",
+                meth_p2: "המתודולוגיה שלהם, <span class='font-bold'>NCR-CAM</span> (תנועת אמנות תאגידית לתחייה ניאו-קלאסית), אינה חוקרת את אובייקט האמנות. היא חוקרת את המערכת שמעניקה לאובייקט את ערכו.",
+                quest_badge: "II. השאלה",
+                quest_p1: "במקום שבו דושאן שאל מהי אמנות, דו ופיסארו שואלים מהו המוסד המינימלי בר-הקיימא הנדרש כדי להפוך את האמונה למקיימת את עצמה מבחינה כלכלית?",
+                quest_p2: "התשובה היא כנסיית האמנות המושגית.",
+                inst_title: "כנסיית האמנות המושגית (CoCA)",
+                inst_badge: "[ החפיר ]",
+                arch_title: "אדריכלות משפטית",
+                arch_sub: "האקט האלוהי",
+                arch_p: "CoCA הוא ארגון דתי רשום כחוק וחברת החזקות תרבותית. על ידי פעולה ככנסייה, CoCA דורשת את החסינות המשפטית הגבוהה ביותר הזמינה - אותה אדריכלות מס המשמשת את הכנסייה הקתולית, המיושמת על שוק האמנות העכשווית. המושג הוא האקט האלוהי. המוסד קודם ליצירה.",
+                leg_title: "מורשת היסטורית",
+                leg_sub: "נכס היסוד",
+                leg_p: "פול פיסארו הוא חימשו של קאמי פיסארו - ממייסדי האימפרסיוניזם, אנרכיסט ואדריכל מודל התערוכות העצמאיות ששינה לצמיתות את היחסים בין האמנות למוסד בשנת 1874. השושלת אינה דקורטיבית. זהו נכס היסוד.",
+                ins_title: "מכשירים מושגיים",
+                ins_sub: "אמנות פיזיות",
+                ins_p: "היא אינה מייצרת סחורות אסתטיות. היא מהנדסת מכשירים פיננסיים מושגיים ומנגנוני ציות - אובייקטים פיזיים הנשלטים על ידי אמנות משפטיות קבועות המלוות את היצירה ללא קשר למי שמחזיק בה. זו אינה עמדה פילוסופית. זהו חפיר מבני.",
+                obj_badge: "האובייקט",
+                obj_price: "1 מתוך 10. $15,000.",
+                obj_p1: "שעון רולקס לא מורשה מרחוב קאנאל - 200 דולר בנקודת הרכישה - עטוף לצמיתות בשרף ארכיוני, וחרוט עליו החותם המוסדי של CoCA.",
+                obj_p2: "עדיין מתקתק בתוך הבלוק.",
+                obj_p3: "הרכישה מוסדרת על ידי אמנת מכירה חוזרת: 50% מכל מכירה עתידית מועברים לצמיתות לאמנים, ללא קשר למי שמחזיק ביצירה, ללא קשר למקום. האמנה מלווה את האובייקט. לא ניתן לנתק אותה.",
+                obj_f1: "זה לא שעון. זה לא פסל. זהו מכשיר פיננסי מושגי - הראשון מסוגו - שמפיק רווח ממוצא מוסדי ולא מתועלת חומרית.",
+                obj_f2: "האובייקט שעלה 200 דולר שווה 15,000 דולר כי המוסד אומר כך.",
+                obj_f3: "קונס הבין את זה. הירסט הבין את זה. קטלן הבין את זה. ההבדל הוא שדו ופיסארו בנו את המוסד בעצמם.",
+                opp_badge: "ההזדמנות",
+                opp_cov_title: "האמנה",
+                opp_cov_1: "סדרת Genesis Artifact כוללת 10 יצירות. המהדורה מבוקרת.",
+                opp_cov_2: "מבנה האמנה אומר שהאמנים משתתפים באופן קבוע בעליית הערך של היצירה - אדריכלות תמלוגים ממכירה חוזרת שאין לה תקדים בשוק הראשוני ברמת מחיר זו.",
+                opp_bib_title: "התנ\"ך",
+                opp_bib_1: "CoCA נמצאת בפיתוח מוסדי פעיל.",
+                opp_bib_2: "גוף העבודות כולל חפצים פיזיים, בגדים, פרסומים וטקסט מוסדי בכריכה קשה - תנ\"ך CoCA - הזמין כעת תמורת 1,200 דולר.",
+                opp_nod_title: "הצמתים",
+                opp_nod_1: "דו ופיסארו אינם מחפשים ייצוג במובן המסורתי. הם מזהים צמתים מוסדיים מיושרים.",
+                opp_nod_2: "הסוחר שמציב את ה-Genesis Artifact לא מוכר יצירה. הוא נכנס לאמנה.",
+                marquee: "מהו המוסד המינימלי בר-הקיימא הנדרש כדי להפוך את האמונה למקיימת את עצמה מבחינה כלכלית? — ",
+                ft_badge: "צור קשר",
+                ft_title: "כנסיית<br>האמנות המושגית",
+                ft_sys: "// הודעת מערכת:<br>המוסד קודם ליצירה.",
+                ft_dir: "מנהל",
+                ft_ent: "ישויות",
+                ft_loc: "מיקומים",
+                ft_net: "רשת"
             }
         };
 
@@ -1021,6 +1075,10 @@
                 }
             });
             document.documentElement.lang = lang;
+            
+            // RTL support for Arabic and Hebrew
+            document.documentElement.dir = (lang === 'ar' || lang === 'he') ? 'rtl' : 'ltr';
+            
             langSwitcher.value = lang;
             
             // Re-trigger observer animations for fresh look
