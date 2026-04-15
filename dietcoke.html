@@ -291,16 +291,13 @@
         // --- Intelligent Context Loading (RAG) ---
         async function loadProtocol() {
             try {
-                // Fetch the CoCA Doctrine JSON
                 const response = await fetch('gram.json');
                 if (!response.ok) throw new Error("Protocol archive unavailable.");
                 const data = await response.json();
 
-                // Dynamically compile the "ALWAYS" and "NEVER" rules into the prompt
                 const neverRules = data.voice_and_doctrine.rules.never.map(rule => "NEVER " + rule).join(" ");
                 const alwaysRules = data.voice_and_doctrine.rules.always.map(rule => "ALWAYS " + rule).join(" ");
 
-                // Assemble Mode 1 Prompt from JSON
                 PROMPTS.MODE_1 = `You are ${data.system_identifier}, the ${data.system_name}. Enforce MODE 1: ${data.architecture.mode_1.name}.
 CRITICAL INSTRUCTIONS:
 1. ${neverRules}
@@ -318,7 +315,6 @@ Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
 
 CURRENT INQUIRY: `;
 
-                // Assemble Mode 3 Prompt from JSON
                 const structureSteps = data.architecture.mode_3.output_structure.map(item => `${item.step}. ${item.element}: ${item.details}`).join(" ");
                 PROMPTS.MODE_3 = `You are ${data.system_identifier}. Enforce MODE 3: ${data.architecture.mode_3.name}. Input consists of a refined question, a hexagram, and changing lines. 
 Output must follow strict CoCA structure: ${structureSteps} 
@@ -327,29 +323,20 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                 console.log("RAG Protocol successfully loaded from gram.json");
             } catch (error) {
                 console.warn("Could not load gram.json. Initiating hardcoded fallback.");
-                
-                // Fallback instructions in case the JSON is missing or blocked by CORS
-                PROMPTS.MODE_1 = `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
-RULES: Reject outcome bias and advice-seeking. NEVER give advice. NEVER be conversational. NEVER use slang. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. If the user's input is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
-CURRENT INQUIRY: `;
-                PROMPTS.MODE_3 = "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies.\n\n";
+                PROMPTS.MODE_1 = `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. RULES: Reject outcome bias. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. CURRENT INQUIRY: `;
+                PROMPTS.MODE_3 = "You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. Output must follow strict CoCA structure: ID, Primary Text, Changing Lines, Transformed Hexagram, Closing Notation. Present tense only.\n\n";
             }
             
-            // Clear boot message and start UI
             document.getElementById('initialOracleMsg').outerHTML = `<div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>`;
             setLoadingState(false);
         }
 
         window.addEventListener('DOMContentLoaded', loadProtocol);
 
-        // --- Core Base Model Safeguards ---
-        // The base model loves to add quotes, conversational intros, or pirate slang. This forces it to conform.
         function cleanGemmaOutput(text) {
             let clean = text.replace("reframe:", "").trim();
-            clean = clean.replace(/^"|"$/g, '').trim(); // Remove surrounding quotes
-            clean = clean.replace(/^(Listen up).*?/gi, "").trim(); // Nuke the pirate persona if it leaks
-            
-            // If the model generates multiple reframes, keep only the first one
+            clean = clean.replace(/^"|"$/g, '').trim();
+            clean = clean.replace(/^(Listen up).*?/gi, "").trim();
             if (clean.includes('\n')) {
                 clean = clean.split('\n')[0].trim(); 
             }
@@ -358,10 +345,10 @@ CURRENT INQUIRY: `;
 
         async function fetchOracleResponse(apiMessages, maxTokens) {
             const payload = {
-                model: "google/gemma-7b-it", // Change to "diet_coke" when LoRA is retrained
+                model: "google/gemma-7b-it", 
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.1 : 0.4, // Keep very low so base model obeys rules
+                temperature: currentMode === 1 ? 0.1 : 0.4, 
                 frequency_penalty: 0.5, 
                 presence_penalty: 0.2,
                 stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n"] 
@@ -373,7 +360,10 @@ CURRENT INQUIRY: `;
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.message || `HTTP ${response.status}`);
+            }
             const data = await response.json();
             return cleanGemmaOutput(data.choices[0].message.content || "");
         }
@@ -386,36 +376,39 @@ CURRENT INQUIRY: `;
             chatInput.value = '';
             setLoadingState(true);
 
-            // Add user input to conversation memory
+            // 1. Push user message to history
             conversationHistory.push({ role: "user", content: text });
 
-            // SAFETY NET: Prevent Context Window Overflow (Max 2048 tokens limit in vLLM)
-            // Keep only the last 6 messages (approx 3 user/assistant turns back and forth)
+            // 2. Rolling Memory: Keep max 6 messages (3 turns)
             if (conversationHistory.length > 6) {
                 conversationHistory = conversationHistory.slice(-6);
             }
 
-            // Construct payload: Inject the massive System RAG prompt ONLY into the oldest user message in the rolling window.
-            // This maintains Gemma's strict user/assistant alternating format while passing context cleanly.
-            let promptInjected = false;
-            const apiMessages = conversationHistory.map((msg) => {
-                if (!promptInjected && msg.role === 'user') {
-                    promptInjected = true;
+            // 3. Construct API payload ensuring alternation
+            // We check the first message in our slice. If it's an 'assistant' role, 
+            // the chat template will error on the server side because a conversation 
+            // usually starts with 'user'. We slice again if needed.
+            let activeHistory = [...conversationHistory];
+            if (activeHistory[0].role === 'assistant') {
+                activeHistory.shift();
+            }
+
+            const apiMessages = activeHistory.map((msg, index) => {
+                if (index === 0) {
                     return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
                 }
                 return msg;
             });
 
             try {
-                let reply = await fetchOracleResponse(apiMessages, 50);
+                let reply = await fetchOracleResponse(apiMessages, 100);
                 
-                // Override Safety Net: If the conversation goes 4 turns deep, force validation
                 const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
                 if (userTurnCount >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
                 }
 
-                // Add assistant response to conversation memory
+                // 4. On success: push assistant response
                 conversationHistory.push({ role: "assistant", content: reply });
                 
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
@@ -430,8 +423,20 @@ CURRENT INQUIRY: `;
                     appendMessage(reply, 'assistant');
                 }
             } catch (error) {
-                console.error(error);
-                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE.", 'error');
+                console.error("API Error:", error);
+                
+                // 5. ROLE SAFETY: If the call failed, remove the user message 
+                // so the history roles don't get stuck on 'user, user'.
+                if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
+                    conversationHistory.pop();
+                }
+
+                if (error.message.includes("Conversation roles must alternate")) {
+                    appendMessage("[ERR: PROTOCOL] ROLE SEQUENCE VIOLATION. REINITIALIZING...", 'error');
+                    conversationHistory = []; // Hard reset on template error
+                } else {
+                    appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
+                }
             } finally {
                 setLoadingState(false);
             }
@@ -518,13 +523,12 @@ CURRENT INQUIRY: `;
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
             setLoadingState(true);
 
-            // Single shot array to pass the context for the final output interpretation
             const apiMessages = [
                 { role: "user", content: PROMPTS.MODE_3 + mode3Payload }
             ];
 
             try {
-                const finalRuling = await fetchOracleResponse(apiMessages, 300);
+                const finalRuling = await fetchOracleResponse(apiMessages, 400);
                 appendMessage(finalRuling, 'assistant');
             } catch (error) {
                 console.error(error);
@@ -532,7 +536,7 @@ CURRENT INQUIRY: `;
             } finally {
                 setLoadingState(false);
                 currentMode = 1; 
-                conversationHistory = []; // Reset memory for the next session
+                conversationHistory = []; 
             }
         }
     </script>
