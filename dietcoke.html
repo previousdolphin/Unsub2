@@ -96,7 +96,7 @@
 
         .message { max-width: 85%; padding: 12px 18px; font-size: 0.95rem; line-height: 1.5; letter-spacing: 0.5px; word-wrap: break-word; white-space: pre-wrap; }
         .message.user { align-self: flex-end; background-color: var(--msg-user-bg); border-right: 3px solid var(--msg-user-border); }
-        .message.oracle { align-self: flex-start; background-color: rgba(244, 0, 9, 0.1); color: var(--coca-red); border-left: 3px solid var(--coca-red); font-weight: 600; }
+        .message.assistant { align-self: flex-start; background-color: rgba(244, 0, 9, 0.1); color: var(--coca-red); border-left: 3px solid var(--coca-red); font-weight: 600; }
         .message.error { align-self: flex-start; background-color: rgba(255, 165, 0, 0.1); color: #ffa500; border-left: 3px solid #ffa500; font-family: monospace; font-size: 0.85rem; }
         .message.system { align-self: center; background-color: transparent; color: var(--text-muted); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; text-align: center;}
 
@@ -165,10 +165,9 @@
         </div>
 
         <div class="interaction-section">
-            <!-- Mode 1 & 3: Chat Interface -->
             <div class="container-box" id="chatContainer">
                 <div class="chat-history" id="chatHistory">
-                    <div class="message oracle">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
+                    <div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
                 </div>
                 <div class="input-wrapper">
                     <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters..." autocomplete="off">
@@ -178,7 +177,6 @@
                 </div>
             </div>
 
-            <!-- Mode 2: Casting Interface -->
             <div class="container-box" id="castContainer">
                 <div class="hexagram-visual" id="hexagramVisual"></div>
                 <div class="cast-interface">
@@ -194,14 +192,12 @@
     </div>
 
     <script>
-        // --- Theme Logic ---
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             document.getElementById('moonIcon').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
             document.getElementById('sunIcon').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
         });
 
-        // --- Canvas Wave Animation (Maintained from previous build) ---
         const canvas = document.getElementById('waveCanvas');
         const ctx = canvas.getContext('2d');
         let width, height, points = [];
@@ -261,30 +257,24 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
-       // --- System Logic & State Machine ---
+        // --- System Logic & State Machine ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
         const PROMPTS = {
-            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
-            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence."
+            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.\n\n",
+            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence.\n\n"
         };
 
         let currentMode = 1;
         let refinedQuestion = "";
         let castResults = []; 
-        let conversationHistory = []; // Array to store context
+        let conversationHistory = []; // Tracks user and assistant messages only
 
         const chatContainer = document.getElementById('chatContainer');
         const castContainer = document.getElementById('castContainer');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const chatHistory = document.getElementById('chatHistory');
-
-        // Initialize history with the system prompt
-        function resetHistory() {
-            conversationHistory = [{ role: "system", content: PROMPTS.MODE_1 }];
-        }
-        resetHistory();
 
         function appendMessage(text, type) {
             const msgDiv = document.createElement('div');
@@ -301,16 +291,14 @@
             if (!isLoading) chatInput.focus();
         }
 
-        // --- Network Request Logic ---
-        async function fetchOracleResponse(messagesArray, maxTokens) {
+        async function fetchOracleResponse(apiMessages, maxTokens) {
             const payload = {
-                model: "google/gemma-7b-it", // Change to "diet_coke" when LoRA is retrained
-                messages: messagesArray,
+                model: "google/gemma-7b-it", // Change back to "diet_coke" when ready
+                messages: apiMessages,
                 max_tokens: maxTokens,
                 temperature: currentMode === 1 ? 0.3 : 0.6, 
-                frequency_penalty: 0.2, // Keep low for base model, raise slightly for LoRA if needed
+                frequency_penalty: 0.2, 
                 presence_penalty: 0.2,
-                // Removed stop tokens that were causing premature cutoffs
                 stop: ["<end_of_turn>", "<eos>"] 
             };
 
@@ -325,7 +313,6 @@
             return (data.choices[0].message.content || "").replace("reframe:", "").trim();
         }
 
-        // --- Core Application Logic ---
         async function handleSend() {
             const text = chatInput.value.trim();
             if (!text || currentMode !== 1) return;
@@ -334,17 +321,21 @@
             chatInput.value = '';
             setLoadingState(true);
 
-            // Add user message to history array
             conversationHistory.push({ role: "user", content: text });
 
+            // Gemma fix: We prepend the prompt to the *first* user message in the array. 
+            // No "system" role is sent, avoiding the 400 error.
+            const apiMessages = conversationHistory.map((msg, index) => {
+                if (index === 0 && msg.role === 'user') {
+                    return { role: 'user', content: PROMPTS.MODE_1 + msg.content };
+                }
+                return msg;
+            });
+
             try {
-                // Increased max_tokens to 100 to stop cut-offs
-                let reply = await fetchOracleResponse(conversationHistory, 100);
-                
-                // Add model response to history array
+                let reply = await fetchOracleResponse(apiMessages, 100);
                 conversationHistory.push({ role: "assistant", content: reply });
                 
-                // Manual override for validation if base model struggles to output exact string
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
                                   reply.includes("Proceed to Mode 2") ||
                                   reply.toLowerCase().includes("oracle-grade");
@@ -354,7 +345,7 @@
                     appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
-                    appendMessage(reply, 'oracle');
+                    appendMessage(reply, 'assistant');
                 }
             } catch (error) {
                 console.error(error);
@@ -367,7 +358,6 @@
         sendBtn.addEventListener('click', handleSend);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
-        // --- MODE 2: CASTING ENGINE ---
         const CAST_QUESTIONS = [
             ["Does the structure require submission or assertion?", "SUBMIT", "ASSERT"],
             ["Is the tension internal or external?", "INTERNAL", "EXTERNAL"],
@@ -415,7 +405,6 @@
             updateCastUI();
         }
 
-        // --- MODE 3: INTERPRETATION ---
         const HEXAGRAM_MAP = {
             "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
         };
@@ -445,22 +434,21 @@
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
             setLoadingState(true);
 
-            // Create a temporary history just for Mode 3 to ensure strict formatting
-            const mode3History = [
-                { role: "system", content: PROMPTS.MODE_3 },
-                { role: "user", content: mode3Payload }
+            // Single shot array. Put instructions in 'user' role per Gemma protocol.
+            const apiMessages = [
+                { role: "user", content: PROMPTS.MODE_3 + mode3Payload }
             ];
 
             try {
-                const finalRuling = await fetchOracleResponse(mode3History, 300);
-                appendMessage(finalRuling, 'oracle');
+                const finalRuling = await fetchOracleResponse(apiMessages, 300);
+                appendMessage(finalRuling, 'assistant');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
             } finally {
                 setLoadingState(false);
                 currentMode = 1; 
-                resetHistory(); // Clear history for the next session
+                conversationHistory = []; // Reset memory for the next user query
             }
         }
     </script>
