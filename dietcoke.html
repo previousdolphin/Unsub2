@@ -680,22 +680,21 @@
         async function handleSend() {
             const text = chatInput.value.trim();
             if (!text) return;
-
+        
             appendMessage(text, 'user');
             chatInput.value = '';
             setLoadingState(true);
-
-            // Cancel any ongoing AI speech so they don't overlap
+        
             window.speechSynthesis.cancel();
             isOutputVisualizing = false;
-
+        
             try {
                 const response = await fetch(BACKEND_API_URL, {
                     method: 'POST',
                     mode: 'cors',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer EMPTY', // Standard header expected by vLLM
+                        'Authorization': 'Bearer EMPTY',
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({ 
@@ -706,31 +705,35 @@
                                 content: ORACLE_SYSTEM_PROMPT + text 
                             }
                         ],
-                        max_tokens: 35, // Keep it short and sweet
-                        temperature: 0.7, // Bumping this up; sometimes 0.4 is too "stiff" and causes loops
-                        frequency_penalty: 1.5, // Aggressive anti-repetition
-                        presence_penalty: 0.5,
-                        stop: ["<end_of_turn>", "<eos>", "\n", "User:", "reframe:"] 
+                        max_tokens: 35, 
+                        // Bumping temperature helps the model "jump out" of loops
+                        temperature: 0.7, 
+                        // Frequency penalty acts as a "tax" on repeating tokens
+                        frequency_penalty: 1.5, 
+                        presence_penalty: 0.2,
+                        // Top_p helps ignore the "trash" tokens like 'veve'
+                        top_p: 0.9,
+                        // Hard stops are our ultimate safety net
+                        stop: ["<end_of_turn>", "<eos>", "\n", "User:", "reframe:", "veve"] 
                     })
                 });
-
+        
                 if (!response.ok) {
-                    const errorBody = await response.text();
-                    console.error("Server Error Body:", errorBody);
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
-
+        
                 const data = await response.json();
+                let replyText = data.choices[0].message.content || "EMPTY RESPONSE GENERATED.";
                 
-                // Properly parses the vLLM OpenAI-formatted JSON output
-                const replyText = data.choices[0].message.content || "EMPTY RESPONSE GENERATED.";
+                // Final cleanup: if the model still sneaks a "ve" in, we strip the trash
+                replyText = replyText.replace(/(ve){2,}/gi, "").trim();
                 
                 appendMessage(replyText, 'oracle');
                 speakResponse(replyText); 
-
+        
             } catch (error) {
-                console.error("Detailed Fetch Error:", error);
-                appendMessage("[ERR: CONNECTION REFUSED] CHECK CONSOLE FOR LOGS.", 'error');
+                console.error("Fetch Error:", error);
+                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE.", 'error');
             } finally {
                 setLoadingState(false);
             }
