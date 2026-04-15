@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UNSUBSCRIBE NYC | Video Wall Presentation</title>
+    <title>MOVIE ATTRACTIONS BY UNSUBSCRIBE</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
@@ -22,7 +19,6 @@
             --text-color: #0F0F0F;
             --grid-line: 1px solid #0F0F0F;
             --slide-duration: 10000ms;
-            --quiz-bg: #0a0a0a;
         }
 
         body {
@@ -37,9 +33,7 @@
             transition: background-color 0.5s;
         }
 
-        body.admin-active {
-            cursor: auto;
-        }
+        body.admin-active { cursor: auto; }
 
         .font-serif { font-family: 'Playfair Display', serif; }
         .font-mono { font-family: 'Space Mono', monospace; }
@@ -64,9 +58,7 @@
             transition: filter 0.3s ease, opacity 0.3s ease;
         }
 
-        .invert-ui {
-            filter: invert(1) hue-rotate(180deg);
-        }
+        .invert-ui { filter: invert(1) hue-rotate(180deg); }
 
         #progress-bar {
             position: absolute;
@@ -108,9 +100,7 @@
             display: flex !important;
         }
 
-        .hidden-slide {
-            display: none;
-        }
+        .hidden-slide { display: none; }
 
         .slide .animate-block {
             opacity: 0;
@@ -164,7 +154,6 @@
             content: ''; position: absolute; top: 50%; left: 0; width: 100%; border-top: var(--grid-line);
         }
         
-        /* Scrollbar styling for admin */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #333; }
@@ -179,9 +168,7 @@
             font-family: 'Space Mono', monospace;
             outline: none;
         }
-        input:focus, textarea:focus, select:focus {
-            border-color: #00FF41;
-        }
+        input:focus, textarea:focus, select:focus { border-color: #00FF41; }
     </style>
 </head>
 <body>
@@ -189,7 +176,6 @@
     <div id="canvas-container"></div>
     <div id="wipe-overlay"></div>
 
-    <!-- UI LAYER -->
     <div id="ui-layer" class="p-[20px] flex flex-col justify-between">
         <header class="flex justify-between items-start uppercase text-sm tracking-[0.2em] font-bold">
             <div class="flex items-center gap-4">
@@ -198,7 +184,7 @@
             </div>
             <div class="text-right">
                 <div id="countdown" class="font-mono text-xl tabular-nums tracking-wider text-gray-400 opacity-60">T-00.00s</div>
-                <div class="text-[10px] text-gray-500 mt-1" id="slide-indicator">SEQ_01 / 10</div>
+                <div class="text-[10px] text-gray-500 mt-1" id="slide-indicator">SEQ_01 / 20</div>
             </div>
         </header>
         
@@ -209,9 +195,8 @@
         <div id="progress-bar"></div>
     </div>
 
-    <!-- SLIDES CONTAINER (Initial state built via JS fallback or hardcoded base) -->
     <main id="slide-container">
-        <!-- BASE MANIFESTO SLIDES (These remain static anchors) -->
+        
         <section class="slide active text-center" data-type="manifesto" data-name="01: Hero Quote">
             <div class="max-w-7xl px-4">
                 <p class="font-mono text-lg md:text-2xl tracking-[0.3em] text-gray-500 uppercase mb-12 animate-block" style="transition-delay: 0.2s">
@@ -257,8 +242,40 @@
             </div>
         </section>
 
-        <!-- DYNAMIC QUIZ INJECTION POINT -->
-        <div id="quiz-injection-anchor" style="display:none;"></div>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q1" data-name="Q1: Wizard of Oz" data-raw='{"id":"q1","title":"The Wizard of Oz","year":"1939","truth":"real","qImg":"https://upload.wikimedia.org/wikipedia/commons/c/c5/Wizard_of_oz_movie_poster.jpg","aImg":"","question":"To create the magical snow that falls on Dorothy, the Cowardly Lion, and the Tin Man in the poppy field, the production team used \"100% pure chrysotile asbestos\", which was common for fake snow at the time.","answer":"As horrifying as it is today, the snow in the poppy field scene was indeed made of pure asbestos. It was sold under brand names like \"Snow Drift\" and \"White Magic\" specifically for holiday decorations."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Wizard_of_oz_movie_poster.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 01</div>
+                    <h3 class="font-serif text-5xl mb-8">The Wizard of Oz <span class="text-3xl text-neutral-500">(1939)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        To create the magical snow that falls on Dorothy, the Cowardly Lion, and the Tin Man in the poppy field, the production team used <span class="text-white bg-white/10 px-2">"100% pure chrysotile asbestos"</span>, which was common for fake snow at the time.
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q1" data-name="A1: Wizard of Oz">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#00FF41] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(0,255,65,0.2)] overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Wizard_of_oz_movie_poster.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#00FF41] text-black font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(0,255,65,0.4)]">VERIFIED: REAL FACT</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        As horrifying as it is today, the snow in the poppy field scene was indeed made of pure asbestos. It was sold under brand names like <span class="text-white italic">"Snow Drift"</span> and <span class="text-white italic">"White Magic"</span> specifically for holiday decorations.
+                    </p>
+                </div>
+            </div>
+        </section>
 
         <section class="slide bg-transparent" data-type="manifesto" data-name="04: The Convergence">
             <div class="w-full max-w-7xl grid grid-cols-2 gap-0 border-4 border-black/80 animate-block">
@@ -281,6 +298,77 @@
                         <li>Fluid identity</li>
                         <li>Art as Operating System</li>
                     </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q2" data-name="Q2: Shadow in the Sun" data-raw='{"id":"q2","title":"A Shadow in the Sun","year":"1958","truth":"fake","qImg":"https://upload.wikimedia.org/wikipedia/commons/1/18/Marlon_Brando_publicity_for_A_Streetcar_Named_Desire.jpg","aImg":"","question":"Directed by Elia Kazan, this classic drama features Marlon Brando&apos;s only performance spoken entirely in French. It had to be heavily dubbed in post-production, however, because the studio deemed his accent \"too Nebraskan.\"","answer":"\"A Shadow in the Sun\" does not exist. While Elia Kazan did direct Brando in classics like On the Waterfront, Brando never starred in a French-speaking film for him. This entire production is a complete machine fabrication."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Marlon_Brando_publicity_for_A_Streetcar_Named_Desire.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 02</div>
+                    <h3 class="font-serif text-5xl mb-8">A Shadow in the Sun <span class="text-3xl text-neutral-500">(1958)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        Directed by Elia Kazan, this classic drama features Marlon Brando's only performance spoken entirely in French. It had to be heavily dubbed in post-production, however, because the studio deemed his accent <span class="text-white bg-white/10 px-2">"too Nebraskan."</span>
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q2" data-name="A2: Shadow in the Sun">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#FF3333] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(255,51,51,0.2)] overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Marlon_Brando_publicity_for_A_Streetcar_Named_Desire.jpg" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-[#FF3333]/10 mix-blend-overlay"></div>
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#FF3333] text-white font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(255,51,51,0.4)]">WARNING: AI HALLUCINATION</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        <span class="text-white italic">"A Shadow in the Sun"</span> does not exist. While Elia Kazan did direct Brando in classics like On the Waterfront, Brando never starred in a French-speaking film for him. This entire production is a complete machine fabrication.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q3" data-name="Q3: The Godfather" data-raw='{"id":"q3","title":"The Godfather","year":"1972","truth":"real","qImg":"https://upload.wikimedia.org/wikipedia/commons/b/b3/Marlon_Brando_The_Godfather_trailer.jpg","aImg":"","question":"The famous cat that Marlon Brando holds during the opening scene wasn&apos;t in the script. It was a stray found wandering the Paramount lot that Francis Ford Coppola handed to Brando right before \"Action!\"","answer":"The cat was indeed a stray. Its purring was actually so loud during the take that the audio team had to ADR (re-record) some of Brando&apos;s muffled lines in post-production."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Marlon_Brando_The_Godfather_trailer.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 03</div>
+                    <h3 class="font-serif text-5xl mb-8">The Godfather <span class="text-3xl text-neutral-500">(1972)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        The famous cat that Marlon Brando holds during the opening scene wasn't in the script. It was a stray found wandering the Paramount lot that Francis Ford Coppola handed to Brando right before <span class="text-white bg-white/10 px-2">"Action!"</span>
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q3" data-name="A3: The Godfather">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#00FF41] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(0,255,65,0.2)] overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/Marlon_Brando_The_Godfather_trailer.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#00FF41] text-black font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(0,255,65,0.4)]">VERIFIED: REAL FACT</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        The cat was indeed a stray. Its purring was actually so loud during the take that the audio team had to ADR (re-record) some of Brando's muffled lines in post-production.
+                    </p>
                 </div>
             </div>
         </section>
@@ -309,16 +397,179 @@
             </div>
         </section>
 
-        <section class="slide bg-white/30 backdrop-blur-md border-[20px] border-black/80" data-type="manifesto" data-name="06: The Declaration">
-            <div class="text-center w-full max-w-7xl">
-                <div class="font-mono text-xl uppercase tracking-widest text-gray-500 border-2 border-black/80 px-6 py-2 inline-block rounded-full mb-16 animate-block">VI. The Declaration</div>
-                <h2 class="font-serif text-[6rem] md:text-[8rem] lg:text-[10rem] leading-[0.85] animate-block font-bold" style="transition-delay: 0.2s">
-                    THIS IS NOT<br>JUST A COMPANY.
-                </h2>
-                <div class="mt-20 flex justify-center animate-block" style="transition-delay: 0.6s">
-                    <p class="font-mono text-2xl text-white bg-black/80 backdrop-blur-sm p-6 inline-block leading-relaxed">
-                        > SYSTEM MESSAGE:<br>
-                        > THIS IS A CULTURAL REVOLUTION DISGUISED AS ONE.<span class="animate-pulse">_</span>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q4" data-name="Q4: 2001 Space Odyssey" data-raw='{"id":"q4","title":"2001: A Space Odyssey","year":"1968","truth":"fake","qImg":"https://upload.wikimedia.org/wikipedia/commons/a/a2/2001_A_Space_Odyssey_%281968%29_-_Trailer_screenshot_%2834%29.jpg","aImg":"","question":"To evoke genuine lethargy for the Jupiter Mission scenes, Stanley Kubrick famously had the ventilation system pump \"mildly oxygen-deprived air\" onto the set so the actors would act sluggish.","answer":"Kubrick was a notorious perfectionist, but he never deprived his cast of oxygen. The actors&apos; lethargic performances were purely acting, meant to simulate deep-space psychological fatigue."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/2001_A_Space_Odyssey_%281968%29_-_Trailer_screenshot_%2834%29.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 04</div>
+                    <h3 class="font-serif text-5xl mb-8">2001: A Space Odyssey <span class="text-3xl text-neutral-500">(1968)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        To evoke genuine lethargy for the Jupiter Mission scenes, Stanley Kubrick famously had the ventilation system pump <span class="text-white bg-white/10 px-2">"mildly oxygen-deprived air"</span> onto the set so the actors would act sluggish.
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q4" data-name="A4: 2001 Space Odyssey">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#FF3333] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(255,51,51,0.2)] overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/2001_A_Space_Odyssey_%281968%29_-_Trailer_screenshot_%2834%29.jpg" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-[#FF3333]/10 mix-blend-overlay"></div>
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#FF3333] text-white font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(255,51,51,0.4)]">WARNING: AI HALLUCINATION</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        Kubrick was a notorious perfectionist, but he never deprived his cast of oxygen. The actors' lethargic performances were purely acting, meant to simulate deep-space psychological fatigue.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q5" data-name="Q5: Jurassic Park" data-raw='{"id":"q5","title":"Jurassic Park","year":"1993","truth":"real","qImg":"https://images.unsplash.com/photo-1590442385310-745138139d6e?w=800&q=80","aImg":"","question":"The terrifying, iconic roar of the T-Rex was created by sound designer Gary Rydstrom by combining the slowed-down sounds of a baby elephant, a tiger, and an alligator.","answer":"Rydstrom famously won two Academy Awards for his work. The high-frequency element of the roar is the baby elephant, while the guttural rumble comes from the tiger and alligator."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1590442385310-745138139d6e?w=800&q=80" class="absolute inset-0 w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 05</div>
+                    <h3 class="font-serif text-5xl mb-8">Jurassic Park <span class="text-3xl text-neutral-500">(1993)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        The terrifying, iconic roar of the T-Rex was created by sound designer Gary Rydstrom by combining the slowed-down sounds of a baby elephant, a tiger, and an alligator.
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q5" data-name="A5: Jurassic Park">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#00FF41] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(0,255,65,0.2)] overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1590442385310-745138139d6e?w=800&q=80" class="absolute inset-0 w-full h-full object-cover" crossorigin="anonymous">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#00FF41] text-black font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(0,255,65,0.4)]">VERIFIED: REAL FACT</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        Rydstrom famously won two Academy Awards for his work. The high-frequency element of the roar is the baby elephant, while the guttural rumble comes from the tiger and alligator.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q6" data-name="Q6: Casablanca" data-raw='{"id":"q6","title":"Casablanca","year":"1942","truth":"fake","qImg":"https://upload.wikimedia.org/wikipedia/commons/b/b3/CasablancaPoster-Gold.jpg","aImg":"","question":"Because the script was being rewritten daily, director Michael Curtiz actually filmed \"three entirely different endings\". The cast didn&apos;t know which one would be used until the premiere.","answer":"This is a widespread rumor, but it&apos;s an AI hallucination. They only ever filmed one ending. They considered alternatives during writing, but never shot them."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/CasablancaPoster-Gold.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 06</div>
+                    <h3 class="font-serif text-5xl mb-8">Casablanca <span class="text-3xl text-neutral-500">(1942)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        Because the script was being rewritten daily, director Michael Curtiz actually filmed <span class="text-white bg-white/10 px-2">"three entirely different endings"</span>. The cast didn't know which one would be used until the premiere.
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q6" data-name="A6: Casablanca">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#FF3333] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(255,51,51,0.2)] overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/CasablancaPoster-Gold.jpg" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-[#FF3333]/10 mix-blend-overlay"></div>
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#FF3333] text-white font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(255,51,51,0.4)]">WARNING: AI HALLUCINATION</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        This is a widespread rumor, but it's an AI hallucination. They only ever filmed one ending. They considered alternatives during writing, but never shot them.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q7" data-name="Q7: Alien" data-raw='{"id":"q7","title":"Alien","year":"1979","truth":"real","qImg":"https://upload.wikimedia.org/wikipedia/commons/1/14/Alien_1979_movie_trailer_screenshot.jpg","aImg":"","question":"During the famous chestburster scene, director Ridley Scott deliberately \"kept the cast in the dark\" about the exact nature of the blood squibs. The shock and disgust on their faces are genuine.","answer":"This is true. While the actors knew a puppet would emerge, they didn&apos;t know four high-pressure blood pumps were aimed directly at them, resulting in genuine, unscripted horror."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/14/Alien_1979_movie_trailer_screenshot.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 07</div>
+                    <h3 class="font-serif text-5xl mb-8">Alien <span class="text-3xl text-neutral-500">(1979)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        During the famous chestburster scene, director Ridley Scott deliberately <span class="text-white bg-white/10 px-2">"kept the cast in the dark"</span> about the exact nature of the blood squibs. The shock and disgust on their faces are genuine.
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q7" data-name="A7: Alien">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#00FF41] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(0,255,65,0.2)] overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/14/Alien_1979_movie_trailer_screenshot.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#00FF41] text-black font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(0,255,65,0.4)]">VERIFIED: REAL FACT</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        This is true. While the actors knew a puppet would emerge, they didn't know four high-pressure blood pumps were aimed directly at them, resulting in genuine, unscripted horror.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-q" data-quiz-id="q8" data-name="Q8: Singin' in the Rain" data-raw='{"id":"q8","title":"Singin&apos; in the Rain","year":"1952","truth":"fake","qImg":"https://upload.wikimedia.org/wikipedia/commons/5/5d/Singin%27_in_the_Rain_%281952_poster%29.jpg","aImg":"","question":"During the iconic &apos;Singin&apos; in the Rain&apos; dance sequence, Gene Kelly&apos;s umbrella was specially rigged with a \"hidden audio transmitter\" to record his live tap-dancing splashes.","answer":"This is an AI hallucination. The splashing and tap-dancing sounds were entirely dubbed in post-production. In fact, Gene Kelly&apos;s co-stars Gwen Verdon and Carol Haney helped dub his taps."}'>
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Singin%27_in_the_Rain_%281952_poster%29.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 08</div>
+                    <h3 class="font-serif text-5xl mb-8">Singin' in the Rain <span class="text-3xl text-neutral-500">(1952)</span></h3>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
+                        During the iconic 'Singin' in the Rain' dance sequence, Gene Kelly's umbrella was specially rigged with a <span class="text-white bg-white/10 px-2">"hidden audio transmitter"</span> to record his live tap-dancing splashes.
+                    </p>
+                    <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">REAL FACT OR AI HALLUCINATION?</div>
+                </div>
+            </div>
+        </section>
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-type="quiz-a" data-quiz-id="q8" data-name="A8: Singin' in the Rain">
+            <div class="scanlines"></div>
+            <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                <div class="animate-block">
+                    <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#FF3333] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(255,51,51,0.2)] overflow-hidden">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Singin%27_in_the_Rain_%281952_poster%29.jpg" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-[#FF3333]/10 mix-blend-overlay"></div>
+                    </div>
+                </div>
+                <div class="animate-block" style="transition-delay: 0.2s">
+                    <div class="inline-block bg-[#FF3333] text-white font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(255,51,51,0.4)]">WARNING: AI HALLUCINATION</div>
+                    <p class="font-mono text-2xl leading-relaxed text-neutral-300">
+                        This is an AI hallucination. The splashing and tap-dancing sounds were entirely dubbed in post-production. In fact, Gene Kelly's co-stars Gwen Verdon and Carol Haney helped dub his taps.
                     </p>
                 </div>
             </div>
@@ -326,7 +577,6 @@
 
     </main>
 
-    <!-- ADMIN PANE OVERLAY -->
     <div id="admin-pane" class="fixed inset-0 bg-[#0a0a0a]/95 backdrop-blur-md z-[9999] flex-col p-8 md:p-12 text-white overflow-y-auto hidden">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-neutral-800 pb-6 mb-8 gap-4">
             <div class="flex flex-col gap-2">
@@ -352,7 +602,6 @@
             </div>
         </div>
 
-        <!-- Add/Edit Quiz Form -->
         <div id="quiz-form-container" class="mb-12 bg-neutral-900 border border-neutral-700 p-6 hidden flex-col gap-4 font-mono max-w-4xl relative">
             <button id="cancel-quiz" class="absolute top-4 right-4 text-neutral-500 hover:text-white text-xl">&times;</button>
             <h3 id="quiz-form-title" class="text-[#00FF41] text-lg uppercase tracking-widest border-b border-neutral-800 pb-2 mb-2">Create New Quiz Entry</h3>
@@ -379,7 +628,7 @@
                 </div>
             </div>
             <div class="mt-2">
-                <label class="block text-xs text-neutral-500 mb-1">Trivia / Question Text</label>
+                <label class="block text-xs text-neutral-500 mb-1">Trivia / Question Text (wrap highlight text in "quotes")</label>
                 <textarea id="quiz-question" rows="2" placeholder="Enter the trivia fact here..."></textarea>
             </div>
             <div class="mt-2">
@@ -398,7 +647,6 @@
             </div>
         </div>
 
-        <!-- Add/Edit Image Slide Form -->
         <div id="img-form-container" class="mb-12 bg-neutral-900 border border-neutral-700 p-6 hidden flex-col gap-4 font-mono max-w-4xl relative">
             <button id="cancel-img" class="absolute top-4 right-4 text-neutral-500 hover:text-white text-xl">&times;</button>
             <h3 id="img-form-title" class="text-blue-400 text-lg uppercase tracking-widest border-b border-neutral-800 pb-2 mb-2">Create Image Slide</h3>
@@ -418,8 +666,7 @@
         </div>
 
         <div id="admin-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 font-mono pb-20">
-            <!-- Dynamically populated -->
-        </div>
+            </div>
     </div>
 
     <script>
@@ -506,48 +753,7 @@
             return { init, setTarget };
         })();
 
-        // --- DECK DATA & STATE MANAGER ---
-        
-        // Initial Built-in Quiz Data
-        const defaultQuizzes = [
-            {
-                id: 'q1',
-                title: 'The Wizard of Oz', year: '1939', truth: 'real',
-                qImg: '', aImg: '',
-                question: 'To create the magical snow that falls on Dorothy, the Cowardly Lion, and the Tin Man in the poppy field, the production team used "100% pure chrysotile asbestos", which was common for fake snow at the time.',
-                answer: 'As horrifying as it is today, the snow in the poppy field scene was indeed made of pure asbestos. It was sold under brand names like "Snow Drift" and "White Magic".'
-            },
-            {
-                id: 'q2',
-                title: 'A Shadow in the Sun', year: '1958', truth: 'fake',
-                qImg: '', aImg: '',
-                question: 'Directed by Elia Kazan, this classic drama features Marlon Brando\'s only performance spoken entirely in French. It had to be heavily dubbed because the studio deemed his accent "too Nebraskan."',
-                answer: '"A Shadow in the Sun" does not exist. Brando never starred in a French-speaking film for Elia Kazan. This entire production is a machine fabrication.'
-            },
-            {
-                id: 'q3',
-                title: 'The Godfather', year: '1972', truth: 'real',
-                qImg: '', aImg: '',
-                question: 'The famous cat that Marlon Brando holds during the opening scene wasn\'t in the script. It was a stray found wandering the Paramount lot that Francis Ford Coppola handed to Brando right before "Action!"',
-                answer: 'The cat was indeed a stray. Its purring was actually so loud during the take that the audio team had to ADR (re-record) some of Brando\'s muffled lines in post-production.'
-            },
-            {
-                id: 'q4',
-                title: '2001: A Space Odyssey', year: '1968', truth: 'fake',
-                qImg: '', aImg: '',
-                question: 'To evoke genuine lethargy for the Jupiter Mission scenes, Stanley Kubrick famously had the ventilation system pump "mildly oxygen-deprived air" onto the set so the actors would act sluggish.',
-                answer: 'Kubrick was a notorious perfectionist, but he never deprived his cast of oxygen. The actors\' lethargic performances were purely acting, meant to simulate deep-space psychological fatigue.'
-            },
-            {
-                id: 'q5',
-                title: 'Jurassic Park', year: '1993', truth: 'real',
-                qImg: '', aImg: '',
-                question: 'The terrifying, iconic roar of the T-Rex was created by sound designer Gary Rydstrom by combining the slowed-down sounds of a baby elephant, a tiger, and an alligator.',
-                answer: 'Rydstrom famously won two Academy Awards for his work. The high-frequency element of the roar is the baby elephant, while the guttural rumble comes from the tiger and alligator.'
-            }
-        ];
-
-        // Core HTML Generation functions
+        // --- CORE LOGIC ---
         const styleText = (text, isReal) => {
             let s = text.replace(/"([^"]+)"/g, '<span class="text-white bg-white/10 px-2">"$1"</span>');
             if(isReal !== undefined) {
@@ -564,20 +770,16 @@
             slide.className = `slide quiz-slide bg-[#0a0a0a] text-white`;
             slide.dataset.type = isQuestion ? 'quiz-q' : 'quiz-a';
             slide.dataset.quizId = id;
-            slide.dataset.name = `Quiz (${isQuestion ? 'Q' : 'A'}): ${title}`;
+            slide.dataset.name = `${isQuestion ? 'Q' : 'A'}: ${title}`;
             
-            // Store raw data on Q slide for easy editing
             if (isQuestion) {
                 slide.dataset.raw = JSON.stringify(data);
-            }
-
-            if (isQuestion) {
                 const imgHTML = qImg ? `<img src="${qImg}" class="absolute inset-0 w-full h-full object-cover">` : `<span class="font-mono text-neutral-600 mb-2">[ PHOTO SPOT ]</span><span class="font-serif italic text-neutral-500 text-sm">${title} (${year})</span>`;
                 slide.innerHTML = `
                     <div class="scanlines"></div>
                     <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
                         <div class="animate-block">
-                            <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden group">
+                            <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden">
                                 ${imgHTML}
                             </div>
                         </div>
@@ -597,7 +799,7 @@
                 const textShadow = `shadow-[0_0_20px_rgba(${isReal?'0,255,65':'255,51,51'},0.4)]`;
                 const overlay = isReal ? '' : '<div class="absolute inset-0 bg-[#FF3333]/10 mix-blend-overlay"></div>';
                 
-                const imgHTML = aImg ? `<img src="${aImg}" class="absolute inset-0 w-full h-full object-cover">` : `<span class="font-mono text-[${styleColor}]/50 mb-2">[ PHOTO SPOT ]</span>`;
+                const imgHTML = (aImg || qImg) ? `<img src="${aImg || qImg}" class="absolute inset-0 w-full h-full object-cover">` : `<span class="font-mono text-[${styleColor}]/50 mb-2">[ PHOTO SPOT ]</span>`;
 
                 slide.innerHTML = `
                     <div class="scanlines"></div>
@@ -621,17 +823,15 @@
 
         const createImageSlideHTML = (id, title, url) => {
             const slide = document.createElement('section');
-            slide.className = 'slide quiz-slide bg-black text-white p-0'; // Remove padding for full bleed
+            slide.className = 'slide quiz-slide bg-black text-white p-0';
             slide.dataset.type = 'image';
             slide.dataset.imgId = id;
             slide.dataset.name = `IMG: ${title}`;
             slide.dataset.raw = JSON.stringify({ id, title, url });
-            
             slide.innerHTML = `
                 <div class="absolute inset-0 flex items-center justify-center">
                     <img src="${url}" class="w-full h-full object-contain" alt="${title}">
-                </div>
-            `;
+                </div>`;
             return slide;
         };
 
@@ -655,40 +855,26 @@
             let isTransitioning = false;
             let isAdminOpen = false;
 
-            // --- LOCAL STORAGE / INIT ---
             const loadDeckState = () => {
                 const savedHTML = localStorage.getItem('unsubscribe_deck_html');
-                if (savedHTML) {
-                    slideContainer.innerHTML = savedHTML;
-                } else {
-                    // Inject default quizzes before the Convergence slide if no save state
-                    const anchor = document.getElementById('quiz-injection-anchor');
-                    if (anchor) {
-                        defaultQuizzes.forEach(q => {
-                            slideContainer.insertBefore(createQuizSlideHTML(q, true), anchor);
-                            slideContainer.insertBefore(createQuizSlideHTML(q, false), anchor);
-                        });
-                    }
-                }
+                if (savedHTML) slideContainer.innerHTML = savedHTML;
                 refreshSlidesState();
             };
 
             const saveDeckState = () => {
-                // Strip the "active" class before saving to avoid visual glitches on reload
                 slides.forEach(s => s.classList.remove('active'));
                 if(slides[currentSlideIndex]) slides[currentSlideIndex].classList.add('active');
                 localStorage.setItem('unsubscribe_deck_html', slideContainer.innerHTML);
             };
 
-            // --- EXPORT / IMPORT ---
+            // Export / Import / Reset
             document.getElementById('export-deck').addEventListener('click', () => {
-                saveDeckState(); // ensure latest
-                const html = slideContainer.innerHTML;
-                const blob = new Blob([html], { type: 'text/html' });
+                saveDeckState();
+                const blob = new Blob([slideContainer.innerHTML], { type: 'text/html' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `unsubscribe_deck_${Date.now()}.json`; // saving as pseudo-json txt
+                a.download = `unsubscribe_deck_${Date.now()}.json`;
                 a.click();
             });
 
@@ -714,8 +900,6 @@
                 }
             });
 
-
-            // --- SLIDE NAVIGATION ---
             const refreshSlidesState = () => {
                 slides = Array.from(document.querySelectorAll('.slide'));
                 const activeIndex = slides.findIndex(s => s.classList.contains('active'));
@@ -819,7 +1003,7 @@
                 requestAnimationFrame(updateUI);
             };
 
-            // --- ADMIN & FORMS LOGIC ---
+            // --- FORMS ---
             const quizForm = document.getElementById('quiz-form-container');
             const imgForm = document.getElementById('img-form-container');
 
@@ -853,7 +1037,6 @@
             document.getElementById('cancel-quiz').addEventListener('click', () => { quizForm.classList.add('hidden'); quizForm.classList.remove('flex'); });
             document.getElementById('cancel-img').addEventListener('click', () => { imgForm.classList.add('hidden'); imgForm.classList.remove('flex'); });
 
-            // Handle Quiz Submit
             document.getElementById('submit-quiz').addEventListener('click', () => {
                 const data = {
                     id: document.getElementById('quiz-edit-id').value || 'quiz_' + Date.now(),
@@ -870,24 +1053,19 @@
                 const aSlide = createQuizSlideHTML(data, false);
 
                 if (document.getElementById('quiz-edit-id').value) {
-                    // Replace existing
                     const oldQ = slides.find(s => s.dataset.quizId === data.id && s.dataset.type === 'quiz-q');
                     const oldA = slides.find(s => s.dataset.quizId === data.id && s.dataset.type === 'quiz-a');
                     if (oldQ) slideContainer.replaceChild(qSlide, oldQ);
                     if (oldA) slideContainer.replaceChild(aSlide, oldA);
                 } else {
-                    // Append before declaration
-                    const end = Array.from(slides).find(s => s.dataset.name && s.dataset.name.includes("Declaration"));
-                    if (end) { slideContainer.insertBefore(qSlide, end); slideContainer.insertBefore(aSlide, end); } 
-                    else { slideContainer.appendChild(qSlide); slideContainer.appendChild(aSlide); }
+                    slideContainer.appendChild(qSlide); 
+                    slideContainer.appendChild(aSlide);
                 }
 
                 quizForm.classList.add('hidden'); quizForm.classList.remove('flex');
-                refreshSlidesState();
-                saveDeckState();
+                refreshSlidesState(); saveDeckState();
             });
 
-            // Handle Image Submit
             document.getElementById('submit-img').addEventListener('click', () => {
                 const data = {
                     id: document.getElementById('img-edit-id').value || 'img_' + Date.now(),
@@ -901,14 +1079,11 @@
                     const old = slides.find(s => s.dataset.imgId === data.id);
                     if (old) slideContainer.replaceChild(slide, old);
                 } else {
-                    const end = Array.from(slides).find(s => s.dataset.name && s.dataset.name.includes("Declaration"));
-                    if (end) slideContainer.insertBefore(slide, end); 
-                    else slideContainer.appendChild(slide);
+                    slideContainer.appendChild(slide);
                 }
 
                 imgForm.classList.add('hidden'); imgForm.classList.remove('flex');
-                refreshSlidesState();
-                saveDeckState();
+                refreshSlidesState(); saveDeckState();
             });
 
 
@@ -920,10 +1095,6 @@
                     const name = slide.getAttribute('data-name') || `Slide ${index + 1}`;
                     const type = slide.dataset.type;
                     const isEditable = type === 'quiz-q' || type === 'image';
-
-                    // Skip rendering 'quiz-a' independently to keep admin clean, 
-                    // editing 'quiz-q' handles both. But we must allow showing/hiding it.
-                    // Actually, let's render all so user can reorder accurately.
 
                     const card = document.createElement('div');
                     card.className = `p-4 border border-neutral-800 flex flex-col gap-4 ${isActive ? 'bg-[#00FF41]/10 border-[#00FF41]' : 'bg-black'} ${isHidden ? 'opacity-40' : ''}`;
@@ -957,8 +1128,7 @@
                 document.querySelectorAll('.toggle-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         slides[parseInt(e.target.dataset.index)].classList.toggle('hidden-slide');
-                        refreshSlidesState();
-                        saveDeckState();
+                        refreshSlidesState(); saveDeckState();
                     });
                 });
 
@@ -1013,7 +1183,7 @@
                 }
             };
 
-            // --- GLOBAL EVENT LISTENERS ---
+            // --- GLOBALS ---
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') goToSlide(getNextIndex());
                 else if (e.key === 'ArrowLeft' || e.key === 'PageUp') goToSlide(getPrevIndex());
@@ -1041,7 +1211,6 @@
 
             document.getElementById('close-admin').addEventListener('click', toggleAdminPane);
 
-            // Start up
             loadDeckState();
             applySlideTheme(0);
             requestAnimationFrame(updateUI);
