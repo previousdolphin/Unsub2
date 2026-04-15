@@ -706,11 +706,11 @@
                                 content: ORACLE_SYSTEM_PROMPT + text 
                             }
                         ],
-                        max_tokens: 45, 
-                        temperature: 0.4, 
-                        frequency_penalty: 1.2, 
-                        presence_penalty: 0.6,
-                        stop: ["<end_of_turn>", "<eos>", "\n\n", "User:"] 
+                        max_tokens: 35, // Keep it short and sweet
+                        temperature: 0.7, // Bumping this up; sometimes 0.4 is too "stiff" and causes loops
+                        frequency_penalty: 1.5, // Aggressive anti-repetition
+                        presence_penalty: 0.5,
+                        stop: ["<end_of_turn>", "<eos>", "\n", "User:", "reframe:"] 
                     })
                 });
 
