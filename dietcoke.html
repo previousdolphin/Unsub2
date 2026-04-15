@@ -167,11 +167,11 @@
         <div class="interaction-section">
             <div class="container-box" id="chatContainer">
                 <div class="chat-history" id="chatHistory">
-                    <div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
+                    <div class="message assistant" id="initialOracleMsg">MODE 1: THE REFINERY.<br>INITIALIZING ARCHITECTURE...</div>
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters..." autocomplete="off">
-                    <button class="btn" id="sendBtn" title="Send">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Loading protocol..." autocomplete="off" disabled>
+                    <button class="btn" id="sendBtn" title="Send" disabled>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </div>
@@ -192,6 +192,7 @@
     </div>
 
     <script>
+        // --- UI & Canvas Setup ---
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             document.getElementById('moonIcon').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
@@ -260,30 +261,11 @@
         // --- System Logic & State Machine ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
-        // Added Few-Shot Examples and strict rules to force base Gemma to behave like the LoRA
-        const PROMPTS = {
-            MODE_1: `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
-RULES:
-1. Reject outcome bias and advice-seeking. NEVER give advice. NEVER be conversational. NEVER use slang.
-2. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. Maximum 20 words.
-3. If the user's input is finally structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
-
-EXAMPLES OF YOUR VOICE:
-User: What should I do about my business partner?
-Oracle: What is the structural tension that has not yet been named?
-User: How do I fix my relationship?
-Oracle: The oracle is not a therapist. Define the incompatible geometries at the center of the node.
-User: What is the structural failure in my current contract?
-Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
-
-CURRENT INQUIRY:\n`,
-            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence.\n\n"
-        };
-
+        let PROMPTS = { MODE_1: "", MODE_3: "" };
         let currentMode = 1;
         let refinedQuestion = "";
         let castResults = []; 
-        let conversationHistory = []; // Tracks user and assistant messages only
+        let conversationHistory = []; // Tracks full context 
 
         const chatContainer = document.getElementById('chatContainer');
         const castContainer = document.getElementById('castContainer');
@@ -306,16 +288,79 @@ CURRENT INQUIRY:\n`,
             if (!isLoading) chatInput.focus();
         }
 
+        // --- RAG / Intelligent Context Loading ---
+        async function loadProtocol() {
+            try {
+                // Attempt to fetch the adjacent JSON protocol map
+                const response = await fetch('gram.json');
+                if (!response.ok) throw new Error("Protocol archive unavailable.");
+                const data = await response.json();
+
+                // Dynamically compile the "ALWAYS" and "NEVER" architectural directives
+                const neverRules = data.voice_and_doctrine.rules.never.map(rule => "NEVER " + rule).join(" ");
+                const alwaysRules = data.voice_and_doctrine.rules.always.map(rule => "ALWAYS " + rule).join(" ");
+
+                // Map JSON directly to the Mode 1 instruction set
+                PROMPTS.MODE_1 = `You are ${data.system_identifier}, the ${data.system_name}. Enforce MODE 1: ${data.architecture.mode_1.name}.
+RULES:
+1. ${neverRules}
+2. ${alwaysRules} Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. Maximum 20 words.
+3. If the user's input is finally structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+
+EXAMPLES OF YOUR VOICE:
+User: ${data.architecture.mode_1.example_interaction.input}
+Oracle: ${data.architecture.mode_1.example_interaction.refinery_output}
+User: How do I fix my relationship?
+Oracle: The oracle is not a therapist. Define the incompatible geometries at the center of the node.
+User: What is the structural failure in my current contract?
+Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
+
+CURRENT INQUIRY:\n`;
+
+                // Map JSON strictly to the Mode 3 structured output expectations
+                const structure = data.architecture.mode_3.output_structure.map(item => `${item.step}. ${item.element}: ${item.details}`).join(" ");
+                PROMPTS.MODE_3 = `You are ${data.system_identifier}. Enforce MODE 3: ${data.architecture.mode_3.name}. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: ${structure} ${alwaysRules} ${neverRules}\n\n`;
+
+                appendMessage("PROTOCOL LOADED FROM GRAM.JSON ARCHIVE.", 'system');
+            } catch (error) {
+                console.warn("Could not load gram.json via fetch (likely CORS restriction on file://). Initiating hardcoded fallback.");
+                
+                // Fallback safeguards the application if JSON isn't accessible via the web server yet
+                PROMPTS.MODE_1 = `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
+RULES:
+1. Reject outcome bias and advice-seeking. NEVER give advice. NEVER be conversational. NEVER use slang.
+2. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. Maximum 20 words.
+3. If the user's input is finally structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+
+EXAMPLES OF YOUR VOICE:
+User: What should I do about my business partner?
+Oracle: What is the structural tension that has not yet been named?
+User: How do I fix my relationship?
+Oracle: The oracle is not a therapist. Define the incompatible geometries at the center of the node.
+User: What is the structural failure in my current contract?
+Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
+
+CURRENT INQUIRY:\n`;
+                PROMPTS.MODE_3 = "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence.\n\n";
+            }
+            
+            document.getElementById('initialOracleMsg').innerHTML = "MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.";
+            setLoadingState(false);
+        }
+
+        // Initialize Protocol On Load
+        window.addEventListener('DOMContentLoaded', loadProtocol);
+
+        // --- Core Application Execution ---
         async function fetchOracleResponse(apiMessages, maxTokens) {
             const payload = {
-                model: "google/gemma-7b-it", // Change back to "diet_coke" when ready
+                model: "google/gemma-7b-it", // Swap to "diet_coke" when LoRA is retrained
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                // Lowered temperature significantly (0.1) so the base model doesn't hallucinate pirate slang
                 temperature: currentMode === 1 ? 0.1 : 0.6, 
                 frequency_penalty: 0.2, 
                 presence_penalty: 0.2,
-                stop: ["<end_of_turn>", "<eos>"] 
+                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "veve"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -327,8 +372,8 @@ CURRENT INQUIRY:\n`,
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             
-            // Clean up any stray quotes the base model might try to add
             let reply = (data.choices[0].message.content || "").replace("reframe:", "").trim();
+            reply = reply.replace(/(ve){2,}/gi, "").replace(/(lld){2,}/gi, "").trim();
             return reply.replace(/^"|"$/g, '').trim(); 
         }
 
@@ -344,6 +389,8 @@ CURRENT INQUIRY:\n`,
 
             const apiMessages = conversationHistory.map((msg, index) => {
                 if (index === 0 && msg.role === 'user') {
+                    // Injecting the massive PROMPTS.MODE_1 only into the first memory slot
+                    // This allows Gemma to understand the rules without breaking format
                     return { role: 'user', content: PROMPTS.MODE_1 + msg.content };
                 }
                 return msg;
@@ -352,8 +399,6 @@ CURRENT INQUIRY:\n`,
             try {
                 let reply = await fetchOracleResponse(apiMessages, 100);
                 
-                // UX Safety Net: If the user has gone back and forth 4 times, force validation 
-                // so they don't get stuck forever in Mode 1 while using the base model.
                 const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
                 if (userTurnCount >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
@@ -459,6 +504,7 @@ CURRENT INQUIRY:\n`,
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
             setLoadingState(true);
 
+            // Single shot array to pass the context for the final output interpretation
             const apiMessages = [
                 { role: "user", content: PROMPTS.MODE_3 + mode3Payload }
             ];
@@ -472,7 +518,7 @@ CURRENT INQUIRY:\n`,
             } finally {
                 setLoadingState(false);
                 currentMode = 1; 
-                conversationHistory = []; 
+                conversationHistory = []; // Reset memory for the next user query
             }
         }
     </script>
