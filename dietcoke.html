@@ -167,10 +167,10 @@
         <div class="interaction-section">
             <div class="container-box" id="chatContainer">
                 <div class="chat-history" id="chatHistory">
-                    <div class="message assistant" id="initialOracleMsg">MODE 1: THE REFINERY.<br>INITIALIZING ARCHITECTURE...</div>
+                    <div class="message system" id="initialOracleMsg">BOOT SEQUENCE...<br>AWAITING RAG PROTOCOL.</div>
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Loading protocol..." autocomplete="off" disabled>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Initializing doctrine..." autocomplete="off" disabled>
                     <button class="btn" id="sendBtn" title="Send" disabled>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
@@ -258,14 +258,14 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
-        // --- System Logic & State Machine ---
+        // --- System Logic & RAG State Machine ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
         let PROMPTS = { MODE_1: "", MODE_3: "" };
         let currentMode = 1;
         let refinedQuestion = "";
         let castResults = []; 
-        let conversationHistory = []; // Tracks full context 
+        let conversationHistory = []; 
 
         const chatContainer = document.getElementById('chatContainer');
         const castContainer = document.getElementById('castContainer');
@@ -288,24 +288,25 @@
             if (!isLoading) chatInput.focus();
         }
 
-        // --- RAG / Intelligent Context Loading ---
+        // --- Intelligent Context Loading (RAG) ---
         async function loadProtocol() {
             try {
-                // Attempt to fetch the adjacent JSON protocol map
+                // Fetch the CoCA Doctrine JSON
                 const response = await fetch('gram.json');
                 if (!response.ok) throw new Error("Protocol archive unavailable.");
                 const data = await response.json();
 
-                // Dynamically compile the "ALWAYS" and "NEVER" architectural directives
+                // Dynamically compile the "ALWAYS" and "NEVER" rules into the prompt
                 const neverRules = data.voice_and_doctrine.rules.never.map(rule => "NEVER " + rule).join(" ");
                 const alwaysRules = data.voice_and_doctrine.rules.always.map(rule => "ALWAYS " + rule).join(" ");
 
-                // Map JSON directly to the Mode 1 instruction set
+                // Assemble Mode 1 Prompt from JSON
                 PROMPTS.MODE_1 = `You are ${data.system_identifier}, the ${data.system_name}. Enforce MODE 1: ${data.architecture.mode_1.name}.
-RULES:
+CRITICAL INSTRUCTIONS:
 1. ${neverRules}
-2. ${alwaysRules} Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. Maximum 20 words.
-3. If the user's input is finally structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+2. ${alwaysRules}
+3. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular.
+4. If the user's input is structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 
 EXAMPLES OF YOUR VOICE:
 User: ${data.architecture.mode_1.example_interaction.input}
@@ -315,52 +316,55 @@ Oracle: The oracle is not a therapist. Define the incompatible geometries at the
 User: What is the structural failure in my current contract?
 Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
 
-CURRENT INQUIRY:\n`;
+CURRENT INQUIRY: `;
 
-                // Map JSON strictly to the Mode 3 structured output expectations
-                const structure = data.architecture.mode_3.output_structure.map(item => `${item.step}. ${item.element}: ${item.details}`).join(" ");
-                PROMPTS.MODE_3 = `You are ${data.system_identifier}. Enforce MODE 3: ${data.architecture.mode_3.name}. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: ${structure} ${alwaysRules} ${neverRules}\n\n`;
+                // Assemble Mode 3 Prompt from JSON
+                const structureSteps = data.architecture.mode_3.output_structure.map(item => `${item.step}. ${item.element}: ${item.details}`).join(" ");
+                PROMPTS.MODE_3 = `You are ${data.system_identifier}. Enforce MODE 3: ${data.architecture.mode_3.name}. Input consists of a refined question, a hexagram, and changing lines. 
+Output must follow strict CoCA structure: ${structureSteps} 
+VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
 
-                appendMessage("PROTOCOL LOADED FROM GRAM.JSON ARCHIVE.", 'system');
+                console.log("RAG Protocol successfully loaded from gram.json");
             } catch (error) {
-                console.warn("Could not load gram.json via fetch (likely CORS restriction on file://). Initiating hardcoded fallback.");
+                console.warn("Could not load gram.json. Initiating hardcoded fallback.");
                 
-                // Fallback safeguards the application if JSON isn't accessible via the web server yet
+                // Fallback instructions in case the JSON is missing or blocked by CORS
                 PROMPTS.MODE_1 = `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
-RULES:
-1. Reject outcome bias and advice-seeking. NEVER give advice. NEVER be conversational. NEVER use slang.
-2. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. Maximum 20 words.
-3. If the user's input is finally structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
-
-EXAMPLES OF YOUR VOICE:
-User: What should I do about my business partner?
-Oracle: What is the structural tension that has not yet been named?
-User: How do I fix my relationship?
-Oracle: The oracle is not a therapist. Define the incompatible geometries at the center of the node.
-User: What is the structural failure in my current contract?
-Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
-
-CURRENT INQUIRY:\n`;
-                PROMPTS.MODE_3 = "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence.\n\n";
+RULES: Reject outcome bias and advice-seeking. NEVER give advice. NEVER be conversational. NEVER use slang. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. If the user's input is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+CURRENT INQUIRY: `;
+                PROMPTS.MODE_3 = "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies.\n\n";
             }
             
-            document.getElementById('initialOracleMsg').innerHTML = "MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.";
+            // Clear boot message and start UI
+            document.getElementById('initialOracleMsg').outerHTML = `<div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>`;
             setLoadingState(false);
         }
 
-        // Initialize Protocol On Load
         window.addEventListener('DOMContentLoaded', loadProtocol);
 
-        // --- Core Application Execution ---
+        // --- Core Base Model Safeguards ---
+        // The base model loves to add quotes, conversational intros, or pirate slang. This forces it to conform.
+        function cleanGemmaOutput(text) {
+            let clean = text.replace("reframe:", "").trim();
+            clean = clean.replace(/^"|"$/g, '').trim(); // Remove surrounding quotes
+            clean = clean.replace(/^(Listen up).*?/gi, "").trim(); // Nuke the pirate persona if it leaks
+            
+            // If the model generates multiple reframes, keep only the first one
+            if (clean.includes('\n')) {
+                clean = clean.split('\n')[0].trim(); 
+            }
+            return clean;
+        }
+
         async function fetchOracleResponse(apiMessages, maxTokens) {
             const payload = {
-                model: "google/gemma-7b-it", // Swap to "diet_coke" when LoRA is retrained
+                model: "google/gemma-7b-it", // Change to "diet_coke" when LoRA is retrained
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.1 : 0.6, 
-                frequency_penalty: 0.2, 
+                temperature: currentMode === 1 ? 0.1 : 0.4, // Keep very low so base model obeys rules
+                frequency_penalty: 0.5, 
                 presence_penalty: 0.2,
-                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "veve"] 
+                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -371,10 +375,7 @@ CURRENT INQUIRY:\n`;
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
-            
-            let reply = (data.choices[0].message.content || "").replace("reframe:", "").trim();
-            reply = reply.replace(/(ve){2,}/gi, "").replace(/(lld){2,}/gi, "").trim();
-            return reply.replace(/^"|"$/g, '').trim(); 
+            return cleanGemmaOutput(data.choices[0].message.content || "");
         }
 
         async function handleSend() {
@@ -385,25 +386,28 @@ CURRENT INQUIRY:\n`;
             chatInput.value = '';
             setLoadingState(true);
 
+            // Add user input to conversation memory
             conversationHistory.push({ role: "user", content: text });
 
+            // Construct payload: Inject the massive System RAG prompt ONLY into the very first user message.
+            // This maintains Gemma's strict user/assistant alternating format while passing context.
             const apiMessages = conversationHistory.map((msg, index) => {
                 if (index === 0 && msg.role === 'user') {
-                    // Injecting the massive PROMPTS.MODE_1 only into the first memory slot
-                    // This allows Gemma to understand the rules without breaking format
-                    return { role: 'user', content: PROMPTS.MODE_1 + msg.content };
+                    return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
                 }
                 return msg;
             });
 
             try {
-                let reply = await fetchOracleResponse(apiMessages, 100);
+                let reply = await fetchOracleResponse(apiMessages, 50);
                 
+                // Override Safety Net: If the conversation goes 4 turns deep, force validation
                 const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
                 if (userTurnCount >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
                 }
 
+                // Add assistant response to conversation memory
                 conversationHistory.push({ role: "assistant", content: reply });
                 
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
@@ -428,6 +432,7 @@ CURRENT INQUIRY:\n`;
         sendBtn.addEventListener('click', handleSend);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
+        // --- MODE 2: CASTING ENGINE ---
         const CAST_QUESTIONS = [
             ["Does the structure require submission or assertion?", "SUBMIT", "ASSERT"],
             ["Is the tension internal or external?", "INTERNAL", "EXTERNAL"],
@@ -475,6 +480,7 @@ CURRENT INQUIRY:\n`;
             updateCastUI();
         }
 
+        // --- MODE 3: INTERPRETATION ---
         const HEXAGRAM_MAP = {
             "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
         };
@@ -518,7 +524,7 @@ CURRENT INQUIRY:\n`;
             } finally {
                 setLoadingState(false);
                 currentMode = 1; 
-                conversationHistory = []; // Reset memory for the next user query
+                conversationHistory = []; // Reset memory for the next session
             }
         }
     </script>
