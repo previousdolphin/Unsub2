@@ -163,11 +163,11 @@
         <div class="interaction-section">
             <div class="container-box" id="chatContainer">
                 <div class="chat-history" id="chatHistory">
-                    <div class="message system" id="initialOracleMsg">BOOT SEQUENCE...<br>AWAITING RAG PROTOCOL.</div>
+                    <div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Initializing doctrine..." autocomplete="off" disabled>
-                    <button class="btn" id="sendBtn" title="Send" disabled>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters..." autocomplete="off">
+                    <button class="btn" id="sendBtn" title="Send">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </div>
@@ -254,10 +254,27 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
-        // --- System Logic & RAG State Machine ---
+        // --- Core System Constants (Standard 3 Gate Architecture) ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
-        let PROMPTS = { MODE_1: "", MODE_3: "" };
+        const PROMPTS = {
+            MODE_1: `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
+RULES:
+1. Reject advice-seeking, personal belief, and outcome bias.
+2. Respond ONLY with a clarifying reframe using cold, corporate, brutalist vernacular.
+3. Maximum 20 words per response.
+4. If the user's inquiry is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+CURRENT INQUIRY: `,
+            MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
+STRUCTURE:
+1. HEXAGRAM IDENTIFICATION
+2. PRIMARY TEXT (NCR-CAM vernacular, 3-5 sentences)
+3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
+4. THE TRANSFORMED HEXAGRAM
+5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
+Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\n`
+        };
+
         let currentMode = 1;
         let refinedQuestion = "";
         let castResults = []; 
@@ -284,82 +301,24 @@
             if (!isLoading) chatInput.focus();
         }
 
-        // --- Intelligent Context Loading (RAG) ---
-        async function loadProtocol() {
-            try {
-                const response = await fetch('gram.json');
-                if (!response.ok) throw new Error("Protocol archive unavailable.");
-                const data = await response.json();
-
-                const neverRules = data.voice_and_doctrine.rules.never.map(rule => "NEVER " + rule).join(" ");
-                const alwaysRules = data.voice_and_doctrine.rules.always.map(rule => "ALWAYS " + rule).join(" ");
-
-                PROMPTS.MODE_1 = `You are ${data.system_identifier}, the ${data.system_name}. Enforce MODE 1: ${data.architecture.mode_1.name}.
-CORE DIRECTIVE:
-1. ${neverRules}
-2. ${alwaysRules}
-3. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular.
-4. DO NOT use introductory labels, slang, or conversational filler. 
-5. DO NOT acknowledge being an AI. DO NOT respond to meta-talk.
-6. If the user's input is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
-
-EXAMPLES:
-User: What should I do about my business partner?
-Oracle: What is the structural tension that has not yet been named?
-User: What is the structural failure in my current contract?
-Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
-
-CURRENT INQUIRY: `;
-
-                const structureSteps = data.architecture.mode_3.output_structure.map(item => `${item.step}. ${item.element}: ${item.details}`).join(" ");
-                PROMPTS.MODE_3 = `You are ${data.system_identifier}. Enforce MODE 3: ${data.architecture.mode_3.name}. Input consists of a refined question, a hexagram, and changing lines. 
-Output must follow strict CoCA structure: ${structureSteps} 
-VOICE RULES: ${alwaysRules} ${neverRules}
-NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
-\n\n`;
-
-                console.log("RAG Protocol successfully loaded from gram.json");
-            } catch (error) {
-                console.warn("Could not load gram.json. Initiating hardcoded fallback.");
-                PROMPTS.MODE_1 = `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. RULES: Reject outcome bias. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. CURRENT INQUIRY: `;
-                PROMPTS.MODE_3 = "You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. Output must follow strict CoCA structure: ID, Primary Text, Changing Lines, Transformed Hexagram, Closing Notation. Present tense only.\n\n";
-            }
-            
-            document.getElementById('initialOracleMsg').outerHTML = `<div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>`;
-            setLoadingState(false);
-        }
-
-        window.addEventListener('DOMContentLoaded', loadProtocol);
-
-        // --- Role-Atomic State Machine Helpers ---
         function cleanGemmaOutput(text) {
-            // Remove headers, names, labels, and conversational filler
-            let clean = text.replace(/##\s+Diet\s+Coke/gi, "").trim();
-            clean = clean.replace(/reframe:/gi, "").trim();
+            let clean = text.replace(/reframe:/gi, "").trim();
             clean = clean.replace(/oracle response:/gi, "").trim();
-            clean = clean.replace(/oracle:/gi, "").trim();
-            clean = clean.replace(/assistant:/gi, "").trim();
             clean = clean.replace(/^"|"$/g, '').trim(); 
-            
-            // Scrub conversational filler and stars
-            const colloquialisms = [/^Listen up,/i, /^Buttercup,/i, /^Hey kid,/i, /^Sure thing,/i, /^I'll try,/i, /^\*+$/];
-            colloquialisms.forEach(regex => {
-                clean = clean.replace(regex, "").trim();
-            });
-
+            // Scrub conversational fluff the base model might hallucinate
+            const fluff = [/^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^\*+$/];
+            fluff.forEach(regex => { clean = clean.replace(regex, "").trim(); });
             if (clean.includes('\n') && currentMode === 1) {
                 clean = clean.split('\n')[0].trim(); 
             }
             return clean;
         }
 
-        function validateAndFixAlternation(history) {
+        function validateAlternation(history) {
             if (history.length === 0) return [];
-            let filtered = history.filter(m => m.content && m.content.trim().length > 0);
-            if (filtered.length > 0 && filtered[0].role !== 'user') {
-                filtered.shift();
-            }
             let fixed = [];
+            let filtered = history.filter(m => m.content && m.content.trim().length > 0);
+            if (filtered.length > 0 && filtered[0].role !== 'user') filtered.shift();
             for (let i = 0; i < filtered.length; i++) {
                 if (i === 0 || filtered[i].role !== filtered[i - 1].role) {
                     fixed.push(filtered[i]);
@@ -373,11 +332,10 @@ NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
                 model: "google/gemma-7b-it", 
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                // Aggressive sampling to stop meta-talk and leaks
                 temperature: currentMode === 1 ? 0.01 : 0.4, 
-                frequency_penalty: 1.5, 
-                presence_penalty: 0.5,
-                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed", "##"] 
+                frequency_penalty: 1.2, 
+                presence_penalty: 0.2,
+                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -387,10 +345,8 @@ NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
             });
 
             if (!response.ok) {
-                const errText = await response.text();
-                let errJson;
-                try { errJson = JSON.parse(errText); } catch(e) {}
-                throw new Error(errJson?.message || `HTTP ${response.status}`);
+                const errJson = await response.json().catch(() => ({ message: `HTTP ${response.status}` }));
+                throw new Error(errJson.message || "Network Error");
             }
             const data = await response.json();
             return cleanGemmaOutput(data.choices[0].message.content || "");
@@ -405,34 +361,26 @@ NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
             setLoadingState(true);
 
             conversationHistory.push({ role: "user", content: text });
+            if (conversationHistory.length > 6) conversationHistory = conversationHistory.slice(-6);
 
-            // Sliding window: last 6 messages
-            if (conversationHistory.length > 6) {
-                conversationHistory = conversationHistory.slice(-6);
-            }
-
-            let activeHistory = validateAndFixAlternation([...conversationHistory]);
-            
+            let activeHistory = validateAlternation([...conversationHistory]);
             const apiMessages = activeHistory.map((msg, index) => {
-                if (index === 0) {
-                    return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
-                }
+                if (index === 0) return { role: 'user', content: PROMPTS.MODE_1 + msg.content };
                 return msg;
             });
 
             try {
-                let reply = await fetchOracleResponse(apiMessages, 120);
+                let reply = await fetchOracleResponse(apiMessages, 100);
                 
-                const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
-                if (userTurnCount >= 5 && !reply.includes("STATUS: VALIDATED")) {
+                const userTurns = conversationHistory.filter(m => m.role === 'user').length;
+                if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
                 }
 
                 conversationHistory.push({ role: "assistant", content: reply });
                 
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
-                                  reply.includes("Proceed to Mode 2") ||
-                                  reply.toLowerCase().includes("oracle-grade");
+                                  reply.includes("Proceed to Mode 2");
 
                 if (isValidated) {
                     refinedQuestion = text; 
@@ -442,7 +390,7 @@ NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
                     appendMessage(reply, 'assistant');
                 }
             } catch (error) {
-                console.error("API Sequence Failure:", error);
+                console.error("API Error:", error);
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
@@ -526,15 +474,12 @@ NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
             const hexName = HEXAGRAM_NAMES[hexNum];
             const linesText = changingLines.length > 0 ? changingLines.join(", ") : "None";
 
-            // Payload matches the specific training structure in dataset.jsonl
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${hexNum} (${hexName}). CHANGING LINES: ${linesText}.]`;
             
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
             setLoadingState(true);
 
-            const apiMessages = [
-                { role: "user", content: PROMPTS.MODE_3 + mode3Payload }
-            ];
+            const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + mode3Payload } ];
 
             try {
                 const finalRuling = await fetchOracleResponse(apiMessages, 500);
@@ -548,6 +493,8 @@ NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
                 conversationHistory = []; 
             }
         }
+
+        initCanvas(); animate();
     </script>
 </body>
 </html>
