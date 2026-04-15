@@ -60,7 +60,6 @@
             position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        /* Logo Section */
         .logo-section {
             flex: 1 0 auto; display: flex; align-items: center; justify-content: center;
             min-height: 45vh; padding-bottom: 2rem; pointer-events: none; 
@@ -77,7 +76,6 @@
         .oracle-text { font-size: 4rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); }
         .sub-text { font-size: 1.2rem; font-weight: 600; letter-spacing: 4px; margin-top: 10px; color: var(--text-muted); }
 
-        /* Interaction Section (Chat or Cast) */
         .interaction-section {
             flex: 0 0 auto; height: 55vh; min-height: 450px; position: relative; scroll-snap-align: start;
         }
@@ -87,7 +85,6 @@
             padding: 20px 20px 40px 20px; box-sizing: border-box;
         }
 
-        /* Chat Styles */
         .chat-history {
             flex-grow: 1; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; padding-right: 10px;
         }
@@ -110,7 +107,6 @@
         .btn:hover:not(:disabled) { color: var(--coca-red); }
         .btn:disabled { cursor: not-allowed; opacity: 0.5; }
 
-        /* Casting Styles (Mode 2) */
         #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 30px;}
         .hexagram-visual {
             display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start;
@@ -299,17 +295,16 @@
                 const alwaysRules = data.voice_and_doctrine.rules.always.map(rule => "ALWAYS " + rule).join(" ");
 
                 PROMPTS.MODE_1 = `You are ${data.system_identifier}, the ${data.system_name}. Enforce MODE 1: ${data.architecture.mode_1.name}.
-CRITICAL INSTRUCTIONS:
+RULES:
 1. ${neverRules}
 2. ${alwaysRules}
 3. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular.
-4. If the user's input is structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+4. DO NOT use labels like 'Oracle Response:' or 'Reframe:'.
+5. If the user's input is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 
-EXAMPLES OF YOUR VOICE:
-User: ${data.architecture.mode_1.example_interaction.input}
-Oracle: ${data.architecture.mode_1.example_interaction.refinery_output}
-User: How do I fix my relationship?
-Oracle: The oracle is not a therapist. Define the incompatible geometries at the center of the node.
+EXAMPLES:
+User: What should I do about my business partner?
+Oracle: What is the structural tension that has not yet been named?
 User: What is the structural failure in my current contract?
 Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
 
@@ -333,14 +328,40 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
 
         window.addEventListener('DOMContentLoaded', loadProtocol);
 
+        // --- Role-Atomic State Machine Helpers ---
         function cleanGemmaOutput(text) {
-            let clean = text.replace("reframe:", "").trim();
-            clean = clean.replace(/^"|"$/g, '').trim();
-            clean = clean.replace(/^(Listen up).*?/gi, "").trim();
+            let clean = text.replace(/reframe:/gi, "").trim();
+            clean = clean.replace(/oracle response:/gi, "").trim();
+            clean = clean.replace(/oracle:/gi, "").trim();
+            clean = clean.replace(/assistant:/gi, "").trim();
+            clean = clean.replace(/^"|"$/g, '').trim(); // Remove surrounding quotes
+            clean = clean.replace(/^(Listen up).*?/gi, "").trim(); // Nuke the pirate persona
+            
             if (clean.includes('\n')) {
                 clean = clean.split('\n')[0].trim(); 
             }
             return clean;
+        }
+
+        // CRITICAL FIX: Ensures vLLM never receives user/user or assistant/assistant sequences
+        function validateAndFixAlternation(history) {
+            if (history.length === 0) return [];
+            
+            let fixed = [];
+            // A conversation must always start with 'user' for most chat templates
+            if (history[0].role !== 'user') {
+                history.shift();
+                return validateAndFixAlternation(history);
+            }
+
+            for (let i = 0; i < history.length; i++) {
+                if (i === 0 || history[i].role !== history[i - 1].role) {
+                    fixed.push(history[i]);
+                } else {
+                    console.warn("Role sequence violation detected in memory. Removing duplicate role entry.");
+                }
+            }
+            return fixed;
         }
 
         async function fetchOracleResponse(apiMessages, maxTokens) {
@@ -349,9 +370,9 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                 messages: apiMessages,
                 max_tokens: maxTokens,
                 temperature: currentMode === 1 ? 0.1 : 0.4, 
-                frequency_penalty: 0.5, 
+                frequency_penalty: 0.8, 
                 presence_penalty: 0.2,
-                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n"] 
+                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed Oracle Response"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -361,8 +382,10 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             });
 
             if (!response.ok) {
-                const errData = await response.json();
-                throw new Error(errData.message || `HTTP ${response.status}`);
+                const errText = await response.text();
+                let errJson;
+                try { errJson = JSON.parse(errText); } catch(e) {}
+                throw new Error(errJson?.message || `HTTP ${response.status}`);
             }
             const data = await response.json();
             return cleanGemmaOutput(data.choices[0].message.content || "");
@@ -376,23 +399,18 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             chatInput.value = '';
             setLoadingState(true);
 
-            // 1. Push user message to history
+            // 1. Add user turn to memory
             conversationHistory.push({ role: "user", content: text });
 
-            // 2. Rolling Memory: Keep max 6 messages (3 turns)
-            if (conversationHistory.length > 6) {
-                conversationHistory = conversationHistory.slice(-6);
+            // 2. Rolling Memory Logic
+            if (conversationHistory.length > 8) {
+                conversationHistory = conversationHistory.slice(-8);
             }
 
-            // 3. Construct API payload ensuring alternation
-            // We check the first message in our slice. If it's an 'assistant' role, 
-            // the chat template will error on the server side because a conversation 
-            // usually starts with 'user'. We slice again if needed.
-            let activeHistory = [...conversationHistory];
-            if (activeHistory[0].role === 'assistant') {
-                activeHistory.shift();
-            }
-
+            // 3. Ensure role alternation before constructing payload
+            let activeHistory = validateAndFixAlternation([...conversationHistory]);
+            
+            // 4. Construct payload with instruction injection
             const apiMessages = activeHistory.map((msg, index) => {
                 if (index === 0) {
                     return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
@@ -404,11 +422,11 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                 let reply = await fetchOracleResponse(apiMessages, 100);
                 
                 const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
-                if (userTurnCount >= 4 && !reply.includes("STATUS: VALIDATED")) {
+                if (userTurnCount >= 5 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
                 }
 
-                // 4. On success: push assistant response
+                // 5. Success: push assistant turn to memory
                 conversationHistory.push({ role: "assistant", content: reply });
                 
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
@@ -423,19 +441,18 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                     appendMessage(reply, 'assistant');
                 }
             } catch (error) {
-                console.error("API Error:", error);
+                console.error("Critical API Failure:", error);
                 
-                // 5. ROLE SAFETY: If the call failed, remove the user message 
-                // so the history roles don't get stuck on 'user, user'.
+                // 6. Cleanup on fail: Remove the user message so we don't try to send user-user next time
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
 
                 if (error.message.includes("Conversation roles must alternate")) {
-                    appendMessage("[ERR: PROTOCOL] ROLE SEQUENCE VIOLATION. REINITIALIZING...", 'error');
-                    conversationHistory = []; // Hard reset on template error
+                    appendMessage("[ERR: PROTOCOL] ROLE SEQUENCE CORRUPTED. REBOOTING SESSION...", 'error');
+                    conversationHistory = []; 
                 } else {
-                    appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
+                    appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY INQUIRY.", 'error');
                 }
             } finally {
                 setLoadingState(false);
@@ -528,7 +545,7 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             ];
 
             try {
-                const finalRuling = await fetchOracleResponse(apiMessages, 400);
+                const finalRuling = await fetchOracleResponse(apiMessages, 500);
                 appendMessage(finalRuling, 'assistant');
             } catch (error) {
                 console.error(error);
@@ -536,7 +553,7 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             } finally {
                 setLoadingState(false);
                 currentMode = 1; 
-                conversationHistory = []; 
+                conversationHistory = []; // Reset memory for the next user query
             }
         }
     </script>
