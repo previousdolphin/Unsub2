@@ -299,7 +299,7 @@ RULES:
 1. ${neverRules}
 2. ${alwaysRules}
 3. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular.
-4. DO NOT use labels like 'Oracle Response:' or 'Reframe:'.
+4. DO NOT use introductory labels, slang, or conversational filler. 
 5. If the user's input is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 
 EXAMPLES:
@@ -330,35 +330,40 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
 
         // --- Role-Atomic State Machine Helpers ---
         function cleanGemmaOutput(text) {
+            // Aggressive filtering to strip introductory conversational garbage
             let clean = text.replace(/reframe:/gi, "").trim();
             clean = clean.replace(/oracle response:/gi, "").trim();
             clean = clean.replace(/oracle:/gi, "").trim();
             clean = clean.replace(/assistant:/gi, "").trim();
-            clean = clean.replace(/^"|"$/g, '').trim(); // Remove surrounding quotes
-            clean = clean.replace(/^(Listen up).*?/gi, "").trim(); // Nuke the pirate persona
+            clean = clean.replace(/^"|"$/g, '').trim(); 
             
+            // Strip colloquial introductory phrases
+            const colloquialisms = [/^Listen up,/i, /^Buttercup,/i, /^Hey kid,/i, /^Sure thing,/i, /^I'll try,/i];
+            colloquialisms.forEach(regex => {
+                clean = clean.replace(regex, "").trim();
+            });
+
             if (clean.includes('\n')) {
                 clean = clean.split('\n')[0].trim(); 
             }
             return clean;
         }
 
-        // CRITICAL FIX: Ensures vLLM never receives user/user or assistant/assistant sequences
         function validateAndFixAlternation(history) {
             if (history.length === 0) return [];
-            
             let fixed = [];
-            // A conversation must always start with 'user' for most chat templates
-            if (history[0].role !== 'user') {
-                history.shift();
-                return validateAndFixAlternation(history);
+            
+            // Chat templates usually must start with 'user'
+            let filtered = history.filter(m => m.content && m.content.length > 0);
+            if (filtered.length > 0 && filtered[0].role !== 'user') {
+                filtered.shift();
             }
 
-            for (let i = 0; i < history.length; i++) {
-                if (i === 0 || history[i].role !== history[i - 1].role) {
-                    fixed.push(history[i]);
+            for (let i = 0; i < filtered.length; i++) {
+                if (i === 0 || filtered[i].role !== filtered[i - 1].role) {
+                    fixed.push(filtered[i]);
                 } else {
-                    console.warn("Role sequence violation detected in memory. Removing duplicate role entry.");
+                    console.warn("Deduplicating consecutive role turns...");
                 }
             }
             return fixed;
@@ -369,9 +374,9 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                 model: "google/gemma-7b-it", 
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.1 : 0.4, 
-                frequency_penalty: 0.8, 
-                presence_penalty: 0.2,
+                temperature: currentMode === 1 ? 0.05 : 0.4, // Drop to near-zero for strict reframe
+                frequency_penalty: 1.2, // Increase to prevent "Listen up" loops
+                presence_penalty: 0.4,
                 stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed Oracle Response"] 
             };
 
@@ -399,18 +404,18 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             chatInput.value = '';
             setLoadingState(true);
 
-            // 1. Add user turn to memory
+            // 1. Transactional Update: Push user turn
             conversationHistory.push({ role: "user", content: text });
 
-            // 2. Rolling Memory Logic
-            if (conversationHistory.length > 8) {
-                conversationHistory = conversationHistory.slice(-8);
+            // 2. Rolling Memory: Keep max 6 messages (3 turns)
+            if (conversationHistory.length > 6) {
+                conversationHistory = conversationHistory.slice(-6);
             }
 
-            // 3. Ensure role alternation before constructing payload
+            // 3. Guarantee alternation
             let activeHistory = validateAndFixAlternation([...conversationHistory]);
             
-            // 4. Construct payload with instruction injection
+            // 4. Construct payload ensuring first message has instructions
             const apiMessages = activeHistory.map((msg, index) => {
                 if (index === 0) {
                     return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
@@ -419,14 +424,15 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             });
 
             try {
-                let reply = await fetchOracleResponse(apiMessages, 100);
+                let reply = await fetchOracleResponse(apiMessages, 120);
                 
                 const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
-                if (userTurnCount >= 5 && !reply.includes("STATUS: VALIDATED")) {
+                // Force Mode 2 after 4 turns to avoid base model drifting into help-desk mode
+                if (userTurnCount >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
                 }
 
-                // 5. Success: push assistant turn to memory
+                // 5. Atomic Update: Push assistant response
                 conversationHistory.push({ role: "assistant", content: reply });
                 
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
@@ -441,18 +447,18 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                     appendMessage(reply, 'assistant');
                 }
             } catch (error) {
-                console.error("Critical API Failure:", error);
+                console.error("API Sequence Failure:", error);
                 
-                // 6. Cleanup on fail: Remove the user message so we don't try to send user-user next time
+                // Roll back user turn on failure to keep roles aligned
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
 
                 if (error.message.includes("Conversation roles must alternate")) {
-                    appendMessage("[ERR: PROTOCOL] ROLE SEQUENCE CORRUPTED. REBOOTING SESSION...", 'error');
+                    appendMessage("[ERR: PROTOCOL] ROLE SEQUENCE CORRUPTED. REINITIALIZING...", 'error');
                     conversationHistory = []; 
                 } else {
-                    appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY INQUIRY.", 'error');
+                    appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
                 }
             } finally {
                 setLoadingState(false);
@@ -553,7 +559,7 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             } finally {
                 setLoadingState(false);
                 currentMode = 1; 
-                conversationHistory = []; // Reset memory for the next user query
+                conversationHistory = []; 
             }
         }
     </script>
