@@ -263,19 +263,21 @@ RULES:
 1. Reject advice-seeking, personal belief, and outcome bias.
 2. Respond ONLY with a clarifying reframe using cold, corporate, brutalist vernacular.
 3. Maximum 20 words per response.
-4. If the user's inquiry is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+4. NEVER mention your name or the user's name.
+5. If the inquiry is structurally objective, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 CURRENT INQUIRY: `,
             MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
 STRUCTURE:
-1. HEXAGRAM IDENTIFICATION
-2. PRIMARY TEXT (NCR-CAM vernacular, 3-5 sentences)
+1. HEXAGRAM IDENTIFICATION (Number/Name)
+2. PRIMARY TEXT (Architecture of the situation, 3-5 sentences)
 3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
-4. THE TRANSFORMED HEXAGRAM
+4. THE TRANSFORMED HEXAGRAM (Trajectory)
 5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
-Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\n`
+Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sentence.\n\n`
         };
 
         let currentMode = 1;
+        let isProcessing = false;
         let refinedQuestion = "";
         let castResults = []; 
         let conversationHistory = []; 
@@ -295,19 +297,33 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
         }
 
         function setLoadingState(isLoading) {
+            isProcessing = isLoading;
             chatInput.disabled = isLoading;
             sendBtn.disabled = isLoading;
-            chatInput.placeholder = isLoading ? "Consulting architecture..." : "Enter parameters...";
+            chatInput.placeholder = isLoading ? "Architecture processing..." : "Enter parameters...";
             if (!isLoading) chatInput.focus();
+        }
+
+        function resetSystemState() {
+            conversationHistory = [];
+            castResults = [];
+            refinedQuestion = "";
+            currentMode = 1;
+            isProcessing = false;
         }
 
         function cleanGemmaOutput(text) {
             let clean = text.replace(/reframe:/gi, "").trim();
             clean = clean.replace(/oracle response:/gi, "").trim();
+            clean = clean.replace(/oracle:/gi, "").trim();
+            clean = clean.replace(/assistant:/gi, "").trim();
+            clean = clean.replace(/##/g, "").trim();
             clean = clean.replace(/^"|"$/g, '').trim(); 
-            // Scrub conversational fluff the base model might hallucinate
-            const fluff = [/^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^\*+$/];
-            fluff.forEach(regex => { clean = clean.replace(regex, "").trim(); });
+            // Scrub conversational fluff and model artifacts
+            const artifacts = [/^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^\*+$/, /^pilgrim/i];
+            artifacts.forEach(regex => { clean = clean.replace(regex, "").trim(); });
+            
+            // If in mode 1, keep only the first line of output
             if (clean.includes('\n') && currentMode === 1) {
                 clean = clean.split('\n')[0].trim(); 
             }
@@ -333,9 +349,9 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
                 messages: apiMessages,
                 max_tokens: maxTokens,
                 temperature: currentMode === 1 ? 0.01 : 0.4, 
-                frequency_penalty: 1.2, 
-                presence_penalty: 0.2,
-                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n"] 
+                frequency_penalty: 1.3, 
+                presence_penalty: 0.3,
+                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed", "##"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -354,7 +370,7 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
 
         async function handleSend() {
             const text = chatInput.value.trim();
-            if (!text || currentMode !== 1) return;
+            if (!text || currentMode !== 1 || isProcessing) return;
 
             appendMessage(text, 'user');
             chatInput.value = '';
@@ -377,8 +393,6 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
                 }
 
-                conversationHistory.push({ role: "assistant", content: reply });
-                
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
                                   reply.includes("Proceed to Mode 2");
 
@@ -387,7 +401,9 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
                     appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
+                    conversationHistory.push({ role: "assistant", content: reply });
                     appendMessage(reply, 'assistant');
+                    setLoadingState(false);
                 }
             } catch (error) {
                 console.error("API Error:", error);
@@ -395,7 +411,6 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
                     conversationHistory.pop();
                 }
                 appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
-            } finally {
                 setLoadingState(false);
             }
         }
@@ -403,7 +418,6 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
         sendBtn.addEventListener('click', handleSend);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
 
-        // --- MODE 2: CASTING ENGINE ---
         const CAST_QUESTIONS = [
             ["Does the structure require submission or assertion?", "SUBMIT", "ASSERT"],
             ["Is the tension internal or external?", "INTERNAL", "EXTERNAL"],
@@ -425,7 +439,7 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
         function updateCastUI() {
             const step = castResults.length;
             if (step >= 6) {
-                setTimeout(() => triggerMode3Interpretation(), 1000);
+                triggerMode3Interpretation();
                 return;
             }
             document.getElementById('castProgress').textContent = `LINE ${step + 1} / 6`;
@@ -449,7 +463,6 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
             updateCastUI();
         }
 
-        // --- MODE 3: INTERPRETATION ---
         const HEXAGRAM_MAP = {
             "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
         };
@@ -460,6 +473,7 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
 
         async function triggerMode3Interpretation() {
             currentMode = 3;
+            setLoadingState(true);
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
             
@@ -477,20 +491,18 @@ Present tense only. No apologies. Short sentences. Max 20 words per sentence.\n\
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${hexNum} (${hexName}). CHANGING LINES: ${linesText}.]`;
             
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
-            setLoadingState(true);
 
             const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + mode3Payload } ];
 
             try {
-                const finalRuling = await fetchOracleResponse(apiMessages, 500);
+                const finalRuling = await fetchOracleResponse(apiMessages, 600);
                 appendMessage(finalRuling, 'assistant');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
             } finally {
+                resetSystemState();
                 setLoadingState(false);
-                currentMode = 1; 
-                conversationHistory = []; 
             }
         }
 
