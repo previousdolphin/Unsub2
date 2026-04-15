@@ -581,7 +581,12 @@
         const micBtn = document.getElementById('micBtn');
         const chatHistory = document.getElementById('chatHistory');
         
-        const BACKEND_API_URL = 'https://api.your-backend.local/v1/oracle/chat';
+        // 1. THIS IS THE UPDATED RUNPOD API URL
+        const BACKEND_API_URL = 'https://fuxr1zwaholffp-8000.proxy.runpod.net/v1/chat/completions';
+
+        // 2. THIS IS THE SYSTEM PROMPT TO ENFORCE COCA RULES
+        const ORACLE_SYSTEM_PROMPT = "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.\n\n";
+
 
         // Setup Speech Recognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -673,6 +678,7 @@
             }
         }
 
+        // 3. THIS FUNCTION HAS BEEN FULLY UPDATED FOR THE vLLM/OPENAI FORMAT
         async function handleSend() {
             const text = chatInput.value.trim();
             if (!text) return;
@@ -688,8 +694,21 @@
             try {
                 const response = await fetch(BACKEND_API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: text })
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer EMPTY' // Standard header expected by vLLM
+                    },
+                    body: JSON.stringify({ 
+                        model: "diet_coke", // IMPORTANT: Must match the name in your --lora-modules flag when you launched the server
+                        messages: [
+                            { 
+                                role: "user", 
+                                content: ORACLE_SYSTEM_PROMPT + text 
+                            }
+                        ],
+                        max_tokens: 150,
+                        temperature: 0.2
+                    })
                 });
 
                 if (!response.ok) {
@@ -697,7 +716,9 @@
                 }
 
                 const data = await response.json();
-                const replyText = data.reply || "EMPTY RESPONSE GENERATED.";
+                
+                // Properly parses the vLLM OpenAI-formatted JSON output
+                const replyText = data.choices[0].message.content || "EMPTY RESPONSE GENERATED.";
                 
                 appendMessage(replyText, 'oracle');
                 speakResponse(replyText); 
@@ -706,7 +727,7 @@
                 console.error("Backend Connection Error:", error);
                 
                 if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
-                    appendMessage("[ERR: CONNECTION REFUSED] PLEASE ENSURE THE PRODUCT NODE IS ONLINE.", 'error');
+                    appendMessage("[ERR: CONNECTION REFUSED] PLEASE ENSURE THE PRODUCT NODE IS ONLINE. (Did you add --cors-allowed-origins \"*\" when starting vLLM?)", 'error');
                 } else {
                     appendMessage(`[ERR: SYSTEM] INTERNAL ARCHITECTURE ERROR. CANNOT PROCESS REQUEST.`, 'error');
                 }
