@@ -261,23 +261,30 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
-        // --- System Logic & State Machine ---
+       // --- System Logic & State Machine ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
         const PROMPTS = {
-            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.\n\n",
-            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence.\n\n"
+            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
+            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence."
         };
 
         let currentMode = 1;
         let refinedQuestion = "";
-        let castResults = []; // Stores 6 lines: 6, 7, 8, 9
+        let castResults = []; 
+        let conversationHistory = []; // Array to store context
 
         const chatContainer = document.getElementById('chatContainer');
         const castContainer = document.getElementById('castContainer');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const chatHistory = document.getElementById('chatHistory');
+
+        // Initialize history with the system prompt
+        function resetHistory() {
+            conversationHistory = [{ role: "system", content: PROMPTS.MODE_1 }];
+        }
+        resetHistory();
 
         function appendMessage(text, type) {
             const msgDiv = document.createElement('div');
@@ -295,15 +302,16 @@
         }
 
         // --- Network Request Logic ---
-        async function fetchOracleResponse(systemPrompt, userText, maxTokens) {
+        async function fetchOracleResponse(messagesArray, maxTokens) {
             const payload = {
-                model: "google/gemma-7b-it", // CHANGED FROM "diet_coke"
-                messages: [{ role: "user", content: systemPrompt + userText }],
+                model: "google/gemma-7b-it", // Change to "diet_coke" when LoRA is retrained
+                messages: messagesArray,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.2 : 0.6, 
-                frequency_penalty: 0.2, // CHANGED FROM 0.8
+                temperature: currentMode === 1 ? 0.3 : 0.6, 
+                frequency_penalty: 0.2, // Keep low for base model, raise slightly for LoRA if needed
                 presence_penalty: 0.2,
-                stop: ["\n\n", "User:", "<end_of_turn>", "<eos>"]
+                // Removed stop tokens that were causing premature cutoffs
+                stop: ["<end_of_turn>", "<eos>"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -326,12 +334,23 @@
             chatInput.value = '';
             setLoadingState(true);
 
+            // Add user message to history array
+            conversationHistory.push({ role: "user", content: text });
+
             try {
-                const reply = await fetchOracleResponse(PROMPTS.MODE_1, text, 35);
+                // Increased max_tokens to 100 to stop cut-offs
+                let reply = await fetchOracleResponse(conversationHistory, 100);
                 
-                // JS Gatekeeper: Listen for the validation trigger from the model
-                if (reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2")) {
-                    refinedQuestion = text; // Lock in the oracle-grade question
+                // Add model response to history array
+                conversationHistory.push({ role: "assistant", content: reply });
+                
+                // Manual override for validation if base model struggles to output exact string
+                const isValidated = reply.includes("STATUS: VALIDATED") || 
+                                  reply.includes("Proceed to Mode 2") ||
+                                  reply.toLowerCase().includes("oracle-grade");
+
+                if (isValidated) {
+                    refinedQuestion = text; 
                     appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
@@ -381,16 +400,14 @@
         }
 
         function castLine() {
-            // Standard I Ching Probability Distribution applied via JS Math
             const rand = Math.random() * 16;
-            let lineValue = 9; // Old Yang (7/16 chance)
-            if (rand < 1) lineValue = 6; // Old Yin (1/16)
-            else if (rand < 4) lineValue = 7; // Young Yang (3/16)
-            else if (rand < 9) lineValue = 8; // Young Yin (5/16)
+            let lineValue = 9; 
+            if (rand < 1) lineValue = 6; 
+            else if (rand < 4) lineValue = 7; 
+            else if (rand < 9) lineValue = 8; 
 
             castResults.push(lineValue);
             
-            // Render Visuals Bottom-Up
             const lineDiv = document.createElement('div');
             lineDiv.className = `hex-line ${[6,8].includes(lineValue) ? 'yin' : 'yang'} ${[6,9].includes(lineValue) ? 'changing' : ''}`;
             document.getElementById('hexagramVisual').appendChild(lineDiv);
@@ -399,7 +416,6 @@
         }
 
         // --- MODE 3: INTERPRETATION ---
-        // Compact mapping of binary string (bottom-to-top) to I Ching Hexagram Number
         const HEXAGRAM_MAP = {
             "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
         };
@@ -413,7 +429,6 @@
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
             
-            // Build Binary Map and Find Changing Lines
             let binaryString = "";
             let changingLines = [];
             castResults.forEach((val, i) => {
@@ -430,16 +445,22 @@
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
             setLoadingState(true);
 
+            // Create a temporary history just for Mode 3 to ensure strict formatting
+            const mode3History = [
+                { role: "system", content: PROMPTS.MODE_3 },
+                { role: "user", content: mode3Payload }
+            ];
+
             try {
-                // Notice the max_tokens is much higher (200) to allow for the full interpretation
-                const finalRuling = await fetchOracleResponse(PROMPTS.MODE_3, mode3Payload, 200);
+                const finalRuling = await fetchOracleResponse(mode3History, 300);
                 appendMessage(finalRuling, 'oracle');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
             } finally {
                 setLoadingState(false);
-                currentMode = 1; // Reset for next inquiry
+                currentMode = 1; 
+                resetHistory(); // Clear history for the next session
             }
         }
     </script>
