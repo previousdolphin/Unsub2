@@ -295,12 +295,13 @@
                 const alwaysRules = data.voice_and_doctrine.rules.always.map(rule => "ALWAYS " + rule).join(" ");
 
                 PROMPTS.MODE_1 = `You are ${data.system_identifier}, the ${data.system_name}. Enforce MODE 1: ${data.architecture.mode_1.name}.
-RULES:
+CORE DIRECTIVE:
 1. ${neverRules}
 2. ${alwaysRules}
 3. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular.
 4. DO NOT use introductory labels, slang, or conversational filler. 
-5. If the user's input is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+5. DO NOT acknowledge being an AI. DO NOT respond to meta-talk.
+6. If the user's input is structurally sound, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 
 EXAMPLES:
 User: What should I do about my business partner?
@@ -313,7 +314,9 @@ CURRENT INQUIRY: `;
                 const structureSteps = data.architecture.mode_3.output_structure.map(item => `${item.step}. ${item.element}: ${item.details}`).join(" ");
                 PROMPTS.MODE_3 = `You are ${data.system_identifier}. Enforce MODE 3: ${data.architecture.mode_3.name}. Input consists of a refined question, a hexagram, and changing lines. 
 Output must follow strict CoCA structure: ${structureSteps} 
-VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
+VOICE RULES: ${alwaysRules} ${neverRules}
+NO MARKDOWN HEADERS. NO AI NAME IN OUTPUT. NO APOLOGIES. PRESENT TENSE ONLY.
+\n\n`;
 
                 console.log("RAG Protocol successfully loaded from gram.json");
             } catch (error) {
@@ -330,20 +333,21 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
 
         // --- Role-Atomic State Machine Helpers ---
         function cleanGemmaOutput(text) {
-            // Aggressive filtering to strip introductory conversational garbage
-            let clean = text.replace(/reframe:/gi, "").trim();
+            // Remove headers, names, labels, and conversational filler
+            let clean = text.replace(/##\s+Diet\s+Coke/gi, "").trim();
+            clean = clean.replace(/reframe:/gi, "").trim();
             clean = clean.replace(/oracle response:/gi, "").trim();
             clean = clean.replace(/oracle:/gi, "").trim();
             clean = clean.replace(/assistant:/gi, "").trim();
             clean = clean.replace(/^"|"$/g, '').trim(); 
             
-            // Strip colloquial introductory phrases
-            const colloquialisms = [/^Listen up,/i, /^Buttercup,/i, /^Hey kid,/i, /^Sure thing,/i, /^I'll try,/i];
+            // Scrub conversational filler and stars
+            const colloquialisms = [/^Listen up,/i, /^Buttercup,/i, /^Hey kid,/i, /^Sure thing,/i, /^I'll try,/i, /^\*+$/];
             colloquialisms.forEach(regex => {
                 clean = clean.replace(regex, "").trim();
             });
 
-            if (clean.includes('\n')) {
+            if (clean.includes('\n') && currentMode === 1) {
                 clean = clean.split('\n')[0].trim(); 
             }
             return clean;
@@ -351,19 +355,14 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
 
         function validateAndFixAlternation(history) {
             if (history.length === 0) return [];
-            let fixed = [];
-            
-            // Chat templates usually must start with 'user'
-            let filtered = history.filter(m => m.content && m.content.length > 0);
+            let filtered = history.filter(m => m.content && m.content.trim().length > 0);
             if (filtered.length > 0 && filtered[0].role !== 'user') {
                 filtered.shift();
             }
-
+            let fixed = [];
             for (let i = 0; i < filtered.length; i++) {
                 if (i === 0 || filtered[i].role !== filtered[i - 1].role) {
                     fixed.push(filtered[i]);
-                } else {
-                    console.warn("Deduplicating consecutive role turns...");
                 }
             }
             return fixed;
@@ -374,10 +373,11 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                 model: "google/gemma-7b-it", 
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.05 : 0.4, // Drop to near-zero for strict reframe
-                frequency_penalty: 1.2, // Increase to prevent "Listen up" loops
-                presence_penalty: 0.4,
-                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed Oracle Response"] 
+                // Aggressive sampling to stop meta-talk and leaks
+                temperature: currentMode === 1 ? 0.01 : 0.4, 
+                frequency_penalty: 1.5, 
+                presence_penalty: 0.5,
+                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed", "##"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -404,18 +404,15 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             chatInput.value = '';
             setLoadingState(true);
 
-            // 1. Transactional Update: Push user turn
             conversationHistory.push({ role: "user", content: text });
 
-            // 2. Rolling Memory: Keep max 6 messages (3 turns)
+            // Sliding window: last 6 messages
             if (conversationHistory.length > 6) {
                 conversationHistory = conversationHistory.slice(-6);
             }
 
-            // 3. Guarantee alternation
             let activeHistory = validateAndFixAlternation([...conversationHistory]);
             
-            // 4. Construct payload ensuring first message has instructions
             const apiMessages = activeHistory.map((msg, index) => {
                 if (index === 0) {
                     return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
@@ -427,12 +424,10 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                 let reply = await fetchOracleResponse(apiMessages, 120);
                 
                 const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
-                // Force Mode 2 after 4 turns to avoid base model drifting into help-desk mode
-                if (userTurnCount >= 4 && !reply.includes("STATUS: VALIDATED")) {
+                if (userTurnCount >= 5 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
                 }
 
-                // 5. Atomic Update: Push assistant response
                 conversationHistory.push({ role: "assistant", content: reply });
                 
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
@@ -448,18 +443,10 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
                 }
             } catch (error) {
                 console.error("API Sequence Failure:", error);
-                
-                // Roll back user turn on failure to keep roles aligned
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
-
-                if (error.message.includes("Conversation roles must alternate")) {
-                    appendMessage("[ERR: PROTOCOL] ROLE SEQUENCE CORRUPTED. REINITIALIZING...", 'error');
-                    conversationHistory = []; 
-                } else {
-                    appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
-                }
+                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
             } finally {
                 setLoadingState(false);
             }
@@ -508,11 +495,9 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             else if (rand < 9) lineValue = 8; 
 
             castResults.push(lineValue);
-            
             const lineDiv = document.createElement('div');
             lineDiv.className = `hex-line ${[6,8].includes(lineValue) ? 'yin' : 'yang'} ${[6,9].includes(lineValue) ? 'changing' : ''}`;
             document.getElementById('hexagramVisual').appendChild(lineDiv);
-            
             updateCastUI();
         }
 
@@ -541,6 +526,7 @@ VOICE RULES: ${alwaysRules} ${neverRules}\n\n`;
             const hexName = HEXAGRAM_NAMES[hexNum];
             const linesText = changingLines.length > 0 ? changingLines.join(", ") : "None";
 
+            // Payload matches the specific training structure in dataset.jsonl
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${hexNum} (${hexName}). CHANGING LINES: ${linesText}.]`;
             
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
