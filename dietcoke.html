@@ -389,10 +389,18 @@ CURRENT INQUIRY: `;
             // Add user input to conversation memory
             conversationHistory.push({ role: "user", content: text });
 
-            // Construct payload: Inject the massive System RAG prompt ONLY into the very first user message.
-            // This maintains Gemma's strict user/assistant alternating format while passing context.
-            const apiMessages = conversationHistory.map((msg, index) => {
-                if (index === 0 && msg.role === 'user') {
+            // SAFETY NET: Prevent Context Window Overflow (Max 2048 tokens limit in vLLM)
+            // Keep only the last 6 messages (approx 3 user/assistant turns back and forth)
+            if (conversationHistory.length > 6) {
+                conversationHistory = conversationHistory.slice(-6);
+            }
+
+            // Construct payload: Inject the massive System RAG prompt ONLY into the oldest user message in the rolling window.
+            // This maintains Gemma's strict user/assistant alternating format while passing context cleanly.
+            let promptInjected = false;
+            const apiMessages = conversationHistory.map((msg) => {
+                if (!promptInjected && msg.role === 'user') {
+                    promptInjected = true;
                     return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
                 }
                 return msg;
