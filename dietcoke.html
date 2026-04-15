@@ -586,7 +586,6 @@
         // 2. THIS IS THE SYSTEM PROMPT TO ENFORCE COCA RULES
         const ORACLE_SYSTEM_PROMPT = "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.\n\n";
 
-
         // Setup Speech Recognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null;
@@ -693,24 +692,31 @@
             try {
                 const response = await fetch(BACKEND_API_URL, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Authorization': 'Bearer EMPTY' // Standard header expected by vLLM
+                        'Authorization': 'Bearer EMPTY', // Standard header expected by vLLM
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ 
-                        model: "diet_coke", // IMPORTANT: Must match the name in your --lora-modules flag when you launched the server
+                        model: "diet_coke",
                         messages: [
                             { 
                                 role: "user", 
                                 content: ORACLE_SYSTEM_PROMPT + text 
                             }
                         ],
-                        max_tokens: 150,
-                        temperature: 0.2
+                        max_tokens: 45, 
+                        temperature: 0.4, 
+                        frequency_penalty: 1.2, 
+                        presence_penalty: 0.6,
+                        stop: ["<end_of_turn>", "<eos>", "\n\n", "User:"] 
                     })
                 });
 
                 if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error("Server Error Body:", errorBody);
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
 
@@ -723,13 +729,8 @@
                 speakResponse(replyText); 
 
             } catch (error) {
-                console.error("Backend Connection Error:", error);
-                
-                if (error.name === 'TypeError' || error.message.includes('Failed to fetch')) {
-                    appendMessage("[ERR: CONNECTION REFUSED] PLEASE ENSURE THE PRODUCT NODE IS ONLINE. (Did you add --cors-allowed-origins \"*\" when starting vLLM?)", 'error');
-                } else {
-                    appendMessage(`[ERR: SYSTEM] INTERNAL ARCHITECTURE ERROR. CANNOT PROCESS REQUEST.`, 'error');
-                }
+                console.error("Detailed Fetch Error:", error);
+                appendMessage("[ERR: CONNECTION REFUSED] CHECK CONSOLE FOR LOGS.", 'error');
             } finally {
                 setLoadingState(false);
             }
