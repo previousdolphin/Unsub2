@@ -705,16 +705,15 @@
                                 content: ORACLE_SYSTEM_PROMPT + text 
                             }
                         ],
-                        max_tokens: 35, 
-                        // Bumping temperature helps the model "jump out" of loops
+                        max_tokens: 60, // Give it more room
                         temperature: 0.7, 
-                        // Frequency penalty acts as a "tax" on repeating tokens
-                        frequency_penalty: 1.5, 
+                        // Backing these down to standard "safe" levels
+                        frequency_penalty: 0.5, 
                         presence_penalty: 0.2,
-                        // Top_p helps ignore the "trash" tokens like 'veve'
                         top_p: 0.9,
-                        // Hard stops are our ultimate safety net
-                        stop: ["<end_of_turn>", "<eos>", "\n", "User:", "reframe:", "veve"] 
+                        // REMOVED "reframe:" and "\n" from stop tokens as they might be 
+                        // triggering the moment the model starts its response.
+                        stop: ["<end_of_turn>", "<eos>"] 
                     })
                 });
         
