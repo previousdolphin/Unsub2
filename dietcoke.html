@@ -260,8 +260,23 @@
         // --- System Logic & State Machine ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
+        // Added Few-Shot Examples and strict rules to force base Gemma to behave like the LoRA
         const PROMPTS = {
-            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.\n\n",
+            MODE_1: `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
+RULES:
+1. Reject outcome bias and advice-seeking. NEVER give advice. NEVER be conversational. NEVER use slang.
+2. Respond ONLY with a clarifying reframe using cold, corporate, CoCA vernacular. Maximum 20 words.
+3. If the user's input is finally structurally sound, objective, and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+
+EXAMPLES OF YOUR VOICE:
+User: What should I do about my business partner?
+Oracle: What is the structural tension that has not yet been named?
+User: How do I fix my relationship?
+Oracle: The oracle is not a therapist. Define the incompatible geometries at the center of the node.
+User: What is the structural failure in my current contract?
+Oracle: STATUS: VALIDATED. Proceed to Mode 2 Casting.
+
+CURRENT INQUIRY:\n`,
             MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence.\n\n"
         };
 
@@ -296,7 +311,8 @@
                 model: "google/gemma-7b-it", // Change back to "diet_coke" when ready
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.3 : 0.6, 
+                // Lowered temperature significantly (0.1) so the base model doesn't hallucinate pirate slang
+                temperature: currentMode === 1 ? 0.1 : 0.6, 
                 frequency_penalty: 0.2, 
                 presence_penalty: 0.2,
                 stop: ["<end_of_turn>", "<eos>"] 
@@ -310,7 +326,10 @@
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
-            return (data.choices[0].message.content || "").replace("reframe:", "").trim();
+            
+            // Clean up any stray quotes the base model might try to add
+            let reply = (data.choices[0].message.content || "").replace("reframe:", "").trim();
+            return reply.replace(/^"|"$/g, '').trim(); 
         }
 
         async function handleSend() {
@@ -323,8 +342,6 @@
 
             conversationHistory.push({ role: "user", content: text });
 
-            // Gemma fix: We prepend the prompt to the *first* user message in the array. 
-            // No "system" role is sent, avoiding the 400 error.
             const apiMessages = conversationHistory.map((msg, index) => {
                 if (index === 0 && msg.role === 'user') {
                     return { role: 'user', content: PROMPTS.MODE_1 + msg.content };
@@ -334,6 +351,14 @@
 
             try {
                 let reply = await fetchOracleResponse(apiMessages, 100);
+                
+                // UX Safety Net: If the user has gone back and forth 4 times, force validation 
+                // so they don't get stuck forever in Mode 1 while using the base model.
+                const userTurnCount = conversationHistory.filter(m => m.role === 'user').length;
+                if (userTurnCount >= 4 && !reply.includes("STATUS: VALIDATED")) {
+                    reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
+                }
+
                 conversationHistory.push({ role: "assistant", content: reply });
                 
                 const isValidated = reply.includes("STATUS: VALIDATED") || 
@@ -434,7 +459,6 @@
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
             setLoadingState(true);
 
-            // Single shot array. Put instructions in 'user' role per Gemma protocol.
             const apiMessages = [
                 { role: "user", content: PROMPTS.MODE_3 + mode3Payload }
             ];
@@ -448,7 +472,7 @@
             } finally {
                 setLoadingState(false);
                 currentMode = 1; 
-                conversationHistory = []; // Reset memory for the next user query
+                conversationHistory = []; 
             }
         }
     </script>
