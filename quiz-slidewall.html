@@ -33,11 +33,10 @@
             -webkit-font-smoothing: antialiased;
             margin: 0;
             padding: 0;
-            cursor: none; /* Hidden by default for presentation */
+            cursor: none; 
             transition: background-color 0.5s;
         }
 
-        /* Show cursor when admin is active */
         body.admin-active {
             cursor: auto;
         }
@@ -45,7 +44,6 @@
         .font-serif { font-family: 'Playfair Display', serif; }
         .font-mono { font-family: 'Space Mono', monospace; }
 
-        /* Canvas Background */
         #canvas-container {
             position: fixed;
             top: 0;
@@ -58,7 +56,6 @@
             transition: filter 0.5s ease, opacity 0.5s ease;
         }
 
-        /* Persistent UI Elements */
         #ui-layer {
             position: fixed;
             inset: 0;
@@ -71,7 +68,6 @@
             filter: invert(1) hue-rotate(180deg);
         }
 
-        /* Progress Bar */
         #progress-bar {
             position: absolute;
             bottom: 0;
@@ -82,7 +78,6 @@
             transition: width 0.1s linear;
         }
 
-        /* Slide Container */
         #slide-container {
             position: relative;
             z-index: 10;
@@ -107,7 +102,6 @@
             transition: opacity 0.1s;
         }
 
-        /* Override hidden utility so active slide always shows */
         .slide.active {
             opacity: 1;
             visibility: visible;
@@ -129,7 +123,6 @@
             transform: translateY(0);
         }
 
-        /* Wipe Transition Overlay */
         #wipe-overlay {
             position: fixed;
             top: 0;
@@ -143,7 +136,6 @@
             pointer-events: none;
         }
 
-        /* CRT Scanline effect */
         .scanlines {
             background: linear-gradient(
                 to bottom,
@@ -159,7 +151,6 @@
             z-index: 1;
         }
 
-        /* Aesthetic Grid */
         .aesthetic-grid {
             position: absolute;
             inset: 4rem;
@@ -172,22 +163,38 @@
         .aesthetic-grid::after {
             content: ''; position: absolute; top: 50%; left: 0; width: 100%; border-top: var(--grid-line);
         }
+        
+        /* Scrollbar styling for admin */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        input, textarea, select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem;
+            width: 100%;
+            font-family: 'Space Mono', monospace;
+            outline: none;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #00FF41;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Persistent ThreeJS Background -->
     <div id="canvas-container"></div>
-
-    <!-- Wipe Overlay for Transitions -->
     <div id="wipe-overlay"></div>
 
-    <!-- Persistent Tactical UI -->
+    <!-- UI LAYER -->
     <div id="ui-layer" class="p-[20px] flex flex-col justify-between">
         <header class="flex justify-between items-start uppercase text-sm tracking-[0.2em] font-bold">
             <div class="flex items-center gap-4">
                 <span class="w-3 h-3 bg-black rounded-full inline-block animate-pulse"></span>
-                <span>UNSUBSCRIBE NYC LLC</span>
+                <span>MOVIE ATTRACTIONS BY UNSUBSCRIBE</span>
             </div>
             <div class="text-right">
                 <div id="countdown" class="font-mono text-xl tabular-nums tracking-wider text-gray-400 opacity-60">T-00.00s</div>
@@ -196,16 +203,15 @@
         </header>
         
         <footer class="flex justify-between items-end uppercase text-xs tracking-[0.2em] text-gray-500">
-            <div>SYSTEM: ONLINE<br>MANIFESTO_V1.0</div>
+            <div>SYSTEM: ONLINE<br>ENJOY THE MOVIE</div>
             <div class="text-right">[ 2026 ]<br>P. Pissarro / J. Do</div>
         </footer>
         <div id="progress-bar"></div>
     </div>
 
-    <!-- Slides -->
+    <!-- SLIDES CONTAINER -->
     <main id="slide-container">
         
-        <!-- SLIDE 1 -->
         <section class="slide active text-center" data-name="01: Hero Quote">
             <div class="max-w-7xl px-4">
                 <p class="font-mono text-lg md:text-2xl tracking-[0.3em] text-gray-500 uppercase mb-12 animate-block" style="transition-delay: 0.2s">
@@ -217,7 +223,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 2 -->
         <section class="slide bg-white/30 backdrop-blur-md" data-name="02: The Preamble">
             <div class="aesthetic-grid opacity-20 hidden md:block"></div>
             <div class="max-w-6xl w-full z-10 flex flex-col justify-center h-full px-12">
@@ -234,7 +239,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 3: QUIZ INTRO -->
         <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="03: Quiz Intro">
             <div class="scanlines"></div>
             <div class="z-10 text-center animate-block">
@@ -253,19 +257,17 @@
             </div>
         </section>
 
-        <!-- SLIDE 4: QUIZ 1 - QUESTION -->
         <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="04: Quiz 1 (Q)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
                 <div class="animate-block" style="transition-delay: 0.2s">
                     <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden group">
-                        <!-- Add img tag here -->
                         <span class="font-mono text-neutral-600 mb-2">[ PHOTO SPOT ]</span>
                         <span class="font-serif italic text-neutral-500 text-sm">The Wizard of Oz (1939)</span>
                     </div>
                 </div>
                 <div class="animate-block" style="transition-delay: 0.4s">
-                    <div class="font-mono text-[#00FF41] tracking-widest mb-4">QUESTION 01</div>
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 01</div>
                     <h3 class="font-serif text-5xl mb-8">The Wizard of Oz <span class="text-3xl text-neutral-500">(1939)</span></h3>
                     <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
                         To create the magical snow that falls on Dorothy, the Cowardly Lion, and the Tin Man in the poppy field, the production team used <span class="text-white bg-white/10 px-2">100% pure chrysotile asbestos</span>, which was common for fake snow at the time.
@@ -277,7 +279,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 5: QUIZ 1 - ANSWER -->
         <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="05: Quiz 1 (A)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
@@ -297,7 +298,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 6 -->
         <section class="slide bg-transparent" data-name="06: The Convergence">
             <div class="w-full max-w-7xl grid grid-cols-2 gap-0 border-4 border-black/80 animate-block">
                 <div class="p-16 border-r-4 border-black/80 bg-black/80 backdrop-blur-md text-white flex flex-col justify-center min-h-[60vh]">
@@ -323,7 +323,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 7: QUIZ 2 - QUESTION -->
         <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="07: Quiz 2 (Q)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
@@ -334,7 +333,7 @@
                     </div>
                 </div>
                 <div class="animate-block" style="transition-delay: 0.4s">
-                    <div class="font-mono text-[#00FF41] tracking-widest mb-4">QUESTION 02</div>
+                    <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION 02</div>
                     <h3 class="font-serif text-5xl mb-8">A Shadow in the Sun <span class="text-3xl text-neutral-500">(1958)</span></h3>
                     <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">
                         Directed by Elia Kazan, this classic drama features Marlon Brando's only performance spoken entirely in French. It had to be heavily dubbed in post-production, however, because the studio deemed his accent <span class="text-white bg-white/10 px-2">"too Nebraskan."</span>
@@ -346,7 +345,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 8: QUIZ 2 - ANSWER -->
         <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="08: Quiz 2 (A)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
@@ -367,7 +365,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 9 -->
         <section class="slide bg-white/40 backdrop-blur-sm" data-name="09: Sacred Principles">
             <div class="w-full max-w-7xl flex flex-col gap-12">
                 <div class="border-b-2 border-black pb-4 mb-8 animate-block">
@@ -392,7 +389,6 @@
             </div>
         </section>
 
-        <!-- SLIDE 10 -->
         <section class="slide bg-white/30 backdrop-blur-md border-[20px] border-black/80" data-name="10: The Declaration">
             <div class="text-center w-full max-w-7xl">
                 <div class="font-mono text-xl uppercase tracking-widest text-gray-500 border-2 border-black/80 px-6 py-2 inline-block rounded-full mb-16 animate-block">VI. The Declaration</div>
@@ -412,85 +408,123 @@
 
     <!-- ADMIN PANE OVERLAY -->
     <div id="admin-pane" class="fixed inset-0 bg-[#0a0a0a]/95 backdrop-blur-md z-[9999] flex-col p-8 md:p-12 text-white overflow-y-auto hidden">
-        <div class="flex justify-between items-center border-b-2 border-neutral-800 pb-6 mb-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b-2 border-neutral-800 pb-6 mb-8 gap-4">
             <div class="flex items-center gap-4">
                 <span class="w-3 h-3 bg-[#00FF41] rounded-full inline-block animate-pulse shadow-[0_0_10px_#00FF41]"></span>
-                <h2 class="text-2xl md:text-3xl font-mono text-[#00FF41] tracking-widest">DECK CONTROL SYSTEM</h2>
+                <h2 class="text-2xl md:text-3xl font-mono text-[#00FF41] tracking-widest">DECK EDITOR SYSTEM</h2>
             </div>
-            <button id="close-admin" class="font-mono text-sm tracking-widest border border-white/30 px-6 py-3 hover:bg-white hover:text-black transition uppercase">Resume Auto-Pilot</button>
+            <div class="flex gap-4">
+                <button id="open-quiz-form" class="font-mono text-sm tracking-widest bg-[#00FF41]/20 border border-[#00FF41] text-[#00FF41] px-6 py-3 hover:bg-[#00FF41] hover:text-black transition uppercase">+ Add Quiz Slide</button>
+                <button id="close-admin" class="font-mono text-sm tracking-widest border border-white/30 px-6 py-3 hover:bg-white hover:text-black transition uppercase">Resume Presentation</button>
+            </div>
         </div>
         
-        <div class="mb-8 font-mono text-neutral-400 max-w-3xl">
+        <div class="mb-8 font-mono text-neutral-400 max-w-4xl">
             <p>Admin tools activated. Auto-advance is currently PAUSED.</p>
-            <p class="mt-2 text-sm text-neutral-500">Use Arrow Keys (←/→) to manually advance. Toggle slide visibility below, or click 'JUMP' to immediately trigger that slide.</p>
+            <p class="mt-2 text-sm text-neutral-500">Navigate using Arrow Keys (←/→) or Swipe left/right. You can reorder, hide, and inject new slides below.</p>
         </div>
 
-        <div id="admin-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 font-mono">
+        <!-- Add Quiz Form (Hidden by default) -->
+        <div id="quiz-form-container" class="mb-12 bg-neutral-900 border border-neutral-700 p-6 hidden flex-col gap-4 font-mono max-w-4xl">
+            <h3 class="text-[#00FF41] text-lg uppercase tracking-widest border-b border-neutral-800 pb-2 mb-2">Create New Quiz Entry</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-neutral-500 mb-1">Film Title</label>
+                    <input type="text" id="quiz-title" placeholder="e.g. Psycho">
+                </div>
+                <div>
+                    <label class="block text-xs text-neutral-500 mb-1">Release Year</label>
+                    <input type="text" id="quiz-year" placeholder="e.g. 1960">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs text-neutral-500 mb-1">Trivia / Question Text</label>
+                <textarea id="quiz-question" rows="3" placeholder="Enter the trivia fact here..."></textarea>
+            </div>
+            <div>
+                <label class="block text-xs text-neutral-500 mb-1">Is this fact Real or Fake (AI Hallucination)?</label>
+                <select id="quiz-truth">
+                    <option value="real">Real Fact (Green Verified Style)</option>
+                    <option value="fake">Fake / AI Hallucination (Red Warning Style)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-neutral-500 mb-1">Answer Explanation</label>
+                <textarea id="quiz-answer" rows="3" placeholder="Explain why it's real or fake..."></textarea>
+            </div>
+            <div class="flex gap-4 mt-2">
+                <button id="submit-quiz" class="bg-[#00FF41] text-black px-6 py-2 uppercase tracking-widest font-bold hover:bg-white transition">Inject Slides</button>
+                <button id="cancel-quiz" class="border border-neutral-600 px-6 py-2 uppercase tracking-widest hover:bg-neutral-800 transition">Cancel</button>
+            </div>
+        </div>
+
+        <div id="admin-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 font-mono">
             <!-- Dynamically populated by JS -->
         </div>
     </div>
 
     <script>
-        // --- THREE.JS BACKGROUND ---
-        const initThreeJS = () => {
-            const container = document.getElementById('canvas-container');
-            const scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0xF2F2F2, 0.002);
+        // --- THREE.JS BACKGROUND DYNAMIC MANAGER ---
+        const threeManager = (() => {
+            let container, scene, camera, renderer, plane, geometry, currentConfig, targetConfig;
+            let time = 0;
 
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            container.appendChild(renderer.domElement);
-
-            const geometry = new THREE.PlaneGeometry(24, 24, 32, 32);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: 0x000000, 
-                wireframe: true, 
-                transparent: true,
-                opacity: 0.15,
-            });
-            const plane = new THREE.Mesh(geometry, material);
-            plane.rotation.x = -Math.PI / 2.5;
-            scene.add(plane);
-
-            const slideConfigs = [
-                { speed: 0.002, w1A: 0.5, w1F: 0.5, w2A: 0.3, w2F: 0.8, rotZ: 0.0003, camZ: 5, planeX: -Math.PI / 2.5 }, // 1
-                { speed: 0.001, w1A: 0.2, w1F: 1.0, w2A: 0.1, w2F: 2.0, rotZ: 0.0001, camZ: 4.5, planeX: -Math.PI / 2.8 }, // 2
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 3 Quiz
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 4 Q1
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 5 A1
-                { speed: 0.006, w1A: 1.2, w1F: 2.0, w2A: 0.9, w2F: 3.0, rotZ: 0.002, camZ: 6, planeX: -Math.PI / 2.2 }, // 6
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 7 Q2
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 8 A2
-                { speed: 0.003, w1A: 1.5, w1F: 0.3, w2A: 1.0, w2F: 0.5, rotZ: -0.0005, camZ: 7, planeX: -Math.PI / 2.5 }, // 9
-                { speed: 0.0005, w1A: 2.5, w1F: 0.1, w2A: 2.0, w2F: 0.15, rotZ: 0.0001, camZ: 8, planeX: -Math.PI / 2.5 } // 10
+            const baseManifestoConfigs = [
+                { speed: 0.002, w1A: 0.5, w1F: 0.5, w2A: 0.3, w2F: 0.8, rotZ: 0.0003, camZ: 5, planeX: -Math.PI / 2.5 },
+                { speed: 0.001, w1A: 0.2, w1F: 1.0, w2A: 0.1, w2F: 2.0, rotZ: 0.0001, camZ: 4.5, planeX: -Math.PI / 2.8 },
+                { speed: 0.006, w1A: 1.2, w1F: 2.0, w2A: 0.9, w2F: 3.0, rotZ: 0.002, camZ: 6, planeX: -Math.PI / 2.2 },
+                { speed: 0.003, w1A: 1.5, w1F: 0.3, w2A: 1.0, w2F: 0.5, rotZ: -0.0005, camZ: 7, planeX: -Math.PI / 2.5 },
+                { speed: 0.0005, w1A: 2.5, w1F: 0.1, w2A: 2.0, w2F: 0.15, rotZ: 0.0001, camZ: 8, planeX: -Math.PI / 2.5 }
             ];
+            
+            const quizConfig = { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 };
 
-            let currentConfig = { ...slideConfigs[0] };
-            let targetSlide = 0;
+            const init = () => {
+                container = document.getElementById('canvas-container');
+                scene = new THREE.Scene();
+                scene.fog = new THREE.FogExp2(0xF2F2F2, 0.002);
 
-            window.updateThreeState = (index) => {
-                targetSlide = index;
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 5;
+
+                renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                container.appendChild(renderer.domElement);
+
+                geometry = new THREE.PlaneGeometry(24, 24, 32, 32);
+                const material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, transparent: true, opacity: 0.15 });
+                plane = new THREE.Mesh(geometry, material);
+                plane.rotation.x = -Math.PI / 2.5;
+                scene.add(plane);
+
+                currentConfig = { ...baseManifestoConfigs[0] };
+                targetConfig = { ...baseManifestoConfigs[0] };
+
+                animate();
+                window.addEventListener('resize', onWindowResize);
             };
 
-            const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
-            let time = 0;
+            const setTarget = (slideElement, index) => {
+                if (slideElement.classList.contains('quiz-slide')) {
+                    targetConfig = quizConfig;
+                } else {
+                    targetConfig = baseManifestoConfigs[index % baseManifestoConfigs.length];
+                }
+            };
 
             const animate = () => {
                 requestAnimationFrame(animate);
+                const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
 
-                const target = slideConfigs[targetSlide] || slideConfigs[0];
-                currentConfig.speed = lerp(currentConfig.speed, target.speed, 0.05);
-                currentConfig.w1A = lerp(currentConfig.w1A, target.w1A, 0.05);
-                currentConfig.w1F = lerp(currentConfig.w1F, target.w1F, 0.05);
-                currentConfig.w2A = lerp(currentConfig.w2A, target.w2A, 0.05);
-                currentConfig.w2F = lerp(currentConfig.w2F, target.w2F, 0.05);
-                currentConfig.rotZ = lerp(currentConfig.rotZ, target.rotZ, 0.05);
-                currentConfig.camZ = lerp(currentConfig.camZ, target.camZ, 0.05);
-                currentConfig.planeX = lerp(currentConfig.planeX, target.planeX, 0.05);
+                currentConfig.speed = lerp(currentConfig.speed, targetConfig.speed, 0.05);
+                currentConfig.w1A = lerp(currentConfig.w1A, targetConfig.w1A, 0.05);
+                currentConfig.w1F = lerp(currentConfig.w1F, targetConfig.w1F, 0.05);
+                currentConfig.w2A = lerp(currentConfig.w2A, targetConfig.w2A, 0.05);
+                currentConfig.w2F = lerp(currentConfig.w2F, targetConfig.w2F, 0.05);
+                currentConfig.rotZ = lerp(currentConfig.rotZ, targetConfig.rotZ, 0.05);
+                currentConfig.camZ = lerp(currentConfig.camZ, targetConfig.camZ, 0.05);
+                currentConfig.planeX = lerp(currentConfig.planeX, targetConfig.planeX, 0.05);
 
                 time += currentConfig.speed;
                 camera.position.z = currentConfig.camZ;
@@ -501,30 +535,29 @@
 
                 for (let i = 0; i < positionAttribute.count; i++) {
                     vertex.fromBufferAttribute(positionAttribute, i);
-                    const wave1 = currentConfig.w1A * Math.sin(vertex.x * currentConfig.w1F + time);
-                    const wave2 = currentConfig.w2A * Math.sin(vertex.y * currentConfig.w2F + time * 1.5);
-                    const wave3 = 0.1 * Math.sin(vertex.x * 2 + vertex.y * 0.5 + time);
-                    vertex.z = (wave1 + wave2 + wave3) * 1.2;
+                    vertex.z = (currentConfig.w1A * Math.sin(vertex.x * currentConfig.w1F + time) + 
+                               currentConfig.w2A * Math.sin(vertex.y * currentConfig.w2F + time * 1.5) + 
+                               0.1 * Math.sin(vertex.x * 2 + vertex.y * 0.5 + time)) * 1.2;
                     positionAttribute.setZ(i, vertex.z);
                 }
                 positionAttribute.needsUpdate = true;
                 plane.rotation.z += currentConfig.rotZ;
-                
                 renderer.render(scene, camera);
             };
 
-            animate();
-
-            window.addEventListener('resize', () => {
+            const onWindowResize = () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        };
+            };
+
+            return { init, setTarget };
+        })();
 
         // --- SLIDESHOW ENGINE & ADMIN UI ---
         const initSlideshow = () => {
-            const slides = document.querySelectorAll('.slide');
+            const slideContainer = document.getElementById('slide-container');
+            let slides = Array.from(document.querySelectorAll('.slide'));
             const countdownEl = document.getElementById('countdown');
             const progressBar = document.getElementById('progress-bar');
             const indicator = document.getElementById('slide-indicator');
@@ -533,7 +566,6 @@
             const canvasContainer = document.getElementById('canvas-container');
             const adminPane = document.getElementById('admin-pane');
             const adminGrid = document.getElementById('admin-grid');
-            const closeAdminBtn = document.getElementById('close-admin');
             
             const SLIDE_DURATION = 10000;
             let currentSlideIndex = 0;
@@ -541,9 +573,33 @@
             let isTransitioning = false;
             let isAdminOpen = false;
 
-            // -- Theme Management --
+            // Update internal state after DOM changes
+            const refreshSlidesState = () => {
+                slides = Array.from(document.querySelectorAll('.slide'));
+                // Find currently active slide in new array
+                const activeIndex = slides.findIndex(s => s.classList.contains('active'));
+                if(activeIndex !== -1) currentSlideIndex = activeIndex;
+                else {
+                    currentSlideIndex = 0;
+                    if(slides[0]) slides[0].classList.add('active');
+                }
+                
+                // Update quiz question numbers dynamically
+                let qCount = 1;
+                slides.forEach((s) => {
+                    if(!s.classList.contains('hidden-slide') && s.querySelector('.quiz-counter')) {
+                        s.querySelector('.quiz-counter').innerText = `QUESTION ${String(qCount).padStart(2, '0')}`;
+                        qCount++;
+                    }
+                });
+
+                updateIndicator();
+                if(isAdminOpen) renderAdminGrid();
+            };
+
             const applySlideTheme = (index) => {
                 const targetSlide = slides[index];
+                if (!targetSlide) return;
                 const isQuiz = targetSlide.classList.contains('quiz-slide');
                 
                 if (isQuiz) {
@@ -553,18 +609,17 @@
                     uiLayer.classList.remove('invert-ui');
                     canvasContainer.style.opacity = '0.8';
                 }
+                threeManager.setTarget(targetSlide, index);
             };
 
             const updateIndicator = () => {
-                const visibleSlides = Array.from(slides).filter(s => !s.classList.contains('hidden-slide'));
+                const visibleSlides = slides.filter(s => !s.classList.contains('hidden-slide'));
                 const visibleIndex = visibleSlides.indexOf(slides[currentSlideIndex]);
-                // Fallback if current slide is hidden somehow
                 const displayIndex = visibleIndex === -1 ? '??' : String(visibleIndex + 1).padStart(2, '0');
                 const total = String(visibleSlides.length).padStart(2, '0');
                 indicator.innerText = `SEQ_${displayIndex} / ${total}`;
             };
 
-            // -- Navigation Logic --
             const getNextIndex = () => {
                 let next = (currentSlideIndex + 1) % slides.length;
                 while(slides[next].classList.contains('hidden-slide') && next !== currentSlideIndex) {
@@ -594,12 +649,11 @@
                     slides[targetIndex].classList.add('active');
                     currentSlideIndex = targetIndex;
                     
-                    if(window.updateThreeState) window.updateThreeState(currentSlideIndex);
                     applySlideTheme(currentSlideIndex);
                     updateIndicator();
-                    if(isAdminOpen) renderAdminGrid(); // Update active state in admin panel
+                    if(isAdminOpen) renderAdminGrid(); 
                     
-                    slideStartTime = Date.now(); // Reset timer
+                    slideStartTime = Date.now(); 
                     
                     wipeOverlay.style.transformOrigin = 'right';
                     wipeOverlay.style.transform = 'scaleX(0)';
@@ -610,22 +664,16 @@
                 }, 500); 
             };
 
-            // -- Auto Advance Engine --
             const updateUI = () => {
                 if (!isTransitioning && !isAdminOpen) {
                     const elapsed = Date.now() - slideStartTime;
                     const remaining = Math.max(0, SLIDE_DURATION - elapsed);
                     
-                    const seconds = (remaining / 1000).toFixed(2);
-                    countdownEl.innerText = `T-${seconds.padStart(5, '0')}s`;
-
-                    const progressPercent = (elapsed / SLIDE_DURATION) * 100;
-                    progressBar.style.width = `${progressPercent}%`;
+                    countdownEl.innerText = `T-${(remaining / 1000).toFixed(2).padStart(5, '0')}s`;
+                    progressBar.style.width = `${(elapsed / SLIDE_DURATION) * 100}%`;
 
                     if (remaining === 0) goToSlide(getNextIndex());
-
                 } else if (isAdminOpen) {
-                    // Keep timer full while paused
                     slideStartTime = Date.now();
                     countdownEl.innerText = `PAUSED`;
                     progressBar.style.width = `0%`;
@@ -650,33 +698,46 @@
                             ${isHidden ? '<span class="text-xs bg-red-900 text-red-200 px-2 py-1">HIDDEN</span>' : ''}
                         </div>
                         <div class="font-bold text-lg leading-tight truncate" title="${name}">${name}</div>
-                        <div class="flex gap-2 mt-auto pt-4 border-t border-neutral-800">
-                            <button class="toggle-btn flex-1 text-xs border border-white/20 py-2 hover:bg-white hover:text-black transition" data-index="${index}">
-                                ${isHidden ? 'SHOW' : 'HIDE'}
-                            </button>
-                            <button class="jump-btn flex-1 text-xs bg-white/10 border border-white/20 py-2 hover:bg-[#00FF41] hover:text-black hover:border-[#00FF41] transition" data-index="${index}">
-                                JUMP
-                            </button>
+                        <div class="flex flex-col gap-2 mt-auto pt-4 border-t border-neutral-800">
+                            <div class="flex gap-2">
+                                <button class="move-btn flex-1 text-xs border border-white/20 py-2 hover:bg-white hover:text-black transition" data-action="up" data-index="${index}">↑ UP</button>
+                                <button class="move-btn flex-1 text-xs border border-white/20 py-2 hover:bg-white hover:text-black transition" data-action="down" data-index="${index}">↓ DN</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="toggle-btn flex-1 text-xs border border-white/20 py-2 hover:bg-white hover:text-black transition" data-index="${index}">${isHidden ? 'SHOW' : 'HIDE'}</button>
+                                <button class="jump-btn flex-1 text-xs bg-white/10 border border-white/20 py-2 hover:bg-[#00FF41] hover:text-black hover:border-[#00FF41] transition" data-index="${index}">JUMP</button>
+                            </div>
                         </div>
                     `;
                     adminGrid.appendChild(card);
                 });
 
-                // Attach Listeners
                 document.querySelectorAll('.toggle-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        const idx = parseInt(e.target.getAttribute('data-index'));
-                        slides[idx].classList.toggle('hidden-slide');
-                        updateIndicator();
-                        renderAdminGrid(); // Re-render to update UI
+                        slides[parseInt(e.target.dataset.index)].classList.toggle('hidden-slide');
+                        refreshSlidesState();
                     });
                 });
 
                 document.querySelectorAll('.jump-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
-                        const idx = parseInt(e.target.getAttribute('data-index'));
-                        goToSlide(idx);
-                        toggleAdminPane(); // Close admin to show the slide
+                        goToSlide(parseInt(e.target.dataset.index));
+                        toggleAdminPane();
+                    });
+                });
+
+                document.querySelectorAll('.move-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        const action = e.target.dataset.action;
+                        
+                        if (action === 'up' && idx > 0) {
+                            slideContainer.insertBefore(slides[idx], slides[idx - 1]);
+                            refreshSlidesState();
+                        } else if (action === 'down' && idx < slides.length - 1) {
+                            slideContainer.insertBefore(slides[idx], slides[idx + 2] || null);
+                            refreshSlidesState();
+                        }
                     });
                 });
             };
@@ -692,13 +753,107 @@
                     adminPane.classList.add('hidden');
                     adminPane.classList.remove('flex');
                     document.body.classList.remove('admin-active');
-                    slideStartTime = Date.now(); // Reset timer upon closing
+                    slideStartTime = Date.now(); 
                 }
             };
 
-            // -- Event Listeners --
+            // -- Quiz Builder Logic --
+            const quizFormContainer = document.getElementById('quiz-form-container');
+            document.getElementById('open-quiz-form').addEventListener('click', () => {
+                quizFormContainer.classList.toggle('hidden');
+                quizFormContainer.classList.toggle('flex');
+            });
 
-            // 1. Keyboard Nav
+            document.getElementById('cancel-quiz').addEventListener('click', () => {
+                quizFormContainer.classList.add('hidden');
+                quizFormContainer.classList.remove('flex');
+            });
+
+            document.getElementById('submit-quiz').addEventListener('click', () => {
+                const title = document.getElementById('quiz-title').value || "Unknown Film";
+                const year = document.getElementById('quiz-year').value || "XXXX";
+                const question = document.getElementById('quiz-question').value || "No trivia provided.";
+                const isReal = document.getElementById('quiz-truth').value === 'real';
+                const explanation = document.getElementById('quiz-answer').value || "No explanation provided.";
+
+                // Highlight words inside quotes for style
+                const styledQuestion = question.replace(/"([^"]+)"/g, '<span class="text-white bg-white/10 px-2">"$1"</span>');
+                const styledExplanation = explanation.replace(/"([^"]+)"/g, '<span class="text-white italic">"$1"</span>');
+
+                // Q Slide HTML
+                const qSlide = document.createElement('section');
+                qSlide.className = 'slide quiz-slide bg-[#0a0a0a] text-white';
+                qSlide.dataset.name = `Quiz (Q): ${title}`;
+                qSlide.innerHTML = `
+                    <div class="scanlines"></div>
+                    <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                        <div class="animate-block" style="transition-delay: 0.2s">
+                            <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden group">
+                                <span class="font-mono text-neutral-600 mb-2">[ PHOTO SPOT ]</span>
+                                <span class="font-serif italic text-neutral-500 text-sm">${title} (${year})</span>
+                            </div>
+                        </div>
+                        <div class="animate-block" style="transition-delay: 0.4s">
+                            <div class="font-mono text-[#00FF41] tracking-widest mb-4 quiz-counter">QUESTION XX</div>
+                            <h3 class="font-serif text-5xl mb-8">${title} <span class="text-3xl text-neutral-500">(${year})</span></h3>
+                            <p class="font-mono text-2xl leading-relaxed text-neutral-300 mb-12">${styledQuestion}</p>
+                            <div class="font-mono text-2xl border-l-4 border-[#00FF41] pl-6 py-2 animate-pulse">
+                                REAL FACT OR AI HALLUCINATION?
+                            </div>
+                        </div>
+                    </div>`;
+
+                // A Slide HTML
+                const aSlide = document.createElement('section');
+                aSlide.className = 'slide quiz-slide bg-[#0a0a0a] text-white';
+                aSlide.dataset.name = `Quiz (A): ${title}`;
+                
+                const styleColor = isReal ? '#00FF41' : '#FF3333';
+                const badgeText = isReal ? 'VERIFIED: REAL FACT' : 'WARNING: AI HALLUCINATION';
+                const shadow = isReal ? `shadow-[0_0_30px_rgba(0,255,65,0.2)]` : `shadow-[0_0_30px_rgba(255,51,51,0.2)]`;
+                const textShadow = isReal ? `shadow-[0_0_20px_rgba(0,255,65,0.4)]` : `shadow-[0_0_20px_rgba(255,51,51,0.4)]`;
+                const overlay = isReal ? '' : '<div class="absolute inset-0 bg-[#FF3333]/10 mix-blend-overlay"></div>';
+
+                aSlide.innerHTML = `
+                    <div class="scanlines"></div>
+                    <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
+                        <div class="animate-block">
+                            <div class="aspect-[4/3] bg-neutral-900 border-4 border-[${styleColor}] flex flex-col items-center justify-center relative ${shadow}">
+                                <span class="font-mono text-[${styleColor}]/50 mb-2">[ PHOTO SPOT ]</span>
+                                ${overlay}
+                            </div>
+                        </div>
+                        <div class="animate-block" style="transition-delay: 0.2s">
+                            <div class="inline-block bg-[${styleColor}] text-${isReal?'black':'white'} font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest ${textShadow}">
+                                ${badgeText}
+                            </div>
+                            <p class="font-mono text-2xl leading-relaxed text-neutral-300">${styledExplanation}</p>
+                        </div>
+                    </div>`;
+
+                // Add to DOM just before the closing Declaration slide
+                const declarationSlide = Array.from(slides).find(s => s.dataset.name && s.dataset.name.includes("Declaration"));
+                if (declarationSlide) {
+                    slideContainer.insertBefore(qSlide, declarationSlide);
+                    slideContainer.insertBefore(aSlide, declarationSlide);
+                } else {
+                    slideContainer.appendChild(qSlide);
+                    slideContainer.appendChild(aSlide);
+                }
+
+                // Reset form and state
+                document.getElementById('quiz-title').value = '';
+                document.getElementById('quiz-year').value = '';
+                document.getElementById('quiz-question').value = '';
+                document.getElementById('quiz-answer').value = '';
+                quizFormContainer.classList.add('hidden');
+                quizFormContainer.classList.remove('flex');
+
+                refreshSlidesState();
+            });
+
+
+            // -- Event Listeners --
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
                     goToSlide(getNextIndex());
@@ -707,13 +862,21 @@
                 }
             });
 
-            // 2. Triple Click for Admin
+            // Swipe Navigation
+            let touchstartX = 0;
+            let touchendX = 0;
+            window.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
+            window.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                if (touchendX < touchstartX - 50) goToSlide(getNextIndex());
+                if (touchendX > touchstartX + 50) goToSlide(getPrevIndex());
+            });
+
+            // Triple Click for Admin
             let clickCount = 0;
             let clickTimer;
             window.addEventListener('click', (e) => {
-                // Ignore if clicking inside admin panel
                 if (e.target.closest('#admin-pane')) return;
-
                 clickCount++;
                 if (clickCount === 3) {
                     toggleAdminPane();
@@ -725,18 +888,19 @@
                 }
             });
 
-            closeAdminBtn.addEventListener('click', toggleAdminPane);
+            document.getElementById('close-admin').addEventListener('click', toggleAdminPane);
 
-            // Initialize
+            // Start up
+            refreshSlidesState();
             applySlideTheme(0);
-            updateIndicator();
             requestAnimationFrame(updateUI);
         };
 
         window.addEventListener('load', () => {
-            try { initThreeJS(); } catch (e) { console.log('WebGL fallback'); }
+            try { threeManager.init(); } catch (e) { console.log('WebGL fallback'); }
             initSlideshow();
         });
     </script>
 </body>
 </html>
+
