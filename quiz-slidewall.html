@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNSUBSCRIBE NYC | Video Wall Presentation</title>
     
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
@@ -18,7 +21,7 @@
             --bg-color: #F2F2F2;
             --text-color: #0F0F0F;
             --grid-line: 1px solid #0F0F0F;
-            --slide-duration: 10000ms; /* 10 seconds per slide */
+            --slide-duration: 10000ms;
             --quiz-bg: #0a0a0a;
         }
 
@@ -30,7 +33,13 @@
             -webkit-font-smoothing: antialiased;
             margin: 0;
             padding: 0;
-            cursor: none;
+            cursor: none; /* Hidden by default for presentation */
+            transition: background-color 0.5s;
+        }
+
+        /* Show cursor when admin is active */
+        body.admin-active {
+            cursor: auto;
         }
 
         .font-serif { font-family: 'Playfair Display', serif; }
@@ -46,7 +55,7 @@
             z-index: 0;
             opacity: 0.8;
             pointer-events: none;
-            transition: filter 0.5s ease;
+            transition: filter 0.5s ease, opacity 0.5s ease;
         }
 
         /* Persistent UI Elements */
@@ -55,10 +64,9 @@
             inset: 0;
             z-index: 50;
             pointer-events: none;
-            transition: filter 0.3s ease;
+            transition: filter 0.3s ease, opacity 0.3s ease;
         }
 
-        /* Triggered via JS for dark slides */
         .invert-ui {
             filter: invert(1) hue-rotate(180deg);
         }
@@ -99,9 +107,15 @@
             transition: opacity 0.1s;
         }
 
+        /* Override hidden utility so active slide always shows */
         .slide.active {
             opacity: 1;
             visibility: visible;
+            display: flex !important;
+        }
+
+        .hidden-slide {
+            display: none;
         }
 
         .slide .animate-block {
@@ -129,21 +143,7 @@
             pointer-events: none;
         }
 
-        /* Grid lines for aesthetic */
-        .aesthetic-grid {
-            position: absolute;
-            inset: 4rem;
-            border: var(--grid-line);
-            pointer-events: none;
-        }
-        .aesthetic-grid::before {
-            content: ''; position: absolute; top: 0; left: 50%; height: 100%; border-left: var(--grid-line);
-        }
-        .aesthetic-grid::after {
-            content: ''; position: absolute; top: 50%; left: 0; width: 100%; border-top: var(--grid-line);
-        }
-
-        /* CRT Scanline effect for Quiz Slides */
+        /* CRT Scanline effect */
         .scanlines {
             background: linear-gradient(
                 to bottom,
@@ -158,14 +158,31 @@
             pointer-events: none;
             z-index: 1;
         }
+
+        /* Aesthetic Grid */
+        .aesthetic-grid {
+            position: absolute;
+            inset: 4rem;
+            border: var(--grid-line);
+            pointer-events: none;
+        }
+        .aesthetic-grid::before {
+            content: ''; position: absolute; top: 0; left: 50%; height: 100%; border-left: var(--grid-line);
+        }
+        .aesthetic-grid::after {
+            content: ''; position: absolute; top: 50%; left: 0; width: 100%; border-top: var(--grid-line);
+        }
     </style>
 </head>
 <body>
 
+    <!-- Persistent ThreeJS Background -->
     <div id="canvas-container"></div>
 
+    <!-- Wipe Overlay for Transitions -->
     <div id="wipe-overlay"></div>
 
+    <!-- Persistent Tactical UI -->
     <div id="ui-layer" class="p-[20px] flex flex-col justify-between">
         <header class="flex justify-between items-start uppercase text-sm tracking-[0.2em] font-bold">
             <div class="flex items-center gap-4">
@@ -185,9 +202,11 @@
         <div id="progress-bar"></div>
     </div>
 
+    <!-- Slides -->
     <main id="slide-container">
         
-        <section class="slide active text-center">
+        <!-- SLIDE 1 -->
+        <section class="slide active text-center" data-name="01: Hero Quote">
             <div class="max-w-7xl px-4">
                 <p class="font-mono text-lg md:text-2xl tracking-[0.3em] text-gray-500 uppercase mb-12 animate-block" style="transition-delay: 0.2s">
                     Architects of the Invisible
@@ -198,7 +217,8 @@
             </div>
         </section>
 
-        <section class="slide bg-white/30 backdrop-blur-md">
+        <!-- SLIDE 2 -->
+        <section class="slide bg-white/30 backdrop-blur-md" data-name="02: The Preamble">
             <div class="aesthetic-grid opacity-20 hidden md:block"></div>
             <div class="max-w-6xl w-full z-10 flex flex-col justify-center h-full px-12">
                 <div class="flex items-center gap-6 mb-12 animate-block" style="transition-delay: 0.1s">
@@ -214,7 +234,8 @@
             </div>
         </section>
 
-        <section class="slide quiz-slide bg-[#0a0a0a] text-white">
+        <!-- SLIDE 3: QUIZ INTRO -->
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="03: Quiz Intro">
             <div class="scanlines"></div>
             <div class="z-10 text-center animate-block">
                 <div class="inline-block border border-[#00FF41] text-[#00FF41] px-4 py-1 font-mono text-sm tracking-widest mb-8 animate-pulse">
@@ -232,17 +253,17 @@
             </div>
         </section>
 
-        <section class="slide quiz-slide bg-[#0a0a0a] text-white">
+        <!-- SLIDE 4: QUIZ 1 - QUESTION -->
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="04: Quiz 1 (Q)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
-                
                 <div class="animate-block" style="transition-delay: 0.2s">
                     <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden group">
+                        <!-- Add img tag here -->
                         <span class="font-mono text-neutral-600 mb-2">[ PHOTO SPOT ]</span>
                         <span class="font-serif italic text-neutral-500 text-sm">The Wizard of Oz (1939)</span>
                     </div>
                 </div>
-
                 <div class="animate-block" style="transition-delay: 0.4s">
                     <div class="font-mono text-[#00FF41] tracking-widest mb-4">QUESTION 01</div>
                     <h3 class="font-serif text-5xl mb-8">The Wizard of Oz <span class="text-3xl text-neutral-500">(1939)</span></h3>
@@ -256,16 +277,15 @@
             </div>
         </section>
 
-        <section class="slide quiz-slide bg-[#0a0a0a] text-white">
+        <!-- SLIDE 5: QUIZ 1 - ANSWER -->
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="05: Quiz 1 (A)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
-                
                 <div class="animate-block">
                     <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#00FF41] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(0,255,65,0.2)]">
                         <span class="font-mono text-[#00FF41]/50 mb-2">[ PHOTO SPOT ]</span>
                     </div>
                 </div>
-
                 <div class="animate-block" style="transition-delay: 0.2s">
                     <div class="inline-block bg-[#00FF41] text-black font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(0,255,65,0.4)]">
                         VERIFIED: REAL FACT
@@ -277,7 +297,8 @@
             </div>
         </section>
 
-        <section class="slide bg-transparent">
+        <!-- SLIDE 6 -->
+        <section class="slide bg-transparent" data-name="06: The Convergence">
             <div class="w-full max-w-7xl grid grid-cols-2 gap-0 border-4 border-black/80 animate-block">
                 <div class="p-16 border-r-4 border-black/80 bg-black/80 backdrop-blur-md text-white flex flex-col justify-center min-h-[60vh]">
                     <h4 class="font-mono text-xl uppercase tracking-widest mb-16 text-white/50">I. The Death Of</h4>
@@ -302,17 +323,16 @@
             </div>
         </section>
 
-        <section class="slide quiz-slide bg-[#0a0a0a] text-white">
+        <!-- SLIDE 7: QUIZ 2 - QUESTION -->
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="07: Quiz 2 (Q)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
-                
                 <div class="animate-block" style="transition-delay: 0.2s">
                     <div class="aspect-[4/3] bg-neutral-900 border-2 border-dashed border-neutral-700 flex flex-col items-center justify-center relative overflow-hidden group">
                         <span class="font-mono text-neutral-600 mb-2">[ PHOTO SPOT ]</span>
                         <span class="font-serif italic text-neutral-500 text-sm">Marlon Brando Portrait</span>
                     </div>
                 </div>
-
                 <div class="animate-block" style="transition-delay: 0.4s">
                     <div class="font-mono text-[#00FF41] tracking-widest mb-4">QUESTION 02</div>
                     <h3 class="font-serif text-5xl mb-8">A Shadow in the Sun <span class="text-3xl text-neutral-500">(1958)</span></h3>
@@ -326,17 +346,16 @@
             </div>
         </section>
 
-        <section class="slide quiz-slide bg-[#0a0a0a] text-white">
+        <!-- SLIDE 8: QUIZ 2 - ANSWER -->
+        <section class="slide quiz-slide bg-[#0a0a0a] text-white" data-name="08: Quiz 2 (A)">
             <div class="scanlines"></div>
             <div class="z-10 w-full max-w-7xl grid grid-cols-2 gap-16 items-center">
-                
                 <div class="animate-block">
                     <div class="aspect-[4/3] bg-neutral-900 border-4 border-[#FF3333] flex flex-col items-center justify-center relative shadow-[0_0_30px_rgba(255,51,51,0.2)]">
                         <span class="font-mono text-[#FF3333]/50 mb-2">[ PHOTO SPOT ]</span>
                         <div class="absolute inset-0 bg-[#FF3333]/10 mix-blend-overlay"></div>
                     </div>
                 </div>
-
                 <div class="animate-block" style="transition-delay: 0.2s">
                     <div class="inline-block bg-[#FF3333] text-white font-bold font-mono text-3xl px-6 py-2 mb-8 tracking-widest shadow-[0_0_20px_rgba(255,51,51,0.4)]">
                         WARNING: AI HALLUCINATION
@@ -348,12 +367,12 @@
             </div>
         </section>
 
-        <section class="slide bg-white/40 backdrop-blur-sm">
+        <!-- SLIDE 9 -->
+        <section class="slide bg-white/40 backdrop-blur-sm" data-name="09: Sacred Principles">
             <div class="w-full max-w-7xl flex flex-col gap-12">
                 <div class="border-b-2 border-black pb-4 mb-8 animate-block">
                     <h2 class="font-serif text-4xl italic">The Sacred Principles [ I - II ]</h2>
                 </div>
-                
                 <div class="flex gap-12 animate-block" style="transition-delay: 0.2s">
                     <div class="text-8xl font-mono opacity-20">01</div>
                     <div>
@@ -362,7 +381,6 @@
                         <p class="font-serif text-3xl italic leading-snug">Ideas flow like water—trying to own them is like trying to own the rain.</p>
                     </div>
                 </div>
-
                 <div class="flex gap-12 animate-block" style="transition-delay: 0.4s">
                     <div class="text-8xl font-mono opacity-20">02</div>
                     <div>
@@ -374,7 +392,8 @@
             </div>
         </section>
 
-        <section class="slide bg-white/30 backdrop-blur-md border-[20px] border-black/80">
+        <!-- SLIDE 10 -->
+        <section class="slide bg-white/30 backdrop-blur-md border-[20px] border-black/80" data-name="10: The Declaration">
             <div class="text-center w-full max-w-7xl">
                 <div class="font-mono text-xl uppercase tracking-widest text-gray-500 border-2 border-black/80 px-6 py-2 inline-block rounded-full mb-16 animate-block">VI. The Declaration</div>
                 <h2 class="font-serif text-[6rem] md:text-[8rem] lg:text-[10rem] leading-[0.85] animate-block font-bold" style="transition-delay: 0.2s">
@@ -390,6 +409,26 @@
         </section>
 
     </main>
+
+    <!-- ADMIN PANE OVERLAY -->
+    <div id="admin-pane" class="fixed inset-0 bg-[#0a0a0a]/95 backdrop-blur-md z-[9999] flex-col p-8 md:p-12 text-white overflow-y-auto hidden">
+        <div class="flex justify-between items-center border-b-2 border-neutral-800 pb-6 mb-8">
+            <div class="flex items-center gap-4">
+                <span class="w-3 h-3 bg-[#00FF41] rounded-full inline-block animate-pulse shadow-[0_0_10px_#00FF41]"></span>
+                <h2 class="text-2xl md:text-3xl font-mono text-[#00FF41] tracking-widest">DECK CONTROL SYSTEM</h2>
+            </div>
+            <button id="close-admin" class="font-mono text-sm tracking-widest border border-white/30 px-6 py-3 hover:bg-white hover:text-black transition uppercase">Resume Auto-Pilot</button>
+        </div>
+        
+        <div class="mb-8 font-mono text-neutral-400 max-w-3xl">
+            <p>Admin tools activated. Auto-advance is currently PAUSED.</p>
+            <p class="mt-2 text-sm text-neutral-500">Use Arrow Keys (←/→) to manually advance. Toggle slide visibility below, or click 'JUMP' to immediately trigger that slide.</p>
+        </div>
+
+        <div id="admin-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 font-mono">
+            <!-- Dynamically populated by JS -->
+        </div>
+    </div>
 
     <script>
         // --- THREE.JS BACKGROUND ---
@@ -417,18 +456,17 @@
             plane.rotation.x = -Math.PI / 2.5;
             scene.add(plane);
 
-            // Added specific states for the dark quiz slides to calm the mesh down in the background
             const slideConfigs = [
-                { speed: 0.002, w1A: 0.5, w1F: 0.5, w2A: 0.3, w2F: 0.8, rotZ: 0.0003, camZ: 5, planeX: -Math.PI / 2.5 },
-                { speed: 0.001, w1A: 0.2, w1F: 1.0, w2A: 0.1, w2F: 2.0, rotZ: 0.0001, camZ: 4.5, planeX: -Math.PI / 2.8 },
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // Quiz Intro
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // Quiz Q1
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // Quiz A1
-                { speed: 0.006, w1A: 1.2, w1F: 2.0, w2A: 0.9, w2F: 3.0, rotZ: 0.002, camZ: 6, planeX: -Math.PI / 2.2 },
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // Quiz Q2
-                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // Quiz A2
-                { speed: 0.003, w1A: 1.5, w1F: 0.3, w2A: 1.0, w2F: 0.5, rotZ: -0.0005, camZ: 7, planeX: -Math.PI / 2.5 },
-                { speed: 0.0005, w1A: 2.5, w1F: 0.1, w2A: 2.0, w2F: 0.15, rotZ: 0.0001, camZ: 8, planeX: -Math.PI / 2.5 }
+                { speed: 0.002, w1A: 0.5, w1F: 0.5, w2A: 0.3, w2F: 0.8, rotZ: 0.0003, camZ: 5, planeX: -Math.PI / 2.5 }, // 1
+                { speed: 0.001, w1A: 0.2, w1F: 1.0, w2A: 0.1, w2F: 2.0, rotZ: 0.0001, camZ: 4.5, planeX: -Math.PI / 2.8 }, // 2
+                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 3 Quiz
+                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 4 Q1
+                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 5 A1
+                { speed: 0.006, w1A: 1.2, w1F: 2.0, w2A: 0.9, w2F: 3.0, rotZ: 0.002, camZ: 6, planeX: -Math.PI / 2.2 }, // 6
+                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 7 Q2
+                { speed: 0.0005, w1A: 0.1, w1F: 0.1, w2A: 0.1, w2F: 0.1, rotZ: 0, camZ: 6, planeX: -Math.PI / 2 }, // 8 A2
+                { speed: 0.003, w1A: 1.5, w1F: 0.3, w2A: 1.0, w2F: 0.5, rotZ: -0.0005, camZ: 7, planeX: -Math.PI / 2.5 }, // 9
+                { speed: 0.0005, w1A: 2.5, w1F: 0.1, w2A: 2.0, w2F: 0.15, rotZ: 0.0001, camZ: 8, planeX: -Math.PI / 2.5 } // 10
             ];
 
             let currentConfig = { ...slideConfigs[0] };
@@ -439,7 +477,6 @@
             };
 
             const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
-
             let time = 0;
 
             const animate = () => {
@@ -485,7 +522,7 @@
             });
         };
 
-        // --- SLIDESHOW ENGINE & UI ---
+        // --- SLIDESHOW ENGINE & ADMIN UI ---
         const initSlideshow = () => {
             const slides = document.querySelectorAll('.slide');
             const countdownEl = document.getElementById('countdown');
@@ -494,31 +531,88 @@
             const wipeOverlay = document.getElementById('wipe-overlay');
             const uiLayer = document.getElementById('ui-layer');
             const canvasContainer = document.getElementById('canvas-container');
+            const adminPane = document.getElementById('admin-pane');
+            const adminGrid = document.getElementById('admin-grid');
+            const closeAdminBtn = document.getElementById('close-admin');
             
-            const SLIDE_DURATION = 10000; // 10 seconds
+            const SLIDE_DURATION = 10000;
             let currentSlideIndex = 0;
             let slideStartTime = Date.now();
             let isTransitioning = false;
+            let isAdminOpen = false;
 
-            // Handle UI styling based on slide theme
+            // -- Theme Management --
             const applySlideTheme = (index) => {
                 const targetSlide = slides[index];
                 const isQuiz = targetSlide.classList.contains('quiz-slide');
                 
                 if (isQuiz) {
                     uiLayer.classList.add('invert-ui');
-                    canvasContainer.style.opacity = '0.05'; // Dim canvas almost entirely for quiz slides
+                    canvasContainer.style.opacity = '0.05';
                 } else {
                     uiLayer.classList.remove('invert-ui');
                     canvasContainer.style.opacity = '0.8';
                 }
             };
 
-            // Init first slide theme
-            applySlideTheme(0);
+            const updateIndicator = () => {
+                const visibleSlides = Array.from(slides).filter(s => !s.classList.contains('hidden-slide'));
+                const visibleIndex = visibleSlides.indexOf(slides[currentSlideIndex]);
+                // Fallback if current slide is hidden somehow
+                const displayIndex = visibleIndex === -1 ? '??' : String(visibleIndex + 1).padStart(2, '0');
+                const total = String(visibleSlides.length).padStart(2, '0');
+                indicator.innerText = `SEQ_${displayIndex} / ${total}`;
+            };
 
+            // -- Navigation Logic --
+            const getNextIndex = () => {
+                let next = (currentSlideIndex + 1) % slides.length;
+                while(slides[next].classList.contains('hidden-slide') && next !== currentSlideIndex) {
+                    next = (next + 1) % slides.length;
+                }
+                return next;
+            };
+
+            const getPrevIndex = () => {
+                let prev = (currentSlideIndex - 1 + slides.length) % slides.length;
+                while(slides[prev].classList.contains('hidden-slide') && prev !== currentSlideIndex) {
+                    prev = (prev - 1 + slides.length) % slides.length;
+                }
+                return prev;
+            };
+
+            const goToSlide = (targetIndex) => {
+                if (isTransitioning || targetIndex === currentSlideIndex) return;
+                isTransitioning = true;
+
+                wipeOverlay.style.transition = 'transform 0.5s cubic-bezier(0.85, 0, 0.15, 1)';
+                wipeOverlay.style.transformOrigin = 'left';
+                wipeOverlay.style.transform = 'scaleX(1)';
+
+                setTimeout(() => {
+                    slides[currentSlideIndex].classList.remove('active');
+                    slides[targetIndex].classList.add('active');
+                    currentSlideIndex = targetIndex;
+                    
+                    if(window.updateThreeState) window.updateThreeState(currentSlideIndex);
+                    applySlideTheme(currentSlideIndex);
+                    updateIndicator();
+                    if(isAdminOpen) renderAdminGrid(); // Update active state in admin panel
+                    
+                    slideStartTime = Date.now(); // Reset timer
+                    
+                    wipeOverlay.style.transformOrigin = 'right';
+                    wipeOverlay.style.transform = 'scaleX(0)';
+
+                    setTimeout(() => {
+                        isTransitioning = false;
+                    }, 500); 
+                }, 500); 
+            };
+
+            // -- Auto Advance Engine --
             const updateUI = () => {
-                if (!isTransitioning) {
+                if (!isTransitioning && !isAdminOpen) {
                     const elapsed = Date.now() - slideStartTime;
                     const remaining = Math.max(0, SLIDE_DURATION - elapsed);
                     
@@ -528,45 +622,114 @@
                     const progressPercent = (elapsed / SLIDE_DURATION) * 100;
                     progressBar.style.width = `${progressPercent}%`;
 
-                    if (remaining === 0) {
-                        triggerTransition();
-                    }
+                    if (remaining === 0) goToSlide(getNextIndex());
+
+                } else if (isAdminOpen) {
+                    // Keep timer full while paused
+                    slideStartTime = Date.now();
+                    countdownEl.innerText = `PAUSED`;
+                    progressBar.style.width = `0%`;
                 }
                 requestAnimationFrame(updateUI);
             };
 
-            const triggerTransition = () => {
-                if (isTransitioning) return;
-                isTransitioning = true;
+            // -- Admin Pane Logic --
+            const renderAdminGrid = () => {
+                adminGrid.innerHTML = '';
+                slides.forEach((slide, index) => {
+                    const isHidden = slide.classList.contains('hidden-slide');
+                    const isActive = index === currentSlideIndex;
+                    const name = slide.getAttribute('data-name') || `Slide ${index + 1}`;
 
-                const nextSlideIndex = (currentSlideIndex + 1) % slides.length;
-
-                wipeOverlay.style.transition = 'transform 0.6s cubic-bezier(0.85, 0, 0.15, 1)';
-                wipeOverlay.style.transformOrigin = 'left';
-                wipeOverlay.style.transform = 'scaleX(1)';
-
-                setTimeout(() => {
-                    slides[currentSlideIndex].classList.remove('active');
-                    slides[nextSlideIndex].classList.add('active');
-                    currentSlideIndex = nextSlideIndex;
+                    const card = document.createElement('div');
+                    card.className = `p-4 border border-neutral-800 flex flex-col gap-4 ${isActive ? 'bg-[#00FF41]/10 border-[#00FF41]' : 'bg-black'} ${isHidden ? 'opacity-40' : ''}`;
                     
-                    if(window.updateThreeState) window.updateThreeState(currentSlideIndex);
-                    
-                    applySlideTheme(currentSlideIndex);
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <span class="text-sm tracking-widest ${isActive ? 'text-[#00FF41]' : 'text-neutral-500'}">${isActive ? '>> CURRENT' : String(index + 1).padStart(2, '0')}</span>
+                            ${isHidden ? '<span class="text-xs bg-red-900 text-red-200 px-2 py-1">HIDDEN</span>' : ''}
+                        </div>
+                        <div class="font-bold text-lg leading-tight truncate" title="${name}">${name}</div>
+                        <div class="flex gap-2 mt-auto pt-4 border-t border-neutral-800">
+                            <button class="toggle-btn flex-1 text-xs border border-white/20 py-2 hover:bg-white hover:text-black transition" data-index="${index}">
+                                ${isHidden ? 'SHOW' : 'HIDE'}
+                            </button>
+                            <button class="jump-btn flex-1 text-xs bg-white/10 border border-white/20 py-2 hover:bg-[#00FF41] hover:text-black hover:border-[#00FF41] transition" data-index="${index}">
+                                JUMP
+                            </button>
+                        </div>
+                    `;
+                    adminGrid.appendChild(card);
+                });
 
-                    indicator.innerText = `SEQ_${String(currentSlideIndex + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-                    
-                    slideStartTime = Date.now();
-                    
-                    wipeOverlay.style.transformOrigin = 'right';
-                    wipeOverlay.style.transform = 'scaleX(0)';
+                // Attach Listeners
+                document.querySelectorAll('.toggle-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.target.getAttribute('data-index'));
+                        slides[idx].classList.toggle('hidden-slide');
+                        updateIndicator();
+                        renderAdminGrid(); // Re-render to update UI
+                    });
+                });
 
-                    setTimeout(() => {
-                        isTransitioning = false;
-                    }, 600); 
-                }, 600); 
+                document.querySelectorAll('.jump-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.target.getAttribute('data-index'));
+                        goToSlide(idx);
+                        toggleAdminPane(); // Close admin to show the slide
+                    });
+                });
             };
 
+            const toggleAdminPane = () => {
+                isAdminOpen = !isAdminOpen;
+                if (isAdminOpen) {
+                    adminPane.classList.remove('hidden');
+                    adminPane.classList.add('flex');
+                    document.body.classList.add('admin-active');
+                    renderAdminGrid();
+                } else {
+                    adminPane.classList.add('hidden');
+                    adminPane.classList.remove('flex');
+                    document.body.classList.remove('admin-active');
+                    slideStartTime = Date.now(); // Reset timer upon closing
+                }
+            };
+
+            // -- Event Listeners --
+
+            // 1. Keyboard Nav
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                    goToSlide(getNextIndex());
+                } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                    goToSlide(getPrevIndex());
+                }
+            });
+
+            // 2. Triple Click for Admin
+            let clickCount = 0;
+            let clickTimer;
+            window.addEventListener('click', (e) => {
+                // Ignore if clicking inside admin panel
+                if (e.target.closest('#admin-pane')) return;
+
+                clickCount++;
+                if (clickCount === 3) {
+                    toggleAdminPane();
+                    clickCount = 0;
+                    clearTimeout(clickTimer);
+                } else {
+                    clearTimeout(clickTimer);
+                    clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+                }
+            });
+
+            closeAdminBtn.addEventListener('click', toggleAdminPane);
+
+            // Initialize
+            applySlideTheme(0);
+            updateIndicator();
             requestAnimationFrame(updateUI);
         };
 
