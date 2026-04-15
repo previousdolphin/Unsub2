@@ -254,7 +254,7 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
-        // --- Core System Constants (Standard 3 Gate Architecture) ---
+        // --- Core System Configuration ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
         const PROMPTS = {
@@ -262,17 +262,16 @@
 RULES:
 1. Reject advice-seeking, personal belief, and outcome bias.
 2. Respond ONLY with a clarifying reframe using cold, corporate, brutalist vernacular.
-3. Maximum 20 words per response.
-4. NEVER mention your name or the user's name.
-5. If the inquiry is structurally objective, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+3. Maximum 20 words per response. No conversational fluff. No greetings.
+4. If the inquiry is structurally objective and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 CURRENT INQUIRY: `,
             MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
 STRUCTURE:
 1. HEXAGRAM IDENTIFICATION (Number/Name)
-2. PRIMARY TEXT (Architecture of the situation, 3-5 sentences)
+2. PRIMARY TEXT (NCR-CAM vernacular, 3-5 sentences)
 3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
-4. THE TRANSFORMED HEXAGRAM (Trajectory)
-5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
+4. THE TRANSFORMED HEXAGRAM
+5. CLOSING NOTATION (STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
 Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sentence.\n\n`
         };
 
@@ -315,15 +314,15 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
         function cleanGemmaOutput(text) {
             let clean = text.replace(/reframe:/gi, "").trim();
             clean = clean.replace(/oracle response:/gi, "").trim();
-            clean = clean.replace(/oracle:/gi, "").trim();
             clean = clean.replace(/assistant:/gi, "").trim();
             clean = clean.replace(/##/g, "").trim();
             clean = clean.replace(/^"|"$/g, '').trim(); 
-            // Scrub conversational fluff and model artifacts
-            const artifacts = [/^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^\*+$/, /^pilgrim/i];
+            clean = clean.replace(/\*+/g, '').trim();
+            
+            // Scrub specific intro conversationalisms
+            const artifacts = [/^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^Pilgrim/i, /^Sure, here is your/i];
             artifacts.forEach(regex => { clean = clean.replace(regex, "").trim(); });
             
-            // If in mode 1, keep only the first line of output
             if (clean.includes('\n') && currentMode === 1) {
                 clean = clean.split('\n')[0].trim(); 
             }
@@ -349,7 +348,7 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
                 messages: apiMessages,
                 max_tokens: maxTokens,
                 temperature: currentMode === 1 ? 0.01 : 0.4, 
-                frequency_penalty: 1.3, 
+                frequency_penalty: 1.2, 
                 presence_penalty: 0.3,
                 stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed", "##"] 
             };
@@ -388,6 +387,7 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
             try {
                 let reply = await fetchOracleResponse(apiMessages, 100);
                 
+                // Safety turn count logic
                 const userTurns = conversationHistory.filter(m => m.role === 'user').length;
                 if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
@@ -398,6 +398,8 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
 
                 if (isValidated) {
                     refinedQuestion = text; 
+                    // CRITICAL LOCK: Freeze input immediately on validation
+                    chatInput.disabled = true;
                     appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
@@ -429,6 +431,7 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
 
         function triggerMode2Casting() {
             currentMode = 2;
+            isProcessing = false;
             chatContainer.style.display = 'none';
             castContainer.style.display = 'flex';
             castResults = [];
@@ -439,6 +442,7 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
         function updateCastUI() {
             const step = castResults.length;
             if (step >= 6) {
+                // Ensure castResults is complete before triggering Interpretation
                 triggerMode3Interpretation();
                 return;
             }
@@ -450,6 +454,7 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
         }
 
         function castLine() {
+            if (isProcessing) return;
             const rand = Math.random() * 16;
             let lineValue = 9; 
             if (rand < 1) lineValue = 6; 
@@ -474,8 +479,6 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
         async function triggerMode3Interpretation() {
             currentMode = 3;
             setLoadingState(true);
-            castContainer.style.display = 'none';
-            chatContainer.style.display = 'flex';
             
             let binaryString = "";
             let changingLines = [];
@@ -485,22 +488,28 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
             });
 
             const hexNum = HEXAGRAM_MAP[binaryString];
-            const hexName = HEXAGRAM_NAMES[hexNum];
+            const hexName = HEXAGRAM_NAMES[hexNum] || "Unknown Node";
             const linesText = changingLines.length > 0 ? changingLines.join(", ") : "None";
 
-            const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${hexNum} (${hexName}). CHANGING LINES: ${linesText}.]`;
+            // Switch UI back to chat for interpretation result
+            castContainer.style.display = 'none';
+            chatContainer.style.display = 'flex';
             
             appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
 
+            const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${hexNum} (${hexName}). CHANGING LINES: ${linesText}.]`;
             const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + mode3Payload } ];
 
             try {
                 const finalRuling = await fetchOracleResponse(apiMessages, 600);
                 appendMessage(finalRuling, 'assistant');
+                // Final system notification
+                appendMessage("PROTOCOL COMPLETE. SESSION CONCLUDED. REBOOTING...", 'system');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
             } finally {
+                // Return to Mode 1 for the next session
                 resetSystemState();
                 setLoadingState(false);
             }
