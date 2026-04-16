@@ -13,12 +13,13 @@
             --chat-gradient: linear-gradient(to top, rgba(226,226,226,1) 0%, rgba(226,226,226,0.8) 60%, rgba(226,226,226,0) 100%);
             --msg-user-bg: rgba(0, 0, 0, 0.05);
             --msg-user-border: #1a1a1a;
-            --input-bg: #ffffff;
+            --input-bg: rgba(255, 255, 255, 0.95);
             --input-border: transparent;
             --toggle-color: #1a1a1a;
             --coca-red: #f40009;
             --shadow-sm: 0 4px 15px rgba(0,0,0,0.05);
             --shadow-md: 0 8px 30px rgba(0,0,0,0.08);
+            --system-bg: rgba(255, 255, 255, 0.6);
         }
 
         body.dark-mode {
@@ -28,11 +29,12 @@
             --chat-gradient: linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.8) 60%, rgba(10,10,10,0) 100%);
             --msg-user-bg: rgba(255, 255, 255, 0.1);
             --msg-user-border: #e2e2e2;
-            --input-bg: #1a1a1a;
+            --input-bg: rgba(30, 30, 30, 0.95);
             --input-border: transparent;
             --toggle-color: #e2e2e2;
             --shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
             --shadow-md: 0 8px 30px rgba(0,0,0,0.4);
+            --system-bg: rgba(30, 30, 30, 0.6);
         }
 
         body, html {
@@ -130,55 +132,128 @@
             font-size: 0.85rem; 
             border-bottom-left-radius: 2px;
         }
+        
+        /* Modern System Message Enclosure */
         .message.system { 
             align-self: center; 
-            background-color: transparent; 
-            color: var(--text-muted); 
+            width: 100%;
+            max-width: 95%;
+            background-color: var(--system-bg); 
+            color: var(--text-main); 
             font-size: 0.8rem; 
-            letter-spacing: 2px; 
+            letter-spacing: 1px; 
             text-transform: uppercase; 
             font-weight: 700; 
+            text-align: left;
+            padding: 15px 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(150, 150, 150, 0.2);
+        }
+        .system-header {
             text-align: center;
-            box-shadow: none;
-            padding: 10px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* INLINE HEXAGRAM COMPONENT */
+        .inline-hex-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--coca-red);
+        }
+        .dark-mode .inline-hex-container {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .inline-hex-lines {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 4px;
+        }
+        .inline-line {
+            width: 40px;
+            height: 6px;
+            background-color: var(--text-main);
+            border-radius: 1px;
+            transition: all 0.3s ease;
+        }
+        .inline-line.yin {
+            background-color: transparent;
+            border-left: 16px solid var(--text-main);
+            border-right: 16px solid var(--text-main);
+        }
+        .inline-line.changing {
+            background-color: var(--coca-red);
+            border-color: var(--coca-red);
+        }
+        .inline-hex-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .inline-hex-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--coca-red);
+            letter-spacing: 2px;
+            margin: 0;
+        }
+        .inline-hex-path {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+        .inline-hex-path span {
+            color: var(--text-main);
+            font-weight: 700;
         }
 
         /* MODERN INLINE ACCORDION (Replaces Tooltip) */
         .wilhelm-accordion {
-            margin: 15px 0;
-            background: rgba(244, 0, 9, 0.05);
-            border: 1px solid rgba(244, 0, 9, 0.2);
+            margin: 0 0 15px 0;
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(150, 150, 150, 0.2);
             border-radius: 8px;
             overflow: hidden;
             text-align: left;
             transition: all 0.3s ease;
         }
+        .dark-mode .wilhelm-accordion { background: rgba(255, 255, 255, 0.02); }
         .wilhelm-accordion[open] {
-            background: rgba(244, 0, 9, 0.08);
+            background: var(--bg-color);
             box-shadow: var(--shadow-sm);
+            border-color: var(--coca-red);
         }
         .wilhelm-summary {
             padding: 12px 15px;
             cursor: pointer;
-            color: var(--coca-red);
+            color: var(--text-main);
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            list-style: none; /* remove default arrow */
+            list-style: none;
             user-select: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .wilhelm-summary::-webkit-details-marker {
-            display: none;
+        .wilhelm-summary:hover {
+            color: var(--coca-red);
         }
+        .wilhelm-summary::-webkit-details-marker { display: none; }
         .wilhelm-summary::after {
             content: '+';
             font-size: 1.2rem;
             line-height: 1;
             transition: transform 0.3s ease;
+            color: var(--coca-red);
         }
         .wilhelm-accordion[open] .wilhelm-summary::after {
             content: '−';
@@ -186,26 +261,23 @@
         }
         .wilhelm-content {
             padding: 0 15px 15px 15px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
             color: var(--text-main);
             line-height: 1.6;
-            border-top: 1px solid rgba(244, 0, 9, 0.1);
+            border-top: 1px dashed rgba(150, 150, 150, 0.3);
             margin-top: 5px;
             padding-top: 15px;
             text-transform: none;
             letter-spacing: normal;
         }
-        .wilhelm-section {
-            margin-bottom: 12px;
-        }
-        .wilhelm-section:last-child {
-            margin-bottom: 0;
-        }
+        .wilhelm-section { margin-bottom: 12px; }
+        .wilhelm-section:last-child { margin-bottom: 0; }
         .wilhelm-section strong {
             display: block;
-            color: var(--text-muted);
-            font-size: 0.75rem;
+            color: var(--coca-red);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
             letter-spacing: 2px;
             margin-bottom: 4px;
             text-transform: uppercase;
@@ -219,6 +291,7 @@
             margin-bottom: env(safe-area-inset-bottom, 10px); 
             border-radius: 30px;
             box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
         }
         .chat-input { flex-grow: 1; background: transparent; border: none; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 1rem; outline: none; min-width: 0; }
         .chat-input::placeholder { color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600;}
@@ -291,7 +364,10 @@
         <div class="interaction-section">
             <div class="container-box" id="chatContainer">
                 <div class="chat-history" id="chatHistory">
-                    <div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
+                    <div class="message system">
+                        <div class="system-header">MODE 1: THE REFINERY</div>
+                        STATE YOUR INQUIRY. THE ORACLE AWAITS.
+                    </div>
                 </div>
                 <div class="input-wrapper">
                     <input type="text" class="chat-input" id="chatInput" placeholder="Processing..." autocomplete="off">
@@ -307,8 +383,8 @@
                     <div class="cast-progress" id="castProgress">LINE 1 / 6</div>
                     <div class="cast-question" id="castQuestionText">Does the structure require submission or assertion?</div>
                     <div class="cast-options" id="castOptions">
-                        <button class="cast-btn" onclick="castLine()">SUBMIT</button>
-                        <button class="cast-btn" onclick="castLine()">ASSERT</button>
+                        <button class="cast-btn" onclick="castLine(1)">SUBMIT</button>
+                        <button class="cast-btn" onclick="castLine(2)">ASSERT</button>
                     </div>
                 </div>
             </div>
@@ -462,6 +538,7 @@
         let isProcessing = false;
         let refinedQuestion = "";
         let castResults = []; 
+        let userPath = []; // Tracks the user's answers in Mode 2
         let conversationHistory = []; 
 
         const chatContainer = document.getElementById('chatContainer');
@@ -470,7 +547,7 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatHistory = document.getElementById('chatHistory');
 
-        // Allow HTML rendering for our specialized tooltip message
+        // Allow HTML rendering for our specialized embed messages
         function appendMessage(content, type, isHTML = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${type}`;
@@ -494,6 +571,7 @@
         function resetSystemState() {
             conversationHistory = [];
             castResults = [];
+            userPath = [];
             refinedQuestion = "";
             currentMode = 1;
             isProcessing = false;
@@ -551,7 +629,6 @@
 
             conversationHistory.push({ role: "user", content: text });
             
-            // Expanded to 10 so the loop breaker actually functions
             if (conversationHistory.length > 10) {
                 conversationHistory = conversationHistory.slice(-10);
             }
@@ -577,7 +654,7 @@
                 if (isValidated) {
                     refinedQuestion = text; 
                     chatInput.disabled = true;
-                    appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
+                    appendMessage(`<div class="system-header">STATUS: VALIDATED</div>STRUCTURAL CLARITY ACHIEVED. PROCEEDING TO CAST.`, 'system', true);
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
                     conversationHistory.push({ role: "assistant", content: reply });
@@ -589,7 +666,7 @@
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
-                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. PLEASE REPHRASE.", 'error');
+                appendMessage(`<div class="system-header">ERR: SYSTEM</div>ARCHITECTURE UNSTABLE. PLEASE REPHRASE.`, 'error', true);
                 setLoadingState(false);
             }
         }
@@ -612,6 +689,7 @@
             chatContainer.style.display = 'none';
             castContainer.style.display = 'flex';
             castResults = [];
+            userPath = [];
             document.getElementById('hexagramVisual').innerHTML = '';
             document.getElementById('castOptions').style.display = 'flex';
             updateCastUI();
@@ -630,8 +708,14 @@
             btns[1].textContent = CAST_QUESTIONS[step][2];
         }
 
-        function castLine() {
+        function castLine(btnIndex) {
             if (isProcessing || currentMode !== 2) return;
+            
+            // Record the user's choice
+            const step = castResults.length;
+            userPath.push(CAST_QUESTIONS[step][btnIndex]);
+
+            // Randomize the line result
             const rand = Math.random() * 16;
             let lineValue = 9; 
             if (rand < 1) lineValue = 6; 
@@ -692,11 +776,26 @@
             
             const wilhelmData = WILHELM_DATA[details.hexNum];
             
-            // Build the system message with an embedded, modern accordion instead of a tooltip
+            // Build the inline hexagram lines
+            let inlineLinesHTML = '';
+            castResults.forEach(val => {
+                let yClass = [6,8].includes(val) ? 'yin' : 'yang';
+                let cClass = [6,9].includes(val) ? 'changing' : '';
+                inlineLinesHTML += `<div class="inline-line ${yClass} ${cClass}"></div>`;
+            });
+            
+            // Build the modern system enclosure
             const systemMsgHTML = `
-                MODE 2 COMPLETE. ASSIGNED NODE: ${details.hexNum} - ${details.hexName.toUpperCase()}.<br>
+                <div class="system-header">MODE 2 COMPLETE. ASSIGNED NODE: ${details.hexNum}</div>
+                <div class="inline-hex-container">
+                    <div class="inline-hex-lines">${inlineLinesHTML}</div>
+                    <div class="inline-hex-info">
+                        <div class="inline-hex-title">${details.hexNum} - ${details.hexName.toUpperCase()}</div>
+                        <div class="inline-hex-path"><span>PATH:</span> ${userPath.join(' &rarr; ')}</div>
+                    </div>
+                </div>
                 <details class="wilhelm-accordion" ontoggle="setTimeout(() => document.getElementById('chatHistory').scrollTop = document.getElementById('chatHistory').scrollHeight, 10)">
-                    <summary class="wilhelm-summary">[VIEW WILHELM ARCHIVE]</summary>
+                    <summary class="wilhelm-summary">ACCESS WILHELM ARCHIVE</summary>
                     <div class="wilhelm-content">
                         <div class="wilhelm-section"><strong>THE JUDGEMENT</strong>${wilhelmData.judgement}</div>
                         <div class="wilhelm-section"><strong>THE IMAGE</strong>${wilhelmData.image}</div>
@@ -705,7 +804,6 @@
                 ANALYZING ARCHITECTURE...
             `;
             
-            // Render the specific HTML for the accordion injection
             appendMessage(systemMsgHTML, 'system', true);
 
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${details.hexNum} (${details.hexName}). CHANGING LINES: ${details.linesText}.]`;
@@ -714,10 +812,10 @@
             try {
                 const finalRuling = await fetchOracleResponse(apiMessages, 800, 3);
                 appendMessage(finalRuling, 'assistant');
-                appendMessage("PROTOCOL COMPLETE. AWAITING NEW INQUIRY.", 'system');
+                appendMessage(`<div class="system-header">PROTOCOL COMPLETE</div>AWAITING NEW INQUIRY.`, 'system', true);
             } catch (error) {
                 console.error(error);
-                appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
+                appendMessage(`<div class="system-header">ERR: SYSTEM</div>INTERPRETATION FAILED.`, 'error', true);
             } finally {
                 resetSystemState();
             }
