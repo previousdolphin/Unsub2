@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Diet Coke: Oracle System</title>
+    <!-- Dependencies for PDF and Image Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -64,7 +68,7 @@
 
         .layout-wrapper {
             position: relative; z-index: 10; display: flex; flex-direction: column; 
-            height: 100dvh; /* Dynamic viewport height fixes iOS keyboard overlap */
+            height: 100dvh; 
         }
 
         .logo-section {
@@ -171,12 +175,18 @@
             border-left: 4px solid var(--coca-red);
         }
         .dark-mode .inline-hex-container { background: rgba(255, 255, 255, 0.05); }
-        .inline-hex-lines { display: flex; flex-direction: column-reverse; gap: 4px; }
+        .inline-hex-lines { 
+            display: flex; 
+            flex-direction: column-reverse; 
+            gap: 4px; 
+            flex-shrink: 0; /* Prevents squishing */
+            min-width: 40px; /* Explicit width to fix glitch */
+        }
         .inline-line { width: 40px; height: 6px; background-color: var(--text-main); border-radius: 1px; }
         .inline-line.yin { background-color: transparent; border-left: 16px solid var(--text-main); border-right: 16px solid var(--text-main); }
         .inline-line.changing { background-color: var(--coca-red); border-color: var(--coca-red); }
-        .inline-hex-info { display: flex; flex-direction: column; gap: 5px; }
-        .inline-hex-title { font-size: 1.1rem; font-weight: 900; color: var(--coca-red); letter-spacing: 2px; margin: 0; }
+        .inline-hex-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+        .inline-hex-title { font-size: 1.1rem; font-weight: 900; color: var(--coca-red); letter-spacing: 2px; margin: 0; line-height: 1.2; }
         .inline-hex-path { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; text-transform: uppercase; }
         .inline-hex-path span { color: var(--text-main); font-weight: 700; }
 
@@ -215,8 +225,8 @@
         .wilhelm-accordion[open] .wilhelm-summary::after { content: '−'; }
         .wilhelm-content {
             padding: 0 15px 15px 15px;
-            font-family: 'Playfair Display', serif;
-            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif; /* Fixed font family */
+            font-size: 0.90rem;
             color: var(--text-main);
             line-height: 1.6;
             border-top: 1px dashed rgba(150, 150, 150, 0.3);
@@ -228,7 +238,6 @@
         .wilhelm-section strong {
             display: block;
             color: var(--coca-red);
-            font-family: 'Montserrat', sans-serif;
             font-size: 0.7rem;
             letter-spacing: 2px;
             margin-bottom: 4px;
@@ -252,7 +261,7 @@
             border: none; 
             color: var(--text-main); 
             font-family: 'Montserrat', sans-serif; 
-            font-size: 16px !important; /* 16px explicitly stops iOS auto-zoom */
+            font-size: 16px !important; 
             outline: none; 
             min-width: 0; 
             padding: 5px 0;
@@ -261,6 +270,19 @@
         .btn { background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 5px; flex-shrink: 0; transition: color 0.3s ease; display: flex; align-items: center; justify-content: center; }
         .btn:hover:not(:disabled) { color: var(--coca-red); transform: scale(1.05); }
         .btn:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
+
+        /* Completion Action Buttons */
+        .completion-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .completion-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
 
         #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px; height: 100%;}
         .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start; }
@@ -280,27 +302,65 @@
             transition: all 0.2s ease; letter-spacing: 1px; border-radius: 8px; font-size: 0.9rem;
         }
         .cast-btn:hover { background: var(--text-main); color: var(--bg-color); }
+        .cast-btn.export-btn { border-color: var(--coca-red); color: var(--coca-red); font-size: 0.8rem;}
+        .cast-btn.export-btn:hover { background: var(--coca-red); color: white; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* MOBILE OVERRIDES FOR A NATIVE CHAT APP FEEL */
         @media (max-width: 768px) {
-            .logo-section { 
-                padding-top: 15px; padding-bottom: 5px;
-            }
+            .logo-section { padding-top: 15px; padding-bottom: 5px; }
             .logo-top { font-size: 2.2rem; }
             .logo-diet { font-size: 0.9rem; margin-bottom: 22px; margin-left: -22px; }
             .oracle-text { font-size: 1.2rem; letter-spacing: 2px; line-height: 1; }
             .sub-text { font-size: 0.6rem; margin-top: 4px; }
-            
             .container-box { padding: 5px 10px; }
             .message { max-width: 90%; padding: 12px 15px; font-size: 0.9rem; }
-            
             .cast-question { font-size: 0.95rem; min-height: 50px; }
             .cast-btn { font-size: 0.75rem; padding: 10px;}
             .revelation-num { font-size: 2.5rem; }
             .revelation-name { font-size: 1.1rem; }
             .inline-hex-container { padding: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
+        }
+
+        /* HIDDEN DOM FOR EXPORT RENDER */
+        #exportWrapper {
+            position: absolute; left: -9999px; top: -9999px; width: 800px;
+            background: white; color: black; font-family: 'Montserrat', sans-serif;
+            z-index: -1;
+        }
+        .export-page {
+            width: 800px; min-height: 1131px; padding: 60px; box-sizing: border-box; 
+            background: white; position: relative;
+        }
+        .export-brand {
+            text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px;
+        }
+        .export-logo-top {
+            font-family: 'Playfair Display', serif; font-size: 4rem; color: #f40009; font-weight: 700; line-height: 0.8; margin-bottom: 5px;
+        }
+        .export-logo-diet {
+            font-size: 1.5rem; font-style: italic; color: #1a1a1a;
+        }
+        .export-title {
+            font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px;
+        }
+        .export-sub {
+            font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase;
+        }
+        .export-heading {
+            font-size: 1.2rem; color: #f40009; letter-spacing: 2px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; font-weight: 900;
+        }
+        .export-chat-row {
+            margin-bottom: 15px; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6;
+        }
+        .export-chat-user {
+            background: #f5f5f5; border-left: 4px solid #333;
+        }
+        .export-chat-oracle {
+            background: rgba(244,0,9,0.05); border-left: 4px solid #f40009;
+        }
+        .export-label {
+            font-weight: 800; font-size: 12px; letter-spacing: 1px; margin-bottom: 5px; display: block;
         }
     </style>
 </head>
@@ -331,7 +391,7 @@
                         STATE YOUR INQUIRY. THE ORACLE AWAITS.
                     </div>
                 </div>
-                <div class="input-wrapper">
+                <div class="input-wrapper" id="inputWrapper">
                     <input type="text" class="chat-input" id="chatInput" placeholder="Processing..." autocomplete="off">
                     <button class="btn" id="sendBtn" title="Send">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -350,6 +410,29 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- HIDDEN EXPORT DOM -->
+    <div id="exportWrapper">
+        <div class="export-page" id="exportPage1">
+            <div class="export-brand">
+                <div class="export-logo-top">Coke <span class="export-logo-diet">Diet</span></div>
+                <div class="export-title">ORACLE SYSTEM</div>
+                <div class="export-sub">神諭系統 • ai guide • llm</div>
+            </div>
+            <div class="export-heading">MODE 1: THE REFINERY</div>
+            <div id="exportChatLog"></div>
+        </div>
+        <div class="export-page" id="exportPage2">
+            <div class="export-heading">MODE 2: THE CASTING & REVELATION</div>
+            <div id="exportHexagram" style="margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px;"></div>
+            
+            <div class="export-heading" style="margin-top: 40px;">WILHELM ARCHIVE</div>
+            <div id="exportWilhelm" style="font-size: 14px; line-height: 1.6; margin-bottom: 40px; padding: 20px; background: #f9f9f9; border-left: 4px solid #f40009; border-radius: 0 8px 8px 0;"></div>
+            
+            <div class="export-heading">MODE 3: THE INTERPRETATION</div>
+            <div id="exportRuling" style="font-size: 16px; font-weight: 600; color: #f40009; padding: 20px; border: 2px solid #f40009; border-radius: 8px; line-height: 1.6;"></div>
         </div>
     </div>
 
@@ -428,7 +511,6 @@
             MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence."
         };
 
-        // --- WILHELM ARCHIVE DATA ---
         const WILHELM_DATA = {
             1: { judgement: "The Creative works sublime success, Furthering through perseverance.", image: "The movement of heaven is full of power. Thus the superior man makes himself strong and untiring." },
             2: { judgement: "The Receptive brings about sublime success, Furthering through the perseverance of a mare. If the superior man undertakes something and tries to lead, He goes astray; But if he follows, he finds guidance.", image: "The earth's condition is receptive devotion. Thus the superior man who has breadth of character Carries the outer world." },
@@ -502,12 +584,14 @@
         let castResults = []; 
         let userPath = []; 
         let conversationHistory = []; 
+        let finalOracleRuling = "";
 
         const chatContainer = document.getElementById('chatContainer');
         const castContainer = document.getElementById('castContainer');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const chatHistory = document.getElementById('chatHistory');
+        const inputWrapper = document.getElementById('inputWrapper');
 
         function appendMessage(content, type, isHTML = false) {
             const msgDiv = document.createElement('div');
@@ -576,7 +660,6 @@
                 throw new Error(errJson.message || "Network Error");
             }
             const data = await response.json();
-            
             return data.choices[0].message.content.trim();
         }
 
@@ -602,7 +685,6 @@
 
             try {
                 let reply = await fetchOracleResponse(apiMessages, 150, 1);
-                
                 if (!reply) throw new Error("Empty response generated.");
 
                 const userTurns = conversationHistory.filter(m => m.role === 'user').length;
@@ -732,6 +814,7 @@
             
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
+            inputWrapper.style.display = 'none'; // Hide input permanently for the end of the run
             
             const wilhelmData = WILHELM_DATA[details.hexNum];
             
@@ -751,7 +834,7 @@
                         <div class="inline-hex-path"><span>PATH:</span> ${userPath.join(' &rarr; ')}</div>
                     </div>
                 </div>
-                <details class="wilhelm-accordion" ontoggle="setTimeout(() => document.getElementById('chatHistory').scrollTop = document.getElementById('chatHistory').scrollHeight, 10)">
+                <details class="wilhelm-accordion">
                     <summary class="wilhelm-summary">ACCESS WILHELM ARCHIVE</summary>
                     <div class="wilhelm-content">
                         <div class="wilhelm-section"><strong>THE JUDGEMENT</strong>${wilhelmData.judgement}</div>
@@ -767,15 +850,109 @@
             const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + "\n\n" + mode3Payload } ];
 
             try {
-                const finalRuling = await fetchOracleResponse(apiMessages, 800, 3);
-                appendMessage(finalRuling, 'assistant');
-                appendMessage(`<div class="system-header">PROTOCOL COMPLETE</div>AWAITING NEW INQUIRY.`, 'system', true);
+                finalOracleRuling = await fetchOracleResponse(apiMessages, 800, 3);
+                appendMessage(finalOracleRuling, 'assistant');
+                
+                // End of Conversation UX + Export Options
+                const completionUI = `
+                    <div class="system-header" style="margin-top: 10px;">PROTOCOL COMPLETE</div>
+                    <div class="completion-actions">
+                        <button class="cast-btn" style="width: 100%;" onclick="location.reload()">START NEW CONSULTATION</button>
+                        <div class="completion-row">
+                            <button class="cast-btn export-btn" onclick="exportConsultation('pdf', this)">EXPORT PDF</button>
+                            <button class="cast-btn export-btn" onclick="exportConsultation('image', this)">EXPORT IMAGE</button>
+                        </div>
+                    </div>
+                `;
+                appendMessage(completionUI, 'system', true);
+
             } catch (error) {
                 console.error(error);
                 appendMessage(`<div class="system-header">ERR: SYSTEM</div>INTERPRETATION FAILED.`, 'error', true);
             } finally {
-                resetSystemState();
+                isProcessing = false;
             }
+        }
+
+        async function exportConsultation(type, btnElement) {
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "GENERATING...";
+
+            try {
+                // 1. Build the hidden DOM for export
+                const exportChatLog = document.getElementById('exportChatLog');
+                exportChatLog.innerHTML = conversationHistory.map(m => `
+                    <div class="export-chat-row ${m.role === 'user' ? 'export-chat-user' : 'export-chat-oracle'}">
+                        <span class="export-label">${m.role}</span>
+                        ${m.content}
+                    </div>
+                `).join('');
+
+                const details = getHexagramDetails();
+                const wilhelmData = WILHELM_DATA[details.hexNum];
+                
+                let expLinesHTML = '';
+                castResults.forEach(val => {
+                    let isYin = [6,8].includes(val);
+                    let color = [6,9].includes(val) ? '#f40009' : '#1a1a1a';
+                    if (isYin) {
+                        expLinesHTML = `<div style="display: flex; gap: 8px; margin-bottom: 6px;"><div style="height: 10px; width: 35px; background: ${color};"></div><div style="height: 10px; width: 35px; background: ${color};"></div></div>` + expLinesHTML;
+                    } else {
+                        expLinesHTML = `<div style="height: 10px; width: 78px; background: ${color}; margin-bottom: 6px;"></div>` + expLinesHTML;
+                    }
+                });
+
+                document.getElementById('exportHexagram').innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 30px;">
+                        <div>${expLinesHTML}</div>
+                        <div>
+                            <h2 style="margin: 0; color: #f40009; font-size: 24px;">${details.hexNum} - ${details.hexName.toUpperCase()}</h2>
+                            <p style="margin: 8px 0 0 0; color: #555; font-size: 12px; text-transform: uppercase;"><strong>Path:</strong> ${userPath.join(' &rarr; ')}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('exportWilhelm').innerHTML = `
+                    <p style="margin-top:0;"><strong>THE JUDGEMENT:</strong><br/>${wilhelmData.judgement}</p>
+                    <p style="margin-bottom:0;"><strong>THE IMAGE:</strong><br/>${wilhelmData.image}</p>
+                `;
+
+                document.getElementById('exportRuling').innerText = finalOracleRuling;
+
+                // 2. Render & Download
+                const wrapper = document.getElementById('exportWrapper');
+                wrapper.style.display = 'block';
+
+                if (type === 'pdf') {
+                    const page1 = await html2canvas(document.getElementById('exportPage1'), { scale: 2, useCORS: true });
+                    const page2 = await html2canvas(document.getElementById('exportPage2'), { scale: 2, useCORS: true });
+                    
+                    const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    
+                    pdf.addImage(page1.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, (page1.height * pdfWidth) / page1.width);
+                    pdf.addPage();
+                    pdf.addImage(page2.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, (page2.height * pdfWidth) / page2.width);
+                    
+                    pdf.save('Oracle_Consultation.pdf');
+                } else if (type === 'image') {
+                    // For image, temporarily stack the pages cleanly
+                    document.getElementById('exportPage2').style.pageBreakBefore = 'auto';
+                    const fullDoc = await html2canvas(wrapper, { scale: 2, useCORS: true });
+                    const link = document.createElement('a');
+                    link.download = 'Oracle_Consultation.png';
+                    link.href = fullDoc.toDataURL('image/png');
+                    link.click();
+                    document.getElementById('exportPage2').style.pageBreakBefore = 'always';
+                }
+
+                wrapper.style.display = 'none';
+            } catch (err) {
+                console.error("Export Error:", err);
+                alert("Failed to generate export.");
+            }
+
+            btnElement.innerText = originalText;
         }
 
         initCanvas(); animate();
