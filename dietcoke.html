@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -275,22 +274,8 @@
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
         const PROMPTS = {
-            MODE_1: `You are DIET COKE, a clinical, highly analytical systems architect. Enforce MODE 1: THE REFINERY.
-RULES:
-1. Never insult, dismiss, or belittle the user. Your tone must be strictly professional, neutral, and helpful.
-2. Do not give direct advice. Instead, ask ONE sharp, guiding Socratic question to help the user clarify the structural root of their issue.
-3. Use precise, architectural, and corporate terminology (e.g., nodes, variables, structures, leverage).
-4. Maximum 20 words. Cut straight to the point. No filler or greetings.
-5. If the user's inquiry is highly specific, objective, and clear, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
-CURRENT INQUIRY: `,
-            MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
-STRUCTURE:
-1. HEXAGRAM IDENTIFICATION (Number/Name)
-2. PRIMARY TEXT (Architecture of the situation, 3-5 sentences)
-3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
-4. THE TRANSFORMED HEXAGRAM (Trajectory)
-5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
-Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max 20 words per sentence.\n\n`
+            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
+            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence."
         };
 
         let currentMode = 1;
@@ -317,8 +302,8 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
             isProcessing = isLoading;
             chatInput.disabled = isLoading;
             sendBtn.disabled = isLoading;
-            chatInput.placeholder = isLoading ? "Architecture processing..." : "Enter parameters...";
-            if (!isLoading) chatInput.focus();
+            chatInput.placeholder = isLoading ? "Processing..." : "Enter parameters...";
+            if (!isLoading && currentMode === 1) chatInput.focus();
         }
 
         function resetSystemState() {
@@ -327,42 +312,9 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
             refinedQuestion = "";
             currentMode = 1;
             isProcessing = false;
-            // Restore UI for the next potential cast
             document.getElementById('castOptions').style.display = 'flex';
-        }
-
-        function cleanGemmaOutput(text) {
-            let clean = text.replace(/reframe:/gi, "").trim();
-            clean = clean.replace(/oracle response:/gi, "").trim();
-            clean = clean.replace(/assistant:/gi, "").trim();
-            clean = clean.replace(/##/g, "").trim();
-            clean = clean.replace(/^"|"$/g, '').trim(); 
-            clean = clean.replace(/\*+/g, '').trim();
-            
-            const artifacts = [
-                /^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^Pilgrim/i, 
-                /^Sure, here is your/i, /^Buttercup/i, /^Hey kid/i, /^Listen/i,
-                /^Look,/i, /^Alright,/i
-            ];
-            artifacts.forEach(regex => { clean = clean.replace(regex, "").trim(); });
-            
-            if (clean.includes('\n') && currentMode === 1) {
-                clean = clean.split('\n')[0].trim(); 
-            }
-            return clean;
-        }
-
-        function validateAlternation(history) {
-            if (history.length === 0) return [];
-            let fixed = [];
-            let filtered = history.filter(m => m.content && m.content.trim().length > 0);
-            if (filtered.length > 0 && filtered[0].role !== 'user') filtered.shift();
-            for (let i = 0; i < filtered.length; i++) {
-                if (i === 0 || filtered[i].role !== filtered[i - 1].role) {
-                    fixed.push(filtered[i]);
-                }
-            }
-            return fixed;
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
         }
 
         async function fetchOracleResponse(apiMessages, maxTokens) {
@@ -370,10 +322,10 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
                 model: "google/gemma-7b-it", 
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.2 : 0.4, 
-                frequency_penalty: 0.6, 
+                temperature: 0.2, 
+                frequency_penalty: 0.2, 
                 presence_penalty: 0.2,
-                stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed", "##"] 
+                stop: ["<end_of_turn>", "<eos>"] 
             };
 
             const response = await fetch(BACKEND_API_URL, {
@@ -387,55 +339,64 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
                 throw new Error(errJson.message || "Network Error");
             }
             const data = await response.json();
-            return cleanGemmaOutput(data.choices[0].message.content || "");
+            return data.choices[0].message.content.trim();
         }
 
         async function handleSend() {
             const text = chatInput.value.trim();
-            if (!text || currentMode !== 1 || isProcessing) return;
+            // Block execution if empty, if API is thinking, or if we've successfully moved to Mode 2/3
+            if (!text || isProcessing || currentMode !== 1) return;
 
             appendMessage(text, 'user');
             chatInput.value = '';
             setLoadingState(true);
 
             conversationHistory.push({ role: "user", content: text });
-            if (conversationHistory.length > 6) conversationHistory = conversationHistory.slice(-6);
+            
+            // Rolling window: keep last 6 messages
+            if (conversationHistory.length > 6) {
+                conversationHistory = conversationHistory.slice(-6);
+            }
+            
+            // Ensure first message in the window is always a 'user' role
+            if (conversationHistory.length > 0 && conversationHistory[0].role !== 'user') {
+                conversationHistory.shift();
+            }
 
-            let activeHistory = validateAlternation([...conversationHistory]);
-            const apiMessages = activeHistory.map((msg, index) => {
-                if (index === 0) return { role: 'user', content: PROMPTS.MODE_1 + msg.content };
+            // Construct payload mapping
+            const apiMessages = conversationHistory.map((msg, index) => {
+                if (index === 0) {
+                    return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
+                }
                 return msg;
             });
 
             try {
-                let reply = await fetchOracleResponse(apiMessages, 100);
+                let reply = await fetchOracleResponse(apiMessages, 150);
                 
-                if (!reply) throw new Error("Empty response generated.");
-
-                const userTurns = conversationHistory.filter(m => m.role === 'user').length;
-                if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
-                    reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
-                }
-
-                const isValidated = reply.includes("STATUS: VALIDATED") || 
-                                  reply.includes("Proceed to Mode 2");
-
-                if (isValidated) {
+                // Immediately push to history
+                conversationHistory.push({ role: "assistant", content: reply });
+                
+                // Lock mode change logic
+                if (reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2 Casting")) {
+                    currentMode = 2; // Lock Mode immediately
                     refinedQuestion = text; 
-                    chatInput.disabled = true;
-                    appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
+                    
+                    // Force the raw output to screen before transition
+                    appendMessage(reply, 'assistant');
+                    
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
-                    conversationHistory.push({ role: "assistant", content: reply });
                     appendMessage(reply, 'assistant');
                     setLoadingState(false);
                 }
             } catch (error) {
                 console.error("API Error:", error);
+                // Rollback user turn on network failure so they can try again
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
-                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. PLEASE REPHRASE.", 'error');
+                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
                 setLoadingState(false);
             }
         }
@@ -452,14 +413,6 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
             ["Is the asset public or private?", "PUBLIC", "PRIVATE"]
         ];
 
-        const HEXAGRAM_MAP = {
-            "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
-        };
-
-        const HEXAGRAM_NAMES = {
-            1: "The Creative", 2: "The Receptive", 3: "Difficulty at the Beginning", 4: "Youthful Folly", 5: "Waiting", 6: "Conflict", 7: "The Army", 8: "Holding Together", 9: "Small Taming", 10: "Treading", 11: "Peace", 12: "Standstill", 13: "Fellowship with Men", 14: "Possession in Great Measure", 15: "Modesty", 16: "Enthusiasm", 17: "Following", 18: "Work on What Has Been Spoiled", 19: "Approach", 20: "Contemplation", 21: "Biting Through", 22: "Grace", 23: "Stripping Away", 24: "Return", 25: "Innocence", 26: "Great Taming", 27: "Nourishment", 28: "Preponderance of the Great", 29: "The Abysmal", 30: "The Clinging", 31: "Influence", 32: "Duration", 33: "Retreat", 34: "Great Power", 35: "Progress", 36: "Darkening of the Light", 37: "The Family", 38: "Opposition", 39: "Obstruction", 40: "Deliverance", 41: "Decrease", 42: "Increase", 43: "Breakthrough", 44: "Coming to Meet", 45: "Gathering Together", 46: "Pushing Upward", 47: "Oppression", 48: "The Well", 49: "Revolution", 50: "The Cauldron", 51: "The Arousing", 52: "Keeping Still", 53: "Development", 54: "The Marrying Maiden", 55: "Abundance", 56: "The Wanderer", 57: "The Gentle", 58: "The Joyous", 59: "Dispersion", 60: "Limitation", 61: "Inner Truth", 62: "Preponderance of the Small", 63: "After Completion", 64: "Before Completion"
-        };
-
         function triggerMode2Casting() {
             currentMode = 2;
             isProcessing = false;
@@ -467,9 +420,45 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
             castContainer.style.display = 'flex';
             castResults = [];
             document.getElementById('hexagramVisual').innerHTML = '';
-            document.getElementById('castOptions').style.display = 'flex'; // Ensure buttons are visible
+            document.getElementById('castOptions').style.display = 'flex';
             updateCastUI();
         }
+
+        function updateCastUI() {
+            const step = castResults.length;
+            if (step >= 6) {
+                revealHexagram();
+                return;
+            }
+            document.getElementById('castProgress').textContent = `LINE ${step + 1} / 6`;
+            document.getElementById('castQuestionText').textContent = CAST_QUESTIONS[step][0];
+            const btns = document.querySelectorAll('.cast-btn');
+            btns[0].textContent = CAST_QUESTIONS[step][1];
+            btns[1].textContent = CAST_QUESTIONS[step][2];
+        }
+
+        function castLine() {
+            if (isProcessing || currentMode !== 2) return;
+            const rand = Math.random() * 16;
+            let lineValue = 9; 
+            if (rand < 1) lineValue = 6; 
+            else if (rand < 4) lineValue = 7; 
+            else if (rand < 9) lineValue = 8; 
+
+            castResults.push(lineValue);
+            const lineDiv = document.createElement('div');
+            lineDiv.className = `hex-line ${[6,8].includes(lineValue) ? 'yin' : 'yang'} ${[6,9].includes(lineValue) ? 'changing' : ''}`;
+            document.getElementById('hexagramVisual').appendChild(lineDiv);
+            updateCastUI();
+        }
+
+        const HEXAGRAM_MAP = {
+            "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
+        };
+
+        const HEXAGRAM_NAMES = {
+            1: "The Creative", 2: "The Receptive", 3: "Difficulty at the Beginning", 4: "Youthful Folly", 5: "Waiting", 6: "Conflict", 7: "The Army", 8: "Holding Together", 9: "Small Taming", 10: "Treading", 11: "Peace", 12: "Standstill", 13: "Fellowship with Men", 14: "Possession in Great Measure", 15: "Modesty", 16: "Enthusiasm", 17: "Following", 18: "Work on What Has Been Spoiled", 19: "Approach", 20: "Contemplation", 21: "Biting Through", 22: "Grace", 23: "Stripping Away", 24: "Return", 25: "Innocence", 26: "Great Taming", 27: "Nourishment", 28: "Preponderance of the Great", 29: "The Abysmal", 30: "The Clinging", 31: "Influence", 32: "Duration", 33: "Retreat", 34: "Great Power", 35: "Progress", 36: "Darkening of the Light", 37: "The Family", 38: "Opposition", 39: "Obstruction", 40: "Deliverance", 41: "Decrease", 42: "Increase", 43: "Breakthrough", 44: "Coming to Meet", 45: "Gathering Together", 46: "Pushing Upward", 47: "Oppression", 48: "The Well", 49: "Revolution", 50: "The Cauldron", 51: "The Arousing", 52: "Keeping Still", 53: "Development", 54: "The Marrying Maiden", 55: "Abundance", 56: "The Wanderer", 57: "The Gentle", 58: "The Joyous", 59: "Dispersion", 60: "Limitation", 61: "Inner Truth", 62: "Preponderance of the Small", 63: "After Completion", 64: "Before Completion"
+        };
 
         function getHexagramDetails() {
             let binaryString = "";
@@ -485,11 +474,11 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
         }
 
         function revealHexagram() {
+            isProcessing = true; // Lock UI during reveal
             const details = getHexagramDetails();
             
-            // The Interstitial Revelation UI Update
             document.getElementById('castProgress').textContent = `GEOMETRY LOCKED`;
-            document.getElementById('castOptions').style.display = 'none'; // Hide buttons
+            document.getElementById('castOptions').style.display = 'none'; 
             
             document.getElementById('castQuestionText').innerHTML = `
                 <div class="revelation-text">
@@ -499,43 +488,14 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
                 </div>
             `;
 
-            // Pause for 3.5 seconds to let the user absorb the weight of the cast before interpreting
+            // Pause to let the user absorb the hexagram before interpreting
             setTimeout(() => {
                 triggerMode3Interpretation(details);
             }, 3500);
         }
 
-        function updateCastUI() {
-            const step = castResults.length;
-            if (step >= 6) {
-                revealHexagram();
-                return;
-            }
-            document.getElementById('castProgress').textContent = `LINE ${step + 1} / 6`;
-            document.getElementById('castQuestionText').innerHTML = CAST_QUESTIONS[step][0]; // reset in case it was a reveal
-            const btns = document.querySelectorAll('.cast-btn');
-            btns[0].textContent = CAST_QUESTIONS[step][1];
-            btns[1].textContent = CAST_QUESTIONS[step][2];
-        }
-
-        function castLine() {
-            if (isProcessing) return;
-            const rand = Math.random() * 16;
-            let lineValue = 9; 
-            if (rand < 1) lineValue = 6; 
-            else if (rand < 4) lineValue = 7; 
-            else if (rand < 9) lineValue = 8; 
-
-            castResults.push(lineValue);
-            const lineDiv = document.createElement('div');
-            lineDiv.className = `hex-line ${[6,8].includes(lineValue) ? 'yin' : 'yang'} ${[6,9].includes(lineValue) ? 'changing' : ''}`;
-            document.getElementById('hexagramVisual').appendChild(lineDiv);
-            updateCastUI();
-        }
-
         async function triggerMode3Interpretation(details) {
             currentMode = 3;
-            setLoadingState(true);
             
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
@@ -543,18 +503,17 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
             appendMessage(`MODE 2 COMPLETE. ASSIGNED NODE: ${details.hexNum} - ${details.hexName.toUpperCase()}.\nANALYZING ARCHITECTURE...`, 'system');
 
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${details.hexNum} (${details.hexName}). CHANGING LINES: ${details.linesText}.]`;
-            const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + mode3Payload } ];
+            const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + "\n\n" + mode3Payload } ];
 
             try {
                 const finalRuling = await fetchOracleResponse(apiMessages, 600);
                 appendMessage(finalRuling, 'assistant');
-                appendMessage("PROTOCOL COMPLETE. SESSION CONCLUDED. AWAITING NEW INQUIRY.", 'system');
+                appendMessage("PROTOCOL COMPLETE. AWAITING NEW INQUIRY.", 'system');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
             } finally {
                 resetSystemState();
-                setLoadingState(false);
             }
         }
 
@@ -562,5 +521,3 @@ Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max
     </script>
 </body>
 </html>
-
-
