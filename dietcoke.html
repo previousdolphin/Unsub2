@@ -13,10 +13,12 @@
             --chat-gradient: linear-gradient(to top, rgba(226,226,226,1) 0%, rgba(226,226,226,0.8) 60%, rgba(226,226,226,0) 100%);
             --msg-user-bg: rgba(0, 0, 0, 0.05);
             --msg-user-border: #1a1a1a;
-            --input-bg: rgba(255, 255, 255, 0.9);
-            --input-border: #ccc;
+            --input-bg: #ffffff;
+            --input-border: transparent;
             --toggle-color: #1a1a1a;
             --coca-red: #f40009;
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.05);
+            --shadow-md: 0 8px 30px rgba(0,0,0,0.08);
         }
 
         body.dark-mode {
@@ -26,9 +28,11 @@
             --chat-gradient: linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.8) 60%, rgba(10,10,10,0) 100%);
             --msg-user-bg: rgba(255, 255, 255, 0.1);
             --msg-user-border: #e2e2e2;
-            --input-bg: rgba(20, 20, 20, 0.9);
-            --input-border: #333;
+            --input-bg: #1a1a1a;
+            --input-border: transparent;
             --toggle-color: #e2e2e2;
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 30px rgba(0,0,0,0.4);
         }
 
         body, html {
@@ -89,83 +93,145 @@
             flex-grow: 1; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; padding-right: 10px;
         }
         .chat-history::-webkit-scrollbar { width: 4px; }
-        .chat-history::-webkit-scrollbar-thumb { background: var(--coca-red); }
+        .chat-history::-webkit-scrollbar-thumb { background: var(--coca-red); border-radius: 4px; }
 
-        .message { max-width: 85%; padding: 12px 18px; font-size: 0.95rem; line-height: 1.5; letter-spacing: 0.5px; word-wrap: break-word; white-space: pre-wrap; }
-        .message.user { align-self: flex-end; background-color: var(--msg-user-bg); border-right: 3px solid var(--msg-user-border); }
-        .message.assistant { align-self: flex-start; background-color: rgba(244, 0, 9, 0.1); color: var(--coca-red); border-left: 3px solid var(--coca-red); font-weight: 600; }
-        .message.error { align-self: flex-start; background-color: rgba(255, 165, 0, 0.1); color: #ffa500; border-left: 3px solid #ffa500; font-family: monospace; font-size: 0.85rem; }
-        .message.system { align-self: center; background-color: transparent; color: var(--text-muted); font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; text-align: center;}
+        .message { 
+            max-width: 85%; 
+            padding: 14px 20px; 
+            font-size: 0.95rem; 
+            line-height: 1.6; 
+            letter-spacing: 0.3px; 
+            word-wrap: break-word; 
+            white-space: pre-wrap;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+        .message.user { 
+            align-self: flex-end; 
+            background-color: var(--msg-user-bg); 
+            border-right: 4px solid var(--msg-user-border);
+            border-bottom-right-radius: 2px;
+        }
+        .message.assistant { 
+            align-self: flex-start; 
+            background-color: rgba(244, 0, 9, 0.08); 
+            color: var(--coca-red); 
+            border-left: 4px solid var(--coca-red); 
+            font-weight: 600; 
+            border-bottom-left-radius: 2px;
+            backdrop-filter: blur(5px);
+        }
+        .message.error { 
+            align-self: flex-start; 
+            background-color: rgba(255, 165, 0, 0.1); 
+            color: #ffa500; 
+            border-left: 4px solid #ffa500; 
+            font-family: monospace; 
+            font-size: 0.85rem; 
+            border-bottom-left-radius: 2px;
+        }
+        .message.system { 
+            align-self: center; 
+            background-color: transparent; 
+            color: var(--text-muted); 
+            font-size: 0.8rem; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            font-weight: 700; 
+            text-align: center;
+            box-shadow: none;
+            padding: 10px;
+        }
 
-        /* WILHELM TOOLTIP CSS */
-        .wilhelm-tooltip {
-            position: relative;
-            display: inline-block;
-            color: var(--coca-red);
-            cursor: help;
-            border-bottom: 1px dotted var(--coca-red);
-            margin: 10px 0;
-            padding: 5px 10px;
+        /* MODERN INLINE ACCORDION (Replaces Tooltip) */
+        .wilhelm-accordion {
+            margin: 15px 0;
             background: rgba(244, 0, 9, 0.05);
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .wilhelm-tooltip:hover {
-            background: rgba(244, 0, 9, 0.15);
-        }
-        .wilhelm-tooltip .wilhelm-tooltip-text {
-            visibility: hidden;
-            width: 320px;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            border: 1px solid rgba(244, 0, 9, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
             text-align: left;
-            border: 2px solid var(--coca-red);
-            padding: 15px;
-            position: absolute;
-            z-index: 100;
-            bottom: 150%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
+        }
+        .wilhelm-accordion[open] {
+            background: rgba(244, 0, 9, 0.08);
+            box-shadow: var(--shadow-sm);
+        }
+        .wilhelm-summary {
+            padding: 12px 15px;
+            cursor: pointer;
+            color: var(--coca-red);
+            font-weight: 700;
             font-size: 0.85rem;
-            font-family: 'Playfair Display', serif;
-            line-height: 1.5;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            list-style: none; /* remove default arrow */
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .wilhelm-summary::-webkit-details-marker {
+            display: none;
+        }
+        .wilhelm-summary::after {
+            content: '+';
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        .wilhelm-accordion[open] .wilhelm-summary::after {
+            content: '−';
+            transform: rotate(180deg);
+        }
+        .wilhelm-content {
+            padding: 0 15px 15px 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.6;
+            border-top: 1px solid rgba(244, 0, 9, 0.1);
+            margin-top: 5px;
+            padding-top: 15px;
             text-transform: none;
             letter-spacing: normal;
         }
-        .wilhelm-tooltip .wilhelm-tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -8px;
-            border-width: 8px;
-            border-style: solid;
-            border-color: var(--coca-red) transparent transparent transparent;
+        .wilhelm-section {
+            margin-bottom: 12px;
         }
-        .wilhelm-tooltip:hover .wilhelm-tooltip-text {
-            visibility: visible;
-            opacity: 1;
+        .wilhelm-section:last-child {
+            margin-bottom: 0;
+        }
+        .wilhelm-section strong {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
         }
 
         .input-wrapper {
-            display: flex; gap: 10px; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border);
-            padding: 10px 15px; margin-bottom: env(safe-area-inset-bottom, 10px); 
+            display: flex; gap: 10px; align-items: center; 
+            background: var(--input-bg); 
+            border: 1px solid var(--input-border);
+            padding: 12px 20px; 
+            margin-bottom: env(safe-area-inset-bottom, 10px); 
+            border-radius: 30px;
+            box-shadow: var(--shadow-md);
         }
         .chat-input { flex-grow: 1; background: transparent; border: none; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 1rem; outline: none; min-width: 0; }
-        .chat-input::placeholder { color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; }
-        .btn { background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 5px; flex-shrink: 0; transition: color 0.3s ease; }
-        .btn:hover:not(:disabled) { color: var(--coca-red); }
-        .btn:disabled { cursor: not-allowed; opacity: 0.5; }
+        .chat-input::placeholder { color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600;}
+        .btn { background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 5px; flex-shrink: 0; transition: color 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .btn:hover:not(:disabled) { color: var(--coca-red); transform: scale(1.05); }
+        .btn:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
 
         #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 30px;}
         .hexagram-visual {
             display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start;
         }
         .hex-line {
-            width: 100px; height: 16px; background-color: var(--text-main); transition: all 0.3s ease; opacity: 0; animation: fadeIn 0.5s forwards;
+            width: 100px; height: 16px; background-color: var(--text-main); transition: all 0.3s ease; opacity: 0; animation: fadeIn 0.5s forwards; border-radius: 2px;
         }
         .hex-line.yin { background-color: transparent; border-left: 40px solid var(--text-main); border-right: 40px solid var(--text-main); width: 20px;}
         .hex-line.changing { background-color: var(--coca-red); border-color: var(--coca-red);}
@@ -183,7 +249,7 @@
         .cast-btn {
             flex: 1; padding: 15px; background: transparent; border: 2px solid var(--text-main); color: var(--text-main);
             font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; cursor: pointer;
-            transition: all 0.2s ease; letter-spacing: 1px;
+            transition: all 0.2s ease; letter-spacing: 1px; border-radius: 8px;
         }
         .cast-btn:hover { background: var(--text-main); color: var(--bg-color); }
 
@@ -199,7 +265,7 @@
             .cast-btn { font-size: 0.8rem; padding: 10px;}
             .revelation-num { font-size: 2.8rem; }
             .revelation-name { font-size: 1.1rem; }
-            .wilhelm-tooltip .wilhelm-tooltip-text { width: 260px; }
+            .message { max-width: 90%; }
         }
     </style>
 </head>
@@ -228,9 +294,9 @@
                     <div class="message assistant">MODE 1: THE REFINERY.<br>STATE YOUR INQUIRY. THE ORACLE AWAITS.</div>
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters..." autocomplete="off">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Processing..." autocomplete="off">
                     <button class="btn" id="sendBtn" title="Send">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     </button>
                 </div>
             </div>
@@ -626,19 +692,20 @@
             
             const wilhelmData = WILHELM_DATA[details.hexNum];
             
-            // Build the system message with the embedded hover tooltip
+            // Build the system message with an embedded, modern accordion instead of a tooltip
             const systemMsgHTML = `
                 MODE 2 COMPLETE. ASSIGNED NODE: ${details.hexNum} - ${details.hexName.toUpperCase()}.<br>
-                <span class="wilhelm-tooltip">[VIEW WILHELM ARCHIVE]
-                    <span class="wilhelm-tooltip-text">
-                        <strong>THE JUDGEMENT:</strong><br>${wilhelmData.judgement}<br><br>
-                        <strong>THE IMAGE:</strong><br>${wilhelmData.image}
-                    </span>
-                </span><br>
+                <details class="wilhelm-accordion" ontoggle="setTimeout(() => document.getElementById('chatHistory').scrollTop = document.getElementById('chatHistory').scrollHeight, 10)">
+                    <summary class="wilhelm-summary">[VIEW WILHELM ARCHIVE]</summary>
+                    <div class="wilhelm-content">
+                        <div class="wilhelm-section"><strong>THE JUDGEMENT</strong>${wilhelmData.judgement}</div>
+                        <div class="wilhelm-section"><strong>THE IMAGE</strong>${wilhelmData.image}</div>
+                    </div>
+                </details>
                 ANALYZING ARCHITECTURE...
             `;
             
-            // Render the specific HTML for the tooltip injection
+            // Render the specific HTML for the accordion injection
             appendMessage(systemMsgHTML, 'system', true);
 
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${details.hexNum} (${details.hexName}). CHANGING LINES: ${details.linesText}.]`;
