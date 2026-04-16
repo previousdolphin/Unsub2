@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Diet Coke: Oracle System</title>
-    <!-- Dependencies for PDF and Image Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -24,6 +23,8 @@
             --shadow-sm: 0 4px 15px rgba(0,0,0,0.05);
             --shadow-md: 0 8px 30px rgba(0,0,0,0.08);
             --system-bg: rgba(255, 255, 255, 0.6);
+            --modal-bg: #ffffff;
+            --modal-overlay: rgba(0, 0, 0, 0.6);
         }
 
         body.dark-mode {
@@ -39,6 +40,8 @@
             --shadow-sm: 0 4px 15px rgba(0,0,0,0.3);
             --shadow-md: 0 8px 30px rgba(0,0,0,0.4);
             --system-bg: rgba(30, 30, 30, 0.6);
+            --modal-bg: #1a1a1a;
+            --modal-overlay: rgba(0, 0, 0, 0.8);
         }
 
         body, html {
@@ -55,7 +58,7 @@
         }
 
         .top-controls {
-            position: fixed; top: 15px; right: 15px; z-index: 50; display: flex; gap: 15px; align-items: center;
+            position: fixed; top: 15px; right: 15px; z-index: 50; display: flex; gap: 10px; align-items: center;
         }
 
         .icon-btn {
@@ -77,13 +80,20 @@
             transition: all 0.3s ease;
         }
         .brand-container { text-align: center; }
+        
+        /* BULLETPROOF LOGO CSS */
+        .logo-wrapper {
+            display: inline-block;
+            position: relative;
+            margin-bottom: 5px;
+        }
         .logo-top {
             font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 700;
-            letter-spacing: -2px; line-height: 0.8; color: var(--coca-red); 
-            margin-bottom: 5px; display: flex; align-items: flex-start; justify-content: center;
+            letter-spacing: -2px; line-height: 0.8; color: var(--coca-red); display: block;
         }
         .logo-diet {
-            font-size: 1.8rem; font-style: italic; margin-bottom: 50px; margin-left: -50px; color: var(--text-main);
+            font-size: 1.8rem; font-style: italic; color: var(--text-main);
+            position: absolute; top: -12px; right: -40px; letter-spacing: normal;
         }
         .oracle-text { font-size: 2.5rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); }
         .sub-text { font-size: 0.9rem; font-weight: 600; letter-spacing: 4px; margin-top: 8px; color: var(--text-muted); }
@@ -164,7 +174,6 @@
             letter-spacing: 2px;
         }
 
-        /* BULLETPROOF HEXAGRAM CSS */
         .hex-line, .inline-line {
             background-color: var(--text-main);
             transition: all 0.3s ease;
@@ -173,153 +182,51 @@
         }
         .hex-line { width: 100px; height: 16px; }
         .inline-line { width: 40px; height: 6px; }
-
-        .hex-line.changing, .inline-line.changing {
-            background-color: var(--coca-red);
-        }
-
-        /* The ::before / ::after trick prevents Safari border box squashing completely */
-        .hex-line.yin, .inline-line.yin {
-            background-color: transparent !important;
-        }
+        .hex-line.changing, .inline-line.changing { background-color: var(--coca-red); }
+        .hex-line.yin, .inline-line.yin { background-color: transparent !important; }
         .hex-line.yin::before, .hex-line.yin::after,
         .inline-line.yin::before, .inline-line.yin::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 42%;
-            height: 100%;
-            background-color: var(--text-main);
-            border-radius: inherit;
+            content: ''; position: absolute; top: 0; width: 42%; height: 100%;
+            background-color: var(--text-main); border-radius: inherit;
         }
         .hex-line.yin::before, .inline-line.yin::before { left: 0; }
         .hex-line.yin::after, .inline-line.yin::after { right: 0; }
-
         .hex-line.yin.changing::before, .hex-line.yin.changing::after,
-        .inline-line.yin.changing::before, .inline-line.yin.changing::after {
-            background-color: var(--coca-red);
-        }
+        .inline-line.yin.changing::before, .inline-line.yin.changing::after { background-color: var(--coca-red); }
 
-        .inline-hex-container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: rgba(0, 0, 0, 0.04);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid var(--coca-red);
-        }
+        .inline-hex-container { display: flex; align-items: center; gap: 20px; background: rgba(0, 0, 0, 0.04); padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid var(--coca-red); }
         .dark-mode .inline-hex-container { background: rgba(255, 255, 255, 0.05); }
-        .inline-hex-lines { 
-            display: flex; 
-            flex-direction: column-reverse; 
-            gap: 4px; 
-            flex-shrink: 0;
-            min-width: 40px; 
-        }
+        .inline-hex-lines { display: flex; flex-direction: column-reverse; gap: 4px; flex-shrink: 0; min-width: 40px; }
         .inline-hex-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
         .inline-hex-title { font-size: 1.1rem; font-weight: 900; color: var(--coca-red); letter-spacing: 2px; margin: 0; line-height: 1.2; }
         .inline-hex-path { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; text-transform: uppercase; }
         .inline-hex-path span { color: var(--text-main); font-weight: 700; }
 
-        .wilhelm-accordion {
-            margin: 0 0 15px 0;
-            background: rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(150, 150, 150, 0.2);
-            border-radius: 8px;
-            overflow: hidden;
-            text-align: left;
-            transition: all 0.3s ease;
-        }
+        .wilhelm-accordion { margin: 0 0 15px 0; background: rgba(0, 0, 0, 0.02); border: 1px solid rgba(150, 150, 150, 0.2); border-radius: 8px; overflow: hidden; text-align: left; transition: all 0.3s ease; }
         .dark-mode .wilhelm-accordion { background: rgba(255, 255, 255, 0.02); }
-        .wilhelm-accordion[open] {
-            background: var(--bg-color);
-            box-shadow: var(--shadow-sm);
-            border-color: var(--coca-red);
-        }
-        .wilhelm-summary {
-            padding: 12px 15px;
-            cursor: pointer;
-            color: var(--text-main);
-            font-weight: 700;
-            font-size: 0.75rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            list-style: none;
-            user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .wilhelm-accordion[open] { background: var(--bg-color); box-shadow: var(--shadow-sm); border-color: var(--coca-red); }
+        .wilhelm-summary { padding: 12px 15px; cursor: pointer; color: var(--text-main); font-weight: 700; font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; list-style: none; user-select: none; display: flex; justify-content: space-between; align-items: center; }
         .wilhelm-summary:hover { color: var(--coca-red); }
         .wilhelm-summary::-webkit-details-marker { display: none; }
         .wilhelm-summary::after { content: '+'; font-size: 1.2rem; line-height: 1; color: var(--coca-red); }
         .wilhelm-accordion[open] .wilhelm-summary::after { content: '−'; }
-        .wilhelm-content {
-            padding: 0 15px 15px 15px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.90rem;
-            color: var(--text-main);
-            line-height: 1.6;
-            border-top: 1px dashed rgba(150, 150, 150, 0.3);
-            margin-top: 5px;
-            padding-top: 15px;
-        }
+        .wilhelm-content { padding: 0 15px 15px 15px; font-family: 'Montserrat', sans-serif; font-size: 0.90rem; color: var(--text-main); line-height: 1.6; border-top: 1px dashed rgba(150, 150, 150, 0.3); margin-top: 5px; padding-top: 15px; }
         .wilhelm-section { margin-bottom: 12px; }
         .wilhelm-section:last-child { margin-bottom: 0; }
-        .wilhelm-section strong {
-            display: block;
-            color: var(--coca-red);
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
+        .wilhelm-section strong { display: block; color: var(--coca-red); font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase; }
 
-        .input-wrapper {
-            display: flex; gap: 10px; align-items: center; 
-            background: var(--input-bg); 
-            border: 1px solid var(--input-border);
-            padding: 10px 20px; 
-            border-radius: 30px;
-            box-shadow: var(--shadow-md);
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
-            margin-bottom: 5px;
-        }
-        .chat-input { 
-            flex-grow: 1; 
-            background: transparent; 
-            border: none; 
-            color: var(--text-main); 
-            font-family: 'Montserrat', sans-serif; 
-            font-size: 16px !important; 
-            outline: none; 
-            min-width: 0; 
-            padding: 5px 0;
-        }
+        .input-wrapper { display: flex; gap: 10px; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); padding: 10px 20px; border-radius: 30px; box-shadow: var(--shadow-md); backdrop-filter: blur(10px); flex-shrink: 0; margin-bottom: 5px; }
+        .chat-input { flex-grow: 1; background: transparent; border: none; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 16px !important; outline: none; min-width: 0; padding: 5px 0; }
         .chat-input::placeholder { color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600;}
         .btn { background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 5px; flex-shrink: 0; transition: color 0.3s ease; display: flex; align-items: center; justify-content: center; }
         .btn:hover:not(:disabled) { color: var(--coca-red); transform: scale(1.05); }
         .btn:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
 
-        /* Completion Action Buttons */
-        .completion-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .completion-row {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-        }
+        .completion-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .completion-row { display: flex; gap: 10px; width: 100%; }
 
         #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px; height: 100%;}
         .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start; }
-
         .cast-interface { text-align: center; width: 100%; max-width: 500px;}
         .cast-progress { font-weight: 900; letter-spacing: 4px; color: var(--coca-red); margin-bottom: 10px; font-size: 0.8rem;}
         .cast-question { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; min-height: 60px; transition: opacity 0.4s ease;}
@@ -330,22 +237,44 @@
         .revelation-lines { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); margin-top: 15px; }
 
         .cast-options { display: flex; gap: 10px; justify-content: center; transition: opacity 0.4s ease;}
-        .cast-btn {
-            flex: 1; padding: 12px; background: transparent; border: 2px solid var(--text-main); color: var(--text-main);
-            font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; cursor: pointer;
-            transition: all 0.2s ease; letter-spacing: 1px; border-radius: 8px; font-size: 0.9rem;
-        }
+        .cast-btn { flex: 1; padding: 12px; background: transparent; border: 2px solid var(--text-main); color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; letter-spacing: 1px; border-radius: 8px; font-size: 0.9rem; }
         .cast-btn:hover { background: var(--text-main); color: var(--bg-color); }
         .cast-btn.export-btn { border-color: var(--coca-red); color: var(--coca-red); font-size: 0.8rem;}
         .cast-btn.export-btn:hover { background: var(--coca-red); color: white; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* EXPLAINER MODAL CSS */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-overlay); backdrop-filter: blur(5px);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: var(--modal-bg); color: var(--text-main);
+            width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto;
+            padding: 30px; border-radius: 12px; box-shadow: var(--shadow-md);
+            position: relative; font-size: 0.95rem; line-height: 1.6;
+        }
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-thumb { background: var(--coca-red); border-radius: 4px; }
+        .modal-close {
+            position: absolute; top: 15px; right: 15px; background: none; border: none;
+            font-size: 1.5rem; color: var(--text-muted); cursor: pointer; transition: color 0.2s;
+        }
+        .modal-close:hover { color: var(--coca-red); }
+        .modal-content h2 { color: var(--coca-red); font-family: 'Playfair Display', serif; font-size: 2rem; margin-top: 0; margin-bottom: 15px; line-height: 1.1; }
+        .modal-content h3 { color: var(--text-main); font-size: 1.1rem; margin-top: 25px; margin-bottom: 10px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(150,150,150,0.2); padding-bottom: 5px; }
+        .modal-content p { margin-bottom: 15px; }
+        .modal-content ul { padding-left: 20px; margin-bottom: 15px; }
+        .modal-content li { margin-bottom: 8px; }
+        .modal-content strong { color: var(--coca-red); }
 
         @media (max-width: 768px) {
             .logo-section { padding-top: 15px; padding-bottom: 5px; }
-            .logo-top { font-size: 2.2rem; }
-            .logo-diet { font-size: 0.9rem; margin-bottom: 22px; margin-left: -22px; }
-            .oracle-text { font-size: 1.2rem; letter-spacing: 2px; line-height: 1; }
+            .logo-top { font-size: 3rem; }
+            .logo-diet { font-size: 1rem; top: -8px; right: -25px; }
+            .oracle-text { font-size: 1.5rem; letter-spacing: 2px; line-height: 1; margin-top: 5px;}
             .sub-text { font-size: 0.6rem; margin-top: 4px; }
             .container-box { padding: 5px 10px; }
             .message { max-width: 90%; padding: 12px 15px; font-size: 0.9rem; }
@@ -354,56 +283,33 @@
             .revelation-num { font-size: 2.5rem; }
             .revelation-name { font-size: 1.1rem; }
             .inline-hex-container { padding: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
+            .modal-content { padding: 20px; font-size: 0.85rem; }
+            .modal-content h2 { font-size: 1.5rem; }
         }
 
         /* HIDDEN DOM FOR EXPORT RENDER */
         #exportWrapper {
             position: absolute; left: -9999px; top: -9999px; width: 800px;
-            background: white; color: black; font-family: 'Montserrat', sans-serif;
-            z-index: -1;
+            background: white; color: black; font-family: 'Montserrat', sans-serif; z-index: -1;
         }
-        .export-page {
-            width: 800px; height: max-content; padding: 60px; box-sizing: border-box; 
-            background: white; position: relative;
-        }
-        .export-brand {
-            text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px;
-        }
-        .export-logo-top {
-            font-family: 'Playfair Display', serif; font-size: 4rem; color: #f40009; font-weight: 700; line-height: 0.8; margin-bottom: 5px;
-        }
-        .export-logo-diet {
-            font-size: 1.5rem; font-style: italic; color: #1a1a1a;
-        }
-        .export-title {
-            font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px;
-        }
-        .export-sub {
-            font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase;
-        }
-        .export-heading {
-            font-size: 1.2rem; color: #f40009; letter-spacing: 2px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; font-weight: 900;
-        }
-        .export-chat-row {
-            margin-bottom: 15px; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6;
-        }
-        .export-chat-user {
-            background: #f5f5f5; border-left: 4px solid #333;
-        }
-        .export-chat-oracle {
-            background: rgba(244,0,9,0.05); border-left: 4px solid #f40009;
-        }
-        .export-label {
-            font-weight: 800; font-size: 12px; letter-spacing: 1px; margin-bottom: 5px; display: block;
-        }
+        .export-page { width: 800px; height: max-content; padding: 60px; box-sizing: border-box; background: white; position: relative; }
+        .export-brand { text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px; }
         
-        /* Export Hexagram Lines (Bulletproof version for rendering) */
+        .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; }
+        .export-logo-top { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 700; color: #f40009; display: block; line-height: 0.8; letter-spacing: -2px; }
+        .export-logo-diet { font-size: 1.8rem; font-style: italic; color: #1a1a1a; position: absolute; top: -12px; right: -40px; }
+        
+        .export-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px; }
+        .export-sub { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase; }
+        .export-heading { font-size: 1.2rem; color: #f40009; letter-spacing: 2px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; font-weight: 900; }
+        .export-chat-row { margin-bottom: 15px; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; }
+        .export-chat-user { background: #f5f5f5; border-left: 4px solid #333; }
+        .export-chat-oracle { background: rgba(244,0,9,0.05); border-left: 4px solid #f40009; }
+        .export-label { font-weight: 800; font-size: 12px; letter-spacing: 1px; margin-bottom: 5px; display: block; }
+        
         .exp-line { position: relative; height: 10px; width: 78px; background: #1a1a1a; margin-bottom: 6px; border-radius: 1px; }
         .exp-line.yin { background: transparent !important; }
-        .exp-line.yin::before, .exp-line.yin::after {
-            content: ''; position: absolute; top: 0; width: 42%; height: 100%;
-            background-color: #1a1a1a; border-radius: inherit;
-        }
+        .exp-line.yin::before, .exp-line.yin::after { content: ''; position: absolute; top: 0; width: 42%; height: 100%; background-color: #1a1a1a; border-radius: inherit; }
         .exp-line.yin::before { left: 0; }
         .exp-line.yin::after { right: 0; }
         .exp-line.changing { background-color: #f40009; }
@@ -412,10 +318,44 @@
 </head>
 <body>
     <div class="top-controls">
+        <button class="icon-btn" id="helpBtn" title="About Oracle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </button>
         <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
             <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             <svg id="sunIcon" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </button>
+    </div>
+
+    <div id="explainerModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+            <h2>What is the Diet Coke Oracle System?</h2>
+            <p>This system is not exactly just a magic 8-ball, and it cannot predict the future. It is a structural refinery that borrows ancient logic of the I Ching to force a change in your perspective.</p>
+            <p>The Oracle works by making you strip away the emotional noise from your problems so you can look at them as pure, mechanical systems.</p>
+            
+            <h3>Privacy / How it was made</h3>
+            <p>Diet Coke is built using a quite large 31B parameter opensource LLM (Gemma4), that has been pretrained using LoRA on ~70000 initial question / answer pairs (synthetically derived from ~700 real hand written pairs) and prompting templates borrowing from both The Church of Conceptual Art, and a number of our favorite English translations / versions of the I Ching.</p>
+
+            <h3>How the Phases Work</h3>
+            <p><strong>Mode 1: The Refinery</strong><br>
+            The AI acts as a hostile editor to refine what your real conflict is. It is explicitly trained to reject vague complaints, emotional venting, or questions looking for a specific outcome. If you ask, "Will I be happy?" or "Why is my business failing?", it will block you. It demands that you reframe your problem into a precise, structural logic-gate before it will allow you to proceed.</p>
+            
+            <p><strong>Mode 2: The Casting</strong><br>
+            Once you achieve structural clarity, you cast the lines. You will answer a series of fixed binary questions about the tension of your situation (e.g., Assert vs. Submit, Internal vs. External). Your choices, combined with probability, generate a specific hexagram.</p>
+
+            <p><strong>Mode 3: The Interpretation</strong><br>
+            The Oracle maps the Wilhelm translation of the I Ching directly onto the clinical, refined parameters you established in Phase 1, at the time of the output.</p>
+
+            <h3>How to Get the Best Results</h3>
+            <p>To get past the Refinery and get a highly accurate interpretation, you must play by the Oracle's rules:</p>
+            <ul>
+                <li><strong>Bring a specific target:</strong> Do not ask about "life." Bring a specific contract, a specific argument, or a specific creative bottleneck.</li>
+                <li><strong>Be clinical:</strong> Remove your feelings. Describe the situation using structural terms like "friction," "leverage," "architecture," or "metrics."</li>
+                <li><strong>Accept the pushback:</strong> The AI's rejections are part of the process. Use its prompts to narrow down exactly what is functionally broken or misaligned in your situation.</li>
+            </ul>
+            <p><em>Export your final result (the full conversation and outcome) as a PDF, or just the Phase 2/3 revelation as an image you can share on social media.</em></p>
+        </div>
     </div>
 
     <canvas id="waveCanvas"></canvas>
@@ -423,7 +363,10 @@
     <div class="layout-wrapper">
         <div class="logo-section">
             <div class="brand-container">
-                <div class="logo-top"><span id="cokeText">Coke</span> <span class="logo-diet">Diet</span></div>
+                <div class="logo-wrapper">
+                    <span class="logo-top">Coke</span>
+                    <span class="logo-diet">Diet</span>
+                </div>
                 <div class="oracle-text">ORACLE SYSTEM</div>
                 <div class="sub-text">ai guide • llm</div>
             </div>
@@ -459,11 +402,13 @@
         </div>
     </div>
 
-    <!-- HIDDEN EXPORT DOM -->
     <div id="exportWrapper">
         <div class="export-page" id="exportPage1">
             <div class="export-brand">
-                <div class="export-logo-top">Coke <span class="export-logo-diet">Diet</span></div>
+                <div class="export-logo-wrapper">
+                    <span class="export-logo-top">Coke</span>
+                    <span class="export-logo-diet">Diet</span>
+                </div>
                 <div class="export-title">ORACLE SYSTEM</div>
                 <div class="export-sub">神諭系統 • ai guide • llm</div>
             </div>
@@ -472,7 +417,10 @@
         </div>
         <div class="export-page" id="exportPage2">
             <div class="export-brand">
-                <div class="export-logo-top">Coke <span class="export-logo-diet">Diet</span></div>
+                <div class="export-logo-wrapper">
+                    <span class="export-logo-top">Coke</span>
+                    <span class="export-logo-diet">Diet</span>
+                </div>
                 <div class="export-title">ORACLE SYSTEM</div>
                 <div class="export-sub">神諭系統 • ai guide • llm</div>
             </div>
@@ -488,13 +436,39 @@
     </div>
 
     <script>
-        // --- UI & Canvas Setup ---
+        // --- Modal Logic ---
+        const explainerModal = document.getElementById('explainerModal');
+        const helpBtn = document.getElementById('helpBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        function openModal() {
+            explainerModal.classList.add('active');
+        }
+
+        function closeModal() {
+            explainerModal.classList.remove('active');
+            localStorage.setItem('dietcoke_oracle_seen', 'true');
+        }
+
+        helpBtn.addEventListener('click', openModal);
+        closeModalBtn.addEventListener('click', closeModal);
+        explainerModal.addEventListener('click', (e) => {
+            if (e.target === explainerModal) closeModal();
+        });
+
+        // Show modal on first visit
+        if (!localStorage.getItem('dietcoke_oracle_seen')) {
+            openModal();
+        }
+
+        // --- Theme Logic ---
         document.getElementById('themeToggleBtn').addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             document.getElementById('moonIcon').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
             document.getElementById('sunIcon').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
         });
 
+        // --- Canvas Animation ---
         const canvas = document.getElementById('waveCanvas');
         const ctx = canvas.getContext('2d');
         let width, height, points = [];
@@ -969,7 +943,6 @@
                 wrapper.style.display = 'block';
 
                 if (type === 'pdf') {
-                    // JPEG export drops file size massively over PNG
                     const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 1.5, useCORS: true });
                     const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 1.5, useCORS: true });
                     
@@ -977,7 +950,6 @@
                     const pdfWidth = pdf.internal.pageSize.getWidth();
                     const pdfHeight = pdf.internal.pageSize.getHeight();
                     
-                    // Scale Page 1 so it NEVER overflows a single page
                     const p1Ratio = page1Canvas.width / page1Canvas.height;
                     let p1W = pdfWidth;
                     let p1H = pdfWidth / p1Ratio;
@@ -987,7 +959,6 @@
                     }
                     pdf.addImage(page1Canvas.toDataURL('image/jpeg', 0.8), 'JPEG', (pdfWidth - p1W)/2, 0, p1W, p1H);
                     
-                    // Page 2
                     pdf.addPage();
                     const p2Ratio = page2Canvas.width / page2Canvas.height;
                     let p2W = pdfWidth;
@@ -1000,7 +971,6 @@
                     
                     pdf.save('Oracle_Consultation.pdf');
                 } else if (type === 'image') {
-                    // Image captures JUST the second page, wrapped tightly around the content
                     const page2 = document.getElementById('exportPage2');
                     const fullDoc = await html2canvas(page2, { scale: 1.5, useCORS: true });
                     const link = document.createElement('a');
