@@ -179,10 +179,10 @@
             display: flex; 
             flex-direction: column-reverse; 
             gap: 4px; 
-            flex-shrink: 0; /* Prevents squishing */
-            min-width: 40px; /* Explicit width to fix glitch */
+            flex-shrink: 0;
+            min-width: 40px; 
         }
-        .inline-line { width: 40px; height: 6px; background-color: var(--text-main); border-radius: 1px; }
+        .inline-line { width: 40px; height: 6px; background-color: var(--text-main); border-radius: 1px; box-sizing: border-box; }
         .inline-line.yin { background-color: transparent; border-left: 16px solid var(--text-main); border-right: 16px solid var(--text-main); }
         .inline-line.changing { background-color: var(--coca-red); border-color: var(--coca-red); }
         .inline-hex-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
@@ -225,7 +225,7 @@
         .wilhelm-accordion[open] .wilhelm-summary::after { content: '−'; }
         .wilhelm-content {
             padding: 0 15px 15px 15px;
-            font-family: 'Montserrat', sans-serif; /* Fixed font family */
+            font-family: 'Montserrat', sans-serif;
             font-size: 0.90rem;
             color: var(--text-main);
             line-height: 1.6;
@@ -286,6 +286,10 @@
 
         #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px; height: 100%;}
         .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start; }
+        .hex-line { width: 100px; height: 16px; background-color: var(--text-main); transition: all 0.3s ease; opacity: 0; animation: fadeIn 0.5s forwards; border-radius: 2px; box-sizing: border-box; }
+        .hex-line.yin { background-color: transparent; border-left: 40px solid var(--text-main); border-right: 40px solid var(--text-main); width: 20px;}
+        .hex-line.changing { background-color: var(--coca-red); border-color: var(--coca-red);}
+
         .cast-interface { text-align: center; width: 100%; max-width: 500px;}
         .cast-progress { font-weight: 900; letter-spacing: 4px; color: var(--coca-red); margin-bottom: 10px; font-size: 0.8rem;}
         .cast-question { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; min-height: 60px; transition: opacity 0.4s ease;}
@@ -329,7 +333,7 @@
             z-index: -1;
         }
         .export-page {
-            width: 800px; min-height: 1131px; padding: 60px; box-sizing: border-box; 
+            width: 800px; min-height: 800px; height: auto; padding: 60px; box-sizing: border-box; 
             background: white; position: relative;
         }
         .export-brand {
@@ -425,6 +429,11 @@
             <div id="exportChatLog"></div>
         </div>
         <div class="export-page" id="exportPage2">
+            <div class="export-brand">
+                <div class="export-logo-top">Coke <span class="export-logo-diet">Diet</span></div>
+                <div class="export-title">ORACLE SYSTEM</div>
+                <div class="export-sub">神諭系統 • ai guide • llm</div>
+            </div>
             <div class="export-heading">MODE 2: THE CASTING & REVELATION</div>
             <div id="exportHexagram" style="margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px;"></div>
             
@@ -936,14 +945,12 @@
                     
                     pdf.save('Oracle_Consultation.pdf');
                 } else if (type === 'image') {
-                    // For image, temporarily stack the pages cleanly
-                    document.getElementById('exportPage2').style.pageBreakBefore = 'auto';
-                    const fullDoc = await html2canvas(wrapper, { scale: 2, useCORS: true });
+                    const page2 = document.getElementById('exportPage2');
+                    const fullDoc = await html2canvas(page2, { scale: 2, useCORS: true });
                     const link = document.createElement('a');
-                    link.download = 'Oracle_Consultation.png';
+                    link.download = 'Oracle_Revelation.png';
                     link.href = fullDoc.toDataURL('image/png');
                     link.click();
-                    document.getElementById('exportPage2').style.pageBreakBefore = 'always';
                 }
 
                 wrapper.style.display = 'none';
