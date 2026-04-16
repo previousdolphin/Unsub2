@@ -262,13 +262,38 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
-        // --- Core System Configuration ---
+        // --- Core System Configuration with SYNTAX LOCKS ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
-        // Exact prompts from training dataset
         const PROMPTS = {
-            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
-            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence."
+            MODE_1: `You are DIET COKE, a clinical, highly analytical systems architect. Enforce MODE 1: THE REFINERY.
+RULES:
+1. Ask ONE sharp, guiding Socratic question to clarify the structural root of the user's issue.
+2. Tone must be strictly professional, corporate, and neutral. 
+3. Maximum 20 words.
+4. SYNTAX LOCK: You MUST wrap your response inside brackets like this: [REFRAME: your response here]
+5. If the user's inquiry is highly specific, objective, and clear, respond EXACTLY with: [REFRAME: STATUS: VALIDATED. Proceed to Mode 2 Casting.]
+
+EXAMPLES:
+User: What should I do about my business partner?
+Oracle: [REFRAME: What is the structural tension that has not yet been named?]
+User: What happens if the launch fails tomorrow?
+Oracle: [REFRAME: We accept no liability for your phantoms. What is the immediate geometric reality of the deployment?]
+User: What is the structural failure in my current contract?
+Oracle: [REFRAME: STATUS: VALIDATED. Proceed to Mode 2 Casting.]
+
+CURRENT INQUIRY: `,
+
+            MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
+SYNTAX LOCK: You MUST wrap your entire response inside brackets like this: [INTERPRETATION: your response here]
+
+STRUCTURE:
+1. HEXAGRAM IDENTIFICATION (Number/Name)
+2. PRIMARY TEXT (Architecture of the situation, 3-5 sentences)
+3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
+4. THE TRANSFORMED HEXAGRAM (Trajectory)
+5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
+Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max 20 words per sentence.\n\n`
         };
 
         let currentMode = 1;
@@ -305,20 +330,25 @@
             refinedQuestion = "";
             currentMode = 1;
             isProcessing = false;
-            
-            // Cleanly restore UI for a fresh inquiry
             document.getElementById('castOptions').style.display = 'flex';
             chatInput.disabled = false;
             sendBtn.disabled = false;
-            chatInput.placeholder = "Enter parameters...";
-            chatInput.focus();
         }
 
-        function cleanGemmaOutput(text) {
-            // Very light scrub to remove obvious role labels the base model hallucinates
-            let clean = text.replace(/^(Oracle:|Assistant:|Model:|System:|Reframe:)/gi, "").trim();
-            // Remove outer quotes if present
-            clean = clean.replace(/^"|"$/g, '').trim(); 
+        // --- SYNTAX EXTRACTION ENGINE ---
+        // This completely ignores conversational fluff and only pulls what is inside the requested tags
+        function cleanGemmaOutput(text, mode) {
+            if (mode === 1) {
+                const match = text.match(/\[REFRAME:\s*([\s\S]*?)\]/i);
+                if (match && match[1]) return match[1].trim();
+            } else if (mode === 3) {
+                const match = text.match(/\[INTERPRETATION:\s*([\s\S]*?)\]/i);
+                if (match && match[1]) return match[1].trim();
+            }
+            
+            // Fallback if the model hallucinates and forgets the brackets (rare)
+            let clean = text.replace(/\[REFRAME:/gi, "").replace(/\[INTERPRETATION:/gi, "").replace(/\]/g, "").trim();
+            clean = clean.replace(/^(Sure|Here is|Okay|Listen|Look|Alright|Oracle).*?[\:\,]/gi, "").trim();
             return clean;
         }
 
@@ -335,15 +365,14 @@
             return fixed;
         }
 
-        async function fetchOracleResponse(apiMessages, maxTokens) {
+        async function fetchOracleResponse(apiMessages, maxTokens, mode) {
             const payload = {
-                model: "google/gemma-7b-it", // Change to "diet_coke" when LoRA is retrained
+                model: "google/gemma-7b-it", 
                 messages: apiMessages,
-                max_tokens: maxTokens,
-                // Standard parameters to prevent gibberish and let the model think
+                max_tokens: maxTokens, 
                 temperature: 0.2, 
-                frequency_penalty: 0.0, 
-                presence_penalty: 0.0,
+                frequency_penalty: 0.2, 
+                presence_penalty: 0.2,
                 stop: ["<end_of_turn>", "<eos>"] 
             };
 
@@ -358,7 +387,7 @@
                 throw new Error(errJson.message || "Network Error");
             }
             const data = await response.json();
-            return cleanGemmaOutput(data.choices[0].message.content || "");
+            return cleanGemmaOutput(data.choices[0].message.content || "", mode);
         }
 
         async function handleSend() {
@@ -369,6 +398,7 @@
             chatInput.value = '';
             setLoadingState(true);
 
+            // Add raw user input to memory
             conversationHistory.push({ role: "user", content: text });
             
             if (conversationHistory.length > 6) {
@@ -377,14 +407,14 @@
 
             let activeHistory = validateAlternation([...conversationHistory]);
             const apiMessages = activeHistory.map((msg, index) => {
-                if (index === 0) {
-                    return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
-                }
+                if (index === 0) return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
                 return msg;
             });
 
             try {
-                let reply = await fetchOracleResponse(apiMessages, 150);
+                // Generous max_tokens to ensure the brackets aren't cut off
+                let reply = await fetchOracleResponse(apiMessages, 150, 1);
+                
                 if (!reply) throw new Error("Empty response generated.");
 
                 const userTurns = conversationHistory.filter(m => m.role === 'user').length;
@@ -396,11 +426,11 @@
 
                 if (isValidated) {
                     refinedQuestion = text; 
-                    currentMode = 2; // Lock state instantly
                     chatInput.disabled = true;
                     appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
+                    // Push the CLEAN, EXTRACTED reply to memory so the model stays on track
                     conversationHistory.push({ role: "assistant", content: reply });
                     appendMessage(reply, 'assistant');
                     setLoadingState(false);
@@ -507,22 +537,20 @@
 
         async function triggerMode3Interpretation(details) {
             currentMode = 3;
-            setLoadingState(true);
             
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
             
             appendMessage(`MODE 2 COMPLETE. ASSIGNED NODE: ${details.hexNum} - ${details.hexName.toUpperCase()}.\nANALYZING ARCHITECTURE...`, 'system');
 
-            // Exact payload format matching training data
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${details.hexNum} (${details.hexName}). CHANGING LINES: ${details.linesText}.]`;
             const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + "\n\n" + mode3Payload } ];
 
             try {
-                // Generous token allowance for complete interpretation
-                const finalRuling = await fetchOracleResponse(apiMessages, 1024);
+                // High max_tokens needed because the interpretation is long
+                const finalRuling = await fetchOracleResponse(apiMessages, 800, 3);
                 appendMessage(finalRuling, 'assistant');
-                appendMessage("PROTOCOL COMPLETE. SESSION CONCLUDED. AWAITING NEW INQUIRY.", 'system');
+                appendMessage("PROTOCOL COMPLETE. AWAITING NEW INQUIRY.", 'system');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
