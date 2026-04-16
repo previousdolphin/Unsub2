@@ -555,8 +555,7 @@
         initCanvas(); animate();
 
         // --- Core System Configuration ---
-        // UPDATED: RunPod Serverless Endpoint
-        const BACKEND_API_URL = 'https://api.runpod.ai/v2/jnhra92g21f6fp/openai/v1/chat/completions'; 
+        const BACKEND_API_URL = 'https://v7e8yjpscb1f16-8000.proxy.runpod.net/v1/chat/completions'; 
 
         const PROMPTS = {
             MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
@@ -690,7 +689,6 @@
             return fixed;
         }
 
-        // UPDATED: Added headers for RunPod API Key
         async function fetchOracleResponse(apiMessages, maxTokens, mode) {
             const payload = {
                 model: "Huggingmaces/diet_coke_oracle_merged", 
@@ -704,10 +702,7 @@
 
             const response = await fetch(BACKEND_API_URL, {
                 method: 'POST', mode: 'cors',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'Authorization': 'Bearer rpa_0T9XUN946XZ2WZAXEEIVSGD8JLR7FG1M3QW65FOVqqagn5' // REPLACE WITH YOUR KEY
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer EMPTY' },
                 body: JSON.stringify(payload)
             });
 
@@ -726,14 +721,6 @@
             appendMessage(text, 'user');
             chatInput.value = '';
             setLoadingState(true);
-
-            // --- WARMUP LOGIC ---
-            // If the request hangs for more than 6 seconds, the Serverless worker is likely starting up
-            const warmupTimer = setTimeout(() => {
-                if (isProcessing) {
-                    chatInput.placeholder = "Oracle is waking from cold sleep...";
-                }
-            }, 6000);
 
             conversationHistory.push({ role: "user", content: text });
             
@@ -775,8 +762,6 @@
                 }
                 appendMessage(`<div class="system-header">ERR: SYSTEM</div>ARCHITECTURE UNSTABLE. PLEASE REPHRASE.`, 'error', true);
                 setLoadingState(false);
-            } finally {
-                clearTimeout(warmupTimer);
             }
         }
 
@@ -912,14 +897,6 @@
             
             appendMessage(systemMsgHTML, 'system', true);
 
-            // --- WARMUP LOGIC ---
-            // If the user sat on the casting screen long enough for the serverless container to shut down
-            const warmupTimer = setTimeout(() => {
-                if (isProcessing && currentMode === 3) {
-                    appendMessage(`<div class="system-header">NOTICE</div>ORACLE IS INITIALIZING FROM COLD START... AWAITING RESONANCE.`, 'system', true);
-                }
-            }, 6000);
-
             const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${details.hexNum} (${details.hexName}). CHANGING LINES: ${details.linesText}.]`;
             const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + "\n\n" + mode3Payload } ];
 
@@ -943,7 +920,6 @@
                 console.error(error);
                 appendMessage(`<div class="system-header">ERR: SYSTEM</div>INTERPRETATION FAILED.`, 'error', true);
             } finally {
-                clearTimeout(warmupTimer);
                 isProcessing = false;
             }
         }
