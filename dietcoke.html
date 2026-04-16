@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Diet Coke: Oracle System</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -42,7 +42,7 @@
             background-color: var(--bg-color); color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
             transition: background-color 0.4s ease, color 0.4s ease;
-            overflow-x: hidden; overflow-y: auto; scroll-snap-type: y proximity;
+            overflow: hidden; 
         }
 
         canvas {
@@ -51,7 +51,7 @@
         }
 
         .top-controls {
-            position: fixed; top: 20px; right: 20px; z-index: 50; display: flex; gap: 15px; align-items: center;
+            position: fixed; top: 15px; right: 15px; z-index: 50; display: flex; gap: 15px; align-items: center;
         }
 
         .icon-btn {
@@ -63,36 +63,40 @@
         .icon-btn:hover { color: var(--coca-red); transform: scale(1.1); }
 
         .layout-wrapper {
-            position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh;
+            position: relative; z-index: 10; display: flex; flex-direction: column; 
+            height: 100dvh; /* Dynamic viewport height fixes iOS keyboard overlap */
         }
 
         .logo-section {
-            flex: 1 0 auto; display: flex; align-items: center; justify-content: center;
-            min-height: 45vh; padding-bottom: 2rem; pointer-events: none; 
+            flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+            padding-top: 30px; padding-bottom: 10px; pointer-events: none; 
+            transition: all 0.3s ease;
         }
         .brand-container { text-align: center; }
         .logo-top {
-            font-family: 'Playfair Display', serif; font-size: 8rem; font-weight: 700;
+            font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 700;
             letter-spacing: -2px; line-height: 0.8; color: var(--coca-red); 
-            margin-bottom: 10px; display: flex; align-items: flex-start; justify-content: center;
+            margin-bottom: 5px; display: flex; align-items: flex-start; justify-content: center;
         }
         .logo-diet {
-            font-size: 2.6rem; font-style: italic; margin-bottom: 90px; margin-left: -90px; color: var(--text-main);
+            font-size: 1.8rem; font-style: italic; margin-bottom: 50px; margin-left: -50px; color: var(--text-main);
         }
-        .oracle-text { font-size: 4rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); }
-        .sub-text { font-size: 1.2rem; font-weight: 600; letter-spacing: 4px; margin-top: 10px; color: var(--text-muted); }
+        .oracle-text { font-size: 2.5rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); }
+        .sub-text { font-size: 0.9rem; font-weight: 600; letter-spacing: 4px; margin-top: 8px; color: var(--text-muted); }
 
         .interaction-section {
-            flex: 0 0 auto; height: 55vh; min-height: 450px; position: relative; scroll-snap-align: start;
+            flex: 1; min-height: 0; position: relative; 
+            display: flex; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 10px);
         }
         .container-box {
             width: 100%; max-width: 800px; height: 100%; margin: 0 auto;
             display: flex; flex-direction: column; background: var(--chat-gradient);
-            padding: 20px 20px 40px 20px; box-sizing: border-box;
+            padding: 10px 20px; box-sizing: border-box;
         }
 
         .chat-history {
-            flex-grow: 1; overflow-y: auto; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px; padding-right: 10px;
+            flex-grow: 1; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 15px; padding-right: 5px;
+            -webkit-overflow-scrolling: touch; 
         }
         .chat-history::-webkit-scrollbar { width: 4px; }
         .chat-history::-webkit-scrollbar-thumb { background: var(--coca-red); border-radius: 4px; }
@@ -133,7 +137,6 @@
             border-bottom-left-radius: 2px;
         }
         
-        /* Modern System Message Enclosure */
         .message.system { 
             align-self: center; 
             width: 100%;
@@ -148,6 +151,7 @@
             padding: 15px 20px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(150, 150, 150, 0.2);
+            border-radius: 8px;
         }
         .system-header {
             text-align: center;
@@ -156,7 +160,6 @@
             letter-spacing: 2px;
         }
 
-        /* INLINE HEXAGRAM COMPONENT */
         .inline-hex-container {
             display: flex;
             align-items: center;
@@ -167,54 +170,16 @@
             margin: 15px 0;
             border-left: 4px solid var(--coca-red);
         }
-        .dark-mode .inline-hex-container {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        .inline-hex-lines {
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 4px;
-        }
-        .inline-line {
-            width: 40px;
-            height: 6px;
-            background-color: var(--text-main);
-            border-radius: 1px;
-            transition: all 0.3s ease;
-        }
-        .inline-line.yin {
-            background-color: transparent;
-            border-left: 16px solid var(--text-main);
-            border-right: 16px solid var(--text-main);
-        }
-        .inline-line.changing {
-            background-color: var(--coca-red);
-            border-color: var(--coca-red);
-        }
-        .inline-hex-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .inline-hex-title {
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: var(--coca-red);
-            letter-spacing: 2px;
-            margin: 0;
-        }
-        .inline-hex-path {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-            text-transform: uppercase;
-        }
-        .inline-hex-path span {
-            color: var(--text-main);
-            font-weight: 700;
-        }
+        .dark-mode .inline-hex-container { background: rgba(255, 255, 255, 0.05); }
+        .inline-hex-lines { display: flex; flex-direction: column-reverse; gap: 4px; }
+        .inline-line { width: 40px; height: 6px; background-color: var(--text-main); border-radius: 1px; }
+        .inline-line.yin { background-color: transparent; border-left: 16px solid var(--text-main); border-right: 16px solid var(--text-main); }
+        .inline-line.changing { background-color: var(--coca-red); border-color: var(--coca-red); }
+        .inline-hex-info { display: flex; flex-direction: column; gap: 5px; }
+        .inline-hex-title { font-size: 1.1rem; font-weight: 900; color: var(--coca-red); letter-spacing: 2px; margin: 0; }
+        .inline-hex-path { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; text-transform: uppercase; }
+        .inline-hex-path span { color: var(--text-main); font-weight: 700; }
 
-        /* MODERN INLINE ACCORDION (Replaces Tooltip) */
         .wilhelm-accordion {
             margin: 0 0 15px 0;
             background: rgba(0, 0, 0, 0.02);
@@ -244,21 +209,10 @@
             justify-content: space-between;
             align-items: center;
         }
-        .wilhelm-summary:hover {
-            color: var(--coca-red);
-        }
+        .wilhelm-summary:hover { color: var(--coca-red); }
         .wilhelm-summary::-webkit-details-marker { display: none; }
-        .wilhelm-summary::after {
-            content: '+';
-            font-size: 1.2rem;
-            line-height: 1;
-            transition: transform 0.3s ease;
-            color: var(--coca-red);
-        }
-        .wilhelm-accordion[open] .wilhelm-summary::after {
-            content: '−';
-            transform: rotate(180deg);
-        }
+        .wilhelm-summary::after { content: '+'; font-size: 1.2rem; line-height: 1; color: var(--coca-red); }
+        .wilhelm-accordion[open] .wilhelm-summary::after { content: '−'; }
         .wilhelm-content {
             padding: 0 15px 15px 15px;
             font-family: 'Playfair Display', serif;
@@ -268,8 +222,6 @@
             border-top: 1px dashed rgba(150, 150, 150, 0.3);
             margin-top: 5px;
             padding-top: 15px;
-            text-transform: none;
-            letter-spacing: normal;
         }
         .wilhelm-section { margin-bottom: 12px; }
         .wilhelm-section:last-child { margin-bottom: 0; }
@@ -287,66 +239,76 @@
             display: flex; gap: 10px; align-items: center; 
             background: var(--input-bg); 
             border: 1px solid var(--input-border);
-            padding: 12px 20px; 
-            margin-bottom: env(safe-area-inset-bottom, 10px); 
+            padding: 10px 20px; 
             border-radius: 30px;
             box-shadow: var(--shadow-md);
             backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            margin-bottom: 5px;
         }
-        .chat-input { flex-grow: 1; background: transparent; border: none; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 1rem; outline: none; min-width: 0; }
+        .chat-input { 
+            flex-grow: 1; 
+            background: transparent; 
+            border: none; 
+            color: var(--text-main); 
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 16px !important; /* 16px explicitly stops iOS auto-zoom */
+            outline: none; 
+            min-width: 0; 
+            padding: 5px 0;
+        }
         .chat-input::placeholder { color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600;}
         .btn { background: transparent; border: none; cursor: pointer; color: var(--text-muted); padding: 5px; flex-shrink: 0; transition: color 0.3s ease; display: flex; align-items: center; justify-content: center; }
         .btn:hover:not(:disabled) { color: var(--coca-red); transform: scale(1.05); }
         .btn:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
 
-        #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 30px;}
-        .hexagram-visual {
-            display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start;
-        }
-        .hex-line {
-            width: 100px; height: 16px; background-color: var(--text-main); transition: all 0.3s ease; opacity: 0; animation: fadeIn 0.5s forwards; border-radius: 2px;
-        }
-        .hex-line.yin { background-color: transparent; border-left: 40px solid var(--text-main); border-right: 40px solid var(--text-main); width: 20px;}
-        .hex-line.changing { background-color: var(--coca-red); border-color: var(--coca-red);}
-
+        #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px; height: 100%;}
+        .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start; }
         .cast-interface { text-align: center; width: 100%; max-width: 500px;}
-        .cast-progress { font-weight: 900; letter-spacing: 4px; color: var(--coca-red); margin-bottom: 15px; font-size: 0.9rem;}
-        .cast-question { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; min-height: 60px; transition: opacity 0.4s ease;}
+        .cast-progress { font-weight: 900; letter-spacing: 4px; color: var(--coca-red); margin-bottom: 10px; font-size: 0.8rem;}
+        .cast-question { font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; min-height: 60px; transition: opacity 0.4s ease;}
         
         .revelation-text { animation: fadeIn 1.5s forwards; }
         .revelation-num { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: var(--coca-red); line-height: 1; margin-bottom: 5px; }
         .revelation-name { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; color: var(--text-main); }
         .revelation-lines { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); margin-top: 15px; }
 
-        .cast-options { display: flex; gap: 15px; justify-content: center; transition: opacity 0.4s ease;}
+        .cast-options { display: flex; gap: 10px; justify-content: center; transition: opacity 0.4s ease;}
         .cast-btn {
-            flex: 1; padding: 15px; background: transparent; border: 2px solid var(--text-main); color: var(--text-main);
+            flex: 1; padding: 12px; background: transparent; border: 2px solid var(--text-main); color: var(--text-main);
             font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; cursor: pointer;
-            transition: all 0.2s ease; letter-spacing: 1px; border-radius: 8px;
+            transition: all 0.2s ease; letter-spacing: 1px; border-radius: 8px; font-size: 0.9rem;
         }
         .cast-btn:hover { background: var(--text-main); color: var(--bg-color); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* MOBILE OVERRIDES FOR A NATIVE CHAT APP FEEL */
         @media (max-width: 768px) {
-            .logo-top { font-size: 4.5rem; }
-            .logo-diet { font-size: 1.5rem; margin-bottom: 55px; margin-left: -50px; }
-            .oracle-text { font-size: 2.2rem; }
-            .sub-text { font-size: 0.85rem; }
-            .container-box { padding: 15px 15px 40px 15px; }
-            .cast-question { font-size: 1rem; }
-            .cast-btn { font-size: 0.8rem; padding: 10px;}
-            .revelation-num { font-size: 2.8rem; }
+            .logo-section { 
+                padding-top: 15px; padding-bottom: 5px;
+            }
+            .logo-top { font-size: 2.2rem; }
+            .logo-diet { font-size: 0.9rem; margin-bottom: 22px; margin-left: -22px; }
+            .oracle-text { font-size: 1.2rem; letter-spacing: 2px; line-height: 1; }
+            .sub-text { font-size: 0.6rem; margin-top: 4px; }
+            
+            .container-box { padding: 5px 10px; }
+            .message { max-width: 90%; padding: 12px 15px; font-size: 0.9rem; }
+            
+            .cast-question { font-size: 0.95rem; min-height: 50px; }
+            .cast-btn { font-size: 0.75rem; padding: 10px;}
+            .revelation-num { font-size: 2.5rem; }
             .revelation-name { font-size: 1.1rem; }
-            .message { max-width: 90%; }
+            .inline-hex-container { padding: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
         }
     </style>
 </head>
 <body>
     <div class="top-controls">
         <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
-            <svg id="moonIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg id="sunIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg id="sunIcon" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </button>
     </div>
 
@@ -356,7 +318,7 @@
         <div class="logo-section">
             <div class="brand-container">
                 <div class="logo-top"><span id="cokeText">Coke</span> <span class="logo-diet">Diet</span></div>
-                <div class="oracle-text">ORACLE<br>SYSTEM</div>
+                <div class="oracle-text">ORACLE SYSTEM</div>
                 <div class="sub-text">ai guide • llm</div>
             </div>
         </div>
@@ -538,7 +500,7 @@
         let isProcessing = false;
         let refinedQuestion = "";
         let castResults = []; 
-        let userPath = []; // Tracks the user's answers in Mode 2
+        let userPath = []; 
         let conversationHistory = []; 
 
         const chatContainer = document.getElementById('chatContainer');
@@ -547,7 +509,6 @@
         const sendBtn = document.getElementById('sendBtn');
         const chatHistory = document.getElementById('chatHistory');
 
-        // Allow HTML rendering for our specialized embed messages
         function appendMessage(content, type, isHTML = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${type}`;
@@ -711,11 +672,9 @@
         function castLine(btnIndex) {
             if (isProcessing || currentMode !== 2) return;
             
-            // Record the user's choice
             const step = castResults.length;
             userPath.push(CAST_QUESTIONS[step][btnIndex]);
 
-            // Randomize the line result
             const rand = Math.random() * 16;
             let lineValue = 9; 
             if (rand < 1) lineValue = 6; 
@@ -776,7 +735,6 @@
             
             const wilhelmData = WILHELM_DATA[details.hexNum];
             
-            // Build the inline hexagram lines
             let inlineLinesHTML = '';
             castResults.forEach(val => {
                 let yClass = [6,8].includes(val) ? 'yin' : 'yang';
@@ -784,7 +742,6 @@
                 inlineLinesHTML += `<div class="inline-line ${yClass} ${cClass}"></div>`;
             });
             
-            // Build the modern system enclosure
             const systemMsgHTML = `
                 <div class="system-header">MODE 2 COMPLETE. ASSIGNED NODE: ${details.hexNum}</div>
                 <div class="inline-hex-container">
