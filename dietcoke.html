@@ -121,18 +121,10 @@
         .cast-progress { font-weight: 900; letter-spacing: 4px; color: var(--coca-red); margin-bottom: 15px; font-size: 0.9rem;}
         .cast-question { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; min-height: 60px; transition: opacity 0.4s ease;}
         
-        .revelation-text {
-            animation: fadeIn 1.5s forwards;
-        }
-        .revelation-num {
-            font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: var(--coca-red); line-height: 1; margin-bottom: 5px;
-        }
-        .revelation-name {
-            font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; color: var(--text-main);
-        }
-        .revelation-lines {
-            font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); margin-top: 15px;
-        }
+        .revelation-text { animation: fadeIn 1.5s forwards; }
+        .revelation-num { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: var(--coca-red); line-height: 1; margin-bottom: 5px; }
+        .revelation-name { font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; color: var(--text-main); }
+        .revelation-lines { font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); margin-top: 15px; }
 
         .cast-options { display: flex; gap: 15px; justify-content: center; transition: opacity 0.4s ease;}
         .cast-btn {
@@ -270,12 +262,38 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
-        // --- Core System Configuration ---
+        // --- Core System Configuration with SYNTAX LOCKS ---
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
         const PROMPTS = {
-            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
-            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence."
+            MODE_1: `You are DIET COKE, a clinical, highly analytical systems architect. Enforce MODE 1: THE REFINERY.
+RULES:
+1. Ask ONE sharp, guiding Socratic question to clarify the structural root of the user's issue.
+2. Tone must be strictly professional, corporate, and neutral. 
+3. Maximum 20 words.
+4. SYNTAX LOCK: You MUST wrap your response inside brackets like this: [REFRAME: your response here]
+5. If the user's inquiry is highly specific, objective, and clear, respond EXACTLY with: [REFRAME: STATUS: VALIDATED. Proceed to Mode 2 Casting.]
+
+EXAMPLES:
+User: What should I do about my business partner?
+Oracle: [REFRAME: What is the structural tension that has not yet been named?]
+User: What happens if the launch fails tomorrow?
+Oracle: [REFRAME: We accept no liability for your phantoms. What is the immediate geometric reality of the deployment?]
+User: What is the structural failure in my current contract?
+Oracle: [REFRAME: STATUS: VALIDATED. Proceed to Mode 2 Casting.]
+
+CURRENT INQUIRY: `,
+
+            MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
+SYNTAX LOCK: You MUST wrap your entire response inside brackets like this: [INTERPRETATION: your response here]
+
+STRUCTURE:
+1. HEXAGRAM IDENTIFICATION (Number/Name)
+2. PRIMARY TEXT (Architecture of the situation, 3-5 sentences)
+3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
+4. THE TRANSFORMED HEXAGRAM (Trajectory)
+5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
+Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max 20 words per sentence.\n\n`
         };
 
         let currentMode = 1;
@@ -317,11 +335,41 @@
             sendBtn.disabled = false;
         }
 
-        async function fetchOracleResponse(apiMessages, maxTokens) {
+        // --- SYNTAX EXTRACTION ENGINE ---
+        // This completely ignores conversational fluff and only pulls what is inside the requested tags
+        function cleanGemmaOutput(text, mode) {
+            if (mode === 1) {
+                const match = text.match(/\[REFRAME:\s*([\s\S]*?)\]/i);
+                if (match && match[1]) return match[1].trim();
+            } else if (mode === 3) {
+                const match = text.match(/\[INTERPRETATION:\s*([\s\S]*?)\]/i);
+                if (match && match[1]) return match[1].trim();
+            }
+            
+            // Fallback if the model hallucinates and forgets the brackets (rare)
+            let clean = text.replace(/\[REFRAME:/gi, "").replace(/\[INTERPRETATION:/gi, "").replace(/\]/g, "").trim();
+            clean = clean.replace(/^(Sure|Here is|Okay|Listen|Look|Alright|Oracle).*?[\:\,]/gi, "").trim();
+            return clean;
+        }
+
+        function validateAlternation(history) {
+            if (history.length === 0) return [];
+            let fixed = [];
+            let filtered = history.filter(m => m.content && m.content.trim().length > 0);
+            if (filtered.length > 0 && filtered[0].role !== 'user') filtered.shift();
+            for (let i = 0; i < filtered.length; i++) {
+                if (i === 0 || filtered[i].role !== filtered[i - 1].role) {
+                    fixed.push(filtered[i]);
+                }
+            }
+            return fixed;
+        }
+
+        async function fetchOracleResponse(apiMessages, maxTokens, mode) {
             const payload = {
                 model: "google/gemma-7b-it", 
                 messages: apiMessages,
-                max_tokens: maxTokens,
+                max_tokens: maxTokens, 
                 temperature: 0.2, 
                 frequency_penalty: 0.2, 
                 presence_penalty: 0.2,
@@ -339,64 +387,60 @@
                 throw new Error(errJson.message || "Network Error");
             }
             const data = await response.json();
-            return data.choices[0].message.content.trim();
+            return cleanGemmaOutput(data.choices[0].message.content || "", mode);
         }
 
         async function handleSend() {
             const text = chatInput.value.trim();
-            // Block execution if empty, if API is thinking, or if we've successfully moved to Mode 2/3
-            if (!text || isProcessing || currentMode !== 1) return;
+            if (!text || currentMode !== 1 || isProcessing) return;
 
             appendMessage(text, 'user');
             chatInput.value = '';
             setLoadingState(true);
 
+            // Add raw user input to memory
             conversationHistory.push({ role: "user", content: text });
             
-            // Rolling window: keep last 6 messages
             if (conversationHistory.length > 6) {
                 conversationHistory = conversationHistory.slice(-6);
             }
-            
-            // Ensure first message in the window is always a 'user' role
-            if (conversationHistory.length > 0 && conversationHistory[0].role !== 'user') {
-                conversationHistory.shift();
-            }
 
-            // Construct payload mapping
-            const apiMessages = conversationHistory.map((msg, index) => {
-                if (index === 0) {
-                    return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
-                }
+            let activeHistory = validateAlternation([...conversationHistory]);
+            const apiMessages = activeHistory.map((msg, index) => {
+                if (index === 0) return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
                 return msg;
             });
 
             try {
-                let reply = await fetchOracleResponse(apiMessages, 150);
+                // Generous max_tokens to ensure the brackets aren't cut off
+                let reply = await fetchOracleResponse(apiMessages, 150, 1);
                 
-                // Immediately push to history
-                conversationHistory.push({ role: "assistant", content: reply });
-                
-                // Lock mode change logic
-                if (reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2 Casting")) {
-                    currentMode = 2; // Lock Mode immediately
+                if (!reply) throw new Error("Empty response generated.");
+
+                const userTurns = conversationHistory.filter(m => m.role === 'user').length;
+                if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
+                    reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
+                }
+
+                const isValidated = reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2");
+
+                if (isValidated) {
                     refinedQuestion = text; 
-                    
-                    // Force the raw output to screen before transition
-                    appendMessage(reply, 'assistant');
-                    
+                    chatInput.disabled = true;
+                    appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
                     setTimeout(() => triggerMode2Casting(), 1500);
                 } else {
+                    // Push the CLEAN, EXTRACTED reply to memory so the model stays on track
+                    conversationHistory.push({ role: "assistant", content: reply });
                     appendMessage(reply, 'assistant');
                     setLoadingState(false);
                 }
             } catch (error) {
                 console.error("API Error:", error);
-                // Rollback user turn on network failure so they can try again
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
-                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
+                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. PLEASE REPHRASE.", 'error');
                 setLoadingState(false);
             }
         }
@@ -474,7 +518,7 @@
         }
 
         function revealHexagram() {
-            isProcessing = true; // Lock UI during reveal
+            isProcessing = true; 
             const details = getHexagramDetails();
             
             document.getElementById('castProgress').textContent = `GEOMETRY LOCKED`;
@@ -488,10 +532,7 @@
                 </div>
             `;
 
-            // Pause to let the user absorb the hexagram before interpreting
-            setTimeout(() => {
-                triggerMode3Interpretation(details);
-            }, 3500);
+            setTimeout(() => { triggerMode3Interpretation(details); }, 3500);
         }
 
         async function triggerMode3Interpretation(details) {
@@ -506,7 +547,8 @@
             const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + "\n\n" + mode3Payload } ];
 
             try {
-                const finalRuling = await fetchOracleResponse(apiMessages, 600);
+                // High max_tokens needed because the interpretation is long
+                const finalRuling = await fetchOracleResponse(apiMessages, 800, 3);
                 appendMessage(finalRuling, 'assistant');
                 appendMessage("PROTOCOL COMPLETE. AWAITING NEW INQUIRY.", 'system');
             } catch (error) {
