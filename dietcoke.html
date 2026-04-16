@@ -362,7 +362,7 @@
             conversationHistory.push({ role: "user", content: text });
             
             if (conversationHistory.length > 6) {
-                conversationHistory = conversationHistory.slice(-6);
+                conversationHistory = conversationHistory.slice(-10);
             }
 
             let activeHistory = validateAlternation([...conversationHistory]);
