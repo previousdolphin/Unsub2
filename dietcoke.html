@@ -261,18 +261,20 @@
             MODE_1: `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
 RULES:
 1. Reject advice-seeking, personal belief, and outcome bias.
-2. Respond ONLY with a clarifying reframe using cold, corporate, brutalist vernacular.
-3. Maximum 20 words per response. No conversational fluff. No greetings.
-4. If the inquiry is structurally objective and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+2. Respond ONLY with a clarifying reframe or guiding question using precise, architectural, and clinical vernacular.
+3. Tone must be neutral and objective. Do not be diminutive, offensive, dismissive, or gritty.
+4. Your goal is to guide the user toward structural clarity. Interrogate the logic of the inquiry.
+5. Maximum 20 words per response. No conversational fluff or greetings.
+6. If the inquiry is structurally objective and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 CURRENT INQUIRY: `,
             MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
 STRUCTURE:
 1. HEXAGRAM IDENTIFICATION (Number/Name)
-2. PRIMARY TEXT (NCR-CAM vernacular, 3-5 sentences)
+2. PRIMARY TEXT (Architecture of the situation, 3-5 sentences)
 3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
-4. THE TRANSFORMED HEXAGRAM
-5. CLOSING NOTATION (STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
-Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sentence.\n\n`
+4. THE TRANSFORMED HEXAGRAM (Trajectory)
+5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
+Voice: Clinical precision. Architectural analysis. No apologies. Short sentences. Max 20 words per sentence.\n\n`
         };
 
         let currentMode = 1;
@@ -299,7 +301,7 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
             isProcessing = isLoading;
             chatInput.disabled = isLoading;
             sendBtn.disabled = isLoading;
-            chatInput.placeholder = isLoading ? "Architecture processing..." : "Enter parameters...";
+            chatInput.placeholder = isLoading ? "Distilling architecture..." : "Enter parameters...";
             if (!isLoading) chatInput.focus();
         }
 
@@ -318,9 +320,13 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
             clean = clean.replace(/##/g, "").trim();
             clean = clean.replace(/^"|"$/g, '').trim(); 
             clean = clean.replace(/\*+/g, '').trim();
+            clean = clean.replace(/MODE 3: THE INTERPRETATION/gi, "").trim();
             
-            // Scrub specific intro conversationalisms
-            const artifacts = [/^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^Pilgrim/i, /^Sure, here is your/i];
+            // Scrub conversational fluff and roleplay artifacts
+            const artifacts = [
+                /^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^Pilgrim/i, 
+                /^Sure, here is your/i, /^Buttercup/i, /^Hey kid/i, /^Listen/i
+            ];
             artifacts.forEach(regex => { clean = clean.replace(regex, "").trim(); });
             
             if (clean.includes('\n') && currentMode === 1) {
@@ -348,8 +354,8 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
                 messages: apiMessages,
                 max_tokens: maxTokens,
                 temperature: currentMode === 1 ? 0.01 : 0.4, 
-                frequency_penalty: 1.2, 
-                presence_penalty: 0.3,
+                frequency_penalty: 1.5, 
+                presence_penalty: 0.5,
                 stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed", "##"] 
             };
 
@@ -387,7 +393,6 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
             try {
                 let reply = await fetchOracleResponse(apiMessages, 100);
                 
-                // Safety turn count logic
                 const userTurns = conversationHistory.filter(m => m.role === 'user').length;
                 if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
@@ -398,7 +403,6 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
 
                 if (isValidated) {
                     refinedQuestion = text; 
-                    // CRITICAL LOCK: Freeze input immediately on validation
                     chatInput.disabled = true;
                     appendMessage("STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.", 'system');
                     setTimeout(() => triggerMode2Casting(), 1500);
@@ -442,7 +446,6 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
         function updateCastUI() {
             const step = castResults.length;
             if (step >= 6) {
-                // Ensure castResults is complete before triggering Interpretation
                 triggerMode3Interpretation();
                 return;
             }
@@ -491,7 +494,6 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
             const hexName = HEXAGRAM_NAMES[hexNum] || "Unknown Node";
             const linesText = changingLines.length > 0 ? changingLines.join(", ") : "None";
 
-            // Switch UI back to chat for interpretation result
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
             
@@ -503,13 +505,11 @@ Voice: Brutalist precision. No apologies. Short sentences. Max 20 words per sent
             try {
                 const finalRuling = await fetchOracleResponse(apiMessages, 600);
                 appendMessage(finalRuling, 'assistant');
-                // Final system notification
                 appendMessage("PROTOCOL COMPLETE. SESSION CONCLUDED. REBOOTING...", 'system');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
             } finally {
-                // Return to Mode 1 for the next session
                 resetSystemState();
                 setLoadingState(false);
             }
