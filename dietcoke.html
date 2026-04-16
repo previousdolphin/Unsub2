@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,8 +120,22 @@
 
         .cast-interface { text-align: center; width: 100%; max-width: 500px;}
         .cast-progress { font-weight: 900; letter-spacing: 4px; color: var(--coca-red); margin-bottom: 15px; font-size: 0.9rem;}
-        .cast-question { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; min-height: 60px;}
-        .cast-options { display: flex; gap: 15px; justify-content: center;}
+        .cast-question { font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; min-height: 60px; transition: opacity 0.4s ease;}
+        
+        .revelation-text {
+            animation: fadeIn 1.5s forwards;
+        }
+        .revelation-num {
+            font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: var(--coca-red); line-height: 1; margin-bottom: 5px;
+        }
+        .revelation-name {
+            font-family: 'Montserrat', sans-serif; font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; color: var(--text-main);
+        }
+        .revelation-lines {
+            font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); margin-top: 15px;
+        }
+
+        .cast-options { display: flex; gap: 15px; justify-content: center; transition: opacity 0.4s ease;}
         .cast-btn {
             flex: 1; padding: 15px; background: transparent; border: 2px solid var(--text-main); color: var(--text-main);
             font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; cursor: pointer;
@@ -128,7 +143,7 @@
         }
         .cast-btn:hover { background: var(--text-main); color: var(--bg-color); }
 
-        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 768px) {
             .logo-top { font-size: 4.5rem; }
@@ -138,6 +153,8 @@
             .container-box { padding: 15px 15px 40px 15px; }
             .cast-question { font-size: 1rem; }
             .cast-btn { font-size: 0.8rem; padding: 10px;}
+            .revelation-num { font-size: 2.8rem; }
+            .revelation-name { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -178,7 +195,7 @@
                 <div class="cast-interface">
                     <div class="cast-progress" id="castProgress">LINE 1 / 6</div>
                     <div class="cast-question" id="castQuestionText">Does the structure require submission or assertion?</div>
-                    <div class="cast-options">
+                    <div class="cast-options" id="castOptions">
                         <button class="cast-btn" onclick="castLine()">SUBMIT</button>
                         <button class="cast-btn" onclick="castLine()">ASSERT</button>
                     </div>
@@ -258,14 +275,13 @@
         const BACKEND_API_URL = 'https://7fhfnrvv1fsvih-8000.proxy.runpod.net/v1/chat/completions';
         
         const PROMPTS = {
-            MODE_1: `You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY.
+            MODE_1: `You are DIET COKE, a clinical, highly analytical systems architect. Enforce MODE 1: THE REFINERY.
 RULES:
-1. Reject advice-seeking, personal belief, and outcome bias.
-2. Respond ONLY with a clarifying reframe or guiding question using precise, architectural, and clinical vernacular.
-3. Tone must be neutral and objective. Do not be diminutive, offensive, dismissive, or gritty.
-4. Your goal is to guide the user toward structural clarity. Interrogate the logic of the inquiry.
-5. Maximum 20 words per response. No conversational fluff or greetings.
-6. If the inquiry is structurally objective and precise, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
+1. Never insult, dismiss, or belittle the user. Your tone must be strictly professional, neutral, and helpful.
+2. Do not give direct advice. Instead, ask ONE sharp, guiding Socratic question to help the user clarify the structural root of their issue.
+3. Use precise, architectural, and corporate terminology (e.g., nodes, variables, structures, leverage).
+4. Maximum 20 words. Cut straight to the point. No filler or greetings.
+5. If the user's inquiry is highly specific, objective, and clear, respond EXACTLY with: 'STATUS: VALIDATED. Proceed to Mode 2 Casting.'
 CURRENT INQUIRY: `,
             MODE_3: `You are DIET COKE. Enforce MODE 3: THE INTERPRETATION. 
 STRUCTURE:
@@ -274,7 +290,7 @@ STRUCTURE:
 3. CHANGING LINES (Strategic vectors, 1-2 sentences each)
 4. THE TRANSFORMED HEXAGRAM (Trajectory)
 5. CLOSING NOTATION (Example: STATUS: ACTIVE / NODE: OPERATOR / COMPLIANCE: PENDING)
-Voice: Clinical precision. Architectural analysis. No apologies. Short sentences. Max 20 words per sentence.\n\n`
+Voice: Clinical precision. Architectural analysis. Neutral. Short sentences. Max 20 words per sentence.\n\n`
         };
 
         let currentMode = 1;
@@ -301,7 +317,7 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
             isProcessing = isLoading;
             chatInput.disabled = isLoading;
             sendBtn.disabled = isLoading;
-            chatInput.placeholder = isLoading ? "Distilling architecture..." : "Enter parameters...";
+            chatInput.placeholder = isLoading ? "Architecture processing..." : "Enter parameters...";
             if (!isLoading) chatInput.focus();
         }
 
@@ -311,6 +327,8 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
             refinedQuestion = "";
             currentMode = 1;
             isProcessing = false;
+            // Restore UI for the next potential cast
+            document.getElementById('castOptions').style.display = 'flex';
         }
 
         function cleanGemmaOutput(text) {
@@ -320,12 +338,11 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
             clean = clean.replace(/##/g, "").trim();
             clean = clean.replace(/^"|"$/g, '').trim(); 
             clean = clean.replace(/\*+/g, '').trim();
-            clean = clean.replace(/MODE 3: THE INTERPRETATION/gi, "").trim();
             
-            // Scrub conversational fluff and roleplay artifacts
             const artifacts = [
                 /^Listen up,/i, /^Sure thing,/i, /^I'll try,/i, /^Pilgrim/i, 
-                /^Sure, here is your/i, /^Buttercup/i, /^Hey kid/i, /^Listen/i
+                /^Sure, here is your/i, /^Buttercup/i, /^Hey kid/i, /^Listen/i,
+                /^Look,/i, /^Alright,/i
             ];
             artifacts.forEach(regex => { clean = clean.replace(regex, "").trim(); });
             
@@ -353,9 +370,9 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
                 model: "google/gemma-7b-it", 
                 messages: apiMessages,
                 max_tokens: maxTokens,
-                temperature: currentMode === 1 ? 0.01 : 0.4, 
-                frequency_penalty: 1.5, 
-                presence_penalty: 0.5,
+                temperature: currentMode === 1 ? 0.2 : 0.4, 
+                frequency_penalty: 0.6, 
+                presence_penalty: 0.2,
                 stop: ["<end_of_turn>", "<eos>", "User:", "Oracle:", "\n\n", "Reframed", "##"] 
             };
 
@@ -393,6 +410,8 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
             try {
                 let reply = await fetchOracleResponse(apiMessages, 100);
                 
+                if (!reply) throw new Error("Empty response generated.");
+
                 const userTurns = conversationHistory.filter(m => m.role === 'user').length;
                 if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
                     reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
@@ -416,7 +435,7 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
-                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. RETRY.", 'error');
+                appendMessage("[ERR: SYSTEM] ARCHITECTURE UNSTABLE. PLEASE REPHRASE.", 'error');
                 setLoadingState(false);
             }
         }
@@ -433,6 +452,14 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
             ["Is the asset public or private?", "PUBLIC", "PRIVATE"]
         ];
 
+        const HEXAGRAM_MAP = {
+            "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
+        };
+
+        const HEXAGRAM_NAMES = {
+            1: "The Creative", 2: "The Receptive", 3: "Difficulty at the Beginning", 4: "Youthful Folly", 5: "Waiting", 6: "Conflict", 7: "The Army", 8: "Holding Together", 9: "Small Taming", 10: "Treading", 11: "Peace", 12: "Standstill", 13: "Fellowship with Men", 14: "Possession in Great Measure", 15: "Modesty", 16: "Enthusiasm", 17: "Following", 18: "Work on What Has Been Spoiled", 19: "Approach", 20: "Contemplation", 21: "Biting Through", 22: "Grace", 23: "Stripping Away", 24: "Return", 25: "Innocence", 26: "Great Taming", 27: "Nourishment", 28: "Preponderance of the Great", 29: "The Abysmal", 30: "The Clinging", 31: "Influence", 32: "Duration", 33: "Retreat", 34: "Great Power", 35: "Progress", 36: "Darkening of the Light", 37: "The Family", 38: "Opposition", 39: "Obstruction", 40: "Deliverance", 41: "Decrease", 42: "Increase", 43: "Breakthrough", 44: "Coming to Meet", 45: "Gathering Together", 46: "Pushing Upward", 47: "Oppression", 48: "The Well", 49: "Revolution", 50: "The Cauldron", 51: "The Arousing", 52: "Keeping Still", 53: "Development", 54: "The Marrying Maiden", 55: "Abundance", 56: "The Wanderer", 57: "The Gentle", 58: "The Joyous", 59: "Dispersion", 60: "Limitation", 61: "Inner Truth", 62: "Preponderance of the Small", 63: "After Completion", 64: "Before Completion"
+        };
+
         function triggerMode2Casting() {
             currentMode = 2;
             isProcessing = false;
@@ -440,17 +467,52 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
             castContainer.style.display = 'flex';
             castResults = [];
             document.getElementById('hexagramVisual').innerHTML = '';
+            document.getElementById('castOptions').style.display = 'flex'; // Ensure buttons are visible
             updateCastUI();
+        }
+
+        function getHexagramDetails() {
+            let binaryString = "";
+            let changingLines = [];
+            castResults.forEach((val, i) => {
+                binaryString += (val === 7 || val === 9) ? "1" : "0";
+                if (val === 6 || val === 9) changingLines.push(i + 1);
+            });
+            const hexNum = HEXAGRAM_MAP[binaryString];
+            const hexName = HEXAGRAM_NAMES[hexNum] || "Unknown Node";
+            const linesText = changingLines.length > 0 ? changingLines.join(", ") : "None";
+            return { hexNum, hexName, linesText };
+        }
+
+        function revealHexagram() {
+            const details = getHexagramDetails();
+            
+            // The Interstitial Revelation UI Update
+            document.getElementById('castProgress').textContent = `GEOMETRY LOCKED`;
+            document.getElementById('castOptions').style.display = 'none'; // Hide buttons
+            
+            document.getElementById('castQuestionText').innerHTML = `
+                <div class="revelation-text">
+                    <div class="revelation-num">${details.hexNum < 10 ? '0'+details.hexNum : details.hexNum}</div>
+                    <div class="revelation-name">${details.hexName.toUpperCase()}</div>
+                    <div class="revelation-lines">CHANGING LINES: ${details.linesText}</div>
+                </div>
+            `;
+
+            // Pause for 3.5 seconds to let the user absorb the weight of the cast before interpreting
+            setTimeout(() => {
+                triggerMode3Interpretation(details);
+            }, 3500);
         }
 
         function updateCastUI() {
             const step = castResults.length;
             if (step >= 6) {
-                triggerMode3Interpretation();
+                revealHexagram();
                 return;
             }
             document.getElementById('castProgress').textContent = `LINE ${step + 1} / 6`;
-            document.getElementById('castQuestionText').textContent = CAST_QUESTIONS[step][0];
+            document.getElementById('castQuestionText').innerHTML = CAST_QUESTIONS[step][0]; // reset in case it was a reveal
             const btns = document.querySelectorAll('.cast-btn');
             btns[0].textContent = CAST_QUESTIONS[step][1];
             btns[1].textContent = CAST_QUESTIONS[step][2];
@@ -471,41 +533,22 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
             updateCastUI();
         }
 
-        const HEXAGRAM_MAP = {
-            "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
-        };
-
-        const HEXAGRAM_NAMES = {
-            1: "The Creative", 2: "The Receptive", 3: "Difficulty at the Beginning", 4: "Youthful Folly", 5: "Waiting", 6: "Conflict", 7: "The Army", 8: "Holding Together", 9: "Small Taming", 10: "Treading", 11: "Peace", 12: "Standstill", 13: "Fellowship with Men", 14: "Possession in Great Measure", 15: "Modesty", 16: "Enthusiasm", 17: "Following", 18: "Work on What Has Been Spoiled", 19: "Approach", 20: "Contemplation", 21: "Biting Through", 22: "Grace", 23: "Stripping Away", 24: "Return", 25: "Innocence", 26: "Great Taming", 27: "Nourishment", 28: "Preponderance of the Great", 29: "The Abysmal", 30: "The Clinging", 31: "Influence", 32: "Duration", 33: "Retreat", 34: "Great Power", 35: "Progress", 36: "Darkening of the Light", 37: "The Family", 38: "Opposition", 39: "Obstruction", 40: "Deliverance", 41: "Decrease", 42: "Increase", 43: "Breakthrough", 44: "Coming to Meet", 45: "Gathering Together", 46: "Pushing Upward", 47: "Oppression", 48: "The Well", 49: "Revolution", 50: "The Cauldron", 51: "The Arousing", 52: "Keeping Still", 53: "Development", 54: "The Marrying Maiden", 55: "Abundance", 56: "The Wanderer", 57: "The Gentle", 58: "The Joyous", 59: "Dispersion", 60: "Limitation", 61: "Inner Truth", 62: "Preponderance of the Small", 63: "After Completion", 64: "Before Completion"
-        };
-
-        async function triggerMode3Interpretation() {
+        async function triggerMode3Interpretation(details) {
             currentMode = 3;
             setLoadingState(true);
             
-            let binaryString = "";
-            let changingLines = [];
-            castResults.forEach((val, i) => {
-                binaryString += (val === 7 || val === 9) ? "1" : "0";
-                if (val === 6 || val === 9) changingLines.push(i + 1);
-            });
-
-            const hexNum = HEXAGRAM_MAP[binaryString];
-            const hexName = HEXAGRAM_NAMES[hexNum] || "Unknown Node";
-            const linesText = changingLines.length > 0 ? changingLines.join(", ") : "None";
-
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
             
-            appendMessage(`MODE 2 COMPLETE. CASTING HEXAGRAM ${hexNum}.\nGENERATING ARCHITECTURAL INTERPRETATION...`, 'system');
+            appendMessage(`MODE 2 COMPLETE. ASSIGNED NODE: ${details.hexNum} - ${details.hexName.toUpperCase()}.\nANALYZING ARCHITECTURE...`, 'system');
 
-            const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${hexNum} (${hexName}). CHANGING LINES: ${linesText}.]`;
+            const mode3Payload = `[INPUT: ${refinedQuestion} HEXAGRAM: ${details.hexNum} (${details.hexName}). CHANGING LINES: ${details.linesText}.]`;
             const apiMessages = [ { role: "user", content: PROMPTS.MODE_3 + mode3Payload } ];
 
             try {
                 const finalRuling = await fetchOracleResponse(apiMessages, 600);
                 appendMessage(finalRuling, 'assistant');
-                appendMessage("PROTOCOL COMPLETE. SESSION CONCLUDED. REBOOTING...", 'system');
+                appendMessage("PROTOCOL COMPLETE. SESSION CONCLUDED. AWAITING NEW INQUIRY.", 'system');
             } catch (error) {
                 console.error(error);
                 appendMessage("[ERR: SYSTEM] INTERPRETATION FAILED.", 'error');
@@ -519,3 +562,5 @@ Voice: Clinical precision. Architectural analysis. No apologies. Short sentences
     </script>
 </body>
 </html>
+
+
