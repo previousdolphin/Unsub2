@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Diet Coke: Oracle System</title>
-    <!-- Dependencies for PDF and Image Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -82,7 +81,7 @@
         }
         .brand-container { text-align: center; }
         
-        /* BULLETPROOF LOGO CSS (Fixes PDF alignment by avoiding flexbox margins) */
+        /* BULLETPROOF LOGO CSS */
         .logo-wrapper {
             display: inline-block;
             position: relative;
@@ -271,8 +270,6 @@
         .modal-content li { margin-bottom: 8px; }
         .modal-content strong { color: var(--coca-red); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         @media (max-width: 768px) {
             .logo-section { padding-top: 15px; padding-bottom: 5px; }
             .logo-top { font-size: 3rem; }
@@ -330,7 +327,6 @@
         </button>
     </div>
 
-    <!-- EXPLAINER MODAL -->
     <div id="explainerModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn">&times;</button>
@@ -406,7 +402,6 @@
         </div>
     </div>
 
-    <!-- HIDDEN EXPORT DOM -->
     <div id="exportWrapper">
         <div class="export-page" id="exportPage1">
             <div class="export-brand">
@@ -534,7 +529,8 @@
         initCanvas(); animate();
 
         // --- Core System Configuration ---
-        const BACKEND_API_URL = 'https://v7e8yjpscb1f16-8000.proxy.runpod.net/v1/chat/completions'; 
+        // NEW CLOUDFLARE WORKER URL
+        const CF_WORKER_URL = 'https://bitter-shadow-ec20.jdo-8af.workers.dev'; 
 
         const PROMPTS = {
             MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
@@ -643,6 +639,18 @@
             if (!isLoading && currentMode === 1) chatInput.focus();
         }
 
+        function resetSystemState() {
+            conversationHistory = [];
+            castResults = [];
+            userPath = [];
+            refinedQuestion = "";
+            currentMode = 1;
+            isProcessing = false;
+            document.getElementById('castOptions').style.display = 'flex';
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+        }
+
         function validateAlternation(history) {
             if (history.length === 0) return [];
             let fixed = [];
@@ -656,29 +664,71 @@
             return fixed;
         }
 
+        // --- NEW SERVERLESS POLLING LOGIC ---
         async function fetchOracleResponse(apiMessages, maxTokens, mode) {
+            // 1. Prepare payload with inputs specifically for RunPod's Serverless architecture
             const payload = {
-                model: "Huggingmaces/diet_coke_oracle_merged", 
-                messages: apiMessages,
-                max_tokens: maxTokens, 
-                temperature: 0.1, 
-                frequency_penalty: 0.0, 
-                presence_penalty: 0.0,
-                stop: ["<end_of_turn>", "<eos>"] 
+                input: {
+                    model: "Huggingmaces/diet_coke_oracle_merged",
+                    messages: apiMessages,
+                    max_tokens: maxTokens,
+                    temperature: 0.1,
+                    frequency_penalty: 0.0,
+                    presence_penalty: 0.0
+                }
             };
 
-            const response = await fetch(BACKEND_API_URL, {
-                method: 'POST', mode: 'cors',
-                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer EMPTY' },
+            // 2. Submit the job via Cloudflare Worker
+            const runResponse = await fetch(`${CF_WORKER_URL}/run`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) {
-                const errJson = await response.json().catch(() => ({ message: `HTTP ${response.status}` }));
-                throw new Error(errJson.message || "Network Error");
+            if (!runResponse.ok) {
+                throw new Error(`Failed to start job: HTTP ${runResponse.status}`);
             }
-            const data = await response.json();
-            return data.choices[0].message.content.trim();
+
+            const runData = await runResponse.json();
+            const jobId = runData.id;
+
+            // 3. Setup polling loop
+            let jobStatus = "IN_QUEUE";
+            
+            // Adjust UI for cold-starts
+            if (document.getElementById('chatInput')) {
+                document.getElementById('chatInput').placeholder = "Waking up Oracle (can take 1-2 mins)...";
+            }
+
+            while (jobStatus === "IN_QUEUE" || jobStatus === "IN_PROGRESS") {
+                // Wait 2 seconds before checking status
+                await new Promise(resolve => setTimeout(resolve, 2000)); 
+                
+                const statusResponse = await fetch(`${CF_WORKER_URL}/status/${jobId}`, {
+                    method: 'GET'
+                });
+                
+                const statusData = await statusResponse.json();
+                jobStatus = statusData.status;
+
+                // 4. Return Output or Error
+                if (jobStatus === "COMPLETED") {
+                    // Check standard OpenAI-vLLM format vs pure text format
+                    if (statusData.output && statusData.output.choices) {
+                        return statusData.output.choices[0].message.content.trim();
+                    } else if (statusData.output && statusData.output.text) {
+                        return statusData.output.text[0].trim();
+                    } else if (typeof statusData.output === 'string') {
+                        return statusData.output.trim();
+                    } else {
+                        return JSON.stringify(statusData.output); // Fallback
+                    }
+                } else if (jobStatus === "FAILED") {
+                    throw new Error("Serverless job failed.");
+                }
+            }
         }
 
         async function handleSend() {
@@ -787,6 +837,14 @@
             document.getElementById('hexagramVisual').appendChild(lineDiv);
             updateCastUI();
         }
+
+        const HEXAGRAM_MAP = {
+            "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
+        };
+
+        const HEXAGRAM_NAMES = {
+            1: "The Creative", 2: "The Receptive", 3: "Difficulty at the Beginning", 4: "Youthful Folly", 5: "Waiting", 6: "Conflict", 7: "The Army", 8: "Holding Together", 9: "Small Taming", 10: "Treading", 11: "Peace", 12: "Standstill", 13: "Fellowship with Men", 14: "Possession in Great Measure", 15: "Modesty", 16: "Enthusiasm", 17: "Following", 18: "Work on What Has Been Spoiled", 19: "Approach", 20: "Contemplation", 21: "Biting Through", 22: "Grace", 23: "Stripping Away", 24: "Return", 25: "Innocence", 26: "Great Taming", 27: "Nourishment", 28: "Preponderance of the Great", 29: "The Abysmal", 30: "The Clinging", 31: "Influence", 32: "Duration", 33: "Retreat", 34: "Great Power", 35: "Progress", 36: "Darkening of the Light", 37: "The Family", 38: "Opposition", 39: "Obstruction", 40: "Deliverance", 41: "Decrease", 42: "Increase", 43: "Breakthrough", 44: "Coming to Meet", 45: "Gathering Together", 46: "Pushing Upward", 47: "Oppression", 48: "The Well", 49: "Revolution", 50: "The Cauldron", 51: "The Arousing", 52: "Keeping Still", 53: "Development", 54: "The Marrying Maiden", 55: "Abundance", 56: "The Wanderer", 57: "The Gentle", 58: "The Joyous", 59: "Dispersion", 60: "Limitation", 61: "Inner Truth", 62: "Preponderance of the Small", 63: "After Completion", 64: "Before Completion"
+        };
 
         function getHexagramDetails() {
             let binaryString = "";
