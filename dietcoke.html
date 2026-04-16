@@ -164,6 +164,42 @@
             letter-spacing: 2px;
         }
 
+        /* BULLETPROOF HEXAGRAM CSS */
+        .hex-line, .inline-line {
+            background-color: var(--text-main);
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 2px;
+        }
+        .hex-line { width: 100px; height: 16px; }
+        .inline-line { width: 40px; height: 6px; }
+
+        .hex-line.changing, .inline-line.changing {
+            background-color: var(--coca-red);
+        }
+
+        /* The ::before / ::after trick prevents Safari border box squashing completely */
+        .hex-line.yin, .inline-line.yin {
+            background-color: transparent !important;
+        }
+        .hex-line.yin::before, .hex-line.yin::after,
+        .inline-line.yin::before, .inline-line.yin::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 42%;
+            height: 100%;
+            background-color: var(--text-main);
+            border-radius: inherit;
+        }
+        .hex-line.yin::before, .inline-line.yin::before { left: 0; }
+        .hex-line.yin::after, .inline-line.yin::after { right: 0; }
+
+        .hex-line.yin.changing::before, .hex-line.yin.changing::after,
+        .inline-line.yin.changing::before, .inline-line.yin.changing::after {
+            background-color: var(--coca-red);
+        }
+
         .inline-hex-container {
             display: flex;
             align-items: center;
@@ -182,9 +218,6 @@
             flex-shrink: 0;
             min-width: 40px; 
         }
-        .inline-line { width: 40px; height: 6px; background-color: var(--text-main); border-radius: 1px; box-sizing: border-box; }
-        .inline-line.yin { background-color: transparent; border-left: 16px solid var(--text-main); border-right: 16px solid var(--text-main); }
-        .inline-line.changing { background-color: var(--coca-red); border-color: var(--coca-red); }
         .inline-hex-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
         .inline-hex-title { font-size: 1.1rem; font-weight: 900; color: var(--coca-red); letter-spacing: 2px; margin: 0; line-height: 1.2; }
         .inline-hex-path { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; text-transform: uppercase; }
@@ -286,9 +319,6 @@
 
         #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px; height: 100%;}
         .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start; }
-        .hex-line { width: 100px; height: 16px; background-color: var(--text-main); transition: all 0.3s ease; opacity: 0; animation: fadeIn 0.5s forwards; border-radius: 2px; box-sizing: border-box; }
-        .hex-line.yin { background-color: transparent; border-left: 40px solid var(--text-main); border-right: 40px solid var(--text-main); width: 20px;}
-        .hex-line.changing { background-color: var(--coca-red); border-color: var(--coca-red);}
 
         .cast-interface { text-align: center; width: 100%; max-width: 500px;}
         .cast-progress { font-weight: 900; letter-spacing: 4px; color: var(--coca-red); margin-bottom: 10px; font-size: 0.8rem;}
@@ -333,7 +363,7 @@
             z-index: -1;
         }
         .export-page {
-            width: 800px; min-height: 800px; height: auto; padding: 60px; box-sizing: border-box; 
+            width: 800px; height: max-content; padding: 60px; box-sizing: border-box; 
             background: white; position: relative;
         }
         .export-brand {
@@ -366,6 +396,18 @@
         .export-label {
             font-weight: 800; font-size: 12px; letter-spacing: 1px; margin-bottom: 5px; display: block;
         }
+        
+        /* Export Hexagram Lines (Bulletproof version for rendering) */
+        .exp-line { position: relative; height: 10px; width: 78px; background: #1a1a1a; margin-bottom: 6px; border-radius: 1px; }
+        .exp-line.yin { background: transparent !important; }
+        .exp-line.yin::before, .exp-line.yin::after {
+            content: ''; position: absolute; top: 0; width: 42%; height: 100%;
+            background-color: #1a1a1a; border-radius: inherit;
+        }
+        .exp-line.yin::before { left: 0; }
+        .exp-line.yin::after { right: 0; }
+        .exp-line.changing { background-color: #f40009; }
+        .exp-line.yin.changing::before, .exp-line.yin.changing::after { background-color: #f40009; }
     </style>
 </head>
 <body>
@@ -823,7 +865,7 @@
             
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
-            inputWrapper.style.display = 'none'; // Hide input permanently for the end of the run
+            inputWrapper.style.display = 'none'; 
             
             const wilhelmData = WILHELM_DATA[details.hexNum];
             
@@ -862,7 +904,6 @@
                 finalOracleRuling = await fetchOracleResponse(apiMessages, 800, 3);
                 appendMessage(finalOracleRuling, 'assistant');
                 
-                // End of Conversation UX + Export Options
                 const completionUI = `
                     <div class="system-header" style="margin-top: 10px;">PROTOCOL COMPLETE</div>
                     <div class="completion-actions">
@@ -888,7 +929,6 @@
             btnElement.innerText = "GENERATING...";
 
             try {
-                // 1. Build the hidden DOM for export
                 const exportChatLog = document.getElementById('exportChatLog');
                 exportChatLog.innerHTML = conversationHistory.map(m => `
                     <div class="export-chat-row ${m.role === 'user' ? 'export-chat-user' : 'export-chat-oracle'}">
@@ -903,17 +943,14 @@
                 let expLinesHTML = '';
                 castResults.forEach(val => {
                     let isYin = [6,8].includes(val);
-                    let color = [6,9].includes(val) ? '#f40009' : '#1a1a1a';
-                    if (isYin) {
-                        expLinesHTML = `<div style="display: flex; gap: 8px; margin-bottom: 6px;"><div style="height: 10px; width: 35px; background: ${color};"></div><div style="height: 10px; width: 35px; background: ${color};"></div></div>` + expLinesHTML;
-                    } else {
-                        expLinesHTML = `<div style="height: 10px; width: 78px; background: ${color}; margin-bottom: 6px;"></div>` + expLinesHTML;
-                    }
+                    let cClass = [6,9].includes(val) ? 'changing' : '';
+                    let yClass = isYin ? 'yin' : 'yang';
+                    expLinesHTML = `<div class="exp-line ${yClass} ${cClass}"></div>` + expLinesHTML;
                 });
 
                 document.getElementById('exportHexagram').innerHTML = `
                     <div style="display: flex; align-items: center; gap: 30px;">
-                        <div>${expLinesHTML}</div>
+                        <div style="display: flex; flex-direction: column-reverse; gap: 6px;">${expLinesHTML}</div>
                         <div>
                             <h2 style="margin: 0; color: #f40009; font-size: 24px;">${details.hexNum} - ${details.hexName.toUpperCase()}</h2>
                             <p style="margin: 8px 0 0 0; color: #555; font-size: 12px; text-transform: uppercase;"><strong>Path:</strong> ${userPath.join(' &rarr; ')}</p>
@@ -928,28 +965,47 @@
 
                 document.getElementById('exportRuling').innerText = finalOracleRuling;
 
-                // 2. Render & Download
                 const wrapper = document.getElementById('exportWrapper');
                 wrapper.style.display = 'block';
 
                 if (type === 'pdf') {
-                    const page1 = await html2canvas(document.getElementById('exportPage1'), { scale: 2, useCORS: true });
-                    const page2 = await html2canvas(document.getElementById('exportPage2'), { scale: 2, useCORS: true });
+                    // JPEG export drops file size massively over PNG
+                    const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 1.5, useCORS: true });
+                    const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 1.5, useCORS: true });
                     
                     const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
                     const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
                     
-                    pdf.addImage(page1.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, (page1.height * pdfWidth) / page1.width);
+                    // Scale Page 1 so it NEVER overflows a single page
+                    const p1Ratio = page1Canvas.width / page1Canvas.height;
+                    let p1W = pdfWidth;
+                    let p1H = pdfWidth / p1Ratio;
+                    if (p1H > pdfHeight) {
+                        p1H = pdfHeight;
+                        p1W = pdfHeight * p1Ratio;
+                    }
+                    pdf.addImage(page1Canvas.toDataURL('image/jpeg', 0.8), 'JPEG', (pdfWidth - p1W)/2, 0, p1W, p1H);
+                    
+                    // Page 2
                     pdf.addPage();
-                    pdf.addImage(page2.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, (page2.height * pdfWidth) / page2.width);
+                    const p2Ratio = page2Canvas.width / page2Canvas.height;
+                    let p2W = pdfWidth;
+                    let p2H = pdfWidth / p2Ratio;
+                    if (p2H > pdfHeight) {
+                        p2H = pdfHeight;
+                        p2W = pdfHeight * p2Ratio;
+                    }
+                    pdf.addImage(page2Canvas.toDataURL('image/jpeg', 0.8), 'JPEG', (pdfWidth - p2W)/2, 0, p2W, p2H);
                     
                     pdf.save('Oracle_Consultation.pdf');
                 } else if (type === 'image') {
+                    // Image captures JUST the second page, wrapped tightly around the content
                     const page2 = document.getElementById('exportPage2');
-                    const fullDoc = await html2canvas(page2, { scale: 2, useCORS: true });
+                    const fullDoc = await html2canvas(page2, { scale: 1.5, useCORS: true });
                     const link = document.createElement('a');
-                    link.download = 'Oracle_Revelation.png';
-                    link.href = fullDoc.toDataURL('image/png');
+                    link.download = 'Oracle_Revelation.jpg';
+                    link.href = fullDoc.toDataURL('image/jpeg', 0.9);
                     link.click();
                 }
 
