@@ -1,7 +1,7 @@
 {
   "name": "Diet Coke Oracle by Unsubscribe LLC",
   "short_name": "DIET COKE Oracle by Unsubscribe",
-  "start_url": ".",
+  "start_url": "./dietcoke.html",
   "display": "standalone",
   "background_color": "#e2e2e2",
   "theme_color": "#1a1a1a",
