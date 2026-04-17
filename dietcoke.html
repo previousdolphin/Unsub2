@@ -6,8 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a1a">
-    <link rel="manifest" href="manifest.json" id="dynamic-manifest">
-    <title>Diet Coke: Oracle System by Unsubscribe LLC</title>
+    <!-- ISOLATED MANIFEST -->
+    <link rel="manifest" href="./dietcoke-manifest.json" id="dynamic-manifest">
+    <title>Diet Coke: Oracle System</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -327,7 +328,19 @@
             position: absolute; left: -9999px; top: -9999px; width: 800px;
             background: white; color: black; font-family: 'Montserrat', sans-serif; z-index: -1;
         }
-        .export-page { width: 800px; height: max-content; padding: 60px; box-sizing: border-box; background: white; position: relative; }
+        
+        .export-page { 
+            width: 800px; 
+            min-height: 1131px; /* A4 aspect ratio 1:1.414 bounds to ensure footer pushes to bottom */
+            padding: 60px; 
+            box-sizing: border-box; 
+            background: white; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; /* pushes watermark to bottom */
+        }
+        
         .export-brand { text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px; }
         
         .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; }
@@ -478,21 +491,7 @@
 
     <div id="exportWrapper">
         <div class="export-page" id="exportPage1">
-            <div class="export-brand">
-                <div class="export-logo-wrapper">
-                    <span class="export-logo-top">Coke</span>
-                    <span class="export-logo-diet">Diet</span>
-                </div>
-                <div class="export-title">ORACLE SYSTEM</div>
-                <div class="export-sub">神諭系統 • ai guide • llm</div>
-            </div>
-            <div class="export-heading">MODE 1: THE REFINERY</div>
-            <div id="exportChatLog"></div>
-            <div class="export-watermark">UNSUBSCRIBE.LLC/DIETCOKE.HTML</div>
-        </div>
-
-        <div id="exportCombinedView" style="background: white; width: 800px;">
-            <div class="export-page" id="exportPage2" style="padding-bottom: 20px;">
+            <div>
                 <div class="export-brand">
                     <div class="export-logo-wrapper">
                         <span class="export-logo-top">Coke</span>
@@ -501,26 +500,47 @@
                     <div class="export-title">ORACLE SYSTEM</div>
                     <div class="export-sub">神諭系統 • ai guide • llm</div>
                 </div>
-                <div class="export-heading">MODE 2: THE CASTING & REVELATION</div>
-                <div id="exportHexagram" style="margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px;"></div>
-                
-                <div class="export-heading" style="margin-top: 40px;">WILHELM ARCHIVE</div>
-                <div id="exportWilhelm" style="font-size: 14px; line-height: 1.6; margin-bottom: 40px; padding: 20px; background: #f9f9f9; border-left: 4px solid #f40009; border-radius: 0 8px 8px 0;"></div>
-                
-                <div class="export-heading">MODE 3: THE INTERPRETATION</div>
-                <div id="exportRuling" style="font-size: 16px; font-weight: 600; color: #f40009; padding: 20px; border: 2px solid #f40009; border-radius: 8px; line-height: 1.6;"></div>
+                <div class="export-heading">MODE 1: THE REFINERY</div>
+                <div id="exportChatLog"></div>
+            </div>
+            <div class="export-watermark">UNSUBSCRIBE.LLC/DIETCOKE.HTML</div>
+        </div>
+
+        <div id="exportCombinedView" style="background: white; width: 800px; display: flex; flex-direction: column;">
+            <div class="export-page" id="exportPage2">
+                <div>
+                    <div class="export-brand">
+                        <div class="export-logo-wrapper">
+                            <span class="export-logo-top">Coke</span>
+                            <span class="export-logo-diet">Diet</span>
+                        </div>
+                        <div class="export-title">ORACLE SYSTEM</div>
+                        <div class="export-sub">神諭系統 • ai guide • llm</div>
+                    </div>
+                    <div class="export-heading">MODE 2: THE CASTING & REVELATION</div>
+                    <div id="exportHexagram" style="margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px;"></div>
+                    
+                    <div class="export-heading" style="margin-top: 40px;">WILHELM ARCHIVE</div>
+                    <div id="exportWilhelm" style="font-size: 14px; line-height: 1.6; margin-bottom: 40px; padding: 20px; background: #f9f9f9; border-left: 4px solid #f40009; border-radius: 0 8px 8px 0;"></div>
+                    
+                    <div class="export-heading">MODE 3: THE INTERPRETATION</div>
+                    <div id="exportRuling" style="font-size: 16px; font-weight: 600; color: #f40009; padding: 20px; border: 2px solid #f40009; border-radius: 8px; line-height: 1.6;"></div>
+                </div>
+                <div class="export-watermark">UNSUBSCRIBE.LLC/DIETCOKE.HTML</div>
             </div>
             
-            <div class="export-page" id="exportPage3" style="padding-top: 0;">
-                <div style="border: 2px dashed #f40009; padding: 40px; border-radius: 12px; margin-top: 20px; text-align: center; background: #fff;">
-                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 24px; margin-bottom: 10px; color: #1a1a1a;">Asking Better Questions</h2>
-                    <h3 style="margin-top: 0; color: #f40009; font-style: italic; font-weight: 700; font-size: 18px;">Most people blame their answers — The problem was always the question.</h3>
-                    <p style="font-size: 14px; line-height: 1.6; color: #333; margin-top: 20px;">You already know how to use AI. You've tried the prompts. You've watched the tutorials. You've gotten useful outputs and forgettable ones and you're not always sure why.</p>
-                    <p style="font-size: 14px; line-height: 1.6; color: #333;">Here's what nobody tells you: <strong>the tool isn't the variable. You are.</strong></p>
-                    <p style="font-size: 14px; line-height: 1.6; color: #333;">The quality of what AI gives you is a direct reflection of the quality of your thinking going in. Which means the people getting extraordinary results aren't better at AI. They're better at asking.</p>
-                    <p style="font-size: 14px; line-height: 1.6; color: #333;">This course teaches that. Four Sunday afternoons. Small room. Real problems. No theory that doesn't immediately touch your actual life.</p>
-                    <div style="margin-top: 30px; padding: 15px 30px; background: #f40009; color: white; font-weight: bold; border-radius: 8px; display: inline-block; font-size: 16px;">
-                        ENROLL EARLY: MAVEN.COM/UNSUB/ASKING-BETTER-QUESTIONS
+            <div class="export-page" id="exportPage3">
+                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 40px 0;">
+                    <div style="border: 2px dashed #f40009; padding: 50px; border-radius: 12px; text-align: center; background: #fff; max-width: 650px;">
+                        <h2 style="font-family: 'Montserrat', sans-serif; font-size: 28px; margin-bottom: 15px; color: #1a1a1a;">Asking Better Questions</h2>
+                        <h3 style="margin-top: 0; color: #f40009; font-style: italic; font-weight: 700; font-size: 18px;">Most people blame their answers — The problem was always the question.</h3>
+                        <p style="font-size: 15px; line-height: 1.7; color: #333; margin-top: 25px;">You already know how to use AI. You've tried the prompts. You've watched the tutorials. You've gotten useful outputs and forgettable ones and you're not always sure why.</p>
+                        <p style="font-size: 15px; line-height: 1.7; color: #333;">Here's what nobody tells you: <strong>the tool isn't the variable. You are.</strong></p>
+                        <p style="font-size: 15px; line-height: 1.7; color: #333;">The quality of what AI gives you is a direct reflection of the quality of your thinking going in. Which means the people getting extraordinary results aren't better at AI. They're better at asking.</p>
+                        <p style="font-size: 15px; line-height: 1.7; color: #333;">This course teaches that. Four Sunday afternoons. Small room. Real problems. No theory that doesn't immediately touch your actual life.</p>
+                        <div style="margin-top: 35px; padding: 18px 35px; background: #f40009; color: white; font-weight: bold; border-radius: 8px; display: inline-block; font-size: 16px; letter-spacing: 1px;">
+                            ENROLL EARLY: MAVEN.COM/UNSUB/ASKING-BETTER-QUESTIONS
+                        </div>
                     </div>
                 </div>
                 <div class="export-watermark">UNSUBSCRIBE.LLC/DIETCOKE.HTML</div>
@@ -531,14 +551,33 @@
     <script>
         // --- Dynamic Fallback PWA Manifest & SW Injection ---
         // (This runs if the external manifest.json and sw.js aren't found on your server)
-        
-        fetch('./manifest.json').catch(() => {
+        const manifestData = {
+            "name": "Diet Coke Oracle",
+            "short_name": "Oracle",
+            "start_url": "./dietcoke.html",
+            "display": "standalone",
+            "background_color": "#e2e2e2",
+            "theme_color": "#1a1a1a",
+            "icons": [
+                {
+                    "src": "./logo192.PNG",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "./logo512.PNG",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
+        };
+        fetch('./dietcoke-manifest.json').catch(() => {
             const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
             document.getElementById('dynamic-manifest').href = URL.createObjectURL(manifestBlob);
         });
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').catch(() => {
+            navigator.serviceWorker.register('./dietcoke-sw.js').catch(() => {
                 const swCode = `
                     self.addEventListener('fetch', function(event) {
                         event.respondWith(fetch(event.request).catch(function() {
@@ -626,14 +665,55 @@
                 historyList.innerHTML = '<p style="text-align:center; color: var(--text-muted);">No records found.</p>';
                 clearHistoryBtn.style.display = 'none';
             } else {
-                historyList.innerHTML = history.map(item => `
-                    <div style="background: var(--msg-user-bg); padding: 15px; border-radius: 8px; border-left: 4px solid var(--coca-red);">
-                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px;">${new Date(item.date).toLocaleDateString()}</div>
-                        <div style="font-weight: 700; margin-bottom: 5px; color: var(--coca-red);">${item.hexNum} - ${item.hexName}</div>
-                        <div style="font-size: 0.85rem; font-style: italic; margin-bottom: 10px; color: var(--text-main);">"${item.question}"</div>
-                        <div style="font-size: 0.85rem; line-height: 1.5; color: var(--text-main);">${item.ruling}</div>
-                    </div>
-                `).join('');
+                historyList.innerHTML = history.map(item => {
+                    const dateStr = new Date(item.date).toLocaleDateString();
+                    
+                    let chatHtml = (item.chatLog || []).map(m => `
+                        <div style="margin-bottom: 8px; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; background: ${m.role === 'user' ? 'var(--msg-user-bg)' : 'rgba(244,0,9,0.05)'}; border-left: 3px solid ${m.role === 'user' ? 'var(--msg-user-border)' : 'var(--coca-red)'}; color: ${m.role === 'user' ? 'var(--text-main)' : 'var(--coca-red)'}; font-weight: ${m.role === 'user' ? '400' : '600'};">
+                            <strong style="font-size: 0.65rem; text-transform: uppercase; color: ${m.role === 'user' ? 'var(--text-muted)' : 'var(--coca-red)'}; opacity: 0.8; display: block; margin-bottom: 4px;">${m.role}</strong>
+                            ${m.content}
+                        </div>
+                    `).join('');
+
+                    let wilhelmHtml = '';
+                    if (item.wilhelm) {
+                        wilhelmHtml = `
+                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(150,150,150,0.3);">
+                                <strong style="color: var(--text-main); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Wilhelm Archive</strong>
+                                <div style="margin-top: 10px; padding: 12px; background: rgba(0,0,0,0.02); border-radius: 6px;">
+                                    <strong style="color: var(--coca-red); font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 4px;">The Judgement</strong>
+                                    <p style="font-size: 0.8rem; margin: 0 0 12px 0; color: var(--text-main); line-height: 1.5;">${item.wilhelm.judgement}</p>
+                                    
+                                    <strong style="color: var(--coca-red); font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 4px;">The Image</strong>
+                                    <p style="font-size: 0.8rem; margin: 0; color: var(--text-main); line-height: 1.5;">${item.wilhelm.image}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <details class="wilhelm-accordion" style="margin-bottom: 10px;">
+                            <summary class="wilhelm-summary" style="padding: 15px;">
+                                <div style="display: flex; flex-direction: column; gap: 5px; text-align: left; width: 90%;">
+                                    <span style="color: var(--text-muted); font-size: 0.65rem; font-weight: 600;">${dateStr}</span>
+                                    <span style="color: var(--coca-red); font-weight: 900; font-size: 1rem;">${item.hexNum} - ${item.hexName}</span>
+                                    <span style="font-style: italic; font-weight: 400; text-transform: none; color: var(--text-main); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">"${item.question}"</span>
+                                </div>
+                            </summary>
+                            <div class="wilhelm-content" style="padding: 0 15px 15px 15px; border-top: none; margin-top: 0;">
+                                <div style="margin-bottom: 15px;">
+                                    <strong style="color: var(--text-main); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 10px; border-bottom: 1px solid rgba(150,150,150,0.2); padding-bottom: 5px;">Refinery Log</strong>
+                                    ${chatHtml}
+                                </div>
+                                ${wilhelmHtml}
+                                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(150,150,150,0.2);">
+                                    <strong style="color: var(--coca-red); font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px;">Oracle Ruling</strong>
+                                    <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-main); font-weight: 600;">${item.ruling}</div>
+                                </div>
+                            </div>
+                        </details>
+                    `;
+                }).join('');
                 clearHistoryBtn.style.display = 'block';
             }
             historyModal.classList.add('active');
@@ -650,9 +730,17 @@
             openHistory();
         });
 
-        function saveToHistory(question, hexNum, hexName, ruling) {
+        function saveToHistory(question, hexNum, hexName, ruling, chatLog, wilhelm) {
             const history = JSON.parse(localStorage.getItem('dietcoke_history') || '[]');
-            history.unshift({ date: new Date().toISOString(), question, hexNum, hexName, ruling });
+            history.unshift({ 
+                date: new Date().toISOString(), 
+                question, 
+                hexNum, 
+                hexName, 
+                ruling,
+                chatLog: JSON.parse(JSON.stringify(chatLog)),
+                wilhelm: JSON.parse(JSON.stringify(wilhelm))
+            });
             localStorage.setItem('dietcoke_history', JSON.stringify(history.slice(0, 50))); 
         }
 
@@ -1159,8 +1247,8 @@
                 finalOracleRuling = await fetchOracleResponse(apiMessages, 800, 3);
                 appendMessage(finalOracleRuling, 'assistant');
                 
-                // Save to local history when completed
-                saveToHistory(refinedQuestion, details.hexNum, details.hexName, finalOracleRuling);
+                // Save complete data map to local history when finished
+                saveToHistory(refinedQuestion, details.hexNum, details.hexName, finalOracleRuling, conversationHistory, wilhelmData);
                 
                 const completionUI = `
                     <div class="system-header" style="margin-top: 10px;">PROTOCOL COMPLETE</div>
