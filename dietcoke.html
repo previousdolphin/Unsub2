@@ -256,7 +256,7 @@
         .btn:disabled { cursor: not-allowed; opacity: 0.5; transform: none; }
 
         .completion-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .completion-row { display: flex; gap: 10px; width: 100%; }
+        .completion-row { display: flex; gap: 10px; width: 100%; flex-wrap: wrap; justify-content: center;}
 
         #castContainer { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px; height: 100%;}
         .hexagram-visual { display: flex; flex-direction: column-reverse; gap: 8px; height: 180px; width: 120px; align-items: center; justify-content: flex-start; }
@@ -272,7 +272,7 @@
         .cast-options { display: flex; gap: 10px; justify-content: center; transition: opacity 0.4s ease;}
         .cast-btn { flex: 1; padding: 12px; background: transparent; border: 2px solid var(--text-main); color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease; letter-spacing: 1px; border-radius: 8px; font-size: 0.9rem; }
         .cast-btn:hover { background: var(--text-main); color: var(--bg-color); }
-        .cast-btn.export-btn { border-color: var(--coca-red); color: var(--coca-red); font-size: 0.8rem;}
+        .cast-btn.export-btn { border-color: var(--coca-red); color: var(--coca-red); font-size: 0.8rem; min-width: 140px;}
         .cast-btn.export-btn:hover { background: var(--coca-red); color: white; }
 
         .modal-overlay {
@@ -315,6 +315,7 @@
             .message { max-width: 90%; padding: 12px 15px; font-size: 0.9rem; }
             .cast-question { font-size: 0.95rem; min-height: 50px; }
             .cast-btn { font-size: 0.75rem; padding: 10px;}
+            .cast-btn.export-btn { min-width: 100px; }
             .revelation-num { font-size: 2.5rem; }
             .revelation-name { font-size: 1.1rem; }
             .inline-hex-container { padding: 10px; flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -348,6 +349,8 @@
         .exp-line.yin::after { right: 0; }
         .exp-line.changing { background-color: #f40009; }
         .exp-line.yin.changing::before, .exp-line.yin.changing::after { background-color: #f40009; }
+        
+        .export-watermark { text-align: center; margin-top: 40px; font-weight: 700; color: #1a1a1a; font-size: 14px; letter-spacing: 2px; padding-top: 20px; border-top: 1px solid #ccc; }
     </style>
 </head>
 <body>
@@ -503,6 +506,9 @@
             
             <div class="export-heading">MODE 3: THE INTERPRETATION</div>
             <div id="exportRuling" style="font-size: 16px; font-weight: 600; color: #f40009; padding: 20px; border: 2px solid #f40009; border-radius: 8px; line-height: 1.6;"></div>
+            
+            <!-- Persistent Export Watermark -->
+            <div class="export-watermark">UNSUBSCRIBE.LLC/DIETCOKE.HTML</div>
         </div>
     </div>
 
@@ -1078,6 +1084,40 @@
             setTimeout(() => { triggerMode3Interpretation(details); }, 3500);
         }
 
+        // New function to handle social sharing via native share sheet or clipboard
+        async function shareToSocials(hexName, btnElement) {
+            const originalText = btnElement.innerText;
+            const shareData = {
+                title: 'Diet Coke Oracle System',
+                text: `I consulted the Diet Coke Oracle. Assigned Node: ${hexName}. The problem was always the question.\n\n`,
+                url: 'https://unsubscribe.llc/dietcoke.html'
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Share cancelled or failed:', err);
+                }
+            } else {
+                // Fallback for desktop or unsupported browsers
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = shareData.text + shareData.url;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                    
+                    btnElement.innerText = "LINK COPIED!";
+                    setTimeout(() => btnElement.innerText = originalText, 2000);
+                } catch (err) {
+                    btnElement.innerText = "FAILED";
+                    setTimeout(() => btnElement.innerText = originalText, 2000);
+                }
+            }
+        }
+
         async function triggerMode3Interpretation(details) {
             currentMode = 3;
             
@@ -1132,6 +1172,7 @@
                         <div class="completion-row">
                             <button class="cast-btn export-btn" onclick="exportConsultation('pdf', this)">EXPORT PDF</button>
                             <button class="cast-btn export-btn" onclick="exportConsultation('image', this)">EXPORT IMAGE</button>
+                            <button class="cast-btn export-btn" onclick="shareToSocials('${details.hexName}', this)">SHARE RESULT</button>
                         </div>
                     </div>
                 `;
