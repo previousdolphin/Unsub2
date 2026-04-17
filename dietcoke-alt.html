@@ -714,17 +714,51 @@
                 jobStatus = statusData.status;
 
                 // 4. Return Output or Error
+                // 4. Return Output or Error
                 if (jobStatus === "COMPLETED") {
-                    // Check standard OpenAI-vLLM format vs pure text format
-                    if (statusData.output && statusData.output.choices) {
-                        return statusData.output.choices[0].message.content.trim();
-                    } else if (statusData.output && statusData.output.text) {
-                        return statusData.output.text[0].trim();
-                    } else if (typeof statusData.output === 'string') {
-                        return statusData.output.trim();
-                    } else {
-                        return JSON.stringify(statusData.output); // Fallback
+                    let out = statusData.output;
+                    
+                    // 1. Handle RunPod returning an array at the top level
+                    if (Array.isArray(out) && out.length > 0) {
+                        out = out[0];
                     }
+
+                    // 2. Extract the actual text from the specific schema
+                    if (out && out.choices && out.choices.length > 0) {
+                        const choice = out.choices[0];
+                        
+                        // Standard OpenAI chat format
+                        if (choice.message && choice.message.content) {
+                            return choice.message.content.trim();
+                        } 
+                        // vLLM / RunPod specific tokens array format
+                        else if (choice.tokens && choice.tokens.length > 0) {
+                            let text = choice.tokens[0];
+                            
+                            // Prevent double-JSON rendering if the worker wraps it twice
+                            if (typeof text === 'string' && text.startsWith('[{"choices"')) {
+                                try {
+                                    const parsed = JSON.parse(text);
+                                    text = parsed[0].choices[0].tokens[0];
+                                } catch(e) {} // If parsing fails, just output the raw text
+                            }
+                            return text.trim();
+                        } 
+                        // Standard text completion format
+                        else if (choice.text) {
+                            return choice.text.trim();
+                        }
+                    } 
+                    
+                    if (out && out.text && Array.isArray(out.text)) {
+                        return out.text[0].trim();
+                    } 
+                    
+                    if (typeof out === 'string') {
+                        return out.trim();
+                    }
+                    
+                    return JSON.stringify(statusData.output); // Final fallback
                 } else if (jobStatus === "FAILED") {
                     throw new Error("Serverless job failed.");
                 }
