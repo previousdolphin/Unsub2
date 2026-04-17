@@ -688,7 +688,7 @@
             return data.choices[0].message.content.trim();
         }
 
-     async function handleSend() {
+         async function handleSend() {
             const text = chatInput.value.trim();
             if (!text || currentMode !== 1 || isProcessing) return;
 
