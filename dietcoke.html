@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #e2e2e2;
@@ -86,7 +86,6 @@
             display: inline-block;
             position: relative;
             margin-bottom: 5px;
-            padding-left: 15px;
         }
         .logo-top {
             font-family: 'Playfair Display', serif; 
@@ -98,13 +97,14 @@
             display: block;
         }
         .logo-diet {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.2rem; 
-            font-style: italic; 
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem; 
+            font-style: italic;
+            font-weight: 400; 
             color: var(--text-main);
             position: absolute; 
-            top: -18px; 
-            left: -15px; 
+            top: -24px; 
+            right: -15px; 
             letter-spacing: normal;
         }
         .oracle-text { font-size: 2.5rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); }
@@ -285,7 +285,7 @@
         @media (max-width: 768px) {
             .logo-section { padding-top: 15px; padding-bottom: 5px; }
             .logo-top { font-size: 4.5rem; }
-            .logo-diet { font-size: 1.6rem; top: -14px; left: -10px; }
+            .logo-diet { font-size: 1.8rem; top: -18px; left: auto; right: -10px; }
             .oracle-text { font-size: 1.5rem; letter-spacing: 2px; line-height: 1; margin-top: 5px;}
             .sub-text { font-size: 0.6rem; margin-top: 4px; }
             .container-box { padding: 5px 10px; }
@@ -307,9 +307,9 @@
         .export-page { width: 800px; height: max-content; padding: 60px; box-sizing: border-box; background: white; position: relative; }
         .export-brand { text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px; }
         
-        .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; padding-left: 20px; }
+        .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; }
         .export-logo-top { font-family: 'Playfair Display', serif; font-size: 6rem; font-weight: 700; color: #f40009; display: block; line-height: 0.8; letter-spacing: -2px; }
-        .export-logo-diet { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-style: italic; color: #1a1a1a; position: absolute; top: -18px; left: -15px; }
+        .export-logo-diet { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; font-weight: 400; color: #1a1a1a; position: absolute; top: -24px; right: -15px; }
         
         .export-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px; }
         .export-sub { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase; }
