@@ -488,27 +488,43 @@
             </div>
             <div class="export-heading">MODE 1: THE REFINERY</div>
             <div id="exportChatLog"></div>
-        </div>
-        <div class="export-page" id="exportPage2">
-            <div class="export-brand">
-                <div class="export-logo-wrapper">
-                    <span class="export-logo-top">Coke</span>
-                    <span class="export-logo-diet">Diet</span>
-                </div>
-                <div class="export-title">ORACLE SYSTEM</div>
-                <div class="export-sub">神諭系統 • ai guide • llm</div>
-            </div>
-            <div class="export-heading">MODE 2: THE CASTING & REVELATION</div>
-            <div id="exportHexagram" style="margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px;"></div>
-            
-            <div class="export-heading" style="margin-top: 40px;">WILHELM ARCHIVE</div>
-            <div id="exportWilhelm" style="font-size: 14px; line-height: 1.6; margin-bottom: 40px; padding: 20px; background: #f9f9f9; border-left: 4px solid #f40009; border-radius: 0 8px 8px 0;"></div>
-            
-            <div class="export-heading">MODE 3: THE INTERPRETATION</div>
-            <div id="exportRuling" style="font-size: 16px; font-weight: 600; color: #f40009; padding: 20px; border: 2px solid #f40009; border-radius: 8px; line-height: 1.6;"></div>
-            
-            <!-- Persistent Export Watermark -->
             <div class="export-watermark">UNSUBSCRIBE.LLC/DIETCOKE.HTML</div>
+        </div>
+
+        <div id="exportCombinedView" style="background: white; width: 800px;">
+            <div class="export-page" id="exportPage2" style="padding-bottom: 20px;">
+                <div class="export-brand">
+                    <div class="export-logo-wrapper">
+                        <span class="export-logo-top">Coke</span>
+                        <span class="export-logo-diet">Diet</span>
+                    </div>
+                    <div class="export-title">ORACLE SYSTEM</div>
+                    <div class="export-sub">神諭系統 • ai guide • llm</div>
+                </div>
+                <div class="export-heading">MODE 2: THE CASTING & REVELATION</div>
+                <div id="exportHexagram" style="margin-bottom: 25px; padding: 20px; background: #f9f9f9; border-radius: 8px;"></div>
+                
+                <div class="export-heading" style="margin-top: 40px;">WILHELM ARCHIVE</div>
+                <div id="exportWilhelm" style="font-size: 14px; line-height: 1.6; margin-bottom: 40px; padding: 20px; background: #f9f9f9; border-left: 4px solid #f40009; border-radius: 0 8px 8px 0;"></div>
+                
+                <div class="export-heading">MODE 3: THE INTERPRETATION</div>
+                <div id="exportRuling" style="font-size: 16px; font-weight: 600; color: #f40009; padding: 20px; border: 2px solid #f40009; border-radius: 8px; line-height: 1.6;"></div>
+            </div>
+            
+            <div class="export-page" id="exportPage3" style="padding-top: 0;">
+                <div style="border: 2px dashed #f40009; padding: 40px; border-radius: 12px; margin-top: 20px; text-align: center; background: #fff;">
+                    <h2 style="font-family: 'Montserrat', sans-serif; font-size: 24px; margin-bottom: 10px; color: #1a1a1a;">Asking Better Questions</h2>
+                    <h3 style="margin-top: 0; color: #f40009; font-style: italic; font-weight: 700; font-size: 18px;">Most people blame their answers — The problem was always the question.</h3>
+                    <p style="font-size: 14px; line-height: 1.6; color: #333; margin-top: 20px;">You already know how to use AI. You've tried the prompts. You've watched the tutorials. You've gotten useful outputs and forgettable ones and you're not always sure why.</p>
+                    <p style="font-size: 14px; line-height: 1.6; color: #333;">Here's what nobody tells you: <strong>the tool isn't the variable. You are.</strong></p>
+                    <p style="font-size: 14px; line-height: 1.6; color: #333;">The quality of what AI gives you is a direct reflection of the quality of your thinking going in. Which means the people getting extraordinary results aren't better at AI. They're better at asking.</p>
+                    <p style="font-size: 14px; line-height: 1.6; color: #333;">This course teaches that. Four Sunday afternoons. Small room. Real problems. No theory that doesn't immediately touch your actual life.</p>
+                    <div style="margin-top: 30px; padding: 15px 30px; background: #f40009; color: white; font-weight: bold; border-radius: 8px; display: inline-block; font-size: 16px;">
+                        ENROLL EARLY: MAVEN.COM/UNSUB/ASKING-BETTER-QUESTIONS
+                    </div>
+                </div>
+                <div class="export-watermark">UNSUBSCRIBE.LLC/DIETCOKE.HTML</div>
+            </div>
         </div>
     </div>
 
@@ -1230,31 +1246,61 @@
                 const wrapper = document.getElementById('exportWrapper');
                 wrapper.style.display = 'block';
 
+                const watermarks = document.querySelectorAll('.export-watermark');
+
                 if (type === 'pdf') {
+                    // Temporarily hide HTML watermarks so they don't render as un-clickable images
+                    watermarks.forEach(w => w.style.display = 'none');
+                    
                     const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 3, useCORS: true });
                     const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 3, useCORS: true });
+                    const page3Canvas = await html2canvas(document.getElementById('exportPage3'), { scale: 3, useCORS: true });
+                    
+                    watermarks.forEach(w => w.style.display = 'block'); // restore
                     
                     const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
                     const pdfWidth = pdf.internal.pageSize.getWidth();
                     const pdfHeight = pdf.internal.pageSize.getHeight();
                     
-                    const p1Ratio = page1Canvas.width / page1Canvas.height;
-                    let p1W = pdfWidth;
-                    let p1H = pdfWidth / p1Ratio;
-                    if (p1H > pdfHeight) { p1H = pdfHeight; p1W = pdfHeight * p1Ratio; }
-                    pdf.addImage(page1Canvas.toDataURL('image/jpeg', 1.0), 'JPEG', (pdfWidth - p1W)/2, 0, p1W, p1H);
-                    
+                    const addPage = (canvas, addMavenLink = false) => {
+                        const ratio = canvas.width / canvas.height;
+                        let w = pdfWidth;
+                        let h = pdfWidth / ratio;
+                        if (h > pdfHeight) { h = pdfHeight; w = pdfHeight * ratio; }
+                        
+                        pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', (pdfWidth - w)/2, 0, w, h);
+                        
+                        // Draw Native Clickable Watermark
+                        const text = "UNSUBSCRIBE.LLC/DIETCOKE.HTML";
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(26, 26, 26);
+                        const textWidth = pdf.getTextWidth(text);
+                        const textX = (pdfWidth - textWidth) / 2;
+                        const textY = pdfHeight - 30; // 30pt from bottom edge
+                        pdf.text(text, textX, textY);
+                        // Add invisible link overlay over the text
+                        pdf.link(textX, textY - 10, textWidth, 15, { url: 'https://unsubscribe.llc/dietcoke.html' });
+
+                        if (addMavenLink) {
+                            // Add a giant invisible clickable link over the bottom half of the image area (where the Maven box is)
+                            pdf.link(0, h * 0.1, pdfWidth, h * 0.8, { url: 'https://maven.com/unsub/asking-better-questions/' });
+                        }
+                    };
+
+                    addPage(page1Canvas);
                     pdf.addPage();
-                    const p2Ratio = page2Canvas.width / page2Canvas.height;
-                    let p2W = pdfWidth;
-                    let p2H = pdfWidth / p2Ratio;
-                    if (p2H > pdfHeight) { p2H = pdfHeight; p2W = pdfHeight * p2Ratio; }
-                    pdf.addImage(page2Canvas.toDataURL('image/jpeg', 1.0), 'JPEG', (pdfWidth - p2W)/2, 0, p2W, p2H);
+                    addPage(page2Canvas);
+                    pdf.addPage();
+                    addPage(page3Canvas, true); // True flag adds the Maven course link
                     
                     pdf.save('Oracle_Consultation.pdf');
+                    
                 } else if (type === 'image') {
-                    const page2 = document.getElementById('exportPage2');
-                    const fullDoc = await html2canvas(page2, { scale: 3, useCORS: true });
+                    // For Image export, capture the combined view containing the ruling AND the Maven course
+                    const combinedView = document.getElementById('exportCombinedView');
+                    const fullDoc = await html2canvas(combinedView, { scale: 3, useCORS: true });
+                    
                     const link = document.createElement('a');
                     link.download = 'Oracle_Revelation.jpg';
                     link.href = fullDoc.toDataURL('image/jpeg', 1.0);
