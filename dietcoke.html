@@ -518,7 +518,7 @@
         const manifestData = {
             "name": "Diet Coke Oracle",
             "short_name": "Oracle",
-            "start_url": ".",
+            "start_url": "./dietcoke.html",
             "display": "standalone",
             "background_color": "#e2e2e2",
             "theme_color": "#1a1a1a",
@@ -1231,8 +1231,8 @@
                 wrapper.style.display = 'block';
 
                 if (type === 'pdf') {
-                    const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 1.5, useCORS: true });
-                    const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 1.5, useCORS: true });
+                    const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 3, useCORS: true });
+                    const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 3, useCORS: true });
                     
                     const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
                     const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -1242,22 +1242,22 @@
                     let p1W = pdfWidth;
                     let p1H = pdfWidth / p1Ratio;
                     if (p1H > pdfHeight) { p1H = pdfHeight; p1W = pdfHeight * p1Ratio; }
-                    pdf.addImage(page1Canvas.toDataURL('image/jpeg', 0.8), 'JPEG', (pdfWidth - p1W)/2, 0, p1W, p1H);
+                    pdf.addImage(page1Canvas.toDataURL('image/jpeg', 1.0), 'JPEG', (pdfWidth - p1W)/2, 0, p1W, p1H);
                     
                     pdf.addPage();
                     const p2Ratio = page2Canvas.width / page2Canvas.height;
                     let p2W = pdfWidth;
                     let p2H = pdfWidth / p2Ratio;
                     if (p2H > pdfHeight) { p2H = pdfHeight; p2W = pdfHeight * p2Ratio; }
-                    pdf.addImage(page2Canvas.toDataURL('image/jpeg', 0.8), 'JPEG', (pdfWidth - p2W)/2, 0, p2W, p2H);
+                    pdf.addImage(page2Canvas.toDataURL('image/jpeg', 1.0), 'JPEG', (pdfWidth - p2W)/2, 0, p2W, p2H);
                     
                     pdf.save('Oracle_Consultation.pdf');
                 } else if (type === 'image') {
                     const page2 = document.getElementById('exportPage2');
-                    const fullDoc = await html2canvas(page2, { scale: 1.5, useCORS: true });
+                    const fullDoc = await html2canvas(page2, { scale: 3, useCORS: true });
                     const link = document.createElement('a');
                     link.download = 'Oracle_Revelation.jpg';
-                    link.href = fullDoc.toDataURL('image/jpeg', 0.9);
+                    link.href = fullDoc.toDataURL('image/jpeg', 1.0);
                     link.click();
                 }
 
