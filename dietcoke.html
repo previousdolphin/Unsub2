@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a1a">
-    <link rel="manifest" href="./manifest.json" id="dynamic-manifest">
+    <link rel="manifest" href="manifest.json" id="dynamic-manifest">
     <title>Diet Coke: Oracle System by Unsubscribe LLC</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -531,26 +531,7 @@
     <script>
         // --- Dynamic Fallback PWA Manifest & SW Injection ---
         // (This runs if the external manifest.json and sw.js aren't found on your server)
-        const manifestData = {
-            "name": "Diet Coke Oracle",
-            "short_name": "Oracle",
-            "start_url": "./dietcoke.html",
-            "display": "standalone",
-            "background_color": "#e2e2e2",
-            "theme_color": "#1a1a1a",
-            "icons": [
-                {
-                    "src": "./logo192.PNG",
-                    "sizes": "192x192",
-                    "type": "image/png"
-                },
-                {
-                    "src": "./logo512.PNG",
-                    "sizes": "512x512",
-                    "type": "image/png"
-                }
-            ]
-        };
+        
         fetch('./manifest.json').catch(() => {
             const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
             document.getElementById('dynamic-manifest').href = URL.createObjectURL(manifestBlob);
