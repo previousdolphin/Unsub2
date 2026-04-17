@@ -1,7 +1,7 @@
 const CACHE_NAME = 'dietcoke-oracle-v1';
 const ASSETS = [
   './',
-  './index.html',
+  './dietcoke.html',
   './manifest.json',
   './logo192.PNG',
   './logo512.PNG'
