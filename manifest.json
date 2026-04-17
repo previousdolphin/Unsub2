@@ -1,0 +1,20 @@
+{
+  "name": "Diet Coke Oracle",
+  "short_name": "Oracle",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#e2e2e2",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "./logo192.PNG",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./logo512.PNG",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
