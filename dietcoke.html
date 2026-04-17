@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a">
+    <link id="dynamic-manifest" rel="manifest">
     <title>Diet Coke: Oracle System</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -81,7 +86,6 @@
         }
         .brand-container { text-align: center; }
         
-        /* RESTORED LOGO CSS */
         .logo-wrapper {
             display: inline-block;
             position: relative;
@@ -100,7 +104,7 @@
             font-family: 'Playfair Display', serif;
             font-size: 2.5rem; 
             font-style: italic;
-            font-weight: bold;
+            font-weight: bold; /* Updated */
             color: var(--text-main);
             position: absolute; 
             top: -24px; 
@@ -254,7 +258,6 @@
         .cast-btn.export-btn { border-color: var(--coca-red); color: var(--coca-red); font-size: 0.8rem;}
         .cast-btn.export-btn:hover { background: var(--coca-red); color: white; }
 
-        /* EXPLAINER MODAL CSS */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--modal-overlay); backdrop-filter: blur(5px);
@@ -282,6 +285,9 @@
         .modal-content li { margin-bottom: 8px; }
         .modal-content strong { color: var(--coca-red); }
 
+        .clear-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; border-radius: 6px; margin-top: 15px; transition: all 0.2s; }
+        .clear-btn:hover { border-color: var(--coca-red); color: var(--coca-red); }
+
         @media (max-width: 768px) {
             .logo-section { padding-top: 15px; padding-bottom: 5px; }
             .logo-top { font-size: 4.5rem; }
@@ -299,7 +305,6 @@
             .modal-content h2 { font-size: 1.5rem; }
         }
 
-        /* HIDDEN DOM FOR EXPORT RENDER */
         #exportWrapper {
             position: absolute; left: -9999px; top: -9999px; width: 800px;
             background: white; color: black; font-family: 'Montserrat', sans-serif; z-index: -1;
@@ -309,7 +314,7 @@
         
         .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; }
         .export-logo-top { font-family: 'Playfair Display', serif; font-size: 6rem; font-weight: 700; color: #f40009; display: block; line-height: 0.8; letter-spacing: -2px; }
-        .export-logo-diet { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; font-weight: 400; color: #1a1a1a; position: absolute; top: -24px; right: -15px; }
+        .export-logo-diet { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; font-weight: bold; /* Updated */ color: #1a1a1a; position: absolute; top: -24px; right: -15px; }
         
         .export-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px; }
         .export-sub { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase; }
@@ -330,6 +335,9 @@
 </head>
 <body>
     <div class="top-controls">
+        <button class="icon-btn" id="historyBtn" title="Consultation History">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path><path d="M12 7v5l4 2"></path></svg>
+        </button>
         <button class="icon-btn" id="helpBtn" title="About Oracle">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
         </button>
@@ -339,6 +347,7 @@
         </button>
     </div>
 
+    <!-- Explainer Modal -->
     <div id="explainerModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn">&times;</button>
@@ -367,6 +376,19 @@
                 <li><strong>Accept the pushback:</strong> The AI's rejections are part of the process. Use its prompts to narrow down exactly what is functionally broken or misaligned in your situation.</li>
             </ul>
             <p><em>Export your final result (the full conversation and outcome) as a PDF, or just the Phase 2/3 revelation as an image you can share on social media.</em></p>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeHistoryBtn">&times;</button>
+            <h2>Archive</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -10px;">Your local consultation history.</p>
+            <div id="historyList" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                <!-- History items will be injected here -->
+            </div>
+            <button class="clear-btn" id="clearHistoryBtn" style="display: none;">CLEAR ARCHIVE</button>
         </div>
     </div>
 
@@ -448,15 +470,71 @@
     </div>
 
     <script>
+        // --- Dynamic PWA Manifest & SW Injection ---
+        const manifestData = {
+            "name": "Diet Coke Oracle",
+            "short_name": "Oracle",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#e2e2e2",
+            "theme_color": "#1a1a1a",
+            "icons": [{
+                "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a1a'/><text x='50' y='65' font-family='serif' font-size='50' fill='%23f40009' text-anchor='middle'>DC</text></svg>",
+                "sizes": "192x192",
+                "type": "image/svg+xml"
+            }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        document.getElementById('dynamic-manifest').href = URL.createObjectURL(manifestBlob);
+
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('fetch', function(event) {
+                    event.respondWith(fetch(event.request).catch(function() {
+                        return new Response('Offline mode not fully cached.');
+                    }));
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW registration failed:', err));
+        }
+
+        // --- Theme Logic ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+
+        function applyTheme(isDark) {
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                moonIcon.style.display = 'none';
+                sunIcon.style.display = 'block';
+            } else {
+                document.body.classList.remove('dark-mode');
+                moonIcon.style.display = 'block';
+                sunIcon.style.display = 'none';
+            }
+        }
+
+        const savedTheme = localStorage.getItem('dietcoke_theme');
+        const osPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && osPrefersDark)) {
+            applyTheme(true);
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            const willBeDark = !document.body.classList.contains('dark-mode');
+            applyTheme(willBeDark);
+            localStorage.setItem('dietcoke_theme', willBeDark ? 'dark' : 'light');
+        });
+
         // --- Modal Logic ---
         const explainerModal = document.getElementById('explainerModal');
         const helpBtn = document.getElementById('helpBtn');
         const closeModalBtn = document.getElementById('closeModalBtn');
 
-        function openModal() {
-            explainerModal.classList.add('active');
-        }
-
+        function openModal() { explainerModal.classList.add('active'); }
         function closeModal() {
             explainerModal.classList.remove('active');
             localStorage.setItem('dietcoke_oracle_seen', 'true');
@@ -472,12 +550,48 @@
             openModal();
         }
 
-        // --- Theme Logic ---
-        document.getElementById('themeToggleBtn').addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            document.getElementById('moonIcon').style.display = document.body.classList.contains('dark-mode') ? 'none' : 'block';
-            document.getElementById('sunIcon').style.display = document.body.classList.contains('dark-mode') ? 'block' : 'none';
+        // --- History Logic ---
+        const historyModal = document.getElementById('historyModal');
+        const historyBtn = document.getElementById('historyBtn');
+        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+        const historyList = document.getElementById('historyList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        function openHistory() {
+            const history = JSON.parse(localStorage.getItem('dietcoke_history') || '[]');
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="text-align:center; color: var(--text-muted);">No records found.</p>';
+                clearHistoryBtn.style.display = 'none';
+            } else {
+                historyList.innerHTML = history.map(item => `
+                    <div style="background: var(--msg-user-bg); padding: 15px; border-radius: 8px; border-left: 4px solid var(--coca-red);">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px;">${new Date(item.date).toLocaleDateString()}</div>
+                        <div style="font-weight: 700; margin-bottom: 5px; color: var(--coca-red);">${item.hexNum} - ${item.hexName}</div>
+                        <div style="font-size: 0.85rem; font-style: italic; margin-bottom: 10px; color: var(--text-main);">"${item.question}"</div>
+                        <div style="font-size: 0.85rem; line-height: 1.5; color: var(--text-main);">${item.ruling}</div>
+                    </div>
+                `).join('');
+                clearHistoryBtn.style.display = 'block';
+            }
+            historyModal.classList.add('active');
+        }
+
+        historyBtn.addEventListener('click', openHistory);
+        closeHistoryBtn.addEventListener('click', () => historyModal.classList.remove('active'));
+        historyModal.addEventListener('click', (e) => {
+            if (e.target === historyModal) historyModal.classList.remove('active');
         });
+
+        clearHistoryBtn.addEventListener('click', () => {
+            localStorage.removeItem('dietcoke_history');
+            openHistory();
+        });
+
+        function saveToHistory(question, hexNum, hexName, ruling) {
+            const history = JSON.parse(localStorage.getItem('dietcoke_history') || '[]');
+            history.unshift({ date: new Date().toISOString(), question, hexNum, hexName, ruling });
+            localStorage.setItem('dietcoke_history', JSON.stringify(history.slice(0, 50))); 
+        }
 
         // --- Canvas Animation ---
         const canvas = document.getElementById('waveCanvas');
@@ -674,7 +788,6 @@
             return fixed;
         }
 
-        // --- NEW SERVERLESS POLLING LOGIC ---
         async function fetchOracleResponse(apiMessages, maxTokens, mode) {
             const payload = {
                 input: {
@@ -719,12 +832,10 @@
                 if (jobStatus === "COMPLETED") {
                     let out = statusData.output;
                     
-                    // Strip array wrapper if it exists
                     if (Array.isArray(out) && out.length > 0) {
                         out = out[0];
                     }
 
-                    // Extract actual text
                     if (out && out.choices && out.choices.length > 0) {
                         const choice = out.choices[0];
                         
@@ -734,7 +845,6 @@
                         else if (choice.tokens && choice.tokens.length > 0) {
                             let text = choice.tokens[0];
                             
-                            // Check for deeply nested stringified JSON (the bug you hit)
                             if (typeof text === 'string' && (text.startsWith('[{"choices"') || text.startsWith('[{'))) {
                                 try {
                                     const parsed = JSON.parse(text);
@@ -755,7 +865,7 @@
                     if (out && out.text && Array.isArray(out.text)) return out.text[0].trim();
                     if (typeof out === 'string') return out.trim();
                     
-                    return JSON.stringify(statusData.output); // Fallback
+                    return JSON.stringify(statusData.output); 
                 } else if (jobStatus === "FAILED") {
                     throw new Error("Serverless job failed.");
                 }
@@ -952,6 +1062,9 @@
                 finalOracleRuling = await fetchOracleResponse(apiMessages, 800, 3);
                 appendMessage(finalOracleRuling, 'assistant');
                 
+                // Save to local history when completed
+                saveToHistory(refinedQuestion, details.hexNum, details.hexName, finalOracleRuling);
+                
                 const completionUI = `
                     <div class="system-header" style="margin-top: 10px;">PROTOCOL COMPLETE</div>
                     <div class="completion-actions">
@@ -1056,7 +1169,6 @@
             btnElement.innerText = originalText;
         }
 
-        initCanvas(); animate();
     </script>
 </body>
 </html>
