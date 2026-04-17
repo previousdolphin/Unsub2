@@ -63,8 +63,13 @@
             position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none;
         }
 
+        .layout-wrapper {
+            position: relative; z-index: 10; display: flex; flex-direction: column; 
+            height: 100dvh; 
+        }
+
         .top-controls {
-            position: fixed; top: 15px; right: 15px; z-index: 50; display: flex; gap: 8px; align-items: center;
+            position: absolute; top: 15px; right: 15px; z-index: 50; display: flex; gap: 8px; align-items: center;
         }
 
         .icon-btn {
@@ -74,11 +79,6 @@
             font-weight: 700; font-size: 1.1rem;
         }
         .icon-btn:hover { color: var(--coca-red); transform: scale(1.1); }
-
-        .layout-wrapper {
-            position: relative; z-index: 10; display: flex; flex-direction: column; 
-            height: 100dvh; 
-        }
 
         .logo-section {
             flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
@@ -236,19 +236,6 @@
         .inline-hex-path { font-size: 0.65rem; color: var(--text-muted); line-height: 1.4; text-transform: uppercase; }
         .inline-hex-path span { color: var(--text-main); font-weight: 700; }
 
-        .wilhelm-accordion { margin: 0 0 15px 0; background: rgba(0, 0, 0, 0.02); border: 1px solid rgba(150, 150, 150, 0.2); border-radius: 8px; overflow: hidden; text-align: left; transition: all 0.3s ease; }
-        .dark-mode .wilhelm-accordion { background: rgba(255, 255, 255, 0.02); }
-        .wilhelm-accordion[open] { background: var(--bg-color); box-shadow: var(--shadow-sm); border-color: var(--coca-red); }
-        .wilhelm-summary { padding: 12px 15px; cursor: pointer; color: var(--text-main); font-weight: 700; font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; list-style: none; user-select: none; display: flex; justify-content: space-between; align-items: center; }
-        .wilhelm-summary:hover { color: var(--coca-red); }
-        .wilhelm-summary::-webkit-details-marker { display: none; }
-        .wilhelm-summary::after { content: '+'; font-size: 1.2rem; line-height: 1; color: var(--coca-red); }
-        .wilhelm-accordion[open] .wilhelm-summary::after { content: '−'; }
-        .wilhelm-content { padding: 0 15px 15px 15px; font-family: 'Montserrat', sans-serif; font-size: 0.90rem; color: var(--text-main); line-height: 1.6; border-top: 1px dashed rgba(150, 150, 150, 0.3); margin-top: 5px; padding-top: 15px; }
-        .wilhelm-section { margin-bottom: 12px; }
-        .wilhelm-section:last-child { margin-bottom: 0; }
-        .wilhelm-section strong { display: block; color: var(--coca-red); font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 4px; text-transform: uppercase; }
-
         .input-wrapper { display: flex; gap: 10px; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); padding: 10px 20px; border-radius: 30px; box-shadow: var(--shadow-md); backdrop-filter: blur(10px); flex-shrink: 0; margin-bottom: 5px; }
         .chat-input { flex-grow: 1; background: transparent; border: none; color: var(--text-main); font-family: 'Montserrat', sans-serif; font-size: 16px !important; outline: none; min-width: 0; padding: 5px 0; }
         .chat-input::placeholder { color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; font-weight: 600;}
@@ -306,9 +293,14 @@
         .clear-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted); padding: 8px 15px; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; border-radius: 6px; margin-top: 15px; transition: all 0.2s; }
         .clear-btn:hover { border-color: var(--coca-red); color: var(--coca-red); }
 
+        /* Archive Specific Styles */
+        details.archive-card summary::-webkit-details-marker { display: none; }
+        details.archive-card summary { list-style: none; position: relative; }
+        details.archive-card[open] summary .tap-hint { display: none; }
+
         @media (max-width: 768px) {
-            .logo-section { padding-top: 75px; padding-bottom: 5px; } /* Increased to prevent icon overlap */
-            .top-controls { top: 10px; right: 10px; gap: 4px; }
+            .top-controls { position: relative; top: 0; right: 0; width: 100%; justify-content: flex-end; padding: 10px 15px; box-sizing: border-box; }
+            .logo-section { padding-top: 5px; padding-bottom: 5px; }
             .icon-btn { padding: 6px; }
             .logo-top { font-size: 4.5rem; }
             .logo-diet { font-size: 1.8rem; top: -18px; left: auto; right: -10px; }
@@ -372,20 +364,63 @@
     </style>
 </head>
 <body>
-    <div class="top-controls">
-        <button class="icon-btn" id="couponBtn" title="Early Enrollment">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="12" y1="9" x2="12" y2="15"></line></svg>
-        </button>
-        <button class="icon-btn" id="historyBtn" title="Consultation History">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path><path d="M12 7v5l4 2"></path></svg>
-        </button>
-        <button class="icon-btn" id="helpBtn" title="About Oracle">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-        </button>
-        <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
-            <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg id="sunIcon" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        </button>
+    <div class="layout-wrapper">
+        <div class="top-controls">
+            <button class="icon-btn" id="couponBtn" title="Early Enrollment">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="12" y1="9" x2="12" y2="15"></line></svg>
+            </button>
+            <button class="icon-btn" id="historyBtn" title="Consultation History">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path><path d="M12 7v5l4 2"></path></svg>
+            </button>
+            <button class="icon-btn" id="helpBtn" title="About Oracle">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </button>
+            <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
+                <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg id="sunIcon" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+        </div>
+
+        <div class="logo-section">
+            <div class="brand-container">
+                <div class="logo-wrapper">
+                    <span class="logo-top">Coke</span>
+                    <span class="logo-diet">Diet</span>
+                </div>
+                <div class="oracle-text">ORACLE SYSTEM</div>
+                <div class="sub-text">ai guide • llm</div>
+                <a href="https://unsubscribe.llc/aboutus" target="_blank" class="unsub-link">By UNSUBSCRIBE LLC</a>
+            </div>
+        </div>
+
+        <div class="interaction-section">
+            <div class="container-box" id="chatContainer">
+                <div class="chat-history" id="chatHistory">
+                    <div class="message system">
+                        <div class="system-header">MODE 1: THE REFINERY</div>
+                        STATE YOUR INQUIRY. THE ORACLE AWAITS.
+                    </div>
+                </div>
+                <div class="input-wrapper" id="inputWrapper">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Processing..." autocomplete="off">
+                    <button class="btn" id="sendBtn" title="Send">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="container-box" id="castContainer">
+                <div class="hexagram-visual" id="hexagramVisual"></div>
+                <div class="cast-interface">
+                    <div class="cast-progress" id="castProgress">LINE 1 / 6</div>
+                    <div class="cast-question" id="castQuestionText">Does the structure require submission or assertion?</div>
+                    <div class="cast-options" id="castOptions">
+                        <button class="cast-btn" onclick="castLine(1)">SUBMIT</button>
+                        <button class="cast-btn" onclick="castLine(2)">ASSERT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Maven Course Modal -->
@@ -453,49 +488,6 @@
     </div>
 
     <canvas id="waveCanvas"></canvas>
-
-    <div class="layout-wrapper">
-        <div class="logo-section">
-            <div class="brand-container">
-                <div class="logo-wrapper">
-                    <span class="logo-top">Coke</span>
-                    <span class="logo-diet">Diet</span>
-                </div>
-                <div class="oracle-text">ORACLE SYSTEM</div>
-                <div class="sub-text">ai guide • llm</div>
-                <a href="https://unsubscribe.llc/aboutus" target="_blank" class="unsub-link">By UNSUBSCRIBE LLC</a>
-            </div>
-        </div>
-
-        <div class="interaction-section">
-            <div class="container-box" id="chatContainer">
-                <div class="chat-history" id="chatHistory">
-                    <div class="message system">
-                        <div class="system-header">MODE 1: THE REFINERY</div>
-                        STATE YOUR INQUIRY. THE ORACLE AWAITS.
-                    </div>
-                </div>
-                <div class="input-wrapper" id="inputWrapper">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Processing..." autocomplete="off">
-                    <button class="btn" id="sendBtn" title="Send">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    </button>
-                </div>
-            </div>
-
-            <div class="container-box" id="castContainer">
-                <div class="hexagram-visual" id="hexagramVisual"></div>
-                <div class="cast-interface">
-                    <div class="cast-progress" id="castProgress">LINE 1 / 6</div>
-                    <div class="cast-question" id="castQuestionText">Does the structure require submission or assertion?</div>
-                    <div class="cast-options" id="castOptions">
-                        <button class="cast-btn" onclick="castLine(1)">SUBMIT</button>
-                        <button class="cast-btn" onclick="castLine(2)">ASSERT</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="exportWrapper">
         <div class="export-page" id="exportPage1">
@@ -677,46 +669,41 @@
                     const dateStr = new Date(item.date).toLocaleDateString();
                     
                     let chatHtml = (item.chatLog || []).filter(m => !m.content.startsWith('[ORACLE')).map(m => `
-                        <div style="margin-bottom: 8px; padding: 12px 16px; border-radius: 8px; font-size: 0.85rem; background: ${m.role === 'user' ? 'var(--msg-user-bg)' : 'rgba(244,0,9,0.05)'}; border-left: 3px solid ${m.role === 'user' ? 'var(--msg-user-border)' : 'var(--coca-red)'}; color: ${m.role === 'user' ? 'var(--text-main)' : 'var(--coca-red)'}; font-weight: ${m.role === 'user' ? '400' : '600'}; white-space: pre-wrap;">
-                            <strong style="font-size: 0.65rem; text-transform: uppercase; color: ${m.role === 'user' ? 'var(--text-muted)' : 'var(--coca-red)'}; opacity: 0.8; display: block; margin-bottom: 4px;">${m.role}</strong>${m.content}
+                        <div style="margin-bottom: 8px; padding: 10px; border-radius: 6px; font-size: 0.8rem; background: ${m.role === 'user' ? 'rgba(0,0,0,0.03)' : 'rgba(244,0,9,0.03)'}; border-left: 2px solid ${m.role === 'user' ? 'var(--text-muted)' : 'var(--coca-red)'}; color: var(--text-main);">
+                            <strong style="font-size: 0.6rem; text-transform: uppercase; color: ${m.role === 'user' ? 'var(--text-muted)' : 'var(--coca-red)'}; display: block; margin-bottom: 2px;">${m.role}</strong>
+                            <span style="white-space: pre-wrap;">${m.content}</span>
                         </div>
                     `).join('');
 
                     let wilhelmHtml = '';
                     if (item.wilhelm) {
                         wilhelmHtml = `
-                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(150,150,150,0.3);">
-                                <strong style="color: var(--text-main); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Wilhelm Archive</strong>
-                                <div style="margin-top: 10px; padding: 15px; background: rgba(0,0,0,0.02); border-radius: 6px;">
-                                    <strong style="color: var(--coca-red); font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 4px;">The Judgement</strong>
-                                    <div style="font-size: 0.85rem; margin: 0 0 16px 0; color: var(--text-main); line-height: 1.6; white-space: pre-wrap;">${item.wilhelm.judgement}</div>
-                                    
-                                    <strong style="color: var(--coca-red); font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 4px;">The Image</strong>
-                                    <div style="font-size: 0.85rem; margin: 0; color: var(--text-main); line-height: 1.6; white-space: pre-wrap;">${item.wilhelm.image}</div>
-                                </div>
+                            <div style="margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.02); border-radius: 6px;">
+                                <strong style="color: var(--text-main); font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; display:block; margin-bottom: 8px;">Wilhelm Archive</strong>
+                                <strong style="color: var(--coca-red); font-size: 0.65rem; text-transform: uppercase; display: block;">The Judgement</strong>
+                                <p style="font-size: 0.8rem; margin: 4px 0 12px 0; line-height: 1.5; color: var(--text-main); white-space: pre-wrap;">${item.wilhelm.judgement}</p>
+                                
+                                <strong style="color: var(--coca-red); font-size: 0.65rem; text-transform: uppercase; display: block;">The Image</strong>
+                                <p style="font-size: 0.8rem; margin: 4px 0 0 0; line-height: 1.5; color: var(--text-main); white-space: pre-wrap;">${item.wilhelm.image}</p>
                             </div>
                         `;
                     }
 
                     return `
-                        <details class="wilhelm-accordion" style="margin-bottom: 10px;">
-                            <summary class="wilhelm-summary" style="padding: 15px;">
-                                <div style="display: flex; flex-direction: column; gap: 5px; text-align: left; width: 90%;">
-                                    <span style="color: var(--text-muted); font-size: 0.65rem; font-weight: 600;">${dateStr}</span>
-                                    <span style="color: var(--coca-red); font-weight: 900; font-size: 1rem;">${item.hexNum} - ${item.hexName}</span>
-                                    <span style="font-style: italic; font-weight: 400; text-transform: none; color: var(--text-main); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">"${item.question}"</span>
-                                </div>
+                        <details class="archive-card" style="background: var(--msg-user-bg); border-radius: 8px; border-left: 4px solid var(--coca-red); margin-bottom: 15px;">
+                            <summary style="padding: 15px; cursor: pointer; list-style: none; position: relative; outline: none;">
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 5px;">${dateStr}</div>
+                                <div style="font-weight: 700; margin-bottom: 5px; color: var(--coca-red); font-size: 1.1rem;">${item.hexNum} - ${item.hexName}</div>
+                                <div style="font-size: 0.85rem; font-style: italic; margin-bottom: 10px; color: var(--text-main);">"${item.question}"</div>
+                                <div style="font-size: 0.85rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap;">${item.ruling}</div>
+                                <div class="tap-hint" style="text-align: center; margin-top: 10px; font-size: 0.7rem; color: var(--coca-red); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">+ Tap for full logs</div>
                             </summary>
-                            <div class="wilhelm-content" style="padding: 0 15px 15px 15px; border-top: none; margin-top: 0;">
-                                <div style="margin-bottom: 15px;">
-                                    <strong style="color: var(--text-main); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 10px; border-bottom: 1px solid rgba(150,150,150,0.2); padding-bottom: 5px;">Refinery Log & Discussion</strong>
+                            <div style="padding: 0 15px 15px 15px; border-top: 1px dashed rgba(150,150,150,0.2); margin-top: 5px;">
+                                <div style="margin-bottom: 10px; margin-top: 10px;">
+                                    <strong style="color: var(--text-main); font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px;">Refinery Log & Discussion</strong>
                                     ${chatHtml}
                                 </div>
                                 ${wilhelmHtml}
-                                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(150,150,150,0.2);">
-                                    <strong style="color: var(--coca-red); font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px;">Oracle Ruling</strong>
-                                    <div style="font-size: 0.95rem; line-height: 1.7; color: var(--text-main); font-weight: 600; white-space: pre-wrap;">${item.ruling}</div>
-                                </div>
                             </div>
                         </details>
                     `;
