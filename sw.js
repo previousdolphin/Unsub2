@@ -1,5 +1,5 @@
 const CACHE_NAME = 'dietcoke-oracle-v1';
-const ASSETS = [
+const ASSETS = [ 
   './',
   './dietcoke.html',
   './manifest.json',
