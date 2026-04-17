@@ -81,19 +81,31 @@
         }
         .brand-container { text-align: center; }
         
-        /* BULLETPROOF LOGO CSS */
+        /* RESTORED LOGO CSS */
         .logo-wrapper {
             display: inline-block;
             position: relative;
             margin-bottom: 5px;
+            padding-left: 15px;
         }
         .logo-top {
-            font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 700;
-            letter-spacing: -2px; line-height: 0.8; color: var(--coca-red); display: block;
+            font-family: 'Playfair Display', serif; 
+            font-size: 6rem; 
+            font-weight: 700;
+            letter-spacing: -2px; 
+            line-height: 0.8; 
+            color: var(--coca-red); 
+            display: block;
         }
         .logo-diet {
-            font-size: 1.8rem; font-style: italic; color: var(--text-main);
-            position: absolute; top: -12px; right: -40px; letter-spacing: normal;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2rem; 
+            font-style: italic; 
+            color: var(--text-main);
+            position: absolute; 
+            top: -18px; 
+            left: -15px; 
+            letter-spacing: normal;
         }
         .oracle-text { font-size: 2.5rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); }
         .sub-text { font-size: 0.9rem; font-weight: 600; letter-spacing: 4px; margin-top: 8px; color: var(--text-muted); }
@@ -272,8 +284,8 @@
 
         @media (max-width: 768px) {
             .logo-section { padding-top: 15px; padding-bottom: 5px; }
-            .logo-top { font-size: 3rem; }
-            .logo-diet { font-size: 1rem; top: -8px; right: -25px; }
+            .logo-top { font-size: 4.5rem; }
+            .logo-diet { font-size: 1.6rem; top: -14px; left: -10px; }
             .oracle-text { font-size: 1.5rem; letter-spacing: 2px; line-height: 1; margin-top: 5px;}
             .sub-text { font-size: 0.6rem; margin-top: 4px; }
             .container-box { padding: 5px 10px; }
@@ -295,9 +307,9 @@
         .export-page { width: 800px; height: max-content; padding: 60px; box-sizing: border-box; background: white; position: relative; }
         .export-brand { text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px; }
         
-        .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; }
-        .export-logo-top { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 700; color: #f40009; display: block; line-height: 0.8; letter-spacing: -2px; }
-        .export-logo-diet { font-size: 1.8rem; font-style: italic; color: #1a1a1a; position: absolute; top: -12px; right: -40px; }
+        .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; padding-left: 20px; }
+        .export-logo-top { font-family: 'Playfair Display', serif; font-size: 6rem; font-weight: 700; color: #f40009; display: block; line-height: 0.8; letter-spacing: -2px; }
+        .export-logo-diet { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-style: italic; color: #1a1a1a; position: absolute; top: -18px; left: -15px; }
         
         .export-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px; }
         .export-sub { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase; }
@@ -456,7 +468,6 @@
             if (e.target === explainerModal) closeModal();
         });
 
-        // Show modal on first visit
         if (!localStorage.getItem('dietcoke_oracle_seen')) {
             openModal();
         }
@@ -529,7 +540,6 @@
         initCanvas(); animate();
 
         // --- Core System Configuration ---
-        // NEW CLOUDFLARE WORKER URL
         const CF_WORKER_URL = 'https://bitter-shadow-ec20.jdo-8af.workers.dev'; 
 
         const PROMPTS = {
@@ -666,7 +676,6 @@
 
         // --- NEW SERVERLESS POLLING LOGIC ---
         async function fetchOracleResponse(apiMessages, maxTokens, mode) {
-            // 1. Prepare payload with inputs specifically for RunPod's Serverless architecture
             const payload = {
                 input: {
                     model: "Huggingmaces/diet_coke_oracle_merged",
@@ -678,12 +687,9 @@
                 }
             };
 
-            // 2. Submit the job via Cloudflare Worker
             const runResponse = await fetch(`${CF_WORKER_URL}/run`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
@@ -694,16 +700,13 @@
             const runData = await runResponse.json();
             const jobId = runData.id;
 
-            // 3. Setup polling loop
             let jobStatus = "IN_QUEUE";
             
-            // Adjust UI for cold-starts
             if (document.getElementById('chatInput')) {
                 document.getElementById('chatInput').placeholder = "Waking up Oracle (can take 1-2 mins)...";
             }
 
             while (jobStatus === "IN_QUEUE" || jobStatus === "IN_PROGRESS") {
-                // Wait 2 seconds before checking status
                 await new Promise(resolve => setTimeout(resolve, 2000)); 
                 
                 const statusResponse = await fetch(`${CF_WORKER_URL}/status/${jobId}`, {
@@ -713,52 +716,46 @@
                 const statusData = await statusResponse.json();
                 jobStatus = statusData.status;
 
-                // 4. Return Output or Error
-                // 4. Return Output or Error
                 if (jobStatus === "COMPLETED") {
                     let out = statusData.output;
                     
-                    // 1. Handle RunPod returning an array at the top level
+                    // Strip array wrapper if it exists
                     if (Array.isArray(out) && out.length > 0) {
                         out = out[0];
                     }
 
-                    // 2. Extract the actual text from the specific schema
+                    // Extract actual text
                     if (out && out.choices && out.choices.length > 0) {
                         const choice = out.choices[0];
                         
-                        // Standard OpenAI chat format
                         if (choice.message && choice.message.content) {
                             return choice.message.content.trim();
                         } 
-                        // vLLM / RunPod specific tokens array format
                         else if (choice.tokens && choice.tokens.length > 0) {
                             let text = choice.tokens[0];
                             
-                            // Prevent double-JSON rendering if the worker wraps it twice
-                            if (typeof text === 'string' && text.startsWith('[{"choices"')) {
+                            // Check for deeply nested stringified JSON (the bug you hit)
+                            if (typeof text === 'string' && (text.startsWith('[{"choices"') || text.startsWith('[{'))) {
                                 try {
                                     const parsed = JSON.parse(text);
-                                    text = parsed[0].choices[0].tokens[0];
-                                } catch(e) {} // If parsing fails, just output the raw text
+                                    if (parsed[0] && parsed[0].choices && parsed[0].choices[0].tokens) {
+                                        text = parsed[0].choices[0].tokens[0];
+                                    } else if (parsed[0] && parsed[0].choices && parsed[0].choices[0].message) {
+                                        text = parsed[0].choices[0].message.content;
+                                    }
+                                } catch(e) {} 
                             }
-                            return text.trim();
+                            return typeof text === 'string' ? text.trim() : JSON.stringify(text);
                         } 
-                        // Standard text completion format
                         else if (choice.text) {
                             return choice.text.trim();
                         }
                     } 
                     
-                    if (out && out.text && Array.isArray(out.text)) {
-                        return out.text[0].trim();
-                    } 
+                    if (out && out.text && Array.isArray(out.text)) return out.text[0].trim();
+                    if (typeof out === 'string') return out.trim();
                     
-                    if (typeof out === 'string') {
-                        return out.trim();
-                    }
-                    
-                    return JSON.stringify(statusData.output); // Final fallback
+                    return JSON.stringify(statusData.output); // Fallback
                 } else if (jobStatus === "FAILED") {
                     throw new Error("Serverless job failed.");
                 }
@@ -1030,20 +1027,14 @@
                     const p1Ratio = page1Canvas.width / page1Canvas.height;
                     let p1W = pdfWidth;
                     let p1H = pdfWidth / p1Ratio;
-                    if (p1H > pdfHeight) {
-                        p1H = pdfHeight;
-                        p1W = pdfHeight * p1Ratio;
-                    }
+                    if (p1H > pdfHeight) { p1H = pdfHeight; p1W = pdfHeight * p1Ratio; }
                     pdf.addImage(page1Canvas.toDataURL('image/jpeg', 0.8), 'JPEG', (pdfWidth - p1W)/2, 0, p1W, p1H);
                     
                     pdf.addPage();
                     const p2Ratio = page2Canvas.width / page2Canvas.height;
                     let p2W = pdfWidth;
                     let p2H = pdfWidth / p2Ratio;
-                    if (p2H > pdfHeight) {
-                        p2H = pdfHeight;
-                        p2W = pdfHeight * p2Ratio;
-                    }
+                    if (p2H > pdfHeight) { p2H = pdfHeight; p2W = pdfHeight * p2Ratio; }
                     pdf.addImage(page2Canvas.toDataURL('image/jpeg', 0.8), 'JPEG', (pdfWidth - p2W)/2, 0, p2W, p2H);
                     
                     pdf.save('Oracle_Consultation.pdf');
