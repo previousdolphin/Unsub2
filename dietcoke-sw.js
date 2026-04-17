@@ -1,10 +1,9 @@
-const CACHE_NAME = 'dietcoke-oracle-v1';
-const ASSETS = [ 
-  './',
+const CACHE_NAME = 'dietcoke-oracle-v2';
+const ASSETS = [
   './dietcoke.html',
-  './manifest.json',
+  './dietcoke-manifest.json',
   './logo192.PNG',
-  './logo512.PNG' 
+  './logo512.PNG'
 ];
 
 self.addEventListener('install', (e) => {
