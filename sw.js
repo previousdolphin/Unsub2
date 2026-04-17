@@ -4,7 +4,7 @@ const ASSETS = [
   './dietcoke.html',
   './manifest.json',
   './logo192.PNG',
-  './logo512.PNG'
+  './logo512.PNG' 
 ];
 
 self.addEventListener('install', (e) => {
