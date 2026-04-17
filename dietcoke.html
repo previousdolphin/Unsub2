@@ -688,7 +688,7 @@
             return data.choices[0].message.content.trim();
         }
 
-        async function handleSend() {
+     async function handleSend() {
             const text = chatInput.value.trim();
             if (!text || currentMode !== 1 || isProcessing) return;
 
@@ -713,9 +713,59 @@
                 if (!reply) throw new Error("Empty response generated.");
 
                 const userTurns = conversationHistory.filter(m => m.role === 'user').length;
-                if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
-                    reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
+                
+                // Base validation check against the LLM's natural output
+                let isValidated = reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2");
+
+                // --- DYNAMIC ORACLE LOGIC ---
+                // Progressively increase the chance of validation to prevent infinite loops,
+                // but keep it unpredictable.
+                if (!isValidated && userTurns >= 3) {
+                    // Turn 3: 20% chance, Turn 4: 50% chance, Turn 5: 80% chance, Turn 6+: 100% chance
+                    const validationChance = userTurns === 3 ? 0.2 : (userTurns === 4 ? 0.5 : (userTurns === 5 ? 0.8 : 1.0));
+                    
+                    if (Math.random() < validationChance) {
+                        isValidated = true;
+                        
+                        // Variable validation messages to make the Oracle feel less robotic
+                        const validationMessages = [
+                            "STATUS: VALIDATED. STRUCTURAL CLARITY ACHIEVED.",
+                            "STATUS: VALIDATED. THE FRICTION IS CLEAR. PROCEEDING TO CAST.",
+                            "STATUS: VALIDATED. STRUCTURAL BOUNDARIES REACHED. COMMENCING MODE 2.",
+                            "STATUS: VALIDATED. EXHAUSTION OF VARIABLES DETECTED. THE CASTING BEGINS.",
+                            "STATUS: VALIDATED. THE ARCHITECTURE HOLDS. STEP FORWARD."
+                        ];
+                        reply = validationMessages[Math.floor(Math.random() * validationMessages.length)];
+                    }
                 }
+                // ----------------------------
+
+                if (isValidated) {
+                    refinedQuestion = text; 
+                    chatInput.disabled = true;
+                    
+                    // Clean up the dynamic reply for the UI system header format
+                    let displayMessage = "STRUCTURAL CLARITY ACHIEVED. PROCEEDING TO CAST.";
+                    if (reply.includes("STATUS: VALIDATED")) {
+                        displayMessage = reply.replace("STATUS: VALIDATED.", "").trim();
+                    }
+
+                    appendMessage(`<div class="system-header">STATUS: VALIDATED</div>${displayMessage}`, 'system', true);
+                    setTimeout(() => triggerMode2Casting(), 1500);
+                } else {
+                    conversationHistory.push({ role: "assistant", content: reply });
+                    appendMessage(reply, 'assistant');
+                    setLoadingState(false);
+                }
+            } catch (error) {
+                console.error("API Error:", error);
+                if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
+                    conversationHistory.pop();
+                }
+                appendMessage(`<div class="system-header">ERR: SYSTEM</div>ARCHITECTURE UNSTABLE. PLEASE REPHRASE.`, 'error', true);
+                setLoadingState(false);
+            }
+        }
 
                 const isValidated = reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2");
 
@@ -734,7 +784,7 @@
                 if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length-1].role === 'user') {
                     conversationHistory.pop();
                 }
-                appendMessage(`<div class="system-header">ERR: SYSTEM</div>ARCHITECTURE UNSTABLE. PLEASE REPHRASE.`, 'error', true);
+                appendMessage(`<div class="system-header">ERR: SYSTEM</div>ARCHITECTURE UNSTABLE. SYSTEM UNREACHABLE. TRY AGAIN.`, 'error', true);
                 setLoadingState(false);
             }
         }
