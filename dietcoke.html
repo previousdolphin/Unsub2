@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1a1a1a">
-    <link id="dynamic-manifest" rel="manifest">
+    <link rel="manifest" href="./manifest.json" id="dynamic-manifest">
     <title>Diet Coke: Oracle System</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -81,7 +81,7 @@
 
         .logo-section {
             flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
-            padding-top: 30px; padding-bottom: 10px; pointer-events: none; 
+            padding-top: 30px; padding-bottom: 10px; pointer-events: auto; 
             transition: all 0.3s ease;
         }
         .brand-container { text-align: center; }
@@ -90,6 +90,7 @@
             display: inline-block;
             position: relative;
             margin-bottom: 5px;
+            pointer-events: none;
         }
         .logo-top {
             font-family: 'Playfair Display', serif; 
@@ -104,19 +105,35 @@
             font-family: 'Playfair Display', serif;
             font-size: 2.5rem; 
             font-style: italic;
-            font-weight: bold; /* Updated */
+            font-weight: bold;
             color: var(--text-main);
             position: absolute; 
             top: -24px; 
             right: -15px; 
             letter-spacing: normal;
         }
-        .oracle-text { font-size: 2.5rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); }
-        .sub-text { font-size: 0.9rem; font-weight: 600; letter-spacing: 4px; margin-top: 8px; color: var(--text-muted); }
+        .oracle-text { font-size: 2.5rem; font-weight: 10; letter-spacing: 3px; line-height: .9; color: var(--text-main); pointer-events: none; }
+        .sub-text { font-size: 0.9rem; font-weight: 600; letter-spacing: 4px; margin-top: 8px; margin-bottom: 8px; color: var(--text-muted); pointer-events: none; }
+        
+        .unsub-link {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 20;
+        }
+        .unsub-link:hover {
+            color: var(--coca-red);
+        }
 
         .interaction-section {
             flex: 1; min-height: 0; position: relative; 
             display: flex; justify-content: center; padding-bottom: env(safe-area-inset-bottom, 10px);
+            z-index: 20;
         }
         .container-box {
             width: 100%; max-width: 800px; height: 100%; margin: 0 auto;
@@ -314,7 +331,7 @@
         
         .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; }
         .export-logo-top { font-family: 'Playfair Display', serif; font-size: 6rem; font-weight: 700; color: #f40009; display: block; line-height: 0.8; letter-spacing: -2px; }
-        .export-logo-diet { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; font-weight: bold; /* Updated */ color: #1a1a1a; position: absolute; top: -24px; right: -15px; }
+        .export-logo-diet { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; font-weight: bold; color: #1a1a1a; position: absolute; top: -24px; right: -15px; }
         
         .export-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px; }
         .export-sub { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase; }
@@ -335,6 +352,9 @@
 </head>
 <body>
     <div class="top-controls">
+        <button class="icon-btn" id="couponBtn" title="Early Enrollment">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><line x1="12" y1="9" x2="12" y2="15"></line></svg>
+        </button>
         <button class="icon-btn" id="historyBtn" title="Consultation History">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"></path><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path><path d="M12 7v5l4 2"></path></svg>
         </button>
@@ -345,6 +365,22 @@
             <svg id="moonIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             <svg id="sunIcon" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
         </button>
+    </div>
+
+    <!-- Maven Course Modal -->
+    <div id="mavenModal" class="modal-overlay">
+        <div class="modal-content" style="border: 2px dashed var(--coca-red);">
+            <button class="modal-close" id="closeMavenBtn">&times;</button>
+            <h2 style="font-family: 'Montserrat', sans-serif; font-size: 1.5rem; margin-bottom: 5px;">Asking Better Questions</h2>
+            <h3 style="margin-top: 0; color: var(--coca-red); font-style: italic; text-transform: none; font-weight: 700; border-bottom: none;">Most people blame their answers — The problem was always the question.</h3>
+            <p>You already know how to use AI. You've tried the prompts. You've watched the tutorials. You've gotten useful outputs and forgettable ones and you're not always sure why.</p>
+            <p>Here's what nobody tells you: <strong>the tool isn't the variable. You are.</strong></p>
+            <p>The quality of what AI gives you is a direct reflection of the quality of your thinking going in. Which means the people getting extraordinary results aren't better at AI. They're better at asking.</p>
+            <p>This course teaches that. Four Sunday afternoons. Small room. Real problems. No theory that doesn't immediately touch your actual life.</p>
+            <div style="text-align: center; margin-top: 25px;">
+                <a href="https://maven.com/unsub/asking-better-questions/" target="_blank" class="cast-btn export-btn" style="display: inline-block; text-decoration: none;">ENROLL EARLY</a>
+            </div>
+        </div>
     </div>
 
     <!-- Explainer Modal -->
@@ -403,6 +439,7 @@
                 </div>
                 <div class="oracle-text">ORACLE SYSTEM</div>
                 <div class="sub-text">ai guide • llm</div>
+                <a href="https://unsubscribe.llc/aboutus" target="_blank" class="unsub-link">By UNSUBSCRIBE LLC</a>
             </div>
         </div>
 
@@ -470,7 +507,8 @@
     </div>
 
     <script>
-        // --- Dynamic PWA Manifest & SW Injection ---
+        // --- Dynamic Fallback PWA Manifest & SW Injection ---
+        // (This runs if the external manifest.json and sw.js aren't found on your server)
         const manifestData = {
             "name": "Diet Coke Oracle",
             "short_name": "Oracle",
@@ -478,25 +516,36 @@
             "display": "standalone",
             "background_color": "#e2e2e2",
             "theme_color": "#1a1a1a",
-            "icons": [{
-                "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a1a1a'/><text x='50' y='65' font-family='serif' font-size='50' fill='%23f40009' text-anchor='middle'>DC</text></svg>",
-                "sizes": "192x192",
-                "type": "image/svg+xml"
-            }]
+            "icons": [
+                {
+                    "src": "./logo192.PNG",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                },
+                {
+                    "src": "./logo512.PNG",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }
+            ]
         };
-        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-        document.getElementById('dynamic-manifest').href = URL.createObjectURL(manifestBlob);
+        fetch('./manifest.json').catch(() => {
+            const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+            document.getElementById('dynamic-manifest').href = URL.createObjectURL(manifestBlob);
+        });
 
         if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('fetch', function(event) {
-                    event.respondWith(fetch(event.request).catch(function() {
-                        return new Response('Offline mode not fully cached.');
-                    }));
-                });
-            `;
-            const swBlob = new Blob([swCode], {type: 'application/javascript'});
-            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW registration failed:', err));
+            navigator.serviceWorker.register('./sw.js').catch(() => {
+                const swCode = `
+                    self.addEventListener('fetch', function(event) {
+                        event.respondWith(fetch(event.request).catch(function() {
+                            return new Response('Offline mode not fully cached.');
+                        }));
+                    });
+                `;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob));
+            });
         }
 
         // --- Theme Logic ---
@@ -529,7 +578,18 @@
             localStorage.setItem('dietcoke_theme', willBeDark ? 'dark' : 'light');
         });
 
-        // --- Modal Logic ---
+        // --- Maven Modal Logic ---
+        const mavenModal = document.getElementById('mavenModal');
+        const couponBtn = document.getElementById('couponBtn');
+        const closeMavenBtn = document.getElementById('closeMavenBtn');
+
+        couponBtn.addEventListener('click', () => mavenModal.classList.add('active'));
+        closeMavenBtn.addEventListener('click', () => mavenModal.classList.remove('active'));
+        mavenModal.addEventListener('click', (e) => {
+            if (e.target === mavenModal) mavenModal.classList.remove('active');
+        });
+
+        // --- Help Modal Logic ---
         const explainerModal = document.getElementById('explainerModal');
         const helpBtn = document.getElementById('helpBtn');
         const closeModalBtn = document.getElementById('closeModalBtn');
