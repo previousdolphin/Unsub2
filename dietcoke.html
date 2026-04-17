@@ -419,7 +419,10 @@
 
             <p><strong>Mode 3: The Interpretation</strong><br>
             The Oracle maps the Wilhelm translation of the I Ching directly onto the clinical, refined parameters you established in Phase 1, at the time of the output.</p>
-
+            
+            <p><strong>Mode 4: The Interpretation</strong><br>
+            You have completed the casting. You can engage in a brief, clinical, structural discussion about the result after the oracle has given you your Hexagram readings.</p>
+                
             <h3>How to Get the Best Results</h3>
             <p>To get past the Refinery and get a highly accurate interpretation, you must play by the Oracle's rules:</p>
             <ul>
@@ -455,7 +458,7 @@
                 </div>
                 <div class="oracle-text">ORACLE SYSTEM</div>
                 <div class="sub-text">ai guide • llm</div>
-                <a href="https://unsubscribe.llc/aboutus" target="_blank" class="unsub-link">By UNSUBSCRIBE LLC</a>
+                <a href="https://unsubscribe.llc/about-us" target="_blank" class="unsub-link">By UNSUBSCRIBE LLC</a>
             </div>
         </div>
 
@@ -668,7 +671,7 @@
                 historyList.innerHTML = history.map(item => {
                     const dateStr = new Date(item.date).toLocaleDateString();
                     
-                    let chatHtml = (item.chatLog || []).map(m => `
+                    let chatHtml = (item.chatLog || []).filter(m => !m.content.startsWith('[ORACLE')).map(m => `
                         <div style="margin-bottom: 8px; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; background: ${m.role === 'user' ? 'var(--msg-user-bg)' : 'rgba(244,0,9,0.05)'}; border-left: 3px solid ${m.role === 'user' ? 'var(--msg-user-border)' : 'var(--coca-red)'}; color: ${m.role === 'user' ? 'var(--text-main)' : 'var(--coca-red)'}; font-weight: ${m.role === 'user' ? '400' : '600'};">
                             <strong style="font-size: 0.65rem; text-transform: uppercase; color: ${m.role === 'user' ? 'var(--text-muted)' : 'var(--coca-red)'}; opacity: 0.8; display: block; margin-bottom: 4px;">${m.role}</strong>
                             ${m.content}
@@ -702,7 +705,7 @@
                             </summary>
                             <div class="wilhelm-content" style="padding: 0 15px 15px 15px; border-top: none; margin-top: 0;">
                                 <div style="margin-bottom: 15px;">
-                                    <strong style="color: var(--text-main); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 10px; border-bottom: 1px solid rgba(150,150,150,0.2); padding-bottom: 5px;">Refinery Log</strong>
+                                    <strong style="color: var(--text-main); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 10px; border-bottom: 1px solid rgba(150,150,150,0.2); padding-bottom: 5px;">Refinery Log & Discussion</strong>
                                     ${chatHtml}
                                 </div>
                                 ${wilhelmHtml}
@@ -732,15 +735,21 @@
 
         function saveToHistory(question, hexNum, hexName, ruling, chatLog, wilhelm) {
             const history = JSON.parse(localStorage.getItem('dietcoke_history') || '[]');
-            history.unshift({ 
-                date: new Date().toISOString(), 
-                question, 
-                hexNum, 
-                hexName, 
-                ruling,
-                chatLog: JSON.parse(JSON.stringify(chatLog)),
-                wilhelm: JSON.parse(JSON.stringify(wilhelm))
-            });
+            // Filter out exact duplicates by checking latest entry
+            if (history.length > 0 && history[0].hexNum === hexNum && history[0].question === question) {
+                // If it's the same consultation (e.g. ongoing discussion in Mode 4), just update the chat log
+                history[0].chatLog = JSON.parse(JSON.stringify(chatLog));
+            } else {
+                history.unshift({ 
+                    date: new Date().toISOString(), 
+                    question, 
+                    hexNum, 
+                    hexName, 
+                    ruling,
+                    chatLog: JSON.parse(JSON.stringify(chatLog)),
+                    wilhelm: JSON.parse(JSON.stringify(wilhelm))
+                });
+            }
             localStorage.setItem('dietcoke_history', JSON.stringify(history.slice(0, 50))); 
         }
 
@@ -808,8 +817,9 @@
         const CF_WORKER_URL = 'https://bitter-shadow-ec20.jdo-8af.workers.dev'; 
 
         const PROMPTS = {
-            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and structural ambiguity. Respond only with a clarifying reframe using CoCA vernacular. Maximum 20 words.",
-            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 20 words per sentence."
+            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and emotional/structural ambiguity. If the user achieves pure structural clarity, output EXACTLY 'STATUS: VALIDATED' and nothing else. Otherwise, respond only with a hostile, clarifying reframe using CoCA vernacular. Maximum 20 words.",
+            MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 30 words per sentence.",
+            MODE_4: "You are DIET COKE, the CoCA Oracle. The user has completed their casting. Engage in a brief, clinical, structural discussion about their result. No therapy, minor advice, minimal hand-holding. Maintain a precise tone. Keep responses under 40 words per sentence."
         };
 
         const WILHELM_DATA = {
@@ -886,6 +896,7 @@
         let userPath = []; 
         let conversationHistory = []; 
         let finalOracleRuling = "";
+        let currentWilhelmData = null; // Cache to pass to History update during Mode 4
 
         const chatContainer = document.getElementById('chatContainer');
         const castContainer = document.getElementById('castContainer');
@@ -910,8 +921,13 @@
             isProcessing = isLoading;
             chatInput.disabled = isLoading;
             sendBtn.disabled = isLoading;
-            chatInput.placeholder = isLoading ? "Processing..." : "Enter parameters...";
-            if (!isLoading && currentMode === 1) chatInput.focus();
+            if (!isLoading) chatInput.focus();
+            
+            if (isLoading) {
+                chatInput.placeholder = "Processing...";
+            } else {
+                chatInput.placeholder = currentMode === 4 ? "Discuss the revelation..." : "Enter parameters...";
+            }
         }
 
         function resetSystemState() {
@@ -921,6 +937,7 @@
             refinedQuestion = "";
             currentMode = 1;
             isProcessing = false;
+            currentWilhelmData = null;
             document.getElementById('castOptions').style.display = 'flex';
             chatInput.disabled = false;
             sendBtn.disabled = false;
@@ -1025,7 +1042,7 @@
 
         async function handleSend() {
             const text = chatInput.value.trim();
-            if (!text || currentMode !== 1 || isProcessing) return;
+            if (!text || (currentMode !== 1 && currentMode !== 4) || isProcessing) return;
 
             appendMessage(text, 'user');
             chatInput.value = '';
@@ -1033,35 +1050,50 @@
 
             conversationHistory.push({ role: "user", content: text });
             
-            if (conversationHistory.length > 10) {
-                conversationHistory = conversationHistory.slice(-10);
+            if (conversationHistory.length > 20) {
+                conversationHistory = conversationHistory.slice(-20);
             }
 
             let activeHistory = validateAlternation([...conversationHistory]);
-            const apiMessages = activeHistory.map((msg, index) => {
-                if (index === 0) return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
-                return msg;
-            });
-
+            
             try {
-                let reply = await fetchOracleResponse(apiMessages, 150, 1);
-                if (!reply) throw new Error("Empty response generated.");
+                if (currentMode === 1) {
+                    const apiMessages = activeHistory.map((msg, index) => {
+                        if (index === 0) return { role: 'user', content: PROMPTS.MODE_1 + "\n\n" + msg.content };
+                        return msg;
+                    });
 
-                const userTurns = conversationHistory.filter(m => m.role === 'user').length;
-                if (userTurns >= 4 && !reply.includes("STATUS: VALIDATED")) {
-                    reply = "STATUS: VALIDATED. Proceed to Mode 2 Casting.";
-                }
+                    let reply = await fetchOracleResponse(apiMessages, 150, 1);
+                    if (!reply) throw new Error("Empty response generated.");
 
-                const isValidated = reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2");
+                    const isValidated = reply.includes("STATUS: VALIDATED") || reply.includes("Proceed to Mode 2");
 
-                if (isValidated) {
-                    refinedQuestion = text; 
-                    chatInput.disabled = true;
-                    appendMessage(`<div class="system-header">STATUS: VALIDATED</div>STRUCTURAL CLARITY ACHIEVED. PROCEEDING TO CAST.`, 'system', true);
-                    setTimeout(() => triggerMode2Casting(), 1500);
-                } else {
+                    if (isValidated) {
+                        refinedQuestion = text; 
+                        chatInput.disabled = true;
+                        appendMessage(`<div class="system-header">STATUS: VALIDATED</div>STRUCTURAL CLARITY ACHIEVED. PROCEEDING TO CAST.`, 'system', true);
+                        setTimeout(() => triggerMode2Casting(), 1500);
+                    } else {
+                        conversationHistory.push({ role: "assistant", content: reply });
+                        appendMessage(reply, 'assistant');
+                        setLoadingState(false);
+                    }
+                } else if (currentMode === 4) {
+                    const apiMessages = [
+                        { role: 'system', content: PROMPTS.MODE_4 },
+                        ...activeHistory.slice(-8)
+                    ];
+                    
+                    let reply = await fetchOracleResponse(apiMessages, 300, 4);
+                    if (!reply) throw new Error("Empty response generated.");
+                    
                     conversationHistory.push({ role: "assistant", content: reply });
                     appendMessage(reply, 'assistant');
+                    
+                    // Update the running history with the discussion dynamically
+                    const details = getHexagramDetails();
+                    saveToHistory(refinedQuestion, details.hexNum, details.hexName, finalOracleRuling, conversationHistory, currentWilhelmData);
+                    
                     setLoadingState(false);
                 }
             } catch (error) {
@@ -1106,7 +1138,7 @@
             }
             document.getElementById('castProgress').textContent = `LINE ${step + 1} / 6`;
             document.getElementById('castQuestionText').textContent = CAST_QUESTIONS[step][0];
-            const btns = document.querySelectorAll('.cast-btn');
+            const btns = document.querySelectorAll('#castOptions .cast-btn');
             btns[0].textContent = CAST_QUESTIONS[step][1];
             btns[1].textContent = CAST_QUESTIONS[step][2];
         }
@@ -1208,9 +1240,10 @@
             
             castContainer.style.display = 'none';
             chatContainer.style.display = 'flex';
-            inputWrapper.style.display = 'none'; 
+            // Input Wrapper remains visible for Mode 4. 
             
             const wilhelmData = WILHELM_DATA[details.hexNum];
+            currentWilhelmData = wilhelmData; // Cache for later saves
             
             let inlineLinesHTML = '';
             castResults.forEach(val => {
@@ -1247,7 +1280,13 @@
                 finalOracleRuling = await fetchOracleResponse(apiMessages, 800, 3);
                 appendMessage(finalOracleRuling, 'assistant');
                 
-                // Save complete data map to local history when finished
+                // Inject the result into conversation history for Mode 4 context
+                conversationHistory.push({ 
+                    role: 'assistant', 
+                    content: `[ORACLE RULING DELIVERED: Hexagram ${details.hexNum} - ${details.hexName}. Ruling: ${finalOracleRuling}]` 
+                });
+
+                // Save to local history when completed
                 saveToHistory(refinedQuestion, details.hexNum, details.hexName, finalOracleRuling, conversationHistory, wilhelmData);
                 
                 const completionUI = `
@@ -1262,6 +1301,12 @@
                     </div>
                 `;
                 appendMessage(completionUI, 'system', true);
+                
+                // Automatically switch to Discussion Mode 4
+                currentMode = 4;
+                chatInput.disabled = false;
+                sendBtn.disabled = false;
+                chatInput.placeholder = "Discuss the revelation...";
 
             } catch (error) {
                 console.error(error);
@@ -1277,7 +1322,8 @@
 
             try {
                 const exportChatLog = document.getElementById('exportChatLog');
-                exportChatLog.innerHTML = conversationHistory.map(m => `
+                const exportHistory = conversationHistory.filter(m => !m.content.startsWith('[ORACLE RULING'));
+                exportChatLog.innerHTML = exportHistory.map(m => `
                     <div class="export-chat-row ${m.role === 'user' ? 'export-chat-user' : 'export-chat-oracle'}">
                         <span class="export-label">${m.role}</span>
                         ${m.content}
