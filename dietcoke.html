@@ -92,6 +92,7 @@
             position: relative;
             margin-bottom: 5px;
             pointer-events: none;
+            margin-right: 40px; /* Accounts for absolute positioning of Diet */
         }
         .logo-top {
             font-family: 'Playfair Display', serif; 
@@ -110,7 +111,7 @@
             color: var(--text-main);
             position: absolute; 
             top: -24px; 
-            right: -15px; 
+            right: -25px; 
             letter-spacing: normal;
         }
 
@@ -327,8 +328,9 @@
             .top-controls { position: relative; top: 0; right: 0; width: 100%; justify-content: flex-end; padding: 10px 15px; box-sizing: border-box; }
             .logo-section { padding-top: 5px; padding-bottom: 5px; }
             .icon-btn { padding: 6px; }
+            .logo-wrapper { margin-right: 20px; }
             .logo-top { font-size: 4.5rem; }
-            .logo-diet { font-size: 1.8rem; top: -18px; left: auto; right: -10px; }
+            .logo-diet { font-size: 1.8rem; top: -18px; right: -25px; }
             .acronym-text { font-size: 0.55rem; }
             .oracle-text { font-size: 1.5rem; letter-spacing: 2px; line-height: 1; margin-top: 5px;}
             .sub-text { font-size: 0.6rem; margin-top: 4px; }
@@ -346,15 +348,16 @@
 
         #exportWrapper {
             position: absolute; left: -9999px; top: -9999px; width: 800px;
-            background: white; color: black; font-family: 'Montserrat', sans-serif; z-index: -1;
+            background: white; color: black; font-family: 'Montserrat', sans-serif; 
+            z-index: -1; display: none; /* Changed back to correctly toggle logic for html2canvas */
         }
         
         .export-page { width: 800px; min-height: 1131px; padding: 60px; box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column; }
         .export-content-wrapper { flex-grow: 1; }
         .export-brand { text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px; }
-        .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; }
+        .export-logo-wrapper { display: inline-block; position: relative; margin-bottom: 5px; margin-right: 40px; }
         .export-logo-top { font-family: 'Playfair Display', serif; font-size: 6rem; font-weight: 700; color: #f40009; display: block; line-height: 0.8; letter-spacing: -2px; }
-        .export-logo-diet { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; font-weight: bold; color: #1a1a1a; position: absolute; top: -24px; right: -15px; }
+        .export-logo-diet { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; font-weight: bold; color: #1a1a1a; position: absolute; top: -24px; right: -25px; }
         .export-title { font-size: 2.5rem; font-weight: 900; letter-spacing: 4px; color: #1a1a1a; line-height: 1; margin-top: 10px; }
         .export-sub { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #555; margin-top: 10px; text-transform: uppercase; }
         .export-heading { font-size: 1.2rem; color: #f40009; letter-spacing: 2px; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; text-transform: uppercase; font-weight: 900; }
@@ -416,7 +419,7 @@
                     </div>
                 </div>
                 <div class="input-wrapper" id="inputWrapper">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Processing..." autocomplete="off">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Enter parameters..." autocomplete="off">
                     <button class="btn" id="micBtn" title="Audio Dictation Mode">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                     </button>
@@ -440,7 +443,7 @@
         </div>
     </div>
 
-    <!-- Modals (Maven, Explainer, History) -->
+    <!-- Maven Course Modal -->
     <div id="mavenModal" class="modal-overlay">
         <div class="modal-content" style="border: 2px dashed var(--coca-red);">
             <button class="modal-close" id="closeMavenBtn">&times;</button>
@@ -456,6 +459,7 @@
         </div>
     </div>
 
+    <!-- Explainer Modal -->
     <div id="explainerModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn">&times;</button>
@@ -490,6 +494,7 @@
         </div>
     </div>
 
+    <!-- History Modal -->
     <div id="historyModal" class="modal-overlay">
         <div class="modal-content" style="width: 95%; max-width: 700px;">
             <button class="modal-close" id="closeHistoryBtn">&times;</button>
@@ -500,9 +505,7 @@
         </div>
     </div>
 
-    <canvas id="waveCanvas"></canvas>
-
-    <!-- PDF EXPORT WRAPPER (Visually hidden) -->
+    <!-- PDF EXPORT WRAPPER -->
     <div id="exportWrapper">
         <div class="export-page" id="exportPage1">
             <div class="export-content-wrapper">
@@ -641,7 +644,7 @@
         }
 
         document.getElementById('acronymSubtitle').addEventListener('click', updateAcronym);
-        updateAcronym(); // Initialize on load
+        updateAcronym(); 
 
         // --- STT & TTS AUDIO CONVERSATION MODE ---
         let isAudioModeActive = false;
@@ -859,51 +862,6 @@
             localStorage.setItem('dietcoke_history', JSON.stringify(history.slice(0, 50))); 
         }
 
-        // --- Canvas Animation ---
-        function initCanvas() {
-            width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;
-            points = [];
-            for (let x = -50; x <= width + 50; x += resolution) {
-                points.push({ top: new Point(x, height / 2), bottom: new Point(x, height / 2) });
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height); time += 0.03; 
-            points.forEach((p) => {
-                const x = p.top.x;
-                const sineOffset = Math.sin(x * 0.002 + time) * 40 + Math.sin(x * 0.005 - time * 0.8) * 25;
-                const dynamicThickness = 80 + Math.sin(x * 0.003 + time * 1.5) * 40;
-                let targetTopY = (height * 0.40) + sineOffset - (dynamicThickness / 2);
-                let targetBottomY = (height * 0.40) + sineOffset + (dynamicThickness / 2);
-
-                const dy = mouse.y - ((targetTopY + targetBottomY) / 2);
-                if (Math.abs(mouse.x - x) < mouse.radius && Math.abs(dy) < mouse.radius) {
-                    const force = (mouse.radius - Math.sqrt(Math.pow(mouse.x - x, 2) + dy*dy)) / mouse.radius;
-                    targetTopY += force * 120 * (mouse.y < ((targetTopY + targetBottomY) / 2) ? 1 : -1);
-                    targetBottomY += force * 120 * (mouse.y < ((targetTopY + targetBottomY) / 2) ? 1 : -1);
-                }
-                p.top.update(targetTopY); p.bottom.update(targetBottomY);
-            });
-
-            ctx.beginPath(); ctx.moveTo(points[0].top.x, points[0].top.y);
-            for (let i = 0; i < points.length - 1; i++) {
-                ctx.quadraticCurveTo(points[i].top.x, points[i].top.y, (points[i].top.x + points[i + 1].top.x) / 2, (points[i].top.y + points[i + 1].top.y) / 2);
-            }
-            ctx.lineTo(points[points.length - 1].top.x, points[points.length - 1].top.y);
-            ctx.lineTo(points[points.length - 1].bottom.x, points[points.length - 1].bottom.y);
-            for (let i = points.length - 2; i >= 0; i--) {
-                ctx.quadraticCurveTo(points[i + 1].bottom.x, points[i + 1].bottom.y, (points[i].bottom.x + points[i + 1].bottom.x) / 2, (points[i].bottom.y + points[i + 1].bottom.y) / 2);
-            }
-            ctx.lineTo(points[0].bottom.x, points[0].bottom.y); ctx.closePath();
-            ctx.fillStyle = '#F40009'; ctx.fill();
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', initCanvas);
-        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-        initCanvas(); animate();
-
         // --- Core System Configuration ---
         const CF_WORKER_URL = 'https://bitter-shadow-ec20.jdo-8af.workers.dev'; 
 
@@ -911,73 +869,6 @@
             MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for structural clarity. Reject purely predictive fortune-telling, emotional venting, or vague outcome bias. However, strike a balance: if the user seeks inner insight (e.g., 'what insight will I gain by X') or defines a clear structural/operational variable, ACCEPT IT. Do not be overly hostile or pedantic. Once the core intent is structurally sound enough to process, output EXACTLY 'STATUS: VALIDATED' and nothing else. If it requires refinement, provide a clinical, clarifying reframe in CoCA vernacular (max 20 words, standard casing).",
             MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 30 words per sentence. Use standard sentence casing, do not output in ALL CAPS.",
             MODE_4: "You are DIET COKE, the CoCA Oracle. The user has completed their casting. Engage in a brief, clinical, structural discussion about their result. No therapy, minor advice, minimal hand-holding. Maintain a precise tone. Keep responses under 40 words per sentence. Use standard sentence casing, do not output in ALL CAPS."
-        };
-
-        const WILHELM_DATA = {
-            1: { judgement: "The Creative works sublime success, Furthering through perseverance.", image: "The movement of heaven is full of power. Thus the superior man makes himself strong and untiring." },
-            2: { judgement: "The Receptive brings about sublime success, Furthering through the perseverance of a mare. If the superior man undertakes something and tries to lead, He goes astray; But if he follows, he finds guidance.", image: "The earth's condition is receptive devotion. Thus the superior man who has breadth of character Carries the outer world." },
-            3: { judgement: "Difficulty at the Beginning works supreme success, Furthering through perseverance. Nothing should be undertaken. It furthers one to appoint helpers.", image: "Clouds and thunder: The image of Difficulty at the Beginning. Thus the superior man Brings order out of confusion." },
-            4: { judgement: "Youthful Folly has success. It is not I who seek the young fool; The young fool seeks me. At the first oracle I inform him. If he asks two or three times, it is importunity.", image: "A spring wells up at the foot of the mountain: The image of Youth. Thus the superior man fosters his character By thoroughness in all that he does." },
-            5: { judgement: "Waiting. If you are sincere, You have light and success. Perseverance brings good fortune. It furthers one to cross the great water.", image: "Clouds rise up to heaven: The image of Waiting. Thus the superior man eats and drinks, Is joyous and of good cheer." },
-            6: { judgement: "Conflict. You are sincere And are being obstructed. A cautious halt halfway brings good fortune. Going through to the end brings misfortune.", image: "Heaven and water go their opposite ways: The image of Conflict. Thus in all his transactions the superior man Carefully considers the beginning." },
-            7: { judgement: "The Army. The army needs perseverance And a strong man. Good fortune without blame.", image: "In the middle of the earth is water: The image of the Army. Thus the superior man increases his masses By generosity toward the people." },
-            8: { judgement: "Holding Together brings good fortune. Inquire of the oracle once again Whether you possess sublimity, constancy, and perseverance; Then there is no blame. Those who are uncertain gradually join.", image: "On the earth is water: The image of Holding Together. Thus the kings of antiquity Bestowed the different states as fiefs And cultivated friendly relations." },
-            9: { judgement: "The Taming Power of the Small Has success. Dense clouds, no rain from our western region.", image: "The wind drives across heaven: The image of The Taming Power of the Small. Thus the superior man Refines the outward aspect of his nature." },
-            10: { judgement: "Treading. Treading upon the tail of the tiger. It does not bite the man. Success.", image: "Heaven above, the lake below: The image of Treading. Thus the superior man discriminates between high and low, And thereby fortifies the thinking of the people." },
-            11: { judgement: "Peace. The small departs, The great approaches. Good fortune. Success.", image: "Heaven and earth unite: the image of Peace. Thus the ruler Divides and completes the course of heaven and earth... And so aids the people." },
-            12: { judgement: "Standstill. Evil people do not further The perseverance of the superior man. The great departs; the small approaches.", image: "Heaven and earth do not unite: The image of Standstill. Thus the superior man falls back upon his inner worth In order to escape the difficulties." },
-            13: { judgement: "Fellowship with Men in the open. Success. It furthers one to cross the great water. The perseverance of the superior man furthers.", image: "Heaven together with fire: The image of Fellowship with Men. Thus the superior man organizes the clans And makes distinctions between things." },
-            14: { judgement: "Possession in Great Measure. Supreme success.", image: "Fire in heaven above: The image of Possession in Great Measure. Thus the superior man curbs evil and furthers good, And thereby obeys the benevolent will of heaven." },
-            15: { judgement: "Modesty creates success. The superior man carries things through.", image: "Within the earth, a mountain: The image of Modesty. Thus the superior man reduces that which is too much, And augments that which is too little." },
-            16: { judgement: "Enthusiasm. It furthers one to install helpers And to set armies marching.", image: "Thunder comes resounding out of the earth: The image of Enthusiasm. Thus the ancient kings made music In order to honor merit." },
-            17: { judgement: "Following has supreme success. Perseverance furthers. No blame.", image: "Thunder in the middle of the lake: The image of Following. Thus the superior man at nightfall Goes indoors for rest and recuperation." },
-            18: { judgement: "Work on What Has Been Spoiled Has supreme success. It furthers one to cross the great water.", image: "The wind blows low on the mountain: The image of Decay. Thus the superior man stirs up the people And strengthens their spirit." },
-            19: { judgement: "Approach has supreme success. Perseverance furthers. When the eighth month comes, There will be misfortune.", image: "The earth above the lake: The image of Approach. Thus the superior man is inexhaustible In his will to teach, And without limits." },
-            20: { judgement: "Contemplation. The ablution has been made, But not yet the offering. Full of trust they look up to him.", image: "The wind blows over the earth: The image of Contemplation. Thus the kings of old visited the regions of the world, Contemplated the people, And gave them instruction." },
-            21: { judgement: "Biting Through has success. It is favorable to let justice be administered.", image: "Thunder and lightning: The image of Biting Through. Thus the kings of former times made firm the laws Through clearly defined penalties." },
-            22: { judgement: "Grace has success. In small matters It is favorable to undertake something.", image: "Fire at the foot of the mountain: The image of Grace. Thus does the superior man proceed When clearing up current affairs." },
-            23: { judgement: "Splitting Apart. It does not further one To go anywhere.", image: "The mountain rests on the earth: The image of Splitting Apart. Thus those above can ensure their position Only by giving generously to those below." },
-            24: { judgement: "Return. Success. Going out and coming in without error. Friends come without blame. To and fro goes the way. On the seventh day comes return.", image: "Thunder within the earth: The image of the Turning Point. Thus the kings of antiquity closed the passes At the time of solstice." },
-            25: { judgement: "Innocence. Supreme success. Perseverance furthers. If someone is not as he should be, He has misfortune.", image: "Under heaven thunder rolls: All things attain the natural state of innocence. Thus the kings of old... Fostered and nourished all beings." },
-            26: { judgement: "The Taming Power of the Great. Perseverance furthers. Not eating at home brings good fortune. It furthers one to cross the great water.", image: "Heaven within the mountain: The image of the Taming Power of the Great. Thus the superior man acquaints himself with many sayings of antiquity." },
-            27: { judgement: "The Corners of the Mouth. Perseverance brings good fortune. Pay heed to the providing of nourishment And to what a man seeks To fill his own mouth with.", image: "At the foot of the mountain, thunder: The image of Providing Nourishment. Thus the superior man is careful of his words And temperate in eating." },
-            28: { judgement: "Preponderance of the Great. The ridgepole sags to the breaking point. It furthers one to have somewhere to go. Success.", image: "The lake rises above the trees: The image of Preponderance of the Great. Thus the superior man, when he stands alone, Is unconcerned." },
-            29: { judgement: "The Abysmal repeated. If you are sincere, you have success in your heart, And whatever you do succeeds.", image: "Water flows on uninterruptedly and reaches its goal: The image of the Abysmal repeated. Thus the superior man walks in lasting virtue." },
-            30: { judgement: "The Clinging. Perseverance furthers. It brings success. Care of the cow brings good fortune.", image: "That which is bright rises twice: The image of Fire. Thus the great man, by perpetuating this brightness, Illumines the four quarters of the world." },
-            31: { judgement: "Influence. Success. Perseverance furthers. To take a maiden to wife brings good fortune.", image: "A lake on the mountain: The image of Influence. Thus the superior man encourages people to approach him By his readiness to receive them." },
-            32: { judgement: "Duration. Success. No blame. Perseverance furthers. It furthers one to have somewhere to go.", image: "Thunder and wind: the image of Duration. Thus the superior man stands firm And does not change his direction." },
-            33: { judgement: "Retreat. Success. In what is small, perseverance furthers.", image: "Mountain under heaven: the image of Retreat. Thus the superior man keeps the inferior man at a distance, Not angrily but with reserve." },
-            34: { judgement: "The Power of the Great. Perseverance furthers.", image: "Thunder in heaven above: The image of the Power of the Great. Thus the superior man does not tread upon paths That do not accord with established order." },
-            35: { judgement: "Progress. The powerful prince Is honored with horses in large numbers. In a single day he is granted audience three times.", image: "The sun rises over the earth: The image of Progress. Thus the superior man himself Brightens his bright virtue." },
-            36: { judgement: "Darkening of the Light. In adversity It furthers one to be persevering.", image: "The light has sunk into the earth: The image of Darkening of the Light. Thus does the superior man live with the great mass: He veils his light, yet still shines." },
-            37: { judgement: "The Family. The perseverance of the woman furthers.", image: "Wind comes forth from fire: The image of the Family. Thus the superior man has substance in his words And duration in his way of life." },
-            38: { judgement: "Opposition. In small matters, good fortune.", image: "Above, fire; below, the lake: The image of Opposition. Thus amid all fellowship The superior man retains his individuality." },
-            39: { judgement: "Obstruction. The southwest furthers. The northeast does not further. It furthers one to see the great man.", image: "Water on the mountain: The image of Obstruction. Thus the superior man turns his attention to himself And molds his character." },
-            40: { judgement: "Deliverance. The southwest furthers. If there is no longer anything where one has to go, Return brings good fortune.", image: "Thunder and rain set in: The image of Deliverance. Thus the superior man pardons mistakes And forgives misdeeds." },
-            41: { judgement: "Decrease combined with sincerity Brings about supreme good fortune Without blame. One may be persevering in this.", image: "At the foot of the mountain, the lake: The image of Decrease. Thus the superior man controls his anger And restrains his instincts." },
-            42: { judgement: "Increase. It furthers one To undertake something. It furthers one to cross the great water.", image: "Wind and thunder: the image of Increase. Thus the superior man: If he sees good, he imitates it; If he has faults, he rids himself of them." },
-            43: { judgement: "Break-through. One must resolutely make the matter known At the court of the king. It must be announced truthfully. Danger.", image: "The lake has risen up to heaven: The image of Break-through. Thus the superior man Dispenses riches downward And refrains from resting on his virtue." },
-            44: { judgement: "Coming to Meet. The maiden is powerful. One should not marry such a maiden.", image: "Under heaven, wind: The image of Coming to Meet. Thus does the prince act when disseminating his commands And proclaiming them to the four quarters of heaven." },
-            45: { judgement: "Gathering Together. Success. The king approaches his temple. It furthers one to see the great man.", image: "Over the earth, the lake: The image of Gathering Together. Thus the superior man renews his weapons In order to meet the unforeseen." },
-            46: { judgement: "Pushing Upward has supreme success. One must see the great man. Fear not. Departure toward the south Brings good fortune.", image: "Within the earth, wood grows: The image of Pushing Upward. Thus the superior man of devoted character Heaps up small things." },
-            47: { judgement: "Oppression. Success. Perseverance. The great man brings about good fortune. No blame.", image: "There is no water in the lake: The image of Exhaustion. Thus the superior man stakes his life On following his will." },
-            48: { judgement: "The Well. The town may be changed, But the well cannot be changed. It neither decreases nor increases.", image: "Water over wood: the image of the Well. Thus the superior man encourages the people at their work, And exhorts them to help one another." },
-            49: { judgement: "Revolution. On your own day You are believed. Supreme success. Furthering through perseverance. Remorse disappears.", image: "Fire in the lake: the image of Revolution. Thus the superior man Sets the calendar in order And makes the seasons clear." },
-            50: { judgement: "The Caldron. Supreme good fortune. Success.", image: "Fire over wood: The image of the Caldron. Thus the superior man consolidates his fate By making his position correct." },
-            51: { judgement: "Shock brings success. Shock comes-oh, oh! Laughing words-ha, ha! The shock terrifies for a hundred miles.", image: "Thunder repeated: the image of Shock. Thus in fear and trembling The superior man sets his life in order And examines himself." },
-            52: { judgement: "Keeping Still. Keeping his back still So that he no longer feels his body. He goes into his courtyard And does not see his people. No blame.", image: "Mountains standing close together: The image of Keeping Still. Thus the superior man Does not permit his thoughts To go beyond his situation." },
-            53: { judgement: "Development. The maiden Is given in marriage. Good fortune. Perseverance furthers.", image: "On the mountain, a tree: The image of Development. Thus the superior man abides in dignity and virtue, In order to improve the mores." },
-            54: { judgement: "The Marrying Maiden. Undertakings bring misfortune. Nothing that would further.", image: "Thunder over the lake: The image of the Marrying Maiden. Thus the superior man Understands the transitory In the light of the eternity of the end." },
-            55: { judgement: "Abundance has success. The king attains abundance. Be not sad. Be like the sun at midday.", image: "Both thunder and lightning come: The image of Abundance. Thus the superior man decides lawsuits And carries out punishments." },
-            56: { judgement: "The Wanderer. Success through smallness. Perseverance brings good fortune To the wanderer.", image: "Fire on the mountain: The image of the Wanderer. Thus the superior man Is clear-minded and cautious In imposing penalties." },
-            57: { judgement: "The Gentle. Success through what is small. It furthers one to have somewhere to go. It furthers one to see the great man.", image: "Winds following one upon the other: The image of the Gently Penetrating. Thus the superior man Spreads his commands abroad." },
-            58: { judgement: "The Joyous. Success. Perseverance is favorable.", image: "Lakes resting one on the other: The image of the Joyous. Thus the superior man joins with his friends For discussion and practice." },
-            59: { judgement: "Dispersion. Success. The king approaches his temple. It furthers one to cross the great water. Perseverance furthers.", image: "The wind drives over the water: The image of Dispersion. Thus the kings of old sacrificed to the Lord And built temples." },
-            60: { judgement: "Limitation. Success. Galling limitation must not be persevered in.", image: "Water over lake: the image of Limitation. Thus the superior man Creates number and measure, And examines the nature of virtue and correct conduct." },
-            61: { judgement: "Inner Truth. Pigs and fishes. Good fortune. It furthers one to cross the great water. Perseverance furthers.", image: "Wind over lake: the image of Inner Truth. Thus the superior man discusses criminal cases In order to delay executions." },
-            62: { judgement: "Preponderance of the Small. Success. Perseverance furthers. Small things may be done; great things should not be done.", image: "Thunder on the mountain: The image of Preponderance of the Small. Thus in his conduct the superior man gives preponderance to reverence." },
-            63: { judgement: "After Completion. Success in small matters. Perseverance furthers. At the beginning good fortune, At the end disorder.", image: "Water over fire: the image of the condition In After Completion. Thus the superior man Takes thought of misfortune And arms himself against it in advance." },
-            64: { judgement: "Before Completion. Success. But if the little fox, after nearly completing the crossing, Gets his tail in the water, There is nothing that would further.", image: "Fire over water: The image of the condition before transition. Thus the superior man is careful In the differentiation of things." }
         };
 
         let currentMode = 1;
@@ -1035,7 +926,8 @@
                     max_tokens: maxTokens,
                     temperature: 0.1,
                     frequency_penalty: 0.0,
-                    presence_penalty: 0.0
+                    presence_penalty: 0.0,
+                    stop: ["<end_of_turn>", "<eos>"] 
                 }
             };
 
@@ -1380,20 +1272,18 @@
                 document.getElementById('exportRuling').innerText = finalOracleRuling;
 
                 const wrapper = document.getElementById('exportWrapper');
-                const watermarks = document.querySelectorAll('.export-watermark');
+                
+                // Toggle display block so html2canvas can actually render it!
+                wrapper.style.display = 'block';
 
                 if (type === 'pdf') {
-                    wrapper.style.zIndex = '1000'; // Bring to front just behind modal layer if any
-                    wrapper.style.left = '0px'; 
-                    wrapper.style.top = '0px'; 
+                    const watermarks = document.querySelectorAll('.export-watermark');
                     watermarks.forEach(w => w.style.display = 'none');
 
                     const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 2, useCORS: true });
                     const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 2, useCORS: true });
                     const page3Canvas = await html2canvas(document.getElementById('exportPage3'), { scale: 2, useCORS: true });
                     
-                    wrapper.style.left = '-9999px'; 
-                    wrapper.style.top = '-9999px'; 
                     watermarks.forEach(w => w.style.display = 'block'); 
                     
                     const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
@@ -1419,21 +1309,17 @@
                     addPage(page1Canvas); pdf.addPage(); addPage(page2Canvas); pdf.addPage(); addPage(page3Canvas, true); 
                     pdf.save('Oracle_Consultation.pdf');
                 } else if (type === 'image') {
-                    wrapper.style.zIndex = '1000'; 
-                    wrapper.style.left = '0px'; 
-                    wrapper.style.top = '0px'; 
-                    
                     const combinedView = document.getElementById('exportCombinedView');
                     const fullDoc = await html2canvas(combinedView, { scale: 2, useCORS: true });
-                    
-                    wrapper.style.left = '-9999px'; 
-                    wrapper.style.top = '-9999px'; 
                     
                     const link = document.createElement('a');
                     link.download = 'Oracle_Revelation.jpg';
                     link.href = fullDoc.toDataURL('image/jpeg', 0.9);
                     link.click();
                 }
+
+                // Hide it again so it doesn't break the UI scroll
+                wrapper.style.display = 'none';
 
             } catch (err) {
                 console.error("Export Error:", err);
@@ -1444,4 +1330,4 @@
         }
     </script>
 </body>
-</html>
+</html
