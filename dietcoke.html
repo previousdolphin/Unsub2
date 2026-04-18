@@ -440,8 +440,7 @@
         </div>
     </div>
 
-    <!-- Modals (Maven, Explainer, History) omitted for brevity but remain structurally identical -->
-    <!-- Maven Course Modal -->
+    <!-- Modals (Maven, Explainer, History) -->
     <div id="mavenModal" class="modal-overlay">
         <div class="modal-content" style="border: 2px dashed var(--coca-red);">
             <button class="modal-close" id="closeMavenBtn">&times;</button>
@@ -457,7 +456,6 @@
         </div>
     </div>
 
-    <!-- Explainer Modal -->
     <div id="explainerModal" class="modal-overlay">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn">&times;</button>
@@ -470,7 +468,7 @@
 
             <h3>How the Phases Work</h3>
             <p><strong>Mode 1: The Refinery</strong><br>
-            The AI acts as a hostile editor to refine what your real conflict is. It is explicitly trained to reject vague complaints, emotional venting, or questions looking for a specific outcome. If you ask, "Will I be happy?" or "Why is my business failing?", it will block you. It demands that you reframe your problem into a precise, structural logic-gate before it will allow you to proceed.</p>
+            The AI acts as a strict structural editor to refine what your real conflict is. It is explicitly trained to reject vague complaints, emotional venting, or purely predictive fortune-telling. It demands that you reframe your problem into a precise, structural logic-gate before it will allow you to proceed.</p>
             
             <p><strong>Mode 2: The Casting</strong><br>
             Once you achieve structural clarity, you cast the lines. You will answer a series of fixed binary questions about the tension of your situation (e.g., Assert vs. Submit, Internal vs. External). Your choices, combined with probability, generate a specific hexagram.</p>
@@ -478,20 +476,20 @@
             <p><strong>Mode 3: The Interpretation</strong><br>
             The Oracle maps the Wilhelm translation of the I Ching directly onto the clinical, refined parameters you established in Phase 1, at the time of the output.</p>
             
-            <p><strong>Mode 4: The Interpretation</strong><br>
+            <p><strong>Mode 4: The Discussion</strong><br>
             You have completed the casting. You can engage in a brief, clinical, structural discussion about the result after the oracle has given you your Hexagram readings.</p>
                 
             <h3>How to Get the Best Results</h3>
             <p>To get past the Refinery and get a highly accurate interpretation, you must play by the Oracle's rules:</p>
             <ul>
-                <li><strong>Bring a specific target:</strong> Do not ask about "life." Bring a specific contract, a specific argument, or a specific creative bottleneck.</li>
+                <li><strong>Bring a specific target:</strong> Do not ask broadly about "life." Bring a specific contract, a specific argument, or a specific creative bottleneck.</li>
+                <li><strong>Questions about insight are valid:</strong> If you seek internal clarity rather than predictive answers (e.g., "What insight will I gain by making X decision?"), the Oracle will accept it.</li>
                 <li><strong>Be clinical:</strong> Remove your feelings. Describe the situation using structural terms like "friction," "leverage," "architecture," or "metrics."</li>
                 <li><strong>Accept the pushback:</strong> The AI's rejections are part of the process. Use its prompts to narrow down exactly what is functionally broken or misaligned in your situation.</li>
             </ul>
         </div>
     </div>
 
-    <!-- History Modal -->
     <div id="historyModal" class="modal-overlay">
         <div class="modal-content" style="width: 95%; max-width: 700px;">
             <button class="modal-close" id="closeHistoryBtn">&times;</button>
@@ -672,7 +670,7 @@
         function speakText(text) {
             if (!isAudioModeActive || !window.speechSynthesis) return;
 
-            window.speechSynthesis.cancel(); // Stop any ongoing speech
+            window.speechSynthesis.cancel(); 
             let cleanText = text.replace(/\[.*?\]/g, '').trim();
             cleanText = cleanText.replace(/STATUS: VALIDATED/gi, 'Status validated.');
             cleanText = cleanText.replace(/ERR: SYSTEM/gi, 'System Error.');
@@ -708,18 +706,18 @@
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
                 document.getElementById('chatInput').value = transcript;
-                handleSend(); // Auto confirm and submit dictation
+                handleSend(); 
             };
 
             recognition.onerror = (event) => {
                 console.error("Speech recognition error", event.error);
                 micBtn.classList.remove('listening');
-                setLoadingState(isProcessing); // reset placeholder
+                setLoadingState(isProcessing); 
             };
 
             recognition.onend = () => {
                 micBtn.classList.remove('listening');
-                setLoadingState(isProcessing); // reset placeholder
+                setLoadingState(isProcessing); 
             };
 
             micBtn.addEventListener('click', () => {
@@ -731,7 +729,7 @@
                 }
             });
         } else {
-            micBtn.style.display = 'none'; // Hide if browser unsupported
+            micBtn.style.display = 'none'; 
         }
 
         // --- Theme Logic ---
@@ -862,20 +860,6 @@
         }
 
         // --- Canvas Animation ---
-        const canvas = document.getElementById('waveCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, points = [];
-        const resolution = 20; 
-        const mouse = { x: -1000, y: -1000, radius: 200 };
-
-        class Point {
-            constructor(x, y) { this.x = x; this.y = y; this.vy = 0; }
-            update(targetY) {
-                let dy = targetY - this.y;
-                this.vy += dy * 0.04; this.vy *= 0.85; this.y += this.vy;
-            }
-        }
-
         function initCanvas() {
             width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;
             points = [];
@@ -884,7 +868,6 @@
             }
         }
 
-        let time = 0;
         function animate() {
             ctx.clearRect(0, 0, width, height); time += 0.03; 
             points.forEach((p) => {
@@ -925,7 +908,7 @@
         const CF_WORKER_URL = 'https://bitter-shadow-ec20.jdo-8af.workers.dev'; 
 
         const PROMPTS = {
-            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for oracle-grade precision. Reject outcome bias, advice-seeking, and emotional/structural ambiguity. If the user achieves pure structural clarity, output EXACTLY 'STATUS: VALIDATED' and nothing else. Otherwise, respond only with a hostile, clarifying reframe using CoCA vernacular. Maximum 20 words. Use standard sentence casing, do not output in ALL CAPS.",
+            MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for structural clarity. Reject purely predictive fortune-telling, emotional venting, or vague outcome bias. However, strike a balance: if the user seeks inner insight (e.g., 'what insight will I gain by X') or defines a clear structural/operational variable, ACCEPT IT. Do not be overly hostile or pedantic. Once the core intent is structurally sound enough to process, output EXACTLY 'STATUS: VALIDATED' and nothing else. If it requires refinement, provide a clinical, clarifying reframe in CoCA vernacular (max 20 words, standard casing).",
             MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 30 words per sentence. Use standard sentence casing, do not output in ALL CAPS.",
             MODE_4: "You are DIET COKE, the CoCA Oracle. The user has completed their casting. Engage in a brief, clinical, structural discussion about their result. No therapy, minor advice, minimal hand-holding. Maintain a precise tone. Keep responses under 40 words per sentence. Use standard sentence casing, do not output in ALL CAPS."
         };
@@ -1224,13 +1207,6 @@
             updateCastUI();
         }
 
-        const HEXAGRAM_MAP = {
-            "111111": 1, "000000": 2, "100010": 3, "010001": 4, "111010": 5, "010111": 6, "010000": 7, "000010": 8, "111011": 9, "110111": 10, "111000": 11, "000111": 12, "101111": 13, "111101": 14, "001000": 15, "000100": 16, "100110": 17, "011001": 18, "110000": 19, "000011": 20, "100101": 21, "101001": 22, "000001": 23, "100000": 24, "100111": 25, "111001": 26, "100001": 27, "011110": 28, "010010": 29, "101101": 30, "001110": 31, "011100": 32, "001111": 33, "111100": 34, "000101": 35, "101000": 36, "101011": 37, "110101": 38, "001010": 39, "010100": 40, "110001": 41, "100011": 42, "111110": 43, "011111": 44, "000110": 45, "011000": 46, "010110": 47, "011010": 48, "101110": 49, "011101": 50, "100100": 51, "001001": 52, "001011": 53, "110100": 54, "101100": 55, "001101": 56, "011011": 57, "110110": 58, "010011": 59, "110010": 60, "110011": 61, "001100": 62, "101010": 63, "010101": 64
-        };
-        const HEXAGRAM_NAMES = {
-            1: "The Creative", 2: "The Receptive", 3: "Difficulty at the Beginning", 4: "Youthful Folly", 5: "Waiting", 6: "Conflict", 7: "The Army", 8: "Holding Together", 9: "Small Taming", 10: "Treading", 11: "Peace", 12: "Standstill", 13: "Fellowship with Men", 14: "Possession in Great Measure", 15: "Modesty", 16: "Enthusiasm", 17: "Following", 18: "Work on What Has Been Spoiled", 19: "Approach", 20: "Contemplation", 21: "Biting Through", 22: "Grace", 23: "Stripping Away", 24: "Return", 25: "Innocence", 26: "Great Taming", 27: "Nourishment", 28: "Preponderance of the Great", 29: "The Abysmal", 30: "The Clinging", 31: "Influence", 32: "Duration", 33: "Retreat", 34: "Great Power", 35: "Progress", 36: "Darkening of the Light", 37: "The Family", 38: "Opposition", 39: "Obstruction", 40: "Deliverance", 41: "Decrease", 42: "Increase", 43: "Breakthrough", 44: "Coming to Meet", 45: "Gathering Together", 46: "Pushing Upward", 47: "Oppression", 48: "The Well", 49: "Revolution", 50: "The Cauldron", 51: "The Arousing", 52: "Keeping Still", 53: "Development", 54: "The Marrying Maiden", 55: "Abundance", 56: "The Wanderer", 57: "The Gentle", 58: "The Joyous", 59: "Dispersion", 60: "Limitation", 61: "Inner Truth", 62: "Preponderance of the Small", 63: "After Completion", 64: "Before Completion"
-        };
-
         function getHexagramDetails() {
             let binaryString = "";
             let changingLines = [];
@@ -1404,14 +1380,20 @@
                 document.getElementById('exportRuling').innerText = finalOracleRuling;
 
                 const wrapper = document.getElementById('exportWrapper');
-                wrapper.style.display = 'block';
                 const watermarks = document.querySelectorAll('.export-watermark');
 
                 if (type === 'pdf') {
+                    wrapper.style.zIndex = '1000'; // Bring to front just behind modal layer if any
+                    wrapper.style.left = '0px'; 
+                    wrapper.style.top = '0px'; 
                     watermarks.forEach(w => w.style.display = 'none');
-                    const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 3, useCORS: true });
-                    const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 3, useCORS: true });
-                    const page3Canvas = await html2canvas(document.getElementById('exportPage3'), { scale: 3, useCORS: true });
+
+                    const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 2, useCORS: true });
+                    const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 2, useCORS: true });
+                    const page3Canvas = await html2canvas(document.getElementById('exportPage3'), { scale: 2, useCORS: true });
+                    
+                    wrapper.style.left = '-9999px'; 
+                    wrapper.style.top = '-9999px'; 
                     watermarks.forEach(w => w.style.display = 'block'); 
                     
                     const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
@@ -1422,7 +1404,7 @@
                         const ratio = canvas.width / canvas.height;
                         let w = pdfWidth; let h = pdfWidth / ratio;
                         if (h > pdfHeight) { h = pdfHeight; w = pdfHeight * ratio; }
-                        pdf.addImage(canvas.toDataURL('image/jpeg', 1.0), 'JPEG', (pdfWidth - w)/2, 0, w, h);
+                        pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', (pdfWidth - w)/2, 0, w, h);
                         
                         const text = "UNSUBSCRIBE.LLC/DIETCOKE.HTML";
                         pdf.setFont('helvetica', 'bold'); pdf.setFontSize(10); pdf.setTextColor(26, 26, 26);
@@ -1437,15 +1419,22 @@
                     addPage(page1Canvas); pdf.addPage(); addPage(page2Canvas); pdf.addPage(); addPage(page3Canvas, true); 
                     pdf.save('Oracle_Consultation.pdf');
                 } else if (type === 'image') {
+                    wrapper.style.zIndex = '1000'; 
+                    wrapper.style.left = '0px'; 
+                    wrapper.style.top = '0px'; 
+                    
                     const combinedView = document.getElementById('exportCombinedView');
-                    const fullDoc = await html2canvas(combinedView, { scale: 3, useCORS: true });
+                    const fullDoc = await html2canvas(combinedView, { scale: 2, useCORS: true });
+                    
+                    wrapper.style.left = '-9999px'; 
+                    wrapper.style.top = '-9999px'; 
+                    
                     const link = document.createElement('a');
                     link.download = 'Oracle_Revelation.jpg';
-                    link.href = fullDoc.toDataURL('image/jpeg', 1.0);
+                    link.href = fullDoc.toDataURL('image/jpeg', 0.9);
                     link.click();
                 }
 
-                wrapper.style.display = 'none';
             } catch (err) {
                 console.error("Export Error:", err);
                 alert("Failed to generate export.");
