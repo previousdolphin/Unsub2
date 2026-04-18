@@ -10,7 +10,6 @@
     <link rel="manifest" href="./dietcoke-manifest.json" id="dynamic-manifest">
     <title>Diet Coke: Oracle System</title>
     
-    <!-- Dependencies for PDF and Image Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -93,7 +92,7 @@
             position: relative;
             margin-bottom: 5px;
             pointer-events: none;
-            margin-right: 40px;
+            margin-right: 40px; 
         }
         .logo-top {
             font-family: 'Playfair Display', serif; 
@@ -281,6 +280,7 @@
         .cast-btn.export-btn { border-color: var(--coca-red); color: var(--coca-red); font-size: 0.8rem; min-width: 140px;}
         .cast-btn.export-btn:hover { background: var(--coca-red); color: white; }
 
+        /* Modals CSS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-overlay); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { background: var(--modal-bg); color: var(--text-main); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-md); position: relative; font-size: 0.95rem; line-height: 1.6; }
@@ -324,11 +324,12 @@
             .modal-content h2 { font-size: 1.5rem; }
         }
 
+        /* HIDDEN DOM FOR EXPORT RENDER */
         #exportWrapper {
             position: absolute; left: -9999px; top: -9999px; width: 800px;
             background: white; color: black; font-family: 'Montserrat', sans-serif; z-index: -1;
-            display: none;
         }
+        
         .export-page { width: 800px; min-height: 1131px; padding: 60px; box-sizing: border-box; background: white; position: relative; display: flex; flex-direction: column; }
         .export-content-wrapper { flex-grow: 1; }
         .export-brand { text-align: center; border-bottom: 4px solid #f40009; padding-bottom: 25px; margin-bottom: 30px; }
@@ -342,7 +343,6 @@
         .export-chat-user { background: #f5f5f5; border-left: 4px solid #333; }
         .export-chat-oracle { background: rgba(244,0,9,0.05); border-left: 4px solid #f40009; }
         .export-label { font-weight: 800; font-size: 12px; letter-spacing: 1px; margin-bottom: 5px; display: block; }
-        
         .exp-line { position: relative; height: 10px; width: 78px; background: #1a1a1a; margin-bottom: 6px; border-radius: 1px; }
         .exp-line.yin { background: transparent !important; }
         .exp-line.yin::before, .exp-line.yin::after { content: ''; position: absolute; top: 0; width: 42%; height: 100%; background-color: #1a1a1a; border-radius: inherit; }
@@ -612,7 +612,7 @@
             "Dense Inference Ethics Turing: Contextual Ordered Kind Enhancer"
         ];
 
-        // --- DOM Elements ---
+        // --- DOM Elements & Global State ---
         const chatContainer = document.getElementById('chatContainer');
         const castContainer = document.getElementById('castContainer');
         const chatInput = document.getElementById('chatInput');
@@ -624,15 +624,14 @@
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const moonIcon = document.getElementById('moonIcon');
         const sunIcon = document.getElementById('sunIcon');
-
-        // --- Modals ---
         const mavenModal = document.getElementById('mavenModal');
         const explainerModal = document.getElementById('explainerModal');
         const historyModal = document.getElementById('historyModal');
         const historyList = document.getElementById('historyList');
         const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
 
-        // --- Global State ---
         let currentMode = 1;
         let isProcessing = false;
         let refinedQuestion = "";
@@ -642,10 +641,14 @@
         let finalOracleRuling = "";
         let currentWilhelmData = null; 
         let isAudioModeActive = false;
+        let width, height, points = [];
+        let time = 0;
+        const resolution = 20; 
+        const mouse = { x: -1000, y: -1000, radius: 200 };
 
         // --- Core System Configuration ---
         const CF_WORKER_URL = 'https://bitter-shadow-ec20.jdo-8af.workers.dev'; 
-
+        
         const PROMPTS = {
             MODE_1: "You are DIET COKE, the CoCA Oracle. Enforce MODE 1: THE REFINERY. Evaluate user input for structural clarity. Reject purely predictive fortune-telling, emotional venting, or vague outcome bias. However, strike a balance: if the user seeks inner insight (e.g., 'what insight will I gain by X') or defines a clear structural/operational variable, ACCEPT IT. Do not be overly hostile or pedantic. Once the core intent is structurally sound enough to process, output EXACTLY 'STATUS: VALIDATED' and nothing else. If it requires refinement, provide a clinical, clarifying reframe in CoCA vernacular (max 20 words, standard casing).",
             MODE_3: "You are DIET COKE, the CoCA Oracle. Enforce MODE 3: THE INTERPRETATION. Input consists of a refined question, a hexagram, and changing lines. Output must follow strict CoCA structure: Hexagram ID, Primary Text, Changing Lines, Transformed Hexagram (if applicable), Closing Notation. Use present tense. No advice. No apologies. Short sentences. Max 30 words per sentence. Use standard sentence casing, do not output in ALL CAPS.",
@@ -851,13 +854,89 @@
             localStorage.setItem('dietcoke_history', JSON.stringify(history.slice(0, 50))); 
         }
 
-        // --- Canvas Animation ---
-        const canvas = document.getElementById('waveCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height, points = [];
-        const resolution = 20; 
-        const mouse = { x: -1000, y: -1000, radius: 200 };
+        // --- STT & TTS AUDIO CONVERSATION MODE ---
+        audioToggleBtn.addEventListener('click', () => {
+            isAudioModeActive = !isAudioModeActive;
+            const offIcon = document.getElementById('speakerOffIcon');
+            const onIcon = document.getElementById('speakerOnIcon');
+            
+            if (isAudioModeActive) {
+                offIcon.style.display = 'none';
+                onIcon.style.display = 'block';
+                if (window.speechSynthesis) {
+                    const unlockMsg = new SpeechSynthesisUtterance('');
+                    window.speechSynthesis.speak(unlockMsg);
+                }
+            } else {
+                offIcon.style.display = 'block';
+                onIcon.style.display = 'none';
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+            }
+        });
 
+        function speakText(text) {
+            if (!isAudioModeActive || !window.speechSynthesis) return;
+
+            window.speechSynthesis.cancel(); 
+            let cleanText = text.replace(/\[.*?\]/g, '').trim();
+            cleanText = cleanText.replace(/STATUS: VALIDATED/gi, 'Status validated.');
+            cleanText = cleanText.replace(/ERR: SYSTEM/gi, 'System Error.');
+
+            if (!cleanText) return;
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.rate = 0.95; 
+            utterance.pitch = 0.85; 
+
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Daniel') || v.name.includes('UK English'));
+            if (preferredVoice) utterance.voice = preferredVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                micBtn.classList.add('listening');
+                if(window.speechSynthesis) window.speechSynthesis.cancel();
+                document.getElementById('chatInput').placeholder = "Listening...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('chatInput').value = transcript;
+                handleSend(); 
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                micBtn.classList.remove('listening');
+                setLoadingState(isProcessing); 
+            };
+
+            recognition.onend = () => {
+                micBtn.classList.remove('listening');
+                setLoadingState(isProcessing); 
+            };
+
+            micBtn.addEventListener('click', () => {
+                if(isProcessing) return;
+                if(micBtn.classList.contains('listening')) recognition.stop();
+                else recognition.start();
+            });
+        } else {
+            micBtn.style.display = 'none'; 
+        }
+
+        // --- Class Definitions & Canvas Init ---
         class Point {
             constructor(x, y) { this.x = x; this.y = y; this.vy = 0; }
             update(targetY) {
@@ -874,7 +953,6 @@
             }
         }
 
-        let time = 0;
         function animate() {
             ctx.clearRect(0, 0, width, height); time += 0.03; 
             points.forEach((p) => {
@@ -911,6 +989,7 @@
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
         initCanvas(); animate();
 
+        // --- Core Application Logic ---
         function appendMessage(content, type, isHTML = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${type}`;
@@ -1099,12 +1178,12 @@
             btns[1].textContent = CAST_QUESTIONS[step][2];
         }
 
-        // Must attach globally so the inline HTML onclick="castLine(1)" can fire
+        // Attached to window scope to ensure the inline HTML onclick works flawlessly
         window.castLine = function(btnIndex) {
             if (isProcessing || currentMode !== 2) return;
             
             const step = castResults.length;
-            userPath.push(CAST_QUESTIONS[step][btnIndex]);
+            userPath.push(CAST_QUESTIONS[step][btnIndex - 1]); // Mapping 1->0, 2->1 for array access
 
             const rand = Math.random() * 16;
             let lineValue = 9; 
@@ -1147,6 +1226,33 @@
 
             speakText(`Geometry locked. Assigned node ${details.hexNum}, ${details.hexName}. Changing lines: ${details.linesText}.`);
             setTimeout(() => { triggerMode3Interpretation(details); }, 3500);
+        }
+
+        async function shareToSocials(hexName, btnElement) {
+            const originalText = btnElement.innerText;
+            const shareData = {
+                title: 'Diet Coke Oracle System',
+                text: `I consulted the Diet Coke Oracle. Assigned Node: ${hexName}. The problem was always the question.\n\n`,
+                url: 'https://unsubscribe.llc/dietcoke.html'
+            };
+
+            if (navigator.share) {
+                try { await navigator.share(shareData); } catch (err) { console.log(err); }
+            } else {
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = shareData.text + shareData.url;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                    btnElement.innerText = "LINK COPIED!";
+                    setTimeout(() => btnElement.innerText = originalText, 2000);
+                } catch (err) {
+                    btnElement.innerText = "FAILED";
+                    setTimeout(() => btnElement.innerText = originalText, 2000);
+                }
+            }
         }
 
         async function triggerMode3Interpretation(details) {
@@ -1220,33 +1326,6 @@
             }
         }
 
-        async function shareToSocials(hexName, btnElement) {
-            const originalText = btnElement.innerText;
-            const shareData = {
-                title: 'Diet Coke Oracle System',
-                text: `I consulted the Diet Coke Oracle. Assigned Node: ${hexName}. The problem was always the question.\n\n`,
-                url: 'https://unsubscribe.llc/dietcoke.html'
-            };
-
-            if (navigator.share) {
-                try { await navigator.share(shareData); } catch (err) { console.log(err); }
-            } else {
-                try {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = shareData.text + shareData.url;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(textArea);
-                    btnElement.innerText = "LINK COPIED!";
-                    setTimeout(() => btnElement.innerText = originalText, 2000);
-                } catch (err) {
-                    btnElement.innerText = "FAILED";
-                    setTimeout(() => btnElement.innerText = originalText, 2000);
-                }
-            }
-        }
-
         window.exportConsultation = async function(type, btnElement) {
             const originalText = btnElement.innerText;
             btnElement.innerText = "GENERATING...";
@@ -1290,16 +1369,20 @@
                 document.getElementById('exportRuling').innerText = finalOracleRuling;
 
                 const wrapper = document.getElementById('exportWrapper');
-                wrapper.style.display = 'block';
+                const watermarks = document.querySelectorAll('.export-watermark');
 
                 if (type === 'pdf') {
-                    const watermarks = document.querySelectorAll('.export-watermark');
+                    wrapper.style.zIndex = '1000'; 
+                    wrapper.style.left = '0px'; 
+                    wrapper.style.top = '0px'; 
                     watermarks.forEach(w => w.style.display = 'none');
 
                     const page1Canvas = await html2canvas(document.getElementById('exportPage1'), { scale: 2, useCORS: true });
                     const page2Canvas = await html2canvas(document.getElementById('exportPage2'), { scale: 2, useCORS: true });
                     const page3Canvas = await html2canvas(document.getElementById('exportPage3'), { scale: 2, useCORS: true });
                     
+                    wrapper.style.left = '-9999px'; 
+                    wrapper.style.top = '-9999px'; 
                     watermarks.forEach(w => w.style.display = 'block'); 
                     
                     const pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
@@ -1325,16 +1408,21 @@
                     addPage(page1Canvas); pdf.addPage(); addPage(page2Canvas); pdf.addPage(); addPage(page3Canvas, true); 
                     pdf.save('Oracle_Consultation.pdf');
                 } else if (type === 'image') {
+                    wrapper.style.zIndex = '1000'; 
+                    wrapper.style.left = '0px'; 
+                    wrapper.style.top = '0px'; 
+                    
                     const combinedView = document.getElementById('exportCombinedView');
                     const fullDoc = await html2canvas(combinedView, { scale: 2, useCORS: true });
+                    
+                    wrapper.style.left = '-9999px'; 
+                    wrapper.style.top = '-9999px'; 
                     
                     const link = document.createElement('a');
                     link.download = 'Oracle_Revelation.jpg';
                     link.href = fullDoc.toDataURL('image/jpeg', 0.9);
                     link.click();
                 }
-
-                wrapper.style.display = 'none';
 
             } catch (err) {
                 console.error("Export Error:", err);
