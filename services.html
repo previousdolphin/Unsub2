@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNSUBSCRIBE NYC LLC | Services</title>
     
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
@@ -85,8 +88,10 @@
 </head>
 <body class="selection:bg-black selection:text-white relative">
 
+    <!-- Three.js Background -->
     <div id="canvas-container"></div>
 
+    <!-- Header -->
     <header class="fixed top-0 w-full z-50 border-b-black bg-[#F2F2F2]/90 backdrop-blur-md">
         <div class="flex justify-between items-center px-4 md:px-6 py-3 uppercase text-[10px] md:text-xs tracking-widest font-bold">
             <div class="flex items-center gap-2">
@@ -98,8 +103,10 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="relative z-10 pt-12 md:pt-14">
 
+        <!-- SECTION 1: HERO / OVERVIEW -->
         <section class="min-h-[70vh] flex flex-col justify-center items-center border-b-black relative px-4 py-20 bg-[#F2F2F2]/80 backdrop-blur-sm">
             <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-400 tracking-[0.3em] uppercase mix-blend-multiply">
                 [ CoCA Mark ]
@@ -118,6 +125,7 @@
                     Every site we build carries a footer: <span class="italic text-black">This site by Unsubscribe LLC. CoCA 2026.</span> Clients can pay to remove it. Most don’t.
                 </p>
 
+                <!-- Disclaimer Caveat -->
                 <div class="border-t border-b border-gray-300 py-4 mt-12 max-w-xl mx-auto">
                     <p class="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 text-left">
                         * System Note: The rates detailed below are historical baselines. They reflect what we have charged in the past. Final architecture, scope, and cost scale dynamically based on our discussions and the complexity of your custom solution.
@@ -126,6 +134,7 @@
             </div>
         </section>
 
+        <!-- SECTION 2: STANDARD PROTOCOLS (The 4 Offerings) -->
         <section class="bg-[#F2F2F2]">
             <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
                 <h2 class="font-serif text-2xl md:text-4xl italic pr-4">Protocols</h2>
@@ -133,6 +142,7 @@
             </div>
 
             <div class="flex flex-col">
+                <!-- 01: Ghostwriting -->
                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
                     <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
                     
@@ -151,10 +161,11 @@
                     </div>
 
                     <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
-                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
+                        <a href="mailto:office@unsubscribe.llc?subject=Inquiry:%20Ghostwriting" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
                     </div>
                 </div>
 
+                <!-- 02: Website Standard -->
                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
                     <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
                     
@@ -173,10 +184,11 @@
                     </div>
 
                     <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
-                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
+                        <a href="mailto:office@unsubscribe.llc?subject=Inquiry:%20Website%20Standard" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
                     </div>
                 </div>
 
+                <!-- 03: Website E-Commerce -->
                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
                     <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
                     
@@ -195,10 +207,11 @@
                     </div>
 
                     <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
-                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
+                        <a href="mailto:office@unsubscribe.llc?subject=Inquiry:%20Website%20E-Commerce" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
                     </div>
                 </div>
 
+                <!-- 04: The Non-Profit Track -->
                 <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative bg-white">
                     <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
                     
@@ -217,17 +230,19 @@
                     </div>
 
                     <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
-                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Say So</a>
+                        <a href="mailto:office@unsubscribe.llc?subject=Inquiry:%20The%20Good%20Cause" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Say So</a>
                     </div>
                 </div>
 
             </div>
         </section>
 
+        <!-- SECTION 3: THE APPLICATION (Social Management) -->
         <section class="border-b-black bg-white relative">
             <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-300 tracking-[0.3em] uppercase pointer-events-none">[ CoCA ]</div>
             
             <div class="grid grid-cols-1 md:grid-cols-12">
+                <!-- Left Context -->
                 <div class="md:col-span-5 p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black flex flex-col justify-center bg-[#F2F2F2]">
                     <h3 class="font-mono text-[10px] uppercase tracking-widest mb-6 text-gray-500">The Application</h3>
                     <h2 class="font-serif text-3xl md:text-5xl leading-tight mb-8">Social Management & Strategy</h2>
@@ -240,12 +255,13 @@
                     </div>
                 </div>
 
+                <!-- Right Input Area (Intentional Friction) -->
                 <div class="md:col-span-7 p-8 md:p-16 flex flex-col justify-center items-center min-h-[500px] reveal-text">
-                    <form class="w-full max-w-xl flex flex-col h-full" action="#" method="POST">
+                    <form class="w-full max-w-xl flex flex-col h-full" action="mailto:office@unsubscribe.llc?subject=Social%20Management%20Application" method="POST" enctype="text/plain">
                         <label for="positioning" class="sr-only">Why is your brand positioned correctly?</label>
                         <textarea 
                             id="positioning" 
-                            name="positioning" 
+                            name="positioning_statement" 
                             class="w-full flex-grow min-h-[300px] bg-transparent border-b border-gray-300 font-serif text-xl md:text-2xl leading-relaxed resize-none p-4 placeholder-gray-300 transition-colors focus:border-black focus:ring-0"
                             placeholder="Type here..."
                             required
@@ -264,6 +280,7 @@
             </div>
         </section>
 
+        <!-- SECTION 4: CONTEXT / HOW WE WORK -->
         <section class="border-b-black bg-[#F2F2F2] p-8 md:p-24 flex justify-center text-center relative">
             <div class="absolute bottom-6 left-6 font-mono text-[8px] text-gray-400 tracking-[0.3em] uppercase pointer-events-none">[ CoCA // Architecture ]</div>
             
@@ -275,6 +292,7 @@
             </div>
         </section>
 
+        <!-- SECTION 5: FOOTER -->
         <footer class="bg-black text-white min-h-[80vh] flex flex-col justify-between p-6 md:p-16 relative">
             <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-800 tracking-[0.3em] uppercase pointer-events-none">CoCA 2026</div>
 
@@ -292,7 +310,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono text-[10px] uppercase tracking-widest pt-12 border-t border-white/20">
                 <div>
                     <span class="block text-gray-500 mb-2">Architects</span>
-                    <a href="#" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Jesse Do<br>Paul Pissarro</a>
+                    <a href="about-us.html" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Jesse Do<br>Paul Pissarro</a>
                 </div>
                 <div>
                     <span class="block text-gray-500 mb-2">Cycle</span>
