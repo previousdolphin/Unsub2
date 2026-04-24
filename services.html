@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNSUBSCRIBE NYC LLC | Services</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F2F2F2;
+            --text-color: #0F0F0F;
+            --grid-line: 1px solid #0F0F0F;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: crosshair;
+        }
+
+        /* Typography */
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        /* Borders */
+        .border-b-black { border-bottom: var(--grid-line); }
+        .border-t-black { border-top: var(--grid-line); }
+        .border-r-black { border-right: var(--grid-line); }
+        .border-l-black { border-left: var(--grid-line); }
+        .border-black { border: var(--grid-line); }
+
+        /* Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+
+        /* Reveal Animation */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover Inversion */
+        .hover-invert {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .hover-invert:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* Textarea specific overrides */
+        textarea {
+            outline: none;
+            box-shadow: none;
+        }
+        textarea:focus {
+            border-bottom-color: #0F0F0F;
+        }
+    </style>
+</head>
+<body class="selection:bg-black selection:text-white relative">
+
+    <div id="canvas-container"></div>
+
+    <header class="fixed top-0 w-full z-50 border-b-black bg-[#F2F2F2]/90 backdrop-blur-md">
+        <div class="flex justify-between items-center px-4 md:px-6 py-3 uppercase text-[10px] md:text-xs tracking-widest font-bold">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-black rounded-full inline-block animate-pulse"></span>
+                Unsubscribe NYC LLC
+            </div>
+            <div class="hidden md:block">P. Pissarro / J. Do</div>
+            <div class="text-right whitespace-nowrap">[ 2026 ]</div>
+        </div>
+    </header>
+
+    <main class="relative z-10 pt-12 md:pt-14">
+
+        <section class="min-h-[70vh] flex flex-col justify-center items-center border-b-black relative px-4 py-20 bg-[#F2F2F2]/80 backdrop-blur-sm">
+            <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-400 tracking-[0.3em] uppercase mix-blend-multiply">
+                [ CoCA Mark ]
+            </div>
+            
+            <div class="max-w-4xl w-full text-center reveal-text space-y-8 md:space-y-12">
+                <h1 class="font-mono text-[10px] md:text-xs tracking-[0.2em] text-gray-500 uppercase">
+                    Service Architecture
+                </h1>
+                
+                <p class="font-serif text-2xl md:text-4xl lg:text-5xl leading-[1.2] font-medium px-2">
+                    Unsubscribe LLC builds websites, writes, and runs strategy for founders, artists, and institutions with something real to say.
+                </p>
+
+                <p class="font-mono text-xs md:text-sm max-w-2xl mx-auto leading-relaxed text-gray-600">
+                    Every site we build carries a footer: <span class="italic text-black">This site by Unsubscribe LLC. CoCA 2026.</span> Clients can pay to remove it. Most don’t.
+                </p>
+
+                <div class="border-t border-b border-gray-300 py-4 mt-12 max-w-xl mx-auto">
+                    <p class="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 text-left">
+                        * System Note: The rates detailed below are historical baselines. They reflect what we have charged in the past. Final architecture, scope, and cost scale dynamically based on our discussions and the complexity of your custom solution.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-[#F2F2F2]">
+            <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
+                <h2 class="font-serif text-2xl md:text-4xl italic pr-4">Protocols</h2>
+                <span class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1">[ 04 ITEMS ]</span>
+            </div>
+
+            <div class="flex flex-col">
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+                    
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">01</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">01</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Ghostwriting</h3>
+                        <div class="font-mono text-sm opacity-80">$4,000 / month</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">Four essays per month. Your ideas, your voice, your byline. We do the architecture, the research, and the writing. You show up as the author you already are.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+                    
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">02</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">02</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Website<br>Standard</h3>
+                        <div class="font-mono text-sm opacity-80">$2,500</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">A single-page or multi-page site built clean and fast. Copy, design direction, and deployment. For founders, practices, and institutions that need a home on the internet that doesn’t embarrass them.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+                    
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">03</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">03</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Website<br>E-Commerce</h3>
+                        <div class="font-mono text-sm opacity-80">$5,000</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">Everything in the standard build plus a fully functional store. Product pages, payment integration, shipping logic, inventory structure. Built to sell from day one.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative bg-white">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+                    
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">04</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">04</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">The Good Cause</h3>
+                        <div class="font-mono text-sm opacity-80">$500</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">Offered on a separate track for non-profits and good causes. Every one of these sites inherently carries the CoCA mark. If that's you, say so.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="#" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Say So</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="border-b-black bg-white relative">
+            <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-300 tracking-[0.3em] uppercase pointer-events-none">[ CoCA ]</div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-12">
+                <div class="md:col-span-5 p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black flex flex-col justify-center bg-[#F2F2F2]">
+                    <h3 class="font-mono text-[10px] uppercase tracking-widest mb-6 text-gray-500">The Application</h3>
+                    <h2 class="font-serif text-3xl md:text-5xl leading-tight mb-8">Social Management & Strategy</h2>
+                    
+                    <div class="space-y-6 font-mono text-xs md:text-sm text-gray-600 leading-relaxed max-w-md">
+                        <p>This one requires an application. Before we touch your accounts we need to know one thing.</p>
+                        <p class="text-black font-bold uppercase tracking-wide">Why is your brand positioned correctly?</p>
+                        <p>Not what your brand is. Not what you sell. Why the position you occupy is the right one, and why you are the right person to occupy it.</p>
+                        <p>If you can answer that clearly, we can build from it. If you can’t, that’s also something we can help with – but it starts here.</p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-7 p-8 md:p-16 flex flex-col justify-center items-center min-h-[500px] reveal-text">
+                    <form class="w-full max-w-xl flex flex-col h-full" action="#" method="POST">
+                        <label for="positioning" class="sr-only">Why is your brand positioned correctly?</label>
+                        <textarea 
+                            id="positioning" 
+                            name="positioning" 
+                            class="w-full flex-grow min-h-[300px] bg-transparent border-b border-gray-300 font-serif text-xl md:text-2xl leading-relaxed resize-none p-4 placeholder-gray-300 transition-colors focus:border-black focus:ring-0"
+                            placeholder="Type here..."
+                            required
+                        ></textarea>
+                        
+                        <div class="mt-12 flex justify-end">
+                            <button type="submit" class="font-mono text-xs uppercase tracking-widest border border-black bg-black text-white px-8 py-4 hover:bg-white hover:text-black transition-colors flex items-center gap-4">
+                                Apply
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="square"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-b-black bg-[#F2F2F2] p-8 md:p-24 flex justify-center text-center relative">
+            <div class="absolute bottom-6 left-6 font-mono text-[8px] text-gray-400 tracking-[0.3em] uppercase pointer-events-none">[ CoCA // Architecture ]</div>
+            
+            <div class="max-w-3xl reveal-text">
+                <h3 class="font-mono text-[10px] uppercase tracking-widest mb-8 text-gray-500">A Note On How We Work</h3>
+                <p class="font-serif text-2xl md:text-4xl leading-tight italic">
+                    We are not an agency. We don’t take every client. Every engagement is documented as content, which means your story becomes part of ours. We work with founders, artists, and institutions who are building something that didn’t exist before.
+                </p>
+            </div>
+        </section>
+
+        <footer class="bg-black text-white min-h-[80vh] flex flex-col justify-between p-6 md:p-16 relative">
+            <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-800 tracking-[0.3em] uppercase pointer-events-none">CoCA 2026</div>
+
+            <div class="flex-grow flex flex-col justify-center items-center text-center reveal-text space-y-8">
+                <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-4 py-1 rounded-full">Systems Online</div>
+                <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl leading-[0.9]">
+                    BUILD FROM<br>THE GROUND UP.
+                </h2>
+                <p class="font-mono text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
+                    // SYSTEM MESSAGE:<br>
+                    TRANSCEND THE NOISE.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono text-[10px] uppercase tracking-widest pt-12 border-t border-white/20">
+                <div>
+                    <span class="block text-gray-500 mb-2">Architects</span>
+                    <a href="#" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Jesse Do<br>Paul Pissarro</a>
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Cycle</span>
+                    2024 - ∞<br>Beyond Limits
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Origin</span>
+                    New York City<br>40.7128° N
+                </div>
+                <div class="text-right flex flex-col justify-between">
+                    <span class="block text-gray-500 mb-2">Input</span>
+                    <a href="mailto:office@unsubscribe.llc" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Connect_</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- THREE.JS BACKGROUND ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0xF2F2F2, 0.002);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Wireframe Terrain
+            const geometry = new THREE.PlaneGeometry(24, 24, 32, 32);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0x000000, 
+                wireframe: true, 
+                transparent: true,
+                opacity: 0.08,
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            plane.rotation.x = -Math.PI / 2.5;
+            scene.add(plane);
+
+            let time = 0;
+            let mouseX = 0;
+            let mouseY = 0;
+
+            const handleInput = (x, y) => {
+                mouseX = (x - window.innerWidth / 2) * 0.001;
+                mouseY = (y - window.innerHeight / 2) * 0.001;
+            };
+
+            document.addEventListener('mousemove', (e) => handleInput(e.clientX, e.clientY));
+            document.addEventListener('touchmove', (e) => {
+                if(e.touches.length > 0) {
+                    handleInput(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                time += 0.002;
+
+                const positionAttribute = geometry.attributes.position;
+                const vertex = new THREE.Vector3();
+
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    vertex.fromBufferAttribute(positionAttribute, i);
+                    const wave1 = 0.5 * Math.sin(vertex.x * 0.5 + time);
+                    const wave2 = 0.3 * Math.sin(vertex.y * 0.8 + time * 1.5);
+                    const wave3 = 0.1 * Math.sin(vertex.x * 2 + vertex.y * 0.5 + time);
+                    vertex.z = (wave1 + wave2 + wave3) * 1.2;
+                    positionAttribute.setZ(i, vertex.z);
+                }
+                positionAttribute.needsUpdate = true;
+
+                plane.rotation.z += 0.0005;
+                plane.rotation.x += (mouseY * 0.5 - plane.rotation.x - Math.PI/2.5) * 0.05;
+                plane.rotation.y += (mouseX * 0.5 - plane.rotation.y) * 0.05;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // --- OBSERVER ---
+        const initObserver = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
+        };
+
+        window.addEventListener('load', () => {
+            try { initThreeJS(); } catch (e) { console.log('WebGL fallback'); }
+            initObserver();
+        });
+    </script>
+</body>
+</html>
