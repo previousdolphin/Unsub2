@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lighten UP by Mark Josefsberg - A playful, practical guide to the Alexander Technique for relieving nerve and neck pain.">
+
+    <!-- Open Graph / Social Meta Tags -->
+    <meta property="og:title" content="Lighten UP - Mark Josefsberg">
+    <meta property="og:description" content="Decades of bad posture left me with debilitating nerve pain. Learn how the Alexander Technique healed me in 29 lighthearted lessons.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.markjosefsberg.com">
+    <!-- Replace with an actual social share image URL -->
+    <meta property="og:image" content="https://www.markjosefsberg.com/wp-content/uploads/2024/01/Cover2-1-600x953.png">
+
     <title>Lighten UP - Mark Josefsberg</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Google Fonts -->
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+
+    <!-- Google Fonts Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Fredoka:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Fredoka:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
-        
         .font-playful { font-family: 'Fredoka', sans-serif; }
         .font-script { font-family: 'Caveat', cursive; }
         .font-body { font-family: 'Inter', sans-serif; }
@@ -22,7 +34,7 @@
         /* Essential 3D utility classes */
         .preserve-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
-        
+
         html { scroll-behavior: smooth; }
     </style>
 </head>
@@ -35,40 +47,40 @@
             Lighten UP
         </div>
         <div class="hidden md:flex gap-8 text-[#2C4258] font-body text-sm font-medium">
-            <a href="#story" class="hover:text-[#4A5D44] transition-colors">My Story</a>
-            <a href="#approach" class="hover:text-[#4A5D44] transition-colors">The Book</a>
-            <a href="#reviews" class="hover:text-[#4A5D44] transition-colors">Reviews</a>
-            <a href="https://www.markjosefsberg.com" target="_blank" class="hover:text-[#4A5D44] transition-colors">Website</a>
+            <a href="#story" class="hover:text-[#4A5D44] focus:outline-none focus:text-[#4A5D44] transition-colors">My Story</a>
+            <a href="#approach" class="hover:text-[#4A5D44] focus:outline-none focus:text-[#4A5D44] transition-colors">The Book</a>
+            <a href="#reviews" class="hover:text-[#4A5D44] focus:outline-none focus:text-[#4A5D44] transition-colors">Reviews</a>
+            <a href="https://www.markjosefsberg.com" target="_blank" rel="noopener noreferrer" class="hover:text-[#4A5D44] focus:outline-none focus:text-[#4A5D44] transition-colors">Website</a>
         </div>
-        <a href="#purchase" class="bg-[#4A5D44] text-white px-6 py-2.5 rounded-full font-body text-sm font-medium hover:bg-[#3a4935] transition-all shadow-sm hover:shadow-md inline-block">
+        <a href="#purchase" class="bg-[#4A5D44] text-white px-6 py-2.5 rounded-full font-body text-sm font-medium hover:bg-[#3a4935] focus:outline-none focus:ring-2 focus:ring-[#4A5D44] focus:ring-offset-2 transition-all shadow-sm hover:shadow-md inline-block">
             Get the Book
         </a>
     </nav>
 
     <!-- DESKTOP SPLIT LAYOUT WRAPPER -->
     <div class="flex flex-col md:flex-row relative z-10 bg-white">
-        
+
         <!-- LEFT COLUMN: Scrolling Content -->
         <div class="w-full md:w-1/2 lg:w-[55%] flex flex-col pt-24">
-            
+
             <!-- Mobile-only Book Display (hidden on md+) -->
             <div class="md:hidden w-full flex justify-center py-12 bg-gradient-to-b from-[#D9EBF2] to-white relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-white/40 rounded-full mix-blend-overlay filter blur-3xl"></div>
-                
+
                 <!-- Mobile 3D Book -->
-                <div id="mobile-book" class="relative w-[260px] sm:w-[320px] h-[390px] sm:h-[480px] mx-auto cursor-pointer group perspective-[1500px]">
+                <div id="mobile-book" role="button" tabindex="0" aria-label="Interactive 3D Book. Click or press enter to flip." class="relative w-[260px] sm:w-[320px] h-[390px] sm:h-[480px] mx-auto cursor-pointer group perspective-[1500px] focus:outline-none focus:ring-4 focus:ring-[#4A5D44]/30 rounded-lg">
                     <div class="absolute z-20 bottom-4 right-4 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-[#2C4258] shadow flex items-center gap-1 pointer-events-none">
                         <i data-lucide="rotate-cw" class="w-3 h-3"></i> Click to flip
                     </div>
                     <div class="book-inner w-full h-full relative preserve-3d transition-transform duration-500" style="transform: rotateX(5deg) rotateY(-15deg);">
                         <!-- Front Cover -->
                         <div class="absolute inset-0 rounded-r-lg overflow-hidden bg-white shadow-[inset_4px_0_10px_rgba(0,0,0,0.1)] backface-hidden" style="transform: translateZ(25px)">
-                            <img src="Cover2-1-600x953.png" alt="Lighten UP Book Cover" class="w-full h-full object-cover" />
+                            <img src="https://www.markjosefsberg.com/wp-content/uploads/2024/01/Cover2-1-600x953.png" alt="Lighten UP Book Cover" class="w-full h-full object-cover" />
                             <div class="book-glare absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 mix-blend-overlay transition-transform duration-200"></div>
                         </div>
                         <!-- Back Cover -->
                         <div class="absolute inset-0 rounded-l-lg overflow-hidden bg-white shadow-[inset_-4px_0_10px_rgba(0,0,0,0.1)] backface-hidden" style="transform: translateZ(-25px) rotateY(180deg)">
-                            <img src="IMG_4724.jpeg" alt="Lighten UP Back Cover" class="w-full h-full object-cover" />
+                            <img src="IMG_4724.jpeg" alt="Lighten UP Back Cover" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop'; this.onerror=null;" />
                             <div class="book-glare absolute inset-0 bg-gradient-to-tl from-white/0 via-white/10 to-white/0 mix-blend-overlay transition-transform duration-200"></div>
                         </div>
                         <!-- Spine -->
@@ -106,10 +118,10 @@
                     Decades of bad posture left me with debilitating nerve pain. After trying every doctor and therapist, the Alexander Technique finally healed me. Now, I've distilled 25 years of teaching into 29 lighthearted, practical lessons.
                 </p>
                 <div class="flex flex-col sm:flex-row items-center gap-4">
-                    <a href="#purchase" class="bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-medium hover:bg-[#1a2836] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 w-full sm:w-auto justify-center">
+                    <a href="#purchase" class="bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-medium hover:bg-[#1a2836] focus:outline-none focus:ring-2 focus:ring-[#2C4258] focus:ring-offset-2 transition-all shadow-lg hover:shadow-xl flex items-center gap-2 w-full sm:w-auto justify-center">
                         Get the Book <i data-lucide="arrow-down" class="w-4 h-4"></i>
                     </a>
-                    <a href="#story" class="bg-white text-[#2C4258] border border-[#D9EBF2] px-8 py-4 rounded-full font-body font-medium hover:bg-[#F9F8F3] transition-all shadow-sm w-full sm:w-auto text-center block">
+                    <a href="#story" class="bg-white text-[#2C4258] border border-[#D9EBF2] px-8 py-4 rounded-full font-body font-medium hover:bg-[#F9F8F3] focus:outline-none focus:ring-2 focus:ring-[#D9EBF2] focus:ring-offset-2 transition-all shadow-sm w-full sm:w-auto text-center block">
                         Read My Story
                     </a>
                 </div>
@@ -192,11 +204,11 @@
             <div class="sticky top-0 w-full h-screen overflow-hidden">
                 <div class="absolute top-1/4 -right-20 w-96 h-96 bg-white/40 rounded-full mix-blend-overlay filter blur-3xl"></div>
                 <div class="absolute bottom-1/4 left-10 w-64 h-64 bg-[#4A5D44]/5 rounded-full filter blur-3xl"></div>
-                
+
                 <!-- The Desktop Book centered in the viewport -->
                 <div class="w-full h-full flex flex-col items-center justify-center relative">
-                    
-                    <div id="desktop-book" class="relative w-[260px] lg:w-[360px] h-[390px] lg:h-[540px] mx-auto cursor-pointer group" style="perspective: 1500px;">
+
+                    <div id="desktop-book" role="button" tabindex="0" aria-label="Interactive 3D Book. Click or press enter to flip." class="relative w-[260px] lg:w-[360px] h-[390px] lg:h-[540px] mx-auto cursor-pointer group focus:outline-none focus:ring-4 focus:ring-[#4A5D44]/30 rounded-lg" style="perspective: 1500px;">
                         <div class="absolute z-20 -right-16 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur px-3 py-1.5 rounded-full text-xs font-medium text-[#2C4258] shadow flex items-center gap-1 pointer-events-none transition-opacity opacity-0 group-hover:opacity-100">
                             <i data-lucide="rotate-cw" class="w-3 h-3"></i> Click to flip
                         </div>
@@ -208,7 +220,7 @@
                             </div>
                             <!-- Back Cover -->
                             <div class="absolute inset-0 rounded-l-lg overflow-hidden bg-white shadow-[inset_-4px_0_10px_rgba(0,0,0,0.1)] backface-hidden" style="transform: translateZ(-25px) rotateY(180deg)">
-                                <img src="IMG_4724.jpeg" alt="Lighten UP Back Cover" class="w-full h-full object-cover" />
+                                <img src="IMG_4724.jpeg" alt="Lighten UP Back Cover" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800&auto=format&fit=crop'; this.onerror=null;" />
                                 <div class="book-glare absolute inset-0 bg-gradient-to-tl from-white/0 via-white/10 to-white/0 mix-blend-overlay transition-transform duration-200"></div>
                             </div>
                             <!-- Spine -->
@@ -241,7 +253,7 @@
 
     <!-- FULL WIDTH BOTTOM SECTIONS -->
     <div class="relative z-20 bg-white">
-        
+
         <!-- Reader Reviews Section -->
         <section id="reviews" class="py-24 px-6 md:px-12 bg-[#2C4258]">
             <div class="max-w-6xl mx-auto">
@@ -307,7 +319,7 @@
                     <!-- Mark -->
                     <div class="flex flex-col items-center text-center">
                         <div class="w-40 h-40 rounded-full flex items-end justify-center mb-6 shadow-md border-4 border-[#D9EBF2] overflow-hidden bg-[#F9F8F3]">
-                            <svg viewBox="0 0 100 100" fill="#2C4258" class="w-32 h-32 translate-y-4">
+                            <svg viewBox="0 0 100 100" fill="#2C4258" class="w-32 h-32 translate-y-4" aria-hidden="true">
                                 <circle cx="50" cy="35" r="22" />
                                 <path d="M50 65 C 20 65, 10 90, 10 100 L 90 100 C 90 90, 80 65, 50 65 Z" />
                             </svg>
@@ -326,7 +338,7 @@
                     <!-- Jessica -->
                     <div class="flex flex-col items-center text-center">
                         <div class="w-40 h-40 rounded-full flex items-end justify-center mb-6 shadow-md border-4 border-[#D9EBF2] overflow-hidden bg-[#F9F8F3]">
-                            <svg viewBox="0 0 100 100" fill="#6B8068" class="w-32 h-32 translate-y-4">
+                            <svg viewBox="0 0 100 100" fill="#6B8068" class="w-32 h-32 translate-y-4" aria-hidden="true">
                                 <circle cx="50" cy="35" r="22" />
                                 <path d="M50 65 C 20 65, 10 90, 10 100 L 90 100 C 90 90, 80 65, 50 65 Z" />
                             </svg>
@@ -341,7 +353,7 @@
                     <!-- Ricky -->
                     <div class="flex flex-col items-center text-center">
                         <div class="w-40 h-40 rounded-full flex items-end justify-center mb-6 shadow-md border-4 border-[#F9F8F3] overflow-hidden bg-[#F9F8F3]">
-                            <svg viewBox="0 0 100 100" fill="#4A5D44" class="w-32 h-32 translate-y-4">
+                            <svg viewBox="0 0 100 100" fill="#4A5D44" class="w-32 h-32 translate-y-4" aria-hidden="true">
                                 <circle cx="50" cy="35" r="22" />
                                 <path d="M50 65 C 20 65, 10 90, 10 100 L 90 100 C 90 90, 80 65, 50 65 Z" />
                             </svg>
@@ -363,32 +375,31 @@
                 <p class="font-body text-slate-600 font-light mb-10 text-lg max-w-xl mx-auto">
                     Get the book, lose the tension, and discover a simpler way to move, sit, and live. Choose your preferred retailer below:
                 </p>
-                
+
                 <div class="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4 mt-8">
                     <!-- Amazon -->
-                    <a href="https://www.amazon.com/Lighten-UP-Playful-Alexander-Technique/dp/B0CJ6CZD5F" target="_blank" class="w-full sm:w-auto bg-[#4A5D44] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#3a4935] transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
+                    <a href="https://www.amazon.com/Lighten-UP-Playful-Alexander-Technique/dp/B0CJ6CZD5F" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-[#4A5D44] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#3a4935] focus:outline-none focus:ring-2 focus:ring-[#4A5D44] focus:ring-offset-2 transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
                         <span>Amazon</span>
                         <span class="text-xs font-normal opacity-80 mt-1">Print & eBook</span>
                     </a>
-                    
+
                     <!-- BookBaby -->
-                    <a href="https://store.bookbaby.com/book/lighten-up?srsltid=AfmBOoqAekZWk_WAkEPYazuA_ar0AKnjFdOz8Q129K7UmLBd2DxFoJnG" target="_blank" class="w-full sm:w-auto bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#1a2836] transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
+                    <a href="https://store.bookbaby.com/book/lighten-up?srsltid=AfmBOoqAekZWk_WAkEPYazuA_ar0AKnjFdOz8Q129K7UmLBd2DxFoJnG" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-[#2C4258] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#1a2836] focus:outline-none focus:ring-2 focus:ring-[#2C4258] focus:ring-offset-2 transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
                         <span>BookBaby</span>
                         <span class="text-xs font-normal opacity-80 mt-1">Print & eBook</span>
                     </a>
-                    
+
                     <!-- Barnes & Noble -->
-                    <a href="https://www.barnesandnoble.com/w/lighten-up-mark-josefsberg/1144068268" target="_blank" class="w-full sm:w-auto bg-[#6B8068] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#576854] transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
+                    <a href="https://www.barnesandnoble.com/w/lighten-up-mark-josefsberg/1144068268" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto bg-[#6B8068] text-white px-8 py-4 rounded-full font-body font-bold text-base md:text-lg hover:bg-[#576854] focus:outline-none focus:ring-2 focus:ring-[#6B8068] focus:ring-offset-2 transition-all shadow-xl transform hover:-translate-y-1 flex flex-col items-center justify-center leading-tight">
                         <span>Barnes & Noble</span>
                         <span class="text-xs font-normal opacity-80 mt-1">eBook Only</span>
                     </a>
                 </div>
-                
+
                 <div class="mt-20 pt-8 border-t border-slate-300 flex flex-col md:flex-row justify-between items-center text-slate-500 font-body text-sm">
-                    <p>© 2026 Mark Josefsberg. All rights reserved.</p>
+                    <p> 2026 - Site built and Designed by <a href="https://unsubscribe.llc" target="_blank">Unsubscribe NYC LLC</a>.</p>
                     <div class="flex gap-6 mt-4 md:mt-0 font-medium">
-                        <a href="https://www.markjosefsberg.com" target="_blank" class="hover:text-[#2C4258] transition-colors">Website</a>
-                        <a href="mailto:Mark@MarkJosefsberg.com" class="hover:text-[#2C4258] transition-colors">Contact</a>
+                        <a href="https://www.markjosefsberg.com" target="_blank" rel="noopener noreferrer" class="hover:text-[#2C4258] focus:outline-none focus:text-[#2C4258] transition-colors">Mark's Full Website</a>
                     </div>
                 </div>
             </div>
@@ -397,92 +408,97 @@
 
     <!-- Scripts -->
     <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+        // Wait for DOM to load before initializing scripts
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide Icons
+            lucide.createIcons();
 
-        // 3D Book Logic
-        const initBook3D = (containerId, isMobile) => {
-            const container = document.getElementById(containerId);
-            if (!container) return;
+            // 3D Book Logic
+            const initBook3D = (containerId, isMobile) => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
 
-            const inner = container.querySelector('.book-inner');
-            const shadow = container.querySelector('.book-shadow');
-            const glare = container.querySelector('.book-glare');
-            
-            let scrollY = 0;
-            let tiltX = 0;
-            let tiltY = 0;
-            let isHovering = false;
-            let isFlipped = false; // Tracks if the book is turned around
+                const inner = container.querySelector('.book-inner');
+                const shadow = container.querySelector('.book-shadow');
+                const glare = container.querySelector('.book-glare');
 
-            const updateTransform = () => {
-                // Base rotation driven by scroll (only for desktop)
-                const baseRotateY = isMobile ? -15 : -15 - (scrollY * 0.06);
-                const baseRotateX = isMobile ? 5 : 5 + (scrollY * 0.01);
-                const floatY = isMobile ? 0 : Math.sin(scrollY * 0.005) * 15;
+                let tiltX = 0;
+                let tiltY = 0;
+                let isHovering = false;
+                let isFlipped = false; // Tracks if the book is turned around
 
-                const finalX = baseRotateX + tiltX;
-                // Add 180 degrees if flipped
-                const finalY = baseRotateY + tiltY + (isFlipped ? 180 : 0);
+                const updateTransform = () => {
+                    // Static base rotation for a cleaner interaction
+                    const baseRotateY = -15;
+                    const baseRotateX = 5;
+                    const floatY = 0;
 
-                inner.style.transform = `translateY(${floatY}px) rotateX(${finalX}deg) rotateY(${finalY}deg)`;
-                
-                // Adjust shadow offset depending on flip state
-                shadow.style.transform = `translateX(${finalY * -1.5}px) scale(${isHovering ? 1.05 : 1})`;
-                shadow.style.opacity = isHovering ? '0.5' : '0.3';
-                if(glare) glare.style.transform = `translateX(${finalY * 2}px) translateY(${finalX * 2}px)`;
-            };
+                    const finalX = baseRotateX + tiltX;
+                    // Add 180 degrees if flipped
+                    const finalY = baseRotateY + tiltY + (isFlipped ? 180 : 0);
 
-            // Toggle flip state on click
-            container.addEventListener('click', () => {
-                isFlipped = !isFlipped;
-                updateTransform();
-            });
+                    inner.style.transform = `translateY(${floatY}px) rotateX(${finalX}deg) rotateY(${finalY}deg)`;
 
-            // Mouse interactions
-            if (!isMobile) {
-                container.addEventListener('mousemove', (e) => {
-                    const rect = container.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    
-                    tiltX = ((y - centerY) / centerY) * -10;
-                    tiltY = ((x - centerX) / centerX) * 15;
+                    // Adjust shadow offset depending on flip state
+                    shadow.style.transform = `translateX(${finalY * -1.5}px) scale(${isHovering ? 1.05 : 1})`;
+                    shadow.style.opacity = isHovering ? '0.5' : '0.3';
+                    if(glare) glare.style.transform = `translateX(${finalY * 2}px) translateY(${finalX * 2}px)`;
+                };
+
+                // Toggle flip state
+                const handleFlip = () => {
+                    isFlipped = !isFlipped;
+                    updateTransform();
+                };
+
+                // Mouse/Touch click interaction
+                container.addEventListener('click', handleFlip);
+
+                // Keyboard interaction (Accessibility)
+                container.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleFlip();
+                    }
+                });
+
+                // Mouse hover interactions (Desktop only)
+                if (!isMobile) {
+                    container.addEventListener('mousemove', (e) => {
+                        const rect = container.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+
+                        tiltX = ((y - centerY) / centerY) * -10;
+                        tiltY = ((x - centerX) / centerX) * 15;
+                        updateTransform();
+                    });
+                }
+
+                container.addEventListener('mouseenter', () => {
+                    isHovering = true;
+                    inner.style.transition = 'transform 0.1s ease-out';
                     updateTransform();
                 });
-            }
 
-            container.addEventListener('mouseenter', () => {
-                isHovering = true;
-                inner.style.transition = 'transform 0.1s ease-out';
-                updateTransform();
-            });
-
-            container.addEventListener('mouseleave', () => {
-                isHovering = false;
-                tiltX = 0;
-                tiltY = 0;
-                inner.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                updateTransform();
-            });
-
-            // Scroll listener for desktop parallax
-            if (!isMobile) {
-                window.addEventListener('scroll', () => {
-                    scrollY = window.scrollY;
+                container.addEventListener('mouseleave', () => {
+                    isHovering = false;
+                    tiltX = 0;
+                    tiltY = 0;
+                    inner.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
                     updateTransform();
-                }, { passive: true });
-            }
+                });
 
-            // Initial setup
-            updateTransform();
-        };
+                // Initial setup
+                updateTransform();
+            };
 
-        // Initialize both books
-        initBook3D('desktop-book', false);
-        initBook3D('mobile-book', true);
+            // Initialize both books
+            initBook3D('desktop-book', false);
+            initBook3D('mobile-book', true);
+        });
     </script>
 </body>
 </html>
