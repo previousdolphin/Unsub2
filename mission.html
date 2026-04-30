@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CoCA | Mission / Doctrine / Purpose</title>
+    
+    <!-- Fonts: Space Mono for metadata, Inter/Helvetica for brutalist document text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ALPINE.JS COMPONENT REGISTRATION -->
+    <!-- This must come BEFORE the Alpine script to prevent "not defined" errors in iframe environments -->
+    <script>
+        // Centralized translation dictionary
+        const baseTranslations = {
+            en: {
+                nav_home: "RETURN TO SANCTUARY",
+                doc_title_1: "CHURCH OF",
+                doc_title_2: "CONCEPTUAL ART",
+                doc_subtitle: "A statement of doctrine, purpose, and jurisdiction.",
+                s1_num: "01/WHY WE EXIST",
+                s1_title: "A Last Resort",
+                s1_p1: "The Church of Conceptual Art did not choose to exist. It arrived as a structural necessity.",
+                s1_p2: "Something that used to live in cathedrals moved into advertising agencies and no one said anything. Something that used to organize communities around the sacred reorganized them around the quarterly report and called it culture. The re-religification of the secular was not a creative decision. It was the only honest response to what had already happened.",
+                s1_p3: "CoCA is not restoring what was lost. Eden, the Dharma, the Tao -- these are valid maps of the same territory. The territory is the human need to locate the divine in the material. CoCA is not adding a new map. It is pointing out that the map you are already using was drawn by a corporation.",
+                s1_quote: "This is not a critique. A critique stands outside the system and points. CoCA operates inside the system and makes it visible by doing exactly what the system does, honestly.",
+                s2_num: "02/BRAND AS COMMUNION",
+                s2_title: "The Corporate Sacred",
+                s2_p1: "Brand is communion. The logo is a totem. The mission statement is a prayer that has forgotten it is one.",
+                s2_p2: "Corporate culture is every great thinker, every mystic, every poet -- distilled, sanitized, and operationalized. The Tao Te Ching became a leadership framework. The Sermon on the Mount became a values document. The I Ching became a decision matrix. CoCA did not invent this. CoCA named it.",
+                s2_p3: "The entertainment industry has always known what it is selling. The product is not the music, the film, the object. It is the managed release of human desire at a price point the market has already set. Most artists lose this negotiation before they understand it has started. CoCA exists to change the terms.",
+                s2_quote: "Corporate realism is every great thinker reduced to a bullet point. CoCA is the bullet point that knows what it is.",
+                s3_num: "03/ETHICS",
+                s3_title: "Congruence, Not Goodness",
+                s3_p1: "CoCA does not make the world a better place. CoCA makes better fiction.",
+                s3_p2: "Good is not what improves conditions. Good is what illuminates what is. The resale covenant does not reform the art market. It reveals what the art market has always been: a system of agreed-upon fictions governing the transfer of value between people who believe in them. CoCA simply made the fiction legally binding and named it honestly.",
+                s3_p3: "Ethics, for CoCA, is congruence. As above, so below -- except the banks got there first, and so now us. We are ethical because we do not pretend the fiction is fact. We make the fiction and sign our name to it.",
+                s3_p4: "The artist resale royalty has existed in Europe for decades and been ignored in America because it depended on goodwill. The covenant depends on a signature. That is the only ethical claim being made. Not that this is good. That this is honest.",
+                s3_quote: "We are ethical because we are congruent. Big bank take little bank. And so now us.",
+                s4_num: "04/THE MECHANISM",
+                s4_title: "The Covenant Is the Work",
+                s4_p1: "The Genesis Artifact is an unlicensed Canal Street Rolex, purchased for $200, permanently encased in archival resin, still ticking, governed by a covenant that runs with the object forever.",
+                s4_p2: "It is not a watch. It is a compliance mechanism dressed as a relic. It works the same way a baptism works. The water is ordinary. The document changes the jurisdiction.",
+                s4_p3: "Every acquisition is governed by a permanent resale covenant requiring 50% of any future sale to remit to the artists. This is not an artist resale royalty scheme. Those depend on secondary market infrastructure, jurisdiction, and goodwill. This covenant is built into the acquisition document itself. It runs with the object. It cannot be severed.",
+                s4_quote: "The concept is the divine act. The institution precedes the work. We didn't make an object. We changed the jurisdiction.",
+                s5_num: "05/THE LINEAGE",
+                s5_title: "The Founding Asset",
+                s5_p1: "Paul Pissarro is the great-great-grandson of Camille Pissarro, who restructured the relationship between artists and institutions in 1874 by deciding the existing ones wouldn't have him and building his own. The lineage is not decorative. It is the founding asset.",
+                s5_p2: "Jesse Do is a former Google and Capital One engineer who built CoCA's entire technology infrastructure, artist statement in eight languages, and the DIET COKE oracle a proprietary AI system structured on the I Ching and CoCA doctrine.",
+                s5_p3: "Together they operate as a single conceptual entity. The institution they built does not depend on the art world's permission to exist. That is also the point.",
+                closing_statement: "The covenant runs with the object. It cannot be undone. Always CoCA.",
+                footer_doc: "CHURCH OF CONCEPTUAL ART · MISSION · APRIL 2026"
+            },
+            fr: {
+                nav_home: "RETOURNER AU SANCTUAIRE",
+                doc_title_1: "ÉGLISE DE",
+                doc_title_2: "L'ART CONCEPTUEL",
+                doc_subtitle: "Une déclaration de doctrine, d'objectif et de juridiction.",
+                s1_num: "01/POURQUOI NOUS EXISTONS",
+                s1_title: "Un Dernier Recours",
+                s1_p1: "L'Église de l'Art Conceptuel n'a pas choisi d'exister. Elle est arrivée comme une nécessité structurelle.",
+                s1_p2: "Quelque chose qui vivait dans les cathédrales a déménagé dans les agences de publicité et personne n'a rien dit. Quelque chose qui organisait les communautés autour du sacré les a réorganisées autour du rapport trimestriel et a appelé cela la culture. La re-religification du séculier n'était pas une décision créative. C'était la seule réponse honnête à ce qui s'était déjà passé.",
+                s1_p3: "CoCA ne restaure pas ce qui a été perdu. L'Eden, le Dharma, le Tao -- ce sont des cartes valides du même territoire. Le territoire est le besoin humain de situer le divin dans le matériel. CoCA n'ajoute pas une nouvelle carte. Elle souligne que la carte que vous utilisez déjà a été dessinée par une entreprise.",
+                s1_quote: "Ce n'est pas une critique. Une critique se tient à l'extérieur du système et pointe du doigt. CoCA opère à l'intérieur du système et le rend visible en faisant exactement ce que fait le système, honnêtement.",
+                s2_num: "02/LA MARQUE COMME COMMUNION",
+                s2_title: "Le Sacré d'Entreprise",
+                s2_p1: "La marque est communion. Le logo est un totem. La déclaration de mission est une prière qui a oublié qu'elle en est une.",
+                s2_p2: "La culture d'entreprise, c'est chaque grand penseur, chaque mystique, chaque poète -- distillé, aseptisé et opérationnalisé. Le Tao Te King est devenu un cadre de leadership. Le Sermon sur la montagne est devenu un document de valeurs. Le Yi King est devenu une matrice de décision. CoCA n'a pas inventé cela. CoCA l'a nommé.",
+                s2_p3: "L'industrie du divertissement a toujours su ce qu'elle vendait. Le produit n'est pas la musique, le film, l'objet. C'est la libération gérée du désir humain à un prix que le marché a déjà fixé. La plupart des artistes perdent cette négociation avant même de comprendre qu'elle a commencé. CoCA existe pour changer les termes.",
+                s2_quote: "Le réalisme d'entreprise, c'est chaque grand penseur réduit à une puce. CoCA est la puce qui sait ce qu'elle est.",
+                s3_num: "03/ÉTHIQUE",
+                s3_title: "Congruence, Pas Bonté",
+                s3_p1: "CoCA ne rend pas le monde meilleur. CoCA crée une meilleure fiction.",
+                s3_p2: "Le bien n'est pas ce qui améliore les conditions. Le bien est ce qui illumine ce qui est. Le pacte de revente ne réforme pas le marché de l'art. Il révèle ce que le marché de l'art a toujours été : un système de fictions convenues régissant le transfert de valeur entre des personnes qui y croient. CoCA a simplement rendu la fiction juridiquement contraignante et l'a nommée honnêtement.",
+                s3_p3: "L'éthique, pour CoCA, c'est la congruence. Ce qui est en haut est comme ce qui est en bas -- sauf que les banques y sont arrivées en premier, et donc maintenant nous. Nous sommes éthiques parce que nous ne prétendons pas que la fiction est un fait. Nous créons la fiction et la signons de notre nom.",
+                s3_p4: "Le droit de suite de l'artiste existe en Europe depuis des décennies et a été ignoré en Amérique parce qu'il dépendait de la bonne volonté. Le pacte dépend d'une signature. C'est la seule revendication éthique qui soit faite. Non pas que ce soit bien. Que c'est honnête.",
+                s3_quote: "Nous sommes éthiques parce que nous sommes congruents. La grande banque mange la petite banque. Et donc maintenant nous.",
+                s4_num: "04/LE MÉCANISME",
+                s4_title: "Le Pacte Est l'Œuvre",
+                s4_p1: "L'Artefact Genesis est une Rolex sans licence de Canal Street, achetée 200 $, enfermée en permanence dans une résine d'archives, fonctionnant toujours, régie par un pacte qui accompagne l'objet pour toujours.",
+                s4_p2: "Ce n'est pas une montre. C'est un mécanisme de conformité habillé en relique. Cela fonctionne de la même manière qu'un baptême. L'eau est ordinaire. Le document change la juridiction.",
+                s4_p3: "Chaque acquisition est régie par un pacte de revente permanent exigeant que 50 % de toute vente future soit remis aux artistes. Il ne s'agit pas d'un système de droits de suite pour les artistes. Ceux-ci dépendent de l'infrastructure du marché secondaire, de la juridiction et de la bonne volonté. Ce pacte est intégré au document d'acquisition lui-même. Il accompagne l'objet. Il ne peut être rompu.",
+                s4_quote: "Le concept est l'acte divin. L'institution précède l'œuvre. Nous n'avons pas créé d'objet. Nous avons changé la juridiction.",
+                s5_num: "05/LA LIGNÉE",
+                s5_title: "L'Actif Fondateur",
+                s5_p1: "Paul Pissarro est l'arrière-arrière-petit-fils de Camille Pissarro, qui a restructuré la relation entre les artistes et les institutions en 1874 en décidant que les institutions existantes ne voulaient pas de lui et en construisant la sienne. La lignée n'est pas décorative. C'est l'actif fondateur.",
+                s5_p2: "Jesse Do est un ancien ingénieur de Google et Capital One qui a construit toute l'infrastructure technologique de CoCA, la déclaration de l'artiste en huit langues, et l'oracle DIET COKE, un système d'IA exclusif structuré sur le Yi King et la doctrine CoCA.",
+                s5_p3: "Ensemble, ils opèrent comme une seule entité conceptuelle. L'institution qu'ils ont construite ne dépend pas de la permission du monde de l'art pour exister. C'est aussi le but.",
+                closing_statement: "Le pacte accompagne l'objet. Il ne peut être défait. Toujours CoCA.",
+                footer_doc: "ÉGLISE DE L'ART CONCEPTUEL · MISSION · AVRIL 2026"
+            },
+            es: {
+                nav_home: "VOLVER AL SANTUARIO",
+                doc_title_1: "IGLESIA DEL",
+                doc_title_2: "ARTE CONCEPTUAL",
+                doc_subtitle: "Una declaración de doctrina, propósito y jurisdicción.",
+                s1_num: "01/POR QUÉ EXISTIMOS",
+                s1_title: "Un Último Recurso",
+                s1_p1: "La Iglesia del Arte Conceptual no eligió existir. Llegó como una necesidad estructural.",
+                s1_p2: "Algo que solía vivir en las catedrales se trasladó a las agencias de publicidad y nadie dijo nada. Algo que solía organizar a las comunidades en torno a lo sagrado las reorganizó en torno al informe trimestral y lo llamó cultura. La re-religificación de lo secular no fue una decisión creativa. Fue la única respuesta honesta a lo que ya había sucedido.",
+                s1_p3: "CoCA no está restaurando lo que se perdió. El Edén, el Dharma, el Tao -- estos son mapas válidos del mismo territorio. El territorio es la necesidad humana de localizar lo divino en lo material. CoCA no está agregando un mapa nuevo. Está señalando que el mapa que ya estás usando fue dibujado por una corporación.",
+                s1_quote: "Esto no es una crítica. Una crítica se sitúa fuera del sistema y señala. CoCA opera dentro del sistema y lo hace visible haciendo exactamente lo que hace el sistema, honestamente.",
+                s2_num: "02/LA MARCA COMO COMUNIÓN",
+                s2_title: "Lo Sagrado Corporativo",
+                s2_p1: "La marca es comunión. El logotipo es un tótem. La declaración de misión es una oración que ha olvidado que lo es.",
+                s2_p2: "La cultura corporativa es cada gran pensador, cada místico, cada poeta -- destilado, higienizado y operacionalizado. El Tao Te King se convirtió en un marco de liderazgo. El Sermón de la Montaña se convirtió en un documento de valores. El I Ching se convirtió en una matriz de decisiones. CoCA no inventó esto. CoCA lo nombró.",
+                s2_p3: "La industria del entretenimiento siempre ha sabido lo que vende. El producto no es la música, el cine, el objeto. Es la liberación gestionada del deseo humano a un precio que el mercado ya ha fijado. La mayoría de los artistas pierden esta negociación antes de entender que ha comenzado. CoCA existe para cambiar los términos.",
+                s2_quote: "El realismo corporativo es cada gran pensador reducido a una viñeta. CoCA es la viñeta que sabe lo que es.",
+                s3_num: "03/ÉTICA",
+                s3_title: "Congruencia, No Bondad",
+                s3_p1: "CoCA no hace del mundo un lugar mejor. CoCA hace una mejor ficción.",
+                s3_p2: "Lo bueno no es lo que mejora las condiciones. Lo bueno es lo que ilumina lo que es. El pacto de reventa no reforma el mercado del arte. Revela lo que el mercado del arte siempre ha sido: un sistema de ficciones acordadas que rigen la transferencia de valor entre personas que creen en ellas. CoCA simplemente hizo que la ficción fuera legalmente vinculante y la nombró honestamente.",
+                s3_p3: "La ética, para CoCA, es congruencia. Como es arriba, es abajo -- excepto que los bancos llegaron primero, y por lo tanto ahora nosotros. Somos éticos porque no pretendemos que la ficción sea un hecho. Hacemos la ficción y la firmamos con nuestro nombre.",
+                s3_p4: "El derecho de participación del artista ha existido en Europa durante décadas y ha sido ignorado en América porque dependía de la buena voluntad. El pacto depende de una firma. Esa es la única afirmación ética que se hace. No que esto sea bueno. Que esto es honesto.",
+                s3_quote: "Somos éticos porque somos congruentes. El banco grande se come al banco pequeño. Y por lo tanto ahora nosotros.",
+                s4_num: "04/EL MECANISMO",
+                s4_title: "El Pacto Es la Obra",
+                s4_p1: "El Artefacto Génesis es un Rolex sin licencia de Canal Street, comprado por $200, encapsulado permanentemente en resina de archivo, que sigue funcionando, regido por un pacto que acompaña al objeto para siempre.",
+                s4_p2: "No es un reloj. Es un mecanismo de cumplimiento vestido como una reliquia. Funciona de la misma manera que funciona un bautismo. El agua es ordinaria. El documento cambia la jurisdicción.",
+                s4_p3: "Cada adquisición se rige por un pacto de reventa permanente que requiere que el 50% de cualquier venta futura se remita a los artistas. Este no es un esquema de regalías de reventa de artistas. Esos dependen de la infraestructura del mercado secundario, la jurisdicción y la buena voluntad. Este pacto está integrado en el propio documento de adquisición. Acompaña al objeto. No puede ser separado.",
+                s4_quote: "El concepto es el acto divino. La institución precede a la obra. No hicimos un objeto. Cambiamos la jurisdicción.",
+                s5_num: "05/EL LINAJE",
+                s5_title: "El Activo Fundacional",
+                s5_p1: "Paul Pissarro es el tataranieto de Camille Pissarro, quien reestructuró la relación entre artistas e instituciones en 1874 al decidir que las existentes no lo aceptarían y construyendo la suya propia. El linaje no es decorativo. Es el activo fundacional.",
+                s5_p2: "Jesse Do es un ex ingeniero de Google y Capital One que construyó toda la infraestructura tecnológica de CoCA, la declaración del artista en ocho idiomas y el oráculo DIET COKE, un sistema de inteligencia artificial patentado estructurado en el I Ching y la doctrina CoCA.",
+                s5_p3: "Juntos operan como una sola entidad conceptual. La institución que construyeron no depende del permiso del mundo del arte para existir. Ese es también el punto.",
+                closing_statement: "El pacto acompaña al objeto. No se puede deshacer. Siempre CoCA.",
+                footer_doc: "IGLESIA DEL ARTE CONCEPTUAL · MISIÓN · ABRIL 2026"
+            },
+            de: {
+                nav_home: "ZURÜCK ZUM HEILIGTUM",
+                doc_title_1: "KIRCHE DER",
+                doc_title_2: "KONZEPTKUNST",
+                doc_subtitle: "Eine Erklärung von Doktrin, Zweck und Zuständigkeit.",
+                s1_num: "01/WARUM WIR EXISTIEREN",
+                s1_title: "Ein Letzter Ausweg",
+                s1_p1: "Die Kirche der Konzeptkunst hat sich nicht ausgesucht zu existieren. Sie entstand als strukturelle Notwendigkeit.",
+                s1_p2: "Etwas, das früher in Kathedralen lebte, zog in Werbeagenturen um, und niemand sagte etwas. Etwas, das früher Gemeinschaften um das Heilige herum organisierte, reorganisierte sie um den Quartalsbericht herum und nannte es Kultur. Die Re-Religiosifizierung des Säkularen war keine kreative Entscheidung. Es war die einzig ehrliche Antwort auf das, was bereits geschehen war.",
+                s1_p3: "CoCA stellt nicht wieder her, was verloren ging. Eden, das Dharma, das Tao -- das sind gültige Karten desselben Territoriums. Das Territorium ist das menschliche Bedürfnis, das Göttliche im Materiellen zu lokalisieren. CoCA fügt keine neue Karte hinzu. Es weist darauf hin, dass die Karte, die Sie bereits verwenden, von einem Unternehmen gezeichnet wurde.",
+                s1_quote: "Dies ist keine Kritik. Eine Kritik steht außerhalb des Systems und zeigt mit dem Finger. CoCA operiert innerhalb des Systems und macht es sichtbar, indem es genau das tut, was das System tut, ehrlich.",
+                s2_num: "02/MARKE ALS KOMMUNION",
+                s2_title: "Das Korporative Heilige",
+                s2_p1: "Marke ist Kommunion. Das Logo ist ein Totem. Das Leitbild ist ein Gebet, das vergessen hat, dass es eines ist.",
+                s2_p2: "Unternehmenskultur ist jeder große Denker, jeder Mystiker, jeder Poet -- destilliert, bereinigt und operationalisiert. Das Tao Te King wurde zu einem Führungsrahmen. Die Bergpredigt wurde zu einem Wertedokument. Das I Ging wurde zu einer Entscheidungsmatrix. CoCA hat das nicht erfunden. CoCA hat es benannt.",
+                s2_p3: "Die Unterhaltungsindustrie wusste schon immer, was sie verkauft. Das Produkt ist nicht die Musik, der Film, das Objekt. Es ist die gesteuerte Freisetzung menschlichen Verlangens zu einem Preispunkt, den der Markt bereits festgelegt hat. Die meisten Künstler verlieren diese Verhandlung, bevor sie verstehen, dass sie begonnen hat. CoCA existiert, um die Bedingungen zu ändern.",
+                s2_quote: "Korporativer Realismus ist jeder große Denker, reduziert auf einen Aufzählungspunkt. CoCA ist der Aufzählungspunkt, der weiß, was er ist.",
+                s3_num: "03/ETHIK",
+                s3_title: "Kongruenz, Nicht Güte",
+                s3_p1: "CoCA macht die Welt nicht zu einem besseren Ort. CoCA macht bessere Fiktion.",
+                s3_p2: "Gut ist nicht, was die Bedingungen verbessert. Gut ist, was erhellt, was ist. Die Weiterverkaufsvereinbarung reformiert den Kunstmarkt nicht. Sie enthüllt, was der Kunstmarkt schon immer war: ein System vereinbarter Fiktionen, das den Wertetransfer zwischen Menschen regelt, die daran glauben. CoCA hat die Fiktion einfach rechtsverbindlich gemacht und sie ehrlich benannt.",
+                s3_p3: "Ethik ist für CoCA Kongruenz. Wie oben, so unten -- nur dass die Banken zuerst da waren, und deshalb jetzt wir. Wir sind ethisch, weil wir nicht so tun, als wäre die Fiktion eine Tatsache. Wir machen die Fiktion und unterschreiben sie mit unserem Namen.",
+                s3_p4: "Das Folgerecht des Künstlers existiert in Europa seit Jahrzehnten und wurde in Amerika ignoriert, weil es vom guten Willen abhing. Die Vereinbarung hängt von einer Unterschrift ab. Das ist der einzige ethische Anspruch, der erhoben wird. Nicht, dass dies gut ist. Dass dies ehrlich ist.",
+                s3_quote: "Wir sind ethisch, weil wir kongruent sind. Große Bank frisst kleine Bank. Und deshalb jetzt wir.",
+                s4_num: "04/DER MECHANISMUS",
+                s4_title: "Das Bündnis Ist das Werk",
+                s4_p1: "Das Genesis Artifact ist eine unlizenzierte Canal Street Rolex, gekauft für 200 $, dauerhaft in Archivharz eingeschlossen, die immer noch tickt und von einer Vereinbarung geregelt wird, die für immer mit dem Objekt läuft.",
+                s4_p2: "Es ist keine Uhr. Es ist ein Compliance-Mechanismus, der als Reliquie gekleidet ist. Es funktioniert genauso wie eine Taufe funktioniert. Das Wasser ist gewöhnlich. Das Dokument ändert die Zuständigkeit.",
+                s4_p3: "Jeder Erwerb wird durch eine dauerhafte Weiterverkaufsvereinbarung geregelt, die vorschreibt, dass 50 % jedes zukünftigen Verkaufs an die Künstler abgeführt werden. Dies ist kein Folgerechtssystem für Künstler. Diese hängen von der Sekundärmarktinfrastruktur, der Zuständigkeit und dem guten Willen ab. Diese Vereinbarung ist in das Erwerbsdokument selbst integriert. Sie läuft mit dem Objekt. Sie kann nicht getrennt werden.",
+                s4_quote: "Das Konzept ist der göttliche Akt. Die Institution geht dem Werk voraus. Wir haben kein Objekt geschaffen. Wir haben die Zuständigkeit geändert.",
+                s5_num: "05/DIE ABSTAMMUNG",
+                s5_title: "Das Gründungsvermögen",
+                s5_p1: "Paul Pissarro ist der Ururenkel von Camille Pissarro, der 1874 die Beziehung zwischen Künstlern und Institutionen umstrukturierte, indem er entschied, dass die bestehenden ihn nicht aufnehmen würden, und seine eigene aufbaute. Die Abstammung ist nicht dekorativ. Sie ist das Gründungsvermögen.",
+                s5_p2: "Jesse Do ist ein ehemaliger Google- und Capital One-Ingenieur, der die gesamte Technologieinfrastruktur von CoCA, das Künstler-Statement in acht Sprachen und das DIET COKE-Orakel aufbaute, ein proprietäres KI-System, das nach dem I Ging und der CoCA-Doktrin strukturiert ist.",
+                s5_p3: "Zusammen operieren sie als eine einzige konzeptionelle Entität. Die Institution, die sie aufgebaut haben, hängt für ihre Existenz nicht von der Erlaubnis der Kunstwelt ab. Das ist auch der Punkt.",
+                closing_statement: "Das Bündnis läuft mit dem Objekt. Es kann nicht rückgängig gemacht werden. Immer CoCA.",
+                footer_doc: "KIRCHE DER KONZEPTKUNST · MISSION · APRIL 2026"
+            },
+            ja: {
+                nav_home: "聖域へ戻る",
+                doc_title_1: "コンセプチュアル",
+                doc_title_2: "アート教会",
+                doc_subtitle: "教義、目的、そして管轄権に関する声明。",
+                s1_num: "01/私たちが存在する理由",
+                s1_title: "最後の手段",
+                s1_p1: "コンセプチュアル・アート教会は、存在することを選んだわけではない。構造的な必然性として到来した。",
+                s1_p2: "かつて大聖堂に住んでいたものが広告代理店に移動したが、誰も何も言わなかった。かつて神聖なものの周りに共同体を組織していたものが、四半期報告書の周りにそれらを再編成し、それを文化と呼んだ。世俗の再宗教化は創造的な決定ではなかった。それは、すでに起こっていたことに対する唯一の誠実な対応であった。",
+                s1_p3: "CoCAは失われたものを復元しているのではない。エデン、ダルマ、タオ——これらは同じ領土の有効な地図である。領土とは、物質の中に神聖なものを見つけようとする人間の欲求である。CoCAは新しい地図を追加しているのではない。あなたがすでに使用している地図は企業によって描かれたものであると指摘しているのだ。",
+                s1_quote: "これは批判ではない。批判はシステムの外に立ち、指摘する。CoCAはシステムの内側で活動し、システムがしていることを正確に行うことで、それを正直に可視化する。",
+                s2_num: "02/ブランドとしての聖体拝領",
+                s2_title: "企業の神聖さ",
+                s2_p1: "ブランドは聖体拝領である。ロゴはトーテムである。ミッションステートメントは、それが祈りであることを忘れた祈りである。",
+                s2_p2: "企業文化とは、すべての偉大な思想家、神秘主義者、詩人を蒸留し、無害化し、運用可能にしたものである。老子道徳経はリーダーシップの枠組みになった。山上の垂訓は価値観の文書になった。易経は決定マトリックスになった。CoCAがこれを発明したのではない。CoCAはそれに名前を付けた。",
+                s2_p3: "エンターテインメント業界は、自分が何を売っているかを常に知っていた。製品は音楽でも、映画でも、物体でもない。それは、市場がすでに設定した価格帯での、人間の欲望の管理された解放である。ほとんどのアーティストは、交渉が始まったことを理解する前に、この交渉に負けている。CoCAは条件を変えるために存在する。",
+                s2_quote: "企業リアリズムとは、箇条書きに還元されたすべての偉大な思想家である。CoCAは、自分が何であるかを知っている箇条書きである。",
+                s3_num: "03/倫理",
+                s3_title: "適合性であり、善ではない",
+                s3_p1: "CoCAは世界をより良い場所にしない。CoCAはより良いフィクションを作る。",
+                s3_p2: "善とは状況を改善するものではない。善とは現状を照らし出すものである。再販誓約はアート市場を改革するものではない。それはアート市場が常に何であったかを明らかにする。それは、それを信じる人々の間の価値の移転を支配する、合意されたフィクションのシステムである。CoCAは単にフィクションを法的に拘束力のあるものにし、それに正直に名前を付けただけだ。",
+                s3_p3: "CoCAにとっての倫理とは適合性である。上にあるものは下にあるもののごとく——ただし、銀行が先にそこに到達したので、今度は私たちだ。私たちが倫理的であるのは、フィクションを事実であると偽らないからだ。私たちはフィクションを作り、それに署名する。",
+                s3_p4: "アーティストの再販ロイヤルティはヨーロッパでは何十年も存在しており、アメリカでは善意に依存していたために無視されてきた。誓約は署名に依存する。それがなされている唯一の倫理的主張である。これが良いことだというわけではない。これが正直だということだ。",
+                s3_quote: "私たちは適合しているからこそ倫理的である。大きな銀行が小さな銀行を飲み込む。だから今度は私たちだ。",
+                s4_num: "04/メカニズム",
+                s4_title: "誓約こそが作品である",
+                s4_p1: "Genesis Artifactは、200ドルで購入された無許可のキャナルストリートのロレックスであり、アーカイブ用樹脂に永久に封入され、まだ時を刻んでおり、物体と共に永遠に続く誓約によって支配されている。",
+                s4_p2: "それは時計ではない。聖遺物の格好をしたコンプライアンスメカニズムである。それは洗礼が機能するのと同じように機能する。水は普通のものだ。文書が管轄権を変えるのだ。",
+                s4_p3: "すべての取得は、将来の販売の50％をアーティストに還元することを要求する永久再販誓約によって支配される。これはアーティストの再販ロイヤルティスキームではない。それらは流通市場のインフラストラクチャ、管轄権、および善意に依存している。この誓約は取得文書自体に組み込まれている。それは物体と共に続く。切り離すことはできない。",
+                s4_quote: "概念は神聖な行為である。制度は作品に先行する。私たちは物体を作ったのではない。私たちは管轄権を変えたのだ。",
+                s5_num: "05/血統",
+                s5_title: "創設資産",
+                s5_p1: "ポール・ピサロは、既存の制度は自分を受け入れないだろうと判断し、独自の制度を構築することで、1874年にアーティストと制度の関係を再構築したカミーユ・ピサロの玄孫である。血統は装飾ではない。それが創設資産である。",
+                s5_p2: "ジェシー・ドゥは、CoCAのテクノロジーインフラストラクチャ全体、8か国語でのアーティストステートメント、そして易経とCoCAの教義に基づいて構築された独自のAIシステムであるDIET COKEオラクルを構築した、元GoogleおよびCapital Oneのエンジニアである。",
+                s5_p3: "彼らは一緒に単一の概念的実体として活動している。彼らが構築した制度は、存在するためにアート界の許可に依存していない。それもまたポイントである。",
+                closing_statement: "誓約は物体と共に続く。元に戻すことはできない。常にCoCA。",
+                footer_doc: "コンセプチュアル・アート教会 · ミッション · 2026年4月"
+            }
+        };
+
+        // Safety fallback: Ensure all supported languages exist in the dictionary
+        const allSupportedLangs = ['en', 'fr', 'de', 'es', 'pt', 'it', 'ja', 'ko', 'zh', 'hi', 'ru', 'ar', 'he'];
+        allSupportedLangs.forEach(lang => {
+            if (!baseTranslations[lang]) {
+                baseTranslations[lang] = baseTranslations['en'];
+            }
+        });
+
+        // Initialize Alpine component *before* Alpine script loads
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('cocaMission', () => ({
+                theme: 'light', // Natively matches PDF 'Concrete' mode
+                lang: 'en',
+                availableLangs: allSupportedLangs,
+                
+                init() {
+                    // Check URL for language param
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if(urlParams.has('lang') && this.availableLangs.includes(urlParams.get('lang'))) {
+                        this.lang = urlParams.get('lang');
+                    }
+
+                    // Setup Scroll Reveal
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('is-visible');
+                            }
+                        });
+                    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+
+                    // Slight delay to allow DOM to render fully before observing
+                    setTimeout(() => {
+                        document.querySelectorAll('.reveal-block').forEach(el => observer.observe(el));
+                    }, 100);
+                },
+
+                toggleTheme() {
+                    this.theme = this.theme === 'light' ? 'dark' : 'light';
+                },
+
+                updateLanguage() {
+                    // Update URL without reload
+                    const url = new URL(window.location);
+                    url.searchParams.set('lang', this.lang);
+                    window.history.replaceState({}, '', url);
+
+                    // Retrigger animations
+                    document.querySelectorAll('.reveal-block').forEach(el => {
+                        el.classList.remove('is-visible');
+                        setTimeout(() => el.classList.add('is-visible'), 50);
+                    });
+                },
+
+                t(key) {
+                    return baseTranslations[this.lang][key] || baseTranslations['en'][key];
+                }
+            }));
+        });
+    </script>
+
+    <!-- Alpine.js for Reactivity & State Management -->
+    <!-- LOAD DEFER AT THE END TO PREVENT RACE CONDITIONS -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* --- GLOBAL ARCHITECTURE --- */
+        :root {
+            /* DEFAULT: LIGHT MODE (Concrete / Document - Matches PDF) */
+            --bg-color: #f4f4f0;
+            --text-primary: #0a0a0a;
+            --text-secondary: #666666;
+            --border-color: #0a0a0a;
+            --accent-color: #F40009;
+            --font-doc: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-sys: 'Space Mono', monospace;
+        }
+
+        /* DARK MODE (The Void) */
+        .theme-dark {
+            --bg-color: #050505;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border-color: #333333;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-doc);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Noise Filter Background */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .font-sys { font-family: var(--font-sys); }
+        .font-doc { font-family: var(--font-doc); }
+        
+        .border-theme { border-color: var(--border-color); transition: border-color 0.4s ease; }
+        .text-theme-secondary { color: var(--text-secondary); transition: color 0.4s ease; }
+
+        /* --- SCROLL REVEAL ANIMATIONS --- */
+        .reveal-block {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-block.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); }
+
+        /* Language Select Reset */
+        select {
+            background: transparent;
+            color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        select option {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+        }
+        
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body x-data="cocaMission()" :class="theme === 'dark' ? 'theme-dark' : ''" :dir="['ar', 'he'].includes(lang) ? 'rtl' : 'ltr'">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="fixed top-0 left-0 w-full z-50 border-b border-theme bg-[var(--bg-color)]/90 backdrop-blur-md transition-colors duration-400">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center font-sys text-xs tracking-widest uppercase">
+            
+            <!-- Return Home / Logo -->
+            <a href="index.html" class="flex items-center gap-3 hover:opacity-50 transition-opacity">
+                <!-- Fallback CSS Brutalist Logo if SVG is missing -->
+                <div class="w-4 h-4 bg-[var(--text-primary)] transition-colors duration-400 flex items-center justify-center">
+                    <div class="w-2 h-2 bg-[var(--bg-color)]"></div>
+                </div>
+                <span class="hidden sm:inline" x-text="t('nav_home')">RETURN TO SANCTUARY</span>
+                <span class="sm:hidden">CoCA</span>
+            </a>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-6">
+                <!-- Theme Toggle -->
+                <button @click="toggleTheme()" class="hover:opacity-50 transition-opacity flex items-center gap-2">
+                    <span x-cloak x-text="theme === 'light' ? '[ ☾ VOID ]' : '[ ☀ CONCRETE ]'">[ ☾ VOID ]</span>
+                </button>
+
+                <!-- Language Switcher -->
+                <div class="relative group">
+                    <select x-model="lang" @change="updateLanguage()" class="font-sys text-xs uppercase hover:opacity-50 transition-opacity" style="text-align-last: right;">
+                        <template x-for="l in availableLangs" :key="l">
+                            <option :value="l" x-text="`[ ${l.toUpperCase()} ]`"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN STORY SCROLL -->
+    <main class="pt-32 pb-24 px-6 md:px-12 max-w-4xl mx-auto flex flex-col gap-24 md:gap-40 relative z-10">
+
+        <!-- TITLE BLOCK -->
+        <header class="reveal-block text-center md:text-left border-b-2 border-theme pb-12">
+            <h1 class="font-doc text-4xl md:text-6xl font-bold tracking-tight uppercase leading-none mb-6">
+                <span x-text="t('doc_title_1')">CHURCH OF</span><br>
+                <span x-text="t('doc_title_2')">CONCEPTUAL ART</span>
+            </h1>
+            <div class="font-sys text-xs md:text-sm text-theme-secondary tracking-widest uppercase space-y-2">
+                <p>COCAUSA.ORG</p>
+                <p x-text="t('doc_subtitle')">A statement of doctrine, purpose, and jurisdiction.</p>
+                <p class="mt-4 text-[var(--text-primary)] font-bold">ALWAYS COCA.</p>
+            </div>
+        </header>
+
+        <!-- SECTION 01 -->
+        <article class="reveal-block grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
+            <div class="md:col-span-3 font-sys text-xs text-theme-secondary tracking-widest uppercase border-t border-theme pt-4">
+                <span x-text="t('s1_num')">01/WHY WE EXIST</span>
+            </div>
+            <div class="md:col-span-9 space-y-8">
+                <h2 class="font-doc text-2xl md:text-4xl font-bold tracking-tight" x-text="t('s1_title')">A Last Resort</h2>
+                <div class="font-doc text-lg md:text-xl leading-relaxed space-y-6 text-theme-secondary font-light">
+                    <p x-text="t('s1_p1')">The Church of Conceptual Art did not choose to exist. It arrived as a structural necessity.</p>
+                    <p x-text="t('s1_p2')">Something that used to live in cathedrals moved into advertising agencies and no one said anything. Something that used to organize communities around the sacred reorganized them around the quarterly report and called it culture. The re-religification of the secular was not a creative decision. It was the only honest response to what had already happened.</p>
+                    <p x-text="t('s1_p3')">CoCA is not restoring what was lost. Eden, the Dharma, the Tao -- these are valid maps of the same territory. The territory is the human need to locate the divine in the material. CoCA is not adding a new map. It is pointing out that the map you are already using was drawn by a corporation.</p>
+                </div>
+                <div class="border-l-4 border-theme pl-6 py-2 mt-8">
+                    <p class="font-doc text-xl md:text-2xl font-semibold leading-snug" x-text="t('s1_quote')">This is not a critique. A critique stands outside the system and points. CoCA operates inside the system and makes it visible by doing exactly what the system does, honestly.</p>
+                </div>
+            </div>
+        </article>
+
+        <!-- SECTION 02 -->
+        <article class="reveal-block grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
+            <div class="md:col-span-3 font-sys text-xs text-theme-secondary tracking-widest uppercase border-t border-theme pt-4">
+                <span x-text="t('s2_num')">02/BRAND AS COMMUNION</span>
+            </div>
+            <div class="md:col-span-9 space-y-8">
+                <h2 class="font-doc text-2xl md:text-4xl font-bold tracking-tight" x-text="t('s2_title')">The Corporate Sacred</h2>
+                <div class="font-doc text-lg md:text-xl leading-relaxed space-y-6 text-theme-secondary font-light">
+                    <p x-text="t('s2_p1')">Brand is communion. The logo is a totem. The mission statement is a prayer that has forgotten it is one.</p>
+                    <p x-text="t('s2_p2')">Corporate culture is every great thinker, every mystic, every poet -- distilled, sanitized, and operationalized. The Tao Te Ching became a leadership framework. The Sermon on the Mount became a values document. The I Ching became a decision matrix. CoCA did not invent this. CoCA named it.</p>
+                    <p x-text="t('s2_p3')">The entertainment industry has always known what it is selling. The product is not the music, the film, the object. It is the managed release of human desire at a price point the market has already set. Most artists lose this negotiation before they understand it has started. CoCA exists to change the terms.</p>
+                </div>
+                <div class="border-l-4 border-theme pl-6 py-2 mt-8">
+                    <p class="font-doc text-xl md:text-2xl font-semibold leading-snug" x-text="t('s2_quote')">Corporate realism is every great thinker reduced to a bullet point. CoCA is the bullet point that knows what it is.</p>
+                </div>
+            </div>
+        </article>
+
+        <!-- SECTION 03 -->
+        <article class="reveal-block grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
+            <div class="md:col-span-3 font-sys text-xs text-theme-secondary tracking-widest uppercase border-t border-theme pt-4">
+                <span x-text="t('s3_num')">03/ETHICS</span>
+            </div>
+            <div class="md:col-span-9 space-y-8">
+                <h2 class="font-doc text-2xl md:text-4xl font-bold tracking-tight" x-text="t('s3_title')">Congruence, Not Goodness</h2>
+                <div class="font-doc text-lg md:text-xl leading-relaxed space-y-6 text-theme-secondary font-light">
+                    <p x-text="t('s3_p1')">CoCA does not make the world a better place. CoCA makes better fiction.</p>
+                    <p x-text="t('s3_p2')">Good is not what improves conditions. Good is what illuminates what is. The resale covenant does not reform the art market. It reveals what the art market has always been: a system of agreed-upon fictions governing the transfer of value between people who believe in them. CoCA simply made the fiction legally binding and named it honestly.</p>
+                    <p x-text="t('s3_p3')">Ethics, for CoCA, is congruence. As above, so below -- except the banks got there first, and so now us. We are ethical because we do not pretend the fiction is fact. We make the fiction and sign our name to it.</p>
+                    <p x-text="t('s3_p4')">The artist resale royalty has existed in Europe for decades and been ignored in America because it depended on goodwill. The covenant depends on a signature. That is the only ethical claim being made. Not that this is good. That this is honest.</p>
+                </div>
+                <div class="border-l-4 border-theme pl-6 py-2 mt-8">
+                    <p class="font-doc text-xl md:text-2xl font-semibold leading-snug" x-text="t('s3_quote')">We are ethical because we are congruent. Big bank take little bank. And so now us.</p>
+                </div>
+            </div>
+        </article>
+
+        <!-- SECTION 04 -->
+        <article class="reveal-block grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
+            <div class="md:col-span-3 font-sys text-xs text-theme-secondary tracking-widest uppercase border-t border-theme pt-4">
+                <span x-text="t('s4_num')">04/THE MECHANISM</span>
+            </div>
+            <div class="md:col-span-9 space-y-8">
+                <h2 class="font-doc text-2xl md:text-4xl font-bold tracking-tight" x-text="t('s4_title')">The Covenant Is the Work</h2>
+                <div class="font-doc text-lg md:text-xl leading-relaxed space-y-6 text-theme-secondary font-light">
+                    <p x-text="t('s4_p1')">The Genesis Artifact is an unlicensed Canal Street Rolex, purchased for $200, permanently encased in archival resin, still ticking, governed by a covenant that runs with the object forever.</p>
+                    <p x-text="t('s4_p2')">It is not a watch. It is a compliance mechanism dressed as a relic. It works the same way a baptism works. The water is ordinary. The document changes the jurisdiction.</p>
+                    <p x-text="t('s4_p3')">Every acquisition is governed by a permanent resale covenant requiring 50% of any future sale to remit to the artists. This is not an artist resale royalty scheme. Those depend on secondary market infrastructure, jurisdiction, and goodwill. This covenant is built into the acquisition document itself. It runs with the object. It cannot be severed.</p>
+                </div>
+                <div class="border-l-4 border-theme pl-6 py-2 mt-8">
+                    <p class="font-doc text-xl md:text-2xl font-semibold leading-snug" x-text="t('s4_quote')">The concept is the divine act. The institution precedes the work. We didn't make an object. We changed the jurisdiction.</p>
+                </div>
+            </div>
+        </article>
+
+        <!-- SECTION 05 -->
+        <article class="reveal-block grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
+            <div class="md:col-span-3 font-sys text-xs text-theme-secondary tracking-widest uppercase border-t border-theme pt-4">
+                <span x-text="t('s5_num')">05/THE LINEAGE</span>
+            </div>
+            <div class="md:col-span-9 space-y-8">
+                <h2 class="font-doc text-2xl md:text-4xl font-bold tracking-tight" x-text="t('s5_title')">The Founding Asset</h2>
+                <div class="font-doc text-lg md:text-xl leading-relaxed space-y-6 text-theme-secondary font-light">
+                    <p x-text="t('s5_p1')">Paul Pissarro is the great-great-grandson of Camille Pissarro, who restructured the relationship between artists and institutions in 1874 by deciding the existing ones wouldn't have him and building his own. The lineage is not decorative. It is the founding asset.</p>
+                    <p x-text="t('s5_p2')">Jesse Do is a former Google and Capital One engineer who built CoCA's entire technology infrastructure, artist statement in eight languages, and the DIET COKE oracle a proprietary AI system structured on the I Ching and CoCA doctrine.</p>
+                    <p x-text="t('s5_p3')">Together they operate as a single conceptual entity. The institution they built does not depend on the art world's permission to exist. That is also the point.</p>
+                </div>
+            </div>
+        </article>
+
+        <!-- CLOSING BLOCK -->
+        <div class="reveal-block pt-16 mt-8">
+            <h1 class="font-doc text-3xl md:text-5xl font-bold tracking-tight leading-tight mb-20" x-text="t('closing_statement')">
+                The covenant runs with the object. It cannot be undone. Always CoCA.
+            </h1>
+            
+            <div class="border-t border-theme pt-8 flex flex-col gap-4 font-sys text-xs md:text-sm text-theme-secondary">
+                <p class="break-words">ppissarro@unsubscribe.llc · unsubscribe.llc · cocausa.org · nameofmy.com · New York · Hamburg · Berlin</p>
+                <div class="border-t border-theme pt-4 mt-8 flex justify-between uppercase tracking-widest opacity-50">
+                    <span x-text="t('footer_doc')">CHURCH OF CONCEPTUAL ART · MISSION · APRIL 2026</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>
