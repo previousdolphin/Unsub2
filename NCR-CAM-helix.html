@@ -64,10 +64,6 @@
             text-shadow: 0 0 5px #ff3300 !important;
             opacity: 0.8 !important;
         }
-        #VRButton:hover {
-            background: rgba(255, 51, 0, 0.2) !important;
-            opacity: 1 !important;
-        }
     </style>
 </head>
 <body>
@@ -113,21 +109,24 @@
         scene.background = new THREE.Color(0x000000);
         scene.fog = new THREE.FogExp2(0x000000, 0.0085); 
 
-        // DOLLY RIG (Supports both VR & Desktop seamlessly)
         const dolly = new THREE.Group();
         scene.add(dolly);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1500);
-        camera.position.set(0, 1.6, 0); // Desktop eye height
+        camera.position.set(0, 1.6, 0); 
         dolly.add(camera);
 
         const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        
         renderer.xr.enabled = true;
         document.getElementById('canvas-container').appendChild(renderer.domElement);
-        document.body.appendChild(VRButton.createButton(renderer));
+
+        try {
+            if (typeof VRButton !== 'undefined') {
+                document.body.appendChild(VRButton.createButton(renderer));
+            }
+        } catch(e) { console.warn("VR Button failed to initialize."); }
 
         const controller1 = renderer.xr.getController(0);
         dolly.add(controller1);
@@ -138,39 +137,59 @@
         const CYLINDER_RADIUS = 40;
         const RIBBON_HEIGHT = 5;
         const PITCH = RIBBON_HEIGHT * 2; 
-        const LOOP_COUNT = 80; 
+        
+        // Use an array of 15 unique materials down the spiral to show all acronyms perfectly
+        const NUM_MATERIALS = 15;
+        const LOOP_COUNT = 90; // Must be a multiple of NUM_MATERIALS for seamless snapping
         const FALL_SPEED = 18.0; 
         
         let meshRed, meshBlue;
+        let redMaterials = [];
+        let blueMaterials = [];
 
-        // --- CUSTOM SPIRAL GEOMETRY ---
-        function createContinuousSpiral(radius, height, pitch, loops, segmentsPerLoop) {
+        // --- CUSTOM MULTI-MATERIAL SPIRAL GEOMETRY ---
+        function createMultiMaterialSpiral(radius, height, pitch, loops, segmentsPerLoop, numMaterials) {
             const geo = new THREE.BufferGeometry();
             const vertices = [];
             const uvs = [];
             const indices = [];
-            const totalSegments = loops * segmentsPerLoop;
 
-            for (let i = 0; i <= totalSegments; i++) {
-                const angle = (i / segmentsPerLoop) * Math.PI * 2;
-                const x = radius * Math.cos(angle);
-                const z = radius * Math.sin(angle);
-                const yOffset = (i / segmentsPerLoop) * pitch;
+            let indexOffset = 0;
 
-                vertices.push(x, yOffset, z);
-                uvs.push(i / segmentsPerLoop, 0);
-                vertices.push(x, yOffset + height, z);
-                uvs.push(i / segmentsPerLoop, 1);
-            }
+            for (let loop = 0; loop < loops; loop++) {
+                const matIndex = loop % numMaterials;
+                const startIndex = vertices.length / 3;
 
-            for (let i = 0; i < totalSegments; i++) {
-                const v1 = i * 2;
-                const v2 = i * 2 + 1;
-                const v3 = (i + 1) * 2;
-                const v4 = (i + 1) * 2 + 1;
+                for (let s = 0; s <= segmentsPerLoop; s++) {
+                    const angle = (s / segmentsPerLoop) * Math.PI * 2;
+                    const x = radius * Math.cos(angle);
+                    const z = radius * Math.sin(angle);
+                    
+                    const globalSegment = loop * segmentsPerLoop + s;
+                    const yOffset = (globalSegment / segmentsPerLoop) * pitch;
 
-                indices.push(v1, v2, v4);
-                indices.push(v1, v4, v3);
+                    vertices.push(x, yOffset, z);
+                    
+                    // Native mapping: s / segmentsPerLoop (0.0 to 1.0)
+                    uvs.push(s / segmentsPerLoop, 0);
+
+                    vertices.push(x, yOffset + height, z);
+                    uvs.push(s / segmentsPerLoop, 1);
+                }
+
+                for (let s = 0; s < segmentsPerLoop; s++) {
+                    const v1 = startIndex + s * 2;
+                    const v2 = startIndex + s * 2 + 1;
+                    const v3 = startIndex + (s + 1) * 2;
+                    const v4 = startIndex + (s + 1) * 2 + 1;
+
+                    indices.push(v1, v2, v4);
+                    indices.push(v1, v4, v3);
+                }
+                
+                const numIndices = segmentsPerLoop * 6;
+                geo.addGroup(indexOffset, numIndices, matIndex);
+                indexOffset += numIndices;
             }
 
             geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
@@ -179,114 +198,125 @@
             return geo;
         }
 
-        // --- SEAMLESS TEXTURE GENERATION ---
-        function shuffle(array) {
-            let currentIndex = array.length, randomIndex;
-            while (currentIndex != 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-            }
-            return array;
-        }
-
-        function createTickerTexture(colorMode) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.height = 128; 
-            
+        // --- HIGH RESOLUTION TEXTURE GENERATOR ---
+        function createTickerMaterials(colorMode, numMaterials) {
+            const materials = [];
+            const baseHeight = 128;
             const separator = "   NCR-CAM   ";
             const mainColor = colorMode === 'red' ? '#ff3300' : '#00e5ff';
             const dimColor = colorMode === 'red' ? 'rgba(255, 51, 0, 0.9)' : 'rgba(0, 229, 255, 0.9)';
             const bgColor = colorMode === 'red' ? 'rgba(255, 51, 0, 0.04)' : 'rgba(0, 229, 255, 0.03)';
             const lineColor = colorMode === 'red' ? 'rgba(255, 51, 0, 0.2)' : 'rgba(0, 229, 255, 0.2)';
 
-            const shuffled = shuffle([...acronyms]).slice(0, 8);
-            const items = [];
-            let totalWidth = 0;
+            // Fetch the user's specific graphics limits to prevent crashes
+            const maxTexSize = renderer.capabilities.maxTextureSize || 4096;
+            let acrIndex = 0;
 
-            ctx.font = '50px "Share Tech Mono", monospace';
-            for(let j=0; j<shuffled.length; j++) {
-                const acr = shuffled[j].toUpperCase();
-                const w1 = ctx.measureText(acr).width;
-                const w2 = ctx.measureText(separator).width;
-                items.push({ text: acr, type: 'acr', width: w1 });
-                items.push({ text: separator, type: 'sep', width: w2 });
-                totalWidth += w1 + w2;
-            }
-
-            canvas.width = Math.round(totalWidth);
-
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.beginPath();
-            ctx.moveTo(0, 2);
-            ctx.lineTo(canvas.width, 2);
-            ctx.moveTo(0, canvas.height - 2);
-            ctx.lineTo(canvas.width, canvas.height - 2);
-            ctx.strokeStyle = lineColor;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.font = '50px "Share Tech Mono", monospace';
-            ctx.textBaseline = 'middle';
-            ctx.shadowColor = mainColor;
-            ctx.shadowBlur = 12;
-
-            let xOffset = 0;
-            for(const item of items) {
-                if(item.type === 'acr') {
-                    ctx.fillStyle = dimColor;
-                } else {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            for (let i = 0; i < numMaterials; i++) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const items = [];
+                let totalWidth = 0;
+                ctx.font = '50px "Share Tech Mono", monospace';
+                
+                // Pack exactly 2 acronyms per texture to bypass mobile resizing limits
+                for(let j = 0; j < 2; j++) {
+                    const acr = acronyms[acrIndex % acronyms.length].toUpperCase();
+                    acrIndex++;
+                    const w1 = ctx.measureText(acr).width;
+                    const w2 = ctx.measureText(separator).width;
+                    items.push({ text: acr, type: 'acr', width: w1 });
+                    items.push({ text: separator, type: 'sep', width: w2 });
+                    totalWidth += w1 + w2;
                 }
-                ctx.fillText(item.text, xOffset, canvas.height / 2);
-                xOffset += item.width;
+
+                let desiredWidth = Math.ceil(totalWidth);
+                let desiredHeight = baseHeight;
+                let scaleFactor = 1.0;
+                
+                if (desiredWidth > maxTexSize) {
+                    scaleFactor = maxTexSize / desiredWidth;
+                    desiredWidth = maxTexSize;
+                    desiredHeight = Math.floor(baseHeight * scaleFactor);
+                }
+
+                canvas.width = desiredWidth;
+                canvas.height = desiredHeight;
+
+                if (scaleFactor !== 1.0) {
+                    ctx.scale(scaleFactor, scaleFactor);
+                }
+
+                // Background
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, totalWidth, baseHeight);
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, totalWidth, baseHeight);
+
+                // Borders
+                ctx.beginPath();
+                ctx.moveTo(0, 2);
+                ctx.lineTo(totalWidth, 2);
+                ctx.moveTo(0, baseHeight - 2);
+                ctx.lineTo(totalWidth, baseHeight - 2);
+                ctx.strokeStyle = lineColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Text
+                ctx.font = '50px "Share Tech Mono", monospace';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = mainColor;
+                ctx.shadowBlur = 12;
+
+                let xOffset = 0;
+                for(const item of items) {
+                    ctx.fillStyle = item.type === 'acr' ? dimColor : 'rgba(255, 255, 255, 0.6)';
+                    ctx.fillText(item.text, xOffset, baseHeight / 2);
+                    xOffset += item.width;
+                }
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.ClampToEdgeWrapping;
+                
+                materials.push(new THREE.MeshBasicMaterial({ 
+                    map: texture, 
+                    side: THREE.BackSide, 
+                    transparent: true 
+                }));
             }
 
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.ClampToEdgeWrapping;
-            return texture;
+            return materials;
         }
 
+        let environmentBuilt = false;
         function buildEnvironment() {
-            // Prevent double-building if called multiple times
-            if (meshRed || meshBlue) return;
+            if (environmentBuilt) return;
+            environmentBuilt = true;
 
-            const geo = createContinuousSpiral(CYLINDER_RADIUS, RIBBON_HEIGHT, PITCH, LOOP_COUNT, 64);
+            const geo = createMultiMaterialSpiral(CYLINDER_RADIUS, RIBBON_HEIGHT, PITCH, LOOP_COUNT, 64, NUM_MATERIALS);
             
-            const redTex = createTickerTexture('red');
-            const blueTex = createTickerTexture('blue');
+            redMaterials = createTickerMaterials('red', NUM_MATERIALS);
+            blueMaterials = createTickerMaterials('blue', NUM_MATERIALS);
 
-            const matRed = new THREE.MeshBasicMaterial({ map: redTex, side: THREE.BackSide, transparent: true });
-            const matBlue = new THREE.MeshBasicMaterial({ map: blueTex, side: THREE.BackSide, transparent: true });
-
-            meshRed = new THREE.Mesh(geo, matRed);
-            meshBlue = new THREE.Mesh(geo, matBlue);
+            meshRed = new THREE.Mesh(geo, redMaterials);
+            meshBlue = new THREE.Mesh(geo, blueMaterials);
 
             const startY = -(LOOP_COUNT * PITCH) / 2;
             meshRed.position.y = startY;
             meshBlue.position.y = startY + RIBBON_HEIGHT;
 
-            meshRed.userData.scrollSpeed = 0.08;
-            meshBlue.userData.scrollSpeed = -0.08;
-
             scene.add(meshRed);
             scene.add(meshBlue);
         }
 
-        // FAILSAFE INITIALIZATION: Try to wait for fonts, but force build after 500ms 
-        // to prevent black screen lockups in restrictive iframe environments.
-        Promise.race([
-            document.fonts.ready,
-            new Promise(resolve => setTimeout(resolve, 500))
-        ]).then(() => {
-            buildEnvironment();
-        });
+        // Font load failsafe
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => buildEnvironment());
+        }
+        setTimeout(() => buildEnvironment(), 500);
 
 
         // --- UNIVERSAL CONTROLS SYSTEM ---
@@ -298,7 +328,6 @@
         let yawRot = 0;   
         let isDragging = false;
         
-        // Desktop Drag to Look
         document.addEventListener('mousedown', (e) => {
             if(e.target.id === 'VRButton') return;
             isDragging = true;
@@ -311,7 +340,6 @@
             pitchRot = Math.max(-Math.PI / 2.1, Math.min(Math.PI / 2.1, pitchRot));
         });
 
-        // Keyboard Move
         document.addEventListener('keydown', (e) => {
             switch (e.code) {
                 case 'KeyW': moveState.forward = 1; break;
@@ -329,7 +357,6 @@
             }
         });
 
-        // Mobile Touch (Split Screen)
         const touchState = { leftId: null, rightId: null, leftStartX: 0, leftStartY: 0, rightLastX: 0, rightLastY: 0 };
 
         document.addEventListener('touchstart', (e) => {
@@ -399,7 +426,6 @@
             }
         });
 
-        // VR Controllers Joystick Pull
         function getVRGamepadInput() {
             let vrX = 0, vrZ = 0;
             const session = renderer.xr.getSession();
@@ -417,11 +443,13 @@
         }
 
 
-        // --- MAIN TICK LOOP ---
+        // --- MAIN RENDER LOOP ---
         const clock = new THREE.Clock();
+        
+        // Since we map 15 materials sequentially, the pattern perfectly repeats every 15 coils.
+        const SNAP_DISTANCE = NUM_MATERIALS * PITCH; 
 
         function animate() {
-            // Render blank scene until meshes are safely generated
             if(!meshRed || !meshBlue) {
                 renderer.render(scene, camera);
                 return;
@@ -429,9 +457,8 @@
 
             const delta = clock.getDelta();
 
-            // 1. Process Rotation
+            // 1. Rotation Tracking
             let moveAngleY = yawRot;
-            
             if (renderer.xr.isPresenting) {
                 const camEuler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
                 moveAngleY = camEuler.y;
@@ -439,7 +466,7 @@
                 camera.quaternion.setFromEuler(new THREE.Euler(pitchRot, yawRot, 0, 'YXZ'));
             }
 
-            // 2. Process Input 
+            // 2. Input Tracking
             const vrInput = getVRGamepadInput();
             direction.z = Number(moveState.forward) - Number(moveState.backward) + vrInput.z;
             direction.x = Number(moveState.right) - Number(moveState.left) + vrInput.x;
@@ -459,14 +486,13 @@
             dolly.position.x += moveVector.x;
             dolly.position.z += moveVector.z;
 
-            // 3. Perfect Collision Calculation
+            // 3. Cylinder Collision
             dolly.updateMatrixWorld(); 
-            
             const worldCamPos = new THREE.Vector3();
             camera.getWorldPosition(worldCamPos);
             
             const distFromCenter = Math.sqrt(worldCamPos.x * worldCamPos.x + worldCamPos.z * worldCamPos.z);
-            const safeRadius = CYLINDER_RADIUS - 2;
+            const safeRadius = CYLINDER_RADIUS - 3;
             
             if (distFromCenter > safeRadius) {
                 const ratio = safeRadius / distFromCenter;
@@ -474,20 +500,26 @@
                 dolly.position.z = (worldCamPos.z * ratio) - (worldCamPos.z - dolly.position.z);
             }
 
-            // 4. Infinite Treadmill Drop
+            // 4. Infinite Drop Treadmill
             dolly.position.y -= FALL_SPEED * delta;
-            if (dolly.position.y <= -PITCH) {
-                dolly.position.y += PITCH;
+            
+            // Snap back up by exactly the pattern's height to create seamless infinity
+            if (dolly.position.y <= -SNAP_DISTANCE) {
+                dolly.position.y += SNAP_DISTANCE;
             }
 
-            // 5. Scroll textures
-            meshRed.material.map.offset.x += meshRed.userData.scrollSpeed * delta;
-            meshBlue.material.map.offset.x += meshBlue.userData.scrollSpeed * delta;
+            // 5. Scroll Multi-Materials independently
+            redMaterials.forEach(mat => {
+                if(mat.map) mat.map.offset.x += 0.08 * delta;
+            });
+            blueMaterials.forEach(mat => {
+                // Scroll in opposite visual direction
+                if(mat.map) mat.map.offset.x -= 0.08 * delta;
+            });
 
             renderer.render(scene, camera);
         }
 
-        // WebXR loop initialization
         renderer.setAnimationLoop(animate);
 
         window.addEventListener('resize', () => {
