@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NCR-CAM | UNIVERSAL DOUBLE HELIX</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Load Three.js & WebXR VR Button -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/webxr/VRButton.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            background-color: var(--bg-color);
+            font-family: 'Share Tech Mono', monospace;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        /* Scanline Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 50, 0.04), rgba(0, 255, 100, 0.01), rgba(0, 150, 255, 0.05));
+            z-index: 10;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Float VR Button above everything */
+        #VRButton {
+            z-index: 100 !important;
+            font-family: 'Share Tech Mono', monospace !important;
+            border-radius: 0 !important;
+            border: 1px solid rgba(255, 51, 0, 0.5) !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #ff3300 !important;
+            text-shadow: 0 0 5px #ff3300 !important;
+            opacity: 0.8 !important;
+        }
+        #VRButton:hover {
+            background: rgba(255, 51, 0, 0.2) !important;
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <script>
+        const acronyms = [
+            "Non-dilutive Capital Reallocation – Corporate Asset Management",
+            "Necessary Capital Realization – Conceptual Asset Mechanism",
+            "Non-contingent Corporate Revenue – Church of Absolute Money",
+            "Nominal Cost Recovery – Corporate Art Market",
+            "New Capital Regime – Controlled Asset Movement",
+            "Net Cash Return – Consolidated Art Machine",
+            "Non-taxable Capital Reserve – Cloistered Asset Mandate",
+            "Neutral Corporate Risk – Clinical Asset Method",
+            "Necessary Corporate Ruthlessness – Capital Accumulation Model",
+            "Narcissistic Capital Retention – Corporate Art Monopoly",
+            "Negotiable Currency Rate – Conceptual Art Merger",
+            "New Commercial Reality – Corporate Asset Materialization",
+            "Net Conceptual Return – Capitalized Art Machine",
+            "Necessary Conceptual Ritual – Church of Absolute Mandate",
+            "Non-contingent Radical Religion – Church of Absolute Meaning",
+            "New Cosmic Resonance – Conceptual Aura Machine",
+            "Non-secular Corporate Rite – Church of Absolute Mind",
+            "Null Contingency Realm – Cloistered Absolute Method",
+            "New Concrete Reality – Corporate Architecture Movement",
+            "New Construction Regime – Concrete Art Monument",
+            "Neutral Context Reconstruction – Clinical Art Module",
+            "Necessary Core Realignment – Conceptual Art Mainframe",
+            "Necessary Command Routine – Corporate Action Manual",
+            "Non-negotiable Command Rule – Centralized Art Mission",
+            "Necessary Crisis Response – Corporate Adaptation Method",
+            "New Coherent Rationality – Corporate Algorithm Machine",
+            "Narcissistic Control Regime – Corporate Authority Matrix",
+            "New Coded Reality – Cipher of Art Meaning",
+            "Non-existent Creative Residue – Church of Absolute Mystery",
+            "Negative Capability Reserve – Church of Abstract Mind"
+        ];
+
+        // --- THREE.JS SETUP ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        scene.fog = new THREE.FogExp2(0x000000, 0.0085); 
+
+        // DOLLY RIG (Supports both VR & Desktop seamlessly)
+        const dolly = new THREE.Group();
+        scene.add(dolly);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1500);
+        camera.position.set(0, 1.6, 0); // Desktop eye height
+        dolly.add(camera);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        
+        renderer.xr.enabled = true;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        document.body.appendChild(VRButton.createButton(renderer));
+
+        const controller1 = renderer.xr.getController(0);
+        dolly.add(controller1);
+        const controller2 = renderer.xr.getController(1);
+        dolly.add(controller2);
+
+        // Architecture Dimensions
+        const CYLINDER_RADIUS = 40;
+        const RIBBON_HEIGHT = 5;
+        const PITCH = RIBBON_HEIGHT * 2; 
+        const LOOP_COUNT = 80; 
+        const FALL_SPEED = 18.0; 
+        
+        let meshRed, meshBlue;
+
+        // --- CUSTOM SPIRAL GEOMETRY ---
+        function createContinuousSpiral(radius, height, pitch, loops, segmentsPerLoop) {
+            const geo = new THREE.BufferGeometry();
+            const vertices = [];
+            const uvs = [];
+            const indices = [];
+            const totalSegments = loops * segmentsPerLoop;
+
+            for (let i = 0; i <= totalSegments; i++) {
+                const angle = (i / segmentsPerLoop) * Math.PI * 2;
+                const x = radius * Math.cos(angle);
+                const z = radius * Math.sin(angle);
+                const yOffset = (i / segmentsPerLoop) * pitch;
+
+                vertices.push(x, yOffset, z);
+                uvs.push(i / segmentsPerLoop, 0);
+                vertices.push(x, yOffset + height, z);
+                uvs.push(i / segmentsPerLoop, 1);
+            }
+
+            for (let i = 0; i < totalSegments; i++) {
+                const v1 = i * 2;
+                const v2 = i * 2 + 1;
+                const v3 = (i + 1) * 2;
+                const v4 = (i + 1) * 2 + 1;
+
+                indices.push(v1, v2, v4);
+                indices.push(v1, v4, v3);
+            }
+
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geo.setIndex(indices);
+            return geo;
+        }
+
+        // --- SEAMLESS TEXTURE GENERATION ---
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function createTickerTexture(colorMode) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.height = 128; 
+            
+            const separator = "   NCR-CAM   ";
+            const mainColor = colorMode === 'red' ? '#ff3300' : '#00e5ff';
+            const dimColor = colorMode === 'red' ? 'rgba(255, 51, 0, 0.9)' : 'rgba(0, 229, 255, 0.9)';
+            const bgColor = colorMode === 'red' ? 'rgba(255, 51, 0, 0.04)' : 'rgba(0, 229, 255, 0.03)';
+            const lineColor = colorMode === 'red' ? 'rgba(255, 51, 0, 0.2)' : 'rgba(0, 229, 255, 0.2)';
+
+            const shuffled = shuffle([...acronyms]).slice(0, 8);
+            const items = [];
+            let totalWidth = 0;
+
+            ctx.font = '50px "Share Tech Mono", monospace';
+            for(let j=0; j<shuffled.length; j++) {
+                const acr = shuffled[j].toUpperCase();
+                const w1 = ctx.measureText(acr).width;
+                const w2 = ctx.measureText(separator).width;
+                items.push({ text: acr, type: 'acr', width: w1 });
+                items.push({ text: separator, type: 'sep', width: w2 });
+                totalWidth += w1 + w2;
+            }
+
+            canvas.width = Math.round(totalWidth);
+
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.beginPath();
+            ctx.moveTo(0, 2);
+            ctx.lineTo(canvas.width, 2);
+            ctx.moveTo(0, canvas.height - 2);
+            ctx.lineTo(canvas.width, canvas.height - 2);
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.font = '50px "Share Tech Mono", monospace';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = mainColor;
+            ctx.shadowBlur = 12;
+
+            let xOffset = 0;
+            for(const item of items) {
+                if(item.type === 'acr') {
+                    ctx.fillStyle = dimColor;
+                } else {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                }
+                ctx.fillText(item.text, xOffset, canvas.height / 2);
+                xOffset += item.width;
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            return texture;
+        }
+
+        function buildEnvironment() {
+            // Prevent double-building if called multiple times
+            if (meshRed || meshBlue) return;
+
+            const geo = createContinuousSpiral(CYLINDER_RADIUS, RIBBON_HEIGHT, PITCH, LOOP_COUNT, 64);
+            
+            const redTex = createTickerTexture('red');
+            const blueTex = createTickerTexture('blue');
+
+            const matRed = new THREE.MeshBasicMaterial({ map: redTex, side: THREE.BackSide, transparent: true });
+            const matBlue = new THREE.MeshBasicMaterial({ map: blueTex, side: THREE.BackSide, transparent: true });
+
+            meshRed = new THREE.Mesh(geo, matRed);
+            meshBlue = new THREE.Mesh(geo, matBlue);
+
+            const startY = -(LOOP_COUNT * PITCH) / 2;
+            meshRed.position.y = startY;
+            meshBlue.position.y = startY + RIBBON_HEIGHT;
+
+            meshRed.userData.scrollSpeed = 0.08;
+            meshBlue.userData.scrollSpeed = -0.08;
+
+            scene.add(meshRed);
+            scene.add(meshBlue);
+        }
+
+        // FAILSAFE INITIALIZATION: Try to wait for fonts, but force build after 500ms 
+        // to prevent black screen lockups in restrictive iframe environments.
+        Promise.race([
+            document.fonts.ready,
+            new Promise(resolve => setTimeout(resolve, 500))
+        ]).then(() => {
+            buildEnvironment();
+        });
+
+
+        // --- UNIVERSAL CONTROLS SYSTEM ---
+        const moveState = { forward: 0, backward: 0, left: 0, right: 0 };
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
+        
+        let pitchRot = 0; 
+        let yawRot = 0;   
+        let isDragging = false;
+        
+        // Desktop Drag to Look
+        document.addEventListener('mousedown', (e) => {
+            if(e.target.id === 'VRButton') return;
+            isDragging = true;
+        });
+        document.addEventListener('mouseup', () => isDragging = false);
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || renderer.xr.isPresenting) return;
+            yawRot -= e.movementX * 0.003;
+            pitchRot -= e.movementY * 0.003;
+            pitchRot = Math.max(-Math.PI / 2.1, Math.min(Math.PI / 2.1, pitchRot));
+        });
+
+        // Keyboard Move
+        document.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case 'KeyW': moveState.forward = 1; break;
+                case 'KeyS': moveState.backward = 1; break;
+                case 'KeyA': moveState.left = 1; break;
+                case 'KeyD': moveState.right = 1; break;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case 'KeyW': moveState.forward = 0; break;
+                case 'KeyS': moveState.backward = 0; break;
+                case 'KeyA': moveState.left = 0; break;
+                case 'KeyD': moveState.right = 0; break;
+            }
+        });
+
+        // Mobile Touch (Split Screen)
+        const touchState = { leftId: null, rightId: null, leftStartX: 0, leftStartY: 0, rightLastX: 0, rightLastY: 0 };
+
+        document.addEventListener('touchstart', (e) => {
+            if(renderer.xr.isPresenting || e.target.id === 'VRButton') return;
+            e.preventDefault();
+            const halfWidth = window.innerWidth / 2;
+
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (touch.clientX < halfWidth && touchState.leftId === null) {
+                    touchState.leftId = touch.identifier;
+                    touchState.leftStartX = touch.clientX;
+                    touchState.leftStartY = touch.clientY;
+                } else if (touch.clientX >= halfWidth && touchState.rightId === null) {
+                    touchState.rightId = touch.identifier;
+                    touchState.rightLastX = touch.clientX;
+                    touchState.rightLastY = touch.clientY;
+                }
+            }
+        }, {passive: false});
+
+        document.addEventListener('touchmove', (e) => {
+            if(renderer.xr.isPresenting) return;
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+
+                if (touch.identifier === touchState.leftId) {
+                    let dx = touch.clientX - touchState.leftStartX;
+                    let dy = touch.clientY - touchState.leftStartY;
+                    const maxRadius = 60;
+                    let normX = Math.max(-1, Math.min(1, dx / maxRadius));
+                    let normY = Math.max(-1, Math.min(1, dy / maxRadius));
+
+                    moveState.forward = normY < 0 ? Math.abs(normY) : 0;
+                    moveState.backward = normY > 0 ? normY : 0;
+                    moveState.right = normX > 0 ? normX : 0;
+                    moveState.left = normX < 0 ? Math.abs(normX) : 0;
+                }
+
+                if (touch.identifier === touchState.rightId) {
+                    const movementX = touch.clientX - touchState.rightLastX;
+                    const movementY = touch.clientY - touchState.rightLastY;
+
+                    yawRot -= movementX * 0.005;
+                    pitchRot -= movementY * 0.005;
+                    pitchRot = Math.max(-Math.PI / 2.1, Math.min(Math.PI / 2.1, pitchRot));
+
+                    touchState.rightLastX = touch.clientX;
+                    touchState.rightLastY = touch.clientY;
+                }
+            }
+        }, {passive: false});
+
+        document.addEventListener('touchend', (e) => {
+            if(renderer.xr.isPresenting) return;
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (touch.identifier === touchState.leftId) {
+                    touchState.leftId = null;
+                    moveState.forward = 0; moveState.backward = 0;
+                    moveState.left = 0; moveState.right = 0;
+                }
+                if (touch.identifier === touchState.rightId) {
+                    touchState.rightId = null;
+                }
+            }
+        });
+
+        // VR Controllers Joystick Pull
+        function getVRGamepadInput() {
+            let vrX = 0, vrZ = 0;
+            const session = renderer.xr.getSession();
+            if (session) {
+                for (const source of session.inputSources) {
+                    if (source.gamepad) {
+                        const x = source.gamepad.axes[2] || 0;
+                        const z = source.gamepad.axes[3] || 0;
+                        if (Math.abs(x) > 0.1) vrX += x;
+                        if (Math.abs(z) > 0.1) vrZ += z;
+                    }
+                }
+            }
+            return { x: vrX, z: vrZ };
+        }
+
+
+        // --- MAIN TICK LOOP ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            // Render blank scene until meshes are safely generated
+            if(!meshRed || !meshBlue) {
+                renderer.render(scene, camera);
+                return;
+            }
+
+            const delta = clock.getDelta();
+
+            // 1. Process Rotation
+            let moveAngleY = yawRot;
+            
+            if (renderer.xr.isPresenting) {
+                const camEuler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
+                moveAngleY = camEuler.y;
+            } else {
+                camera.quaternion.setFromEuler(new THREE.Euler(pitchRot, yawRot, 0, 'YXZ'));
+            }
+
+            // 2. Process Input 
+            const vrInput = getVRGamepadInput();
+            direction.z = Number(moveState.forward) - Number(moveState.backward) + vrInput.z;
+            direction.x = Number(moveState.right) - Number(moveState.left) + vrInput.x;
+            direction.normalize();
+
+            if (direction.lengthSq() > 0) {
+                velocity.z -= direction.z * 150.0 * delta;
+                velocity.x -= direction.x * 150.0 * delta;
+            }
+
+            velocity.x -= velocity.x * 10.0 * delta;
+            velocity.z -= velocity.z * 10.0 * delta;
+
+            const moveVector = new THREE.Vector3(velocity.x * delta, 0, velocity.z * delta);
+            moveVector.applyEuler(new THREE.Euler(0, moveAngleY, 0, 'YXZ'));
+
+            dolly.position.x += moveVector.x;
+            dolly.position.z += moveVector.z;
+
+            // 3. Perfect Collision Calculation
+            dolly.updateMatrixWorld(); 
+            
+            const worldCamPos = new THREE.Vector3();
+            camera.getWorldPosition(worldCamPos);
+            
+            const distFromCenter = Math.sqrt(worldCamPos.x * worldCamPos.x + worldCamPos.z * worldCamPos.z);
+            const safeRadius = CYLINDER_RADIUS - 2;
+            
+            if (distFromCenter > safeRadius) {
+                const ratio = safeRadius / distFromCenter;
+                dolly.position.x = (worldCamPos.x * ratio) - (worldCamPos.x - dolly.position.x);
+                dolly.position.z = (worldCamPos.z * ratio) - (worldCamPos.z - dolly.position.z);
+            }
+
+            // 4. Infinite Treadmill Drop
+            dolly.position.y -= FALL_SPEED * delta;
+            if (dolly.position.y <= -PITCH) {
+                dolly.position.y += PITCH;
+            }
+
+            // 5. Scroll textures
+            meshRed.material.map.offset.x += meshRed.userData.scrollSpeed * delta;
+            meshBlue.material.map.offset.x += meshBlue.userData.scrollSpeed * delta;
+
+            renderer.render(scene, camera);
+        }
+
+        // WebXR loop initialization
+        renderer.setAnimationLoop(animate);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
