@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>NCR-CAM | INFINITE TICKER FALL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --led-color: #ff3300;
+            --bg-color: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            background-color: var(--bg-color);
+            color: var(--led-color);
+            font-family: 'Share Tech Mono', monospace;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        /* Scanline Overlay */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <script>
+        const acronyms = [
+            "Non-dilutive Capital Reallocation – Corporate Asset Management",
+            "Necessary Capital Realization – Conceptual Asset Mechanism",
+            "Non-contingent Corporate Revenue – Church of Absolute Money",
+            "Nominal Cost Recovery – Corporate Art Market",
+            "New Capital Regime – Controlled Asset Movement",
+            "Net Cash Return – Consolidated Art Machine",
+            "Non-taxable Capital Reserve – Cloistered Asset Mandate",
+            "Neutral Corporate Risk – Clinical Asset Method",
+            "Necessary Corporate Ruthlessness – Capital Accumulation Model",
+            "Narcissistic Capital Retention – Corporate Art Monopoly",
+            "Negotiable Currency Rate – Conceptual Art Merger",
+            "New Commercial Reality – Corporate Asset Materialization",
+            "Net Conceptual Return – Capitalized Art Machine",
+            "Necessary Conceptual Ritual – Church of Absolute Mandate",
+            "Non-contingent Radical Religion – Church of Absolute Meaning",
+            "New Cosmic Resonance – Conceptual Aura Machine",
+            "Non-secular Corporate Rite – Church of Absolute Mind",
+            "Null Contingency Realm – Cloistered Absolute Method",
+            "New Concrete Reality – Corporate Architecture Movement",
+            "New Construction Regime – Concrete Art Monument",
+            "Neutral Context Reconstruction – Clinical Art Module",
+            "Necessary Core Realignment – Conceptual Art Mainframe",
+            "Necessary Command Routine – Corporate Action Manual",
+            "Non-negotiable Command Rule – Centralized Art Mission",
+            "Necessary Crisis Response – Corporate Adaptation Method",
+            "New Coherent Rationality – Corporate Algorithm Machine",
+            "Narcissistic Control Regime – Corporate Authority Matrix",
+            "New Coded Reality – Cipher of Art Meaning",
+            "Non-existent Creative Residue – Church of Absolute Mystery",
+            "Negative Capability Reserve – Church of Abstract Mind",
+            "New Cynical Realism – Corporate Art Mockery",
+            "Non-visible Conceptual Radiance – Church of Art Minimalism",
+            "Necessary Corporate Repetition – Copy/Paste Art Movement",
+            "New Communal Ritual – Collective Art Meal",
+            "New Corporate Rebranding – Conceptual Art Mark",
+            "New Code Red – Corporate Art Manifesto",
+            "Now Create Real – Conceptual Art Magic",
+            "Never Cease Rebranding – Corporate Art Machine"
+        ];
+
+        // --- THREE.JS SETUP ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        
+        // Decreased fog density to see further into the distance
+        scene.fog = new THREE.FogExp2(0x000000, 0.007); 
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1500);
+        camera.position.set(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const CYLINDER_RADIUS = 40;
+        const ROW_HEIGHT = 4;
+        
+        // Increased row count from 60 to 150 to physically extend the visible geometry
+        const ROW_COUNT = 150; 
+        const FALL_SPEED = 18.0; 
+        
+        const cylinderGroup = new THREE.Group();
+        scene.add(cylinderGroup);
+        const rows = []; 
+
+        // --- TEXTURE GENERATION ---
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function createTickerTextures() {
+            const textures = [];
+            const separator = "   NCR-CAM   ";
+
+            for(let i=0; i<6; i++) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.height = 128;
+
+                const shuffled = shuffle([...acronyms]).slice(0, 8);
+                const items = [];
+                let totalWidth = 0;
+
+                ctx.font = '50px "Share Tech Mono"';
+                for(let j=0; j<shuffled.length; j++) {
+                    const acr = shuffled[j].toUpperCase();
+                    const w1 = ctx.measureText(acr).width;
+                    const w2 = ctx.measureText(separator).width;
+                    items.push({ text: acr, type: 'acr', width: w1 });
+                    items.push({ text: separator, type: 'sep', width: w2 });
+                    totalWidth += w1 + w2;
+                }
+
+                canvas.width = Math.ceil(totalWidth);
+
+                const isEven = i % 2 === 0;
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                if(isEven) {
+                    ctx.fillStyle = 'rgba(255, 51, 0, 0.05)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height - 2);
+                ctx.lineTo(canvas.width, canvas.height - 2);
+                ctx.strokeStyle = 'rgba(255, 51, 0, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.font = '50px "Share Tech Mono"';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(255, 51, 0, 0.8)';
+                ctx.shadowBlur = 10;
+
+                let xOffset = 0;
+                for(const item of items) {
+                    if(item.type === 'acr') {
+                        ctx.fillStyle = isEven ? 'rgba(255, 51, 0, 0.9)' : '#ff3300';
+                    } else {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    }
+                    ctx.fillText(item.text, xOffset, canvas.height / 2);
+                    xOffset += item.width;
+                }
+
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.ClampToEdgeWrapping;
+                texture.repeat.x = -1; 
+                textures.push(texture);
+            }
+            return textures;
+        }
+
+        function buildEnvironment() {
+            const textures = createTickerTextures();
+            // Create one shared geometry for all 150 rows
+            const geo = new THREE.CylinderGeometry(CYLINDER_RADIUS, CYLINDER_RADIUS, ROW_HEIGHT, 64, 1, true);
+            
+            const startY = -(ROW_COUNT * ROW_HEIGHT) / 2;
+
+            for (let i = 0; i < ROW_COUNT; i++) {
+                const texIndex = Math.floor(Math.random() * textures.length);
+                const mat = new THREE.MeshBasicMaterial({
+                    map: textures[texIndex].clone(), 
+                    side: THREE.BackSide,
+                    color: 0xffffff,
+                    transparent: true
+                });
+
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.y = startY + (i * ROW_HEIGHT);
+                
+                mesh.userData = {
+                    speed: (Math.random() * 0.001 + 0.0005) * (i % 2 === 0 ? -1 : 1),
+                    isGlitching: false
+                };
+
+                cylinderGroup.add(mesh);
+                rows.push(mesh);
+            }
+        }
+
+        document.fonts.ready.then(() => {
+            buildEnvironment();
+            animate();
+        });
+
+
+        // --- CONTROLS SYSTEM ---
+        const moveState = { forward: 0, backward: 0, left: 0, right: 0 };
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
+        
+        let pitch = 0; 
+        let yaw = 0;   
+        
+        let isDragging = false;
+        
+        document.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mouseup', () => isDragging = false);
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            yaw -= e.movementX * 0.003;
+            pitch -= e.movementY * 0.003;
+            pitch = Math.max(-Math.PI / 2.1, Math.min(Math.PI / 2.1, pitch));
+        });
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.code) {
+                case 'KeyW': moveState.forward = 1; break;
+                case 'KeyS': moveState.backward = 1; break;
+                case 'KeyA': moveState.left = 1; break;
+                case 'KeyD': moveState.right = 1; break;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            switch (e.code) {
+                case 'KeyW': moveState.forward = 0; break;
+                case 'KeyS': moveState.backward = 0; break;
+                case 'KeyA': moveState.left = 0; break;
+                case 'KeyD': moveState.right = 0; break;
+            }
+        });
+
+        const touchState = { leftId: null, rightId: null, leftStartX: 0, leftStartY: 0, rightLastX: 0, rightLastY: 0 };
+
+        document.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const halfWidth = window.innerWidth / 2;
+
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (touch.clientX < halfWidth && touchState.leftId === null) {
+                    touchState.leftId = touch.identifier;
+                    touchState.leftStartX = touch.clientX;
+                    touchState.leftStartY = touch.clientY;
+                } else if (touch.clientX >= halfWidth && touchState.rightId === null) {
+                    touchState.rightId = touch.identifier;
+                    touchState.rightLastX = touch.clientX;
+                    touchState.rightLastY = touch.clientY;
+                }
+            }
+        }, {passive: false});
+
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+
+                if (touch.identifier === touchState.leftId) {
+                    let dx = touch.clientX - touchState.leftStartX;
+                    let dy = touch.clientY - touchState.leftStartY;
+                    const maxRadius = 60;
+                    let normX = Math.max(-1, Math.min(1, dx / maxRadius));
+                    let normY = Math.max(-1, Math.min(1, dy / maxRadius));
+
+                    moveState.forward = normY < 0 ? Math.abs(normY) : 0;
+                    moveState.backward = normY > 0 ? normY : 0;
+                    moveState.right = normX > 0 ? normX : 0;
+                    moveState.left = normX < 0 ? Math.abs(normX) : 0;
+                }
+
+                if (touch.identifier === touchState.rightId) {
+                    const movementX = touch.clientX - touchState.rightLastX;
+                    const movementY = touch.clientY - touchState.rightLastY;
+
+                    yaw -= movementX * 0.005;
+                    pitch -= movementY * 0.005;
+                    pitch = Math.max(-Math.PI / 2.1, Math.min(Math.PI / 2.1, pitch));
+
+                    touchState.rightLastX = touch.clientX;
+                    touchState.rightLastY = touch.clientY;
+                }
+            }
+        }, {passive: false});
+
+        document.addEventListener('touchend', (e) => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if (touch.identifier === touchState.leftId) {
+                    touchState.leftId = null;
+                    moveState.forward = 0; moveState.backward = 0;
+                    moveState.left = 0; moveState.right = 0;
+                }
+                if (touch.identifier === touchState.rightId) {
+                    touchState.rightId = null;
+                }
+            }
+        });
+
+
+        // --- ANIMATION & RENDER LOOP ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+
+            // 1. Camera Rotation
+            camera.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
+
+            // 2. Camera Horizontal Movement (X/Z Plane Only)
+            direction.z = Number(moveState.forward) - Number(moveState.backward);
+            direction.x = Number(moveState.right) - Number(moveState.left);
+            direction.normalize();
+
+            if (moveState.forward || moveState.backward) velocity.z -= direction.z * 150.0 * delta;
+            if (moveState.left || moveState.right) velocity.x -= direction.x * 150.0 * delta;
+
+            velocity.x -= velocity.x * 10.0 * delta;
+            velocity.z -= velocity.z * 10.0 * delta;
+
+            const camEuler = new THREE.Euler(0, yaw, 0, 'YXZ');
+            const moveVector = new THREE.Vector3(velocity.x * delta, 0, velocity.z * delta);
+            moveVector.applyEuler(camEuler);
+
+            camera.position.add(moveVector);
+
+            // 3. Collision constraint
+            const distFromCenter = Math.sqrt(camera.position.x * camera.position.x + camera.position.z * camera.position.z);
+            const safeRadius = CYLINDER_RADIUS - 2;
+            if (distFromCenter > safeRadius) {
+                const ratio = safeRadius / distFromCenter;
+                camera.position.x *= ratio;
+                camera.position.z *= ratio;
+            }
+
+            // 4. Infinite Falling & Scrolling
+            const halfHeight = (ROW_COUNT * ROW_HEIGHT) / 2;
+
+            rows.forEach(row => {
+                row.position.y += FALL_SPEED * delta;
+
+                if (row.position.y > halfHeight) {
+                    row.position.y -= (ROW_COUNT * ROW_HEIGHT);
+                    row.userData.speed = (Math.random() * 0.001 + 0.0005) * (Math.random() > 0.5 ? -1 : 1);
+                }
+
+                if(row.material.map) {
+                    row.material.map.offset.x += row.userData.speed;
+                }
+
+                if (!row.userData.isGlitching && Math.random() < 0.001) {
+                    row.userData.isGlitching = true;
+                    const origX = row.position.x;
+                    const origZ = row.position.z;
+                    
+                    row.position.x += (Math.random() - 0.5) * 1.5;
+                    row.position.z += (Math.random() - 0.5) * 1.5;
+                    
+                    setTimeout(() => {
+                        row.position.x = origX;
+                        row.position.z = origZ;
+                        row.userData.isGlitching = false;
+                    }, 50 + Math.random() * 150);
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
