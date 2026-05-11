@@ -246,70 +246,80 @@
                 date: "September 28, 2024",
                 venue: "signs and symbols",
                 city: "New York",
-                context: "what is left of us"
+                context: "what is left of us",
+                url: "https://www.signsandsymbols.art/performances/fortune-2024"
             },
             {
                 year: 2020,
                 date: "February 8, 2020",
                 venue: "signs and symbols",
                 city: "New York",
-                context: null
+                context: null,
+                url: "https://www.signsandsymbols.art/residencies/fortune"
             },
             {
                 year: 2019,
                 date: "June 30 – December 15, 2019",
                 venue: "signs and symbols",
                 city: "New York",
-                context: "Performance in residence — every Sunday for six months"
+                context: "Performance in residence — every Sunday for six months",
+                url: "https://www.signsandsymbols.art/residencies/fortune"
             },
             {
                 year: 2018,
                 date: "August 22, 2018",
                 venue: "signs and symbols",
                 city: "New York",
-                context: "artists & allies"
+                context: "artists & allies",
+                url: "https://www.signsandsymbols.art/performances/fortune"
             },
             {
                 year: 2017,
                 date: "April 22, 2017",
                 venue: "Leila Heller Gallery",
                 city: "New York",
-                context: "Hands Off Our Revolutions, curated by Mitra Khorasheh"
+                context: "Hands Off Our Revolutions, curated by Mitra Khorasheh",
+                url: "http://www.mitrakhorasheh.com/annabel-daou-fortune"
             },
             {
                 year: 2016,
                 date: "Winter 2016–2017",
                 venue: "53 Orchard Street",
                 city: "New York",
-                context: "Self-run storefront"
+                context: "Self-run storefront",
+                url: null
             },
             {
                 year: 2014,
                 date: "March 2014",
                 venue: "Art Dubai / Global Art Forum",
                 city: "Dubai",
-                context: null
+                context: null,
+                url: "https://www.thenationalnews.com/arts-culture/art/silent-fortune-telling-art-or-transaction-1.307483"
             },
             {
                 year: 2013,
                 date: "February 24, 2013",
                 venue: "MoMA PS1",
                 city: "New York",
-                context: "SUNDAY SESSIONS, hosted by Nikolaus Hirsch & Markus Miessen"
+                context: "SUNDAY SESSIONS, hosted by Nikolaus Hirsch & Markus Miessen",
+                url: "https://www.moma.org/calendar/events/5640"
             },
             {
                 year: 2013,
                 date: "2013",
                 venue: "WhiteBox",
                 city: "New York",
-                context: null
+                context: null,
+                url: null
             },
             {
                 year: 2013,
                 date: "2013",
                 venue: "S2A",
                 city: "New York",
-                context: null
+                context: null,
+                url: null
             },
             {
                 year: null,
@@ -317,7 +327,8 @@
                 uncertain: true,
                 venue: "ISCP",
                 city: "New York",
-                context: "International Studio & Curatorial Program"
+                context: "International Studio & Curatorial Program",
+                url: "https://iscp-nyc.org/resident/annabel-daou"
             }
         ];
 
@@ -335,10 +346,14 @@
                 ? `<br><span class="text-gray-400 font-light">${p.context}</span>`
                 : '';
 
+            const venueHtml = p.url
+                ? `<a href="${p.url}" target="_blank" rel="noopener" class="font-medium text-gray-800 border-b border-gray-300 hover:border-gray-700 transition-colors">${p.venue}</a>`
+                : `<span class="font-medium text-gray-800">${p.venue}</span>`;
+
             return `<tr class="perf-row">
                 <td class="w-14 pr-4 text-gray-400 text-xs font-light whitespace-nowrap">${yearLabel}</td>
                 <td class="pr-6">
-                    <span class="font-medium text-gray-800">${p.venue}</span>${contextHtml}
+                    ${venueHtml}${contextHtml}
                 </td>
                 <td class="text-gray-400 text-xs font-light hidden sm:table-cell whitespace-nowrap">${p.city}</td>
                 <td class="text-gray-400 text-xs font-light text-right whitespace-nowrap pl-4">${p.date ?? '—'}</td>
