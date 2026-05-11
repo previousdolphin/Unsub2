@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORTUNE — Annabel Daou</title>
+    <meta name="description" content="An ongoing silent fortune-telling performance by Annabel Daou. Present your palm. Receive your fortune.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #FDFDFB;
+            --ink: #121212;
+            --line: #E5E5E0;
+            --muted: #888882;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--paper);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .serif { font-family: 'Cormorant Garamond', serif; }
+
+        .fortune-hero {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(6rem, 22vw, 22rem);
+            line-height: 0.88;
+            letter-spacing: -0.03em;
+        }
+
+        .cut-line {
+            height: 1px;
+            background-color: var(--line);
+            margin: 0 2rem;
+        }
+
+        /* Announcement card */
+        .announcement {
+            border: 1px solid var(--line);
+            padding: 3rem 2.5rem;
+            text-align: center;
+            position: relative;
+        }
+        .announcement::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid var(--line);
+            pointer-events: none;
+        }
+
+        /* Past performances accordion */
+        .archive-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .archive-body.open {
+            grid-template-rows: 1fr;
+        }
+        .archive-body > div {
+            overflow: hidden;
+        }
+
+        .archive-toggle .caret {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+        .archive-toggle.open .caret {
+            transform: rotate(45deg);
+        }
+
+        /* Table rows */
+        .perf-row td {
+            padding: 0.9rem 0.75rem 0.9rem 0;
+            border-top: 1px solid var(--line);
+            vertical-align: top;
+        }
+        .perf-row:first-child td {
+            border-top: none;
+        }
+
+        /* Subtle entrance animation for table rows when opened */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .archive-body.open .perf-row {
+            animation: fadeUp 0.3s ease both;
+        }
+        .archive-body.open .perf-row:nth-child(1)  { animation-delay: 0.05s; }
+        .archive-body.open .perf-row:nth-child(2)  { animation-delay: 0.09s; }
+        .archive-body.open .perf-row:nth-child(3)  { animation-delay: 0.13s; }
+        .archive-body.open .perf-row:nth-child(4)  { animation-delay: 0.17s; }
+        .archive-body.open .perf-row:nth-child(5)  { animation-delay: 0.21s; }
+        .archive-body.open .perf-row:nth-child(6)  { animation-delay: 0.25s; }
+        .archive-body.open .perf-row:nth-child(7)  { animation-delay: 0.29s; }
+        .archive-body.open .perf-row:nth-child(8)  { animation-delay: 0.33s; }
+        .archive-body.open .perf-row:nth-child(9)  { animation-delay: 0.37s; }
+        .archive-body.open .perf-row:nth-child(10) { animation-delay: 0.41s; }
+        .archive-body.open .perf-row:nth-child(11) { animation-delay: 0.45s; }
+    </style>
+</head>
+<body class="selection:bg-black selection:text-white">
+
+    <!-- Nav -->
+    <nav class="flex justify-between items-center px-8 md:px-14 py-6">
+        <a href="https://annabeldaou.com" class="text-[10px] tracking-widest uppercase text-gray-400 hover:text-black transition-colors">annabeldaou.com</a>
+        <span class="text-[10px] tracking-widest uppercase text-gray-400">Performance, 2013–</span>
+    </nav>
+
+    <main>
+
+        <!-- ── HERO ────────────────────────────────────────────── -->
+        <section class="px-8 md:px-14 pt-8 pb-20 overflow-hidden">
+            <h1 class="fortune-hero text-center select-none">FORTUNE</h1>
+            <div class="flex flex-col items-center mt-8 gap-2">
+                <p class="serif italic text-xl md:text-2xl text-gray-500 font-light">a silent performance</p>
+                <p class="text-[10px] tracking-widest uppercase text-gray-400">Annabel Daou</p>
+            </div>
+        </section>
+
+        <div class="cut-line"></div>
+
+        <!-- ── THE EXCHANGE ────────────────────────────────────── -->
+        <section class="max-w-xl mx-auto px-8 md:px-14 py-20 text-center">
+
+            <div class="serif italic text-2xl md:text-3xl font-light text-gray-700 leading-snug mb-14 space-y-1">
+                <p>Present your palm.</p>
+                <p>Receive your fortune.</p>
+            </div>
+
+            <div class="text-sm text-gray-600 font-light leading-loose space-y-5 text-left max-w-sm mx-auto">
+                <p>
+                    Annabel Daou offers her services as a fortune teller. Members of the public are invited into an intimate, wordless exchange: a palm presented, a line read, a fortune written and returned — a line of text for a line in your hand.
+                </p>
+                <p>
+                    The reading is entirely silent. No verbal hints. No theatrics. The work is structured around two questions, unspoken but present throughout:
+                </p>
+            </div>
+
+            <div class="mt-12 mb-12 space-y-3">
+                <p class="serif italic text-xl md:text-2xl font-light text-gray-600 tracking-wide">
+                    Where are you coming from?
+                </p>
+                <p class="serif italic text-xl md:text-2xl font-light text-gray-600 tracking-wide">
+                    Where are you going to?
+                </p>
+            </div>
+
+            <p class="text-xs text-gray-400 font-light leading-relaxed max-w-xs mx-auto">
+                The piece explores trust, intimacy, and the power dynamics of transaction — what it means to open your hands to a stranger and leave with something written there.
+                Fortune-telling is technically illegal in New York City. It remains ubiquitous.
+            </p>
+        </section>
+
+        <div class="cut-line"></div>
+
+        <!-- ── UPCOMING PERFORMANCE ────────────────────────────── -->
+        <section class="max-w-2xl mx-auto px-8 md:px-14 py-20">
+            <p class="text-[10px] tracking-widest uppercase text-gray-400 text-center mb-10">Upcoming</p>
+
+            <div class="announcement max-w-md mx-auto">
+                <p class="text-[10px] tracking-widest uppercase text-gray-400 mb-6">You are invited</p>
+                <h2 class="serif text-4xl md:text-5xl font-light mb-1">May 30, 2026</h2>
+                <p class="text-xs tracking-widest uppercase text-gray-400 mb-8">New York</p>
+                <div class="cut-line !mx-0 mb-8"></div>
+                <p class="text-sm text-gray-600 font-light leading-relaxed mb-2">
+                    Fortunes are given one at a time, in silence.<br>
+                    Participation requires a small fee, paid directly to the artist.<br>
+                    You leave with the work.
+                </p>
+                <p class="text-[10px] tracking-widest uppercase text-gray-400 mt-6 mb-8">
+                    Fortunes are limited &nbsp;·&nbsp; Reservation required
+                </p>
+                <a href="mailto:contact@annabeldaou.com" class="inline-block text-[10px] tracking-widest uppercase border-b border-black pb-0.5 hover:text-gray-500 hover:border-gray-400 transition-colors">
+                    Reserve &rarr;
+                </a>
+            </div>
+        </section>
+
+        <div class="cut-line"></div>
+
+        <!-- ── PAST PERFORMANCES ───────────────────────────────── -->
+        <section class="max-w-3xl mx-auto px-8 md:px-14 py-16">
+
+            <button
+                class="archive-toggle w-full flex items-center justify-between text-left group"
+                id="archive-toggle"
+                aria-expanded="false"
+                aria-controls="archive-body"
+            >
+                <div>
+                    <p class="text-[10px] tracking-widest uppercase text-gray-400 mb-1">Archive</p>
+                    <h3 class="serif text-2xl md:text-3xl font-light group-hover:text-gray-500 transition-colors">
+                        Past Performances
+                    </h3>
+                </div>
+                <span class="caret text-2xl font-light text-gray-400 group-hover:text-gray-600 transition-colors leading-none select-none" aria-hidden="true">+</span>
+            </button>
+
+            <div class="archive-body mt-0" id="archive-body" role="region">
+                <div>
+                    <table class="w-full mt-10 text-sm" id="perf-table">
+                        <!-- populated by JS -->
+                    </table>
+                    <p class="text-[10px] text-gray-300 tracking-wider mt-8">
+                        * Dates marked — are confirmed but year-unverified. List is ongoing.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <div class="cut-line"></div>
+
+        <!-- ── ARTIST ──────────────────────────────────────────── -->
+        <section class="max-w-xl mx-auto px-8 md:px-14 py-20 text-center">
+            <p class="text-[10px] tracking-widest uppercase text-gray-400 mb-6">Artist</p>
+            <p class="text-sm text-gray-600 font-light leading-loose">
+                Annabel Daou was born and raised in Beirut and lives in New York. Her intricate works probe the tensions between permanence and impermanence, belonging and dislocation. <em>Possibilities of Repair</em>, a monograph of her work, was published by Distanz Publishing Berlin in 2025.
+            </p>
+            <a
+                href="https://annabeldaou.com"
+                class="inline-block mt-8 text-[10px] tracking-widest uppercase border-b border-gray-300 pb-0.5 hover:border-black hover:text-black transition-colors text-gray-400"
+            >
+                annabeldaou.com
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 py-10 px-8 md:px-14 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-400 tracking-widest uppercase">
+        <span>&copy; 2026 Annabel Daou</span>
+        <a href="mailto:contact@annabeldaou.com" class="hover:text-black transition-colors">Contact</a>
+    </footer>
+
+    <script>
+        // ── Performance data ─────────────────────────────────────
+        // Compiled from: signs and symbols, MoMA PS1, The National (Art Dubai),
+        // Leila Heller Gallery, mitra khorasheh curator notes, Artforum.
+        // Marked with uncertain: true where date is confirmed but year unverified.
+        const performances = [
+            {
+                year: 2024,
+                date: "September 28, 2024",
+                venue: "signs and symbols",
+                city: "New York",
+                context: "what is left of us"
+            },
+            {
+                year: 2020,
+                date: "February 8, 2020",
+                venue: "signs and symbols",
+                city: "New York",
+                context: null
+            },
+            {
+                year: 2019,
+                date: "June 30 – December 15, 2019",
+                venue: "signs and symbols",
+                city: "New York",
+                context: "Performance in residence — every Sunday for six months"
+            },
+            {
+                year: 2018,
+                date: "August 22, 2018",
+                venue: "signs and symbols",
+                city: "New York",
+                context: "artists & allies"
+            },
+            {
+                year: 2017,
+                date: "April 22, 2017",
+                venue: "Leila Heller Gallery",
+                city: "New York",
+                context: "Hands Off Our Revolutions, curated by Mitra Khorasheh"
+            },
+            {
+                year: 2016,
+                date: "Winter 2016–2017",
+                venue: "53 Orchard Street",
+                city: "New York",
+                context: "Self-run storefront"
+            },
+            {
+                year: 2014,
+                date: "March 2014",
+                venue: "Art Dubai / Global Art Forum",
+                city: "Dubai",
+                context: null
+            },
+            {
+                year: 2013,
+                date: "February 24, 2013",
+                venue: "MoMA PS1",
+                city: "New York",
+                context: "SUNDAY SESSIONS, hosted by Nikolaus Hirsch & Markus Miessen"
+            },
+            {
+                year: 2013,
+                date: "2013",
+                venue: "WhiteBox",
+                city: "New York",
+                context: null
+            },
+            {
+                year: 2013,
+                date: "2013",
+                venue: "S2A",
+                city: "New York",
+                context: null
+            },
+            {
+                year: null,
+                date: null,
+                uncertain: true,
+                venue: "ISCP",
+                city: "New York",
+                context: "International Studio & Curatorial Program"
+            }
+        ];
+
+        // ── Render table ─────────────────────────────────────────
+        const table = document.getElementById('perf-table');
+        let prevYear = null;
+
+        const rows = performances.map(p => {
+            const yearLabel = p.year !== prevYear
+                ? `<span class="text-gray-400">${p.year ?? '—'}</span>`
+                : '';
+            prevYear = p.year;
+
+            const contextHtml = p.context
+                ? `<br><span class="text-gray-400 font-light">${p.context}</span>`
+                : '';
+
+            return `<tr class="perf-row">
+                <td class="w-14 pr-4 text-gray-400 text-xs font-light whitespace-nowrap">${yearLabel}</td>
+                <td class="pr-6">
+                    <span class="font-medium text-gray-800">${p.venue}</span>${contextHtml}
+                </td>
+                <td class="text-gray-400 text-xs font-light hidden sm:table-cell whitespace-nowrap">${p.city}</td>
+                <td class="text-gray-400 text-xs font-light text-right whitespace-nowrap pl-4">${p.date ?? '—'}</td>
+            </tr>`;
+        }).join('');
+
+        table.innerHTML = rows;
+
+        // ── Toggle ───────────────────────────────────────────────
+        const toggleBtn = document.getElementById('archive-toggle');
+        const archiveBody = document.getElementById('archive-body');
+
+        toggleBtn.addEventListener('click', () => {
+            const isOpen = archiveBody.classList.contains('open');
+            archiveBody.classList.toggle('open', !isOpen);
+            toggleBtn.classList.toggle('open', !isOpen);
+            toggleBtn.setAttribute('aria-expanded', String(!isOpen));
+        });
+    </script>
+
+</body>
+</html>
