@@ -1,11 +1,10 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ADVERSARIAL WONDERLAND AND THE ENDING OF A UNIVERSE</title>
+    <title>Adversarial Wonderland and the Ending of a Universe</title>
     <style>
         *, *::before, *::after {
             box-sizing: border-box;
@@ -46,7 +45,6 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.4s ease, object-fit 0.3s ease;
-            will-change: opacity, object-fit;
         }
 
         .media-asset.active {
@@ -229,10 +227,9 @@
             background: #3f3f46;
         }
 
-        /* Checkbox styling */
         .size-option input[type="radio"] {
             margin-right: 1em;
-            accent-color: #ffd700; /* Gold to match the sparkle */
+            accent-color: #ffd700;
             transform: scale(1.2);
         }
 
@@ -256,7 +253,7 @@
         .checkout-btn:active {
             transform: scale(0.98);
         }
-    </script>
+    </style>
 </head>
 <body>
 
@@ -302,7 +299,6 @@
                 </label>
             </div>
 
-            <!-- Generic Stripe checkout link for the mockup -->
             <a href="https://checkout.stripe.com" target="_blank" class="checkout-btn">Checkout on Stripe</a>
         </div>
     </div>
@@ -370,7 +366,6 @@
         const videoViewer = document.getElementById('video-viewer');
         const unsubscribeBtn = document.getElementById('unsubscribe-btn');
         
-        // Modal references
         const buyBtn = document.getElementById('buy-btn');
         const modal = document.getElementById('purchase-modal');
         const closeModal = document.getElementById('close-modal');
@@ -390,21 +385,40 @@
             const filename = ASSET_FILES[randomIndex];
             const fileUrl = CDN_BASE_URL + filename;
 
+            // Reset active states robustly
+            imageViewer.classList.remove('active');
+            videoViewer.classList.remove('active');
+            videoViewer.pause();
+
             if (isVideo(filename)) {
-                videoViewer.src = fileUrl;
                 videoViewer.onloadeddata = () => {
                     videoViewer.classList.add('active');
                 };
+                videoViewer.src = fileUrl;
                 
-                const playPromise = videoViewer.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => console.warn("Autoplay prevented:", error));
+                // Fallback for cached video
+                if (videoViewer.readyState >= 2) {
+                    videoViewer.classList.add('active');
                 }
+                
+                videoViewer.play().catch(error => console.warn("Autoplay prevented:", error));
             } else {
-                imageViewer.src = fileUrl;
                 imageViewer.onload = () => {
                     imageViewer.classList.add('active');
                 };
+                
+                // Fallback if image fails (skips to next to avoid black screen)
+                imageViewer.onerror = () => {
+                    console.error("Failed to load image:", fileUrl);
+                    loadRandomAsset();
+                };
+
+                imageViewer.src = fileUrl;
+                
+                // Fallback for cached image loading instantly
+                if (imageViewer.complete) {
+                    imageViewer.classList.add('active');
+                }
             }
             
             resetSlideshowTimer();
@@ -433,7 +447,6 @@
         // 4. DISPLAY MODE TOGGLE
         // ==========================================
         function toggleDisplayMode() {
-            // Prevent toggling if modal is open
             if (modal.classList.contains('show')) return;
 
             isExpandedCover = !isExpandedCover;
@@ -453,7 +466,6 @@
             viewer.classList.remove('idle');
             clearTimeout(idleTimer);
             idleTimer = setTimeout(() => {
-                // Don't hide cursor if modal is open
                 if (!modal.classList.contains('show')) {
                     viewer.classList.add('idle');
                 }
@@ -467,7 +479,6 @@
         // 6. EVENT LISTENERS
         // ==========================================
         
-        // Viewer interactions
         window.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'f') toggleDisplayMode();
         });
@@ -478,35 +489,31 @@
             e.stopPropagation();
         });
 
-        // Modal interactions
         buyBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevents image resizing toggle
+            e.stopPropagation();
             modal.classList.add('show');
-            clearTimeout(slideshowTimer); // Pause slideshow so it doesn't change while shopping
+            clearTimeout(slideshowTimer);
             resetIdleTimer();
         });
 
         closeModal.addEventListener('click', (e) => {
             e.stopPropagation();
             modal.classList.remove('show');
-            resetSlideshowTimer(); // Resume slideshow
+            resetSlideshowTimer();
         });
 
         modal.addEventListener('click', (e) => {
             e.stopPropagation();
-            // Close if clicking the dark overlay outside the modal box
             if (e.target === modal) {
                 modal.classList.remove('show');
                 resetSlideshowTimer();
             }
         });
 
-        // Stop clicks inside the modal content from bubbling to the viewer
         modalContent.addEventListener('click', (e) => {
             e.stopPropagation();
         });
 
-        // Initialize
         window.addEventListener('DOMContentLoaded', () => {
             loadRandomAsset();
             resetIdleTimer();
@@ -515,4 +522,3 @@
     </script>
 </body>
 </html>
-
