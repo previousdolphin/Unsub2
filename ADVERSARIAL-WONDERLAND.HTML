@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Adversarial Wonderland and the Ending of a Universe</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .viewer-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: cursor 0.3s ease;
+        }
+
+        .viewer-container.idle {
+            cursor: none;
+        }
+
+        .media-asset {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, object-fit 0.3s ease;
+            will-change: opacity, object-fit;
+        }
+
+        .media-asset.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* View Modes */
+        .mode-contain { object-fit: contain; }
+        .mode-cover { object-fit: cover; }
+
+        /* Subtle Glitch Link */
+        .unsubscribe-link {
+            position: absolute;
+            right: 2em;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0000EE; /* Classic unvisited link blue */
+            text-decoration: underline;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 1.1rem;
+            z-index: 50;
+            cursor: pointer;
+            /* Applies the subtler glitchy flicker */
+            animation: glitch-flicker-subtle 6s infinite;
+        }
+
+        @keyframes glitch-flicker-subtle {
+            0%, 100% { color: #0000EE; opacity: 1; text-shadow: none; transform: translateY(-50%) skewX(0deg); }
+            2% { color: #551A8B; opacity: 0.9; } /* Brief visited purple flash */
+            3% { color: #0000EE; }
+            35% { color: #0000EE; opacity: 1; text-shadow: none; }
+            36% { color: #FF0000; opacity: 0.8; text-shadow: 1px 0 #0000EE; transform: translateY(-50%) skewX(-5deg); } /* Subtle red/blue split */
+            37% { color: #0000EE; opacity: 1; text-shadow: none; transform: translateY(-50%) skewX(0deg); }
+            70% { opacity: 1; }
+            71% { opacity: 0.4; } /* Quick dim */
+            72% { opacity: 1; }
+            95% { color: #0000EE; transform: translateY(-50%); }
+            96% { color: #0000EE; transform: translateY(-50%) translateX(1px); } /* Tiny horizontal jitter */
+            97% { color: #0000EE; transform: translateY(-50%); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="viewer-container" id="viewer">
+        <img id="image-viewer" class="media-asset mode-cover" alt="" draggable="false" />
+        <video id="video-viewer" class="media-asset mode-cover" loop muted playsinline></video>
+        
+        <!-- Glitchy Unsubscribe Link pointing to self in new tab -->
+        <a href="" target="_blank" class="unsubscribe-link" id="unsubscribe-btn">Unsubscribe</a>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. ASSET CONFIGURATION
+        // ==========================================
+        
+        const CDN_BASE_URL = 'https://pub-3179368549be4f1a8eb5476550e9b575.r2.dev/'; 
+        
+        const ASSET_FILES = [
+            'odesssej_It_highlights_the_fundamental_alienness_of_machine_per_2677e6f3-ca4d-4013-b65a-69490f346615.png',
+            'odesssej_It_highlights_the_fundamental_alienness_of_machine_per_2f052341-f4ab-45cd-a601-229d468478ca.png',
+            'odesssej_It_highlights_the_fundamental_alienness_of_machine_per_316cbcdd-c740-45e7-a1e4-e2bfad1cbdec.png',
+            'odesssej_It_highlights_the_fundamental_alienness_of_machine_per_37e11327-70df-40d2-9c5d-ac363ccb4f65.png',
+            'odesssej_It_highlights_the_fundamental_alienness_of_machine_per_fddef5cc-8aaf-4558-8921-90eaa0010b56.png',
+            'odesssej_It_tricks_the_models_neural_network_into_believing_tha_30cdb0f0-a1ca-4eea-a823-7df03ca78de8.png',
+            'odesssej_It_tricks_the_models_neural_network_into_believing_tha_c96dc93b-df09-4f19-b1f2-faa696dfd5dd.png',
+            'odesssej_The_image_captures_the_users_sister_Samantha_Do_as_a_g_5cc5e5ca-9504-40cc-85f4-ad51277d8020.png',
+            'odesssej_The_image_captures_the_users_sister_Samantha_Do_as_a_g_67642097-1d1a-4c7a-8df0-222aed17533d.png',
+            'odesssej_The_image_captures_the_users_sister_Samantha_Do_as_a_g_9e0e8ee7-8e84-43f1-9b92-02e622289d8f.png',
+            'odesssej_it_dumps_its_raw_spatial_vocabulary_into_a_recursive_l_28dc12c9-dc8f-4272-9352-3d8b1b4f27ba.png',
+            'odesssej_it_dumps_its_raw_spatial_vocabulary_into_a_recursive_l_42de47a4-646e-4546-b4ca-c4c93473f377.png',
+            'odesssej_it_dumps_its_raw_spatial_vocabulary_into_a_recursive_l_53479e31-2a98-4e30-9641-e33538c5e2c4.png',
+            'odesssej_it_dumps_its_raw_spatial_vocabulary_into_a_recursive_l_766e9ff4-10ad-4bd4-9a40-343900d4212b.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_0c147e3f-9a9b-4fb0-b5e7-745b37b9e95a.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_137756ed-50f9-4f2b-b0ee-9fac909c4b90.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_165fbf88-e003-4379-afdf-6a4434c94f12.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_2a56ac02-87d9-42fa-a3df-b62a0683f41a.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_4671ac11-5f41-4ddf-ba16-cac2cbeb1435.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_5bc29a48-1c2f-457e-8cfb-6b95cf905dd1.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_634438c7-ad99-4f2a-885f-9ba313c2032f.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_6d20ec12-3e26-4e39-b2e8-7a854cd2aa18.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_6e6103dc-3d92-4d25-a477-7d7102370ebf.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_7361de57-e3a7-44b1-853c-efaba60bc8e6.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_77ef406c-b8d0-4ac5-bd13-dc3f9cd84ef4.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_7871f1ff-42dc-4bae-b96e-c63fbb386b36.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_7b8d0fba-7f17-46f8-a92c-3f380e272ae4.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_87ac8f3e-4a2f-41ae-baaa-86dd55fdb59b.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_8e502ea1-8720-4a86-879b-d8aef3a9c11e.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_c51f8289-42a7-4b11-aa8b-4d0cf053155c.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_cc4cce90-fcba-431f-b8da-02bf1bc7215a.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_d18e507f-2cc9-4c88-bda8-5934ddd2f1b8.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_d235ab57-0435-48e7-8050-aa95125acaba.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_d90e93dc-2c52-4203-9063-ddf8a676d8a2.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_e3b52628-4ae2-4dd7-800f-11a1d9ba5442.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_e7fb0b9b-74ef-4010-900d-ae8eac456fe2.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_eb04b346-7c0d-4632-b9c8-636dfabfb976.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_ec41244d-f83c-4175-829c-9da878e3df71.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_efe094d0-578b-40bb-9378-d53ccd8f552b.png',
+            'odesssej_the_output_tricks_the_AI_models_neural_networks_into_b_fe523d39-26c4-4630-b7f0-9f74a2ebaa1a.png'
+        ];
+
+        // ==========================================
+        // 2. STATE & REFERENCES
+        // ==========================================
+        let isExpandedCover = true;
+        let idleTimer;
+        let slideshowTimer;
+        const SLIDESHOW_INTERVAL_MS = 100000; 
+        
+        const viewer = document.getElementById('viewer');
+        const imageViewer = document.getElementById('image-viewer');
+        const videoViewer = document.getElementById('video-viewer');
+        const unsubscribeBtn = document.getElementById('unsubscribe-btn');
+
+        function isVideo(filename) {
+            return filename.toLowerCase().endsWith('.mp4') || filename.toLowerCase().endsWith('.webm');
+        }
+
+        // ==========================================
+        // 3. CORE LOGIC: LOAD RANDOM ASSET
+        // ==========================================
+        function loadRandomAsset() {
+            if (ASSET_FILES.length === 0) return;
+
+            const randomIndex = Math.floor(Math.random() * ASSET_FILES.length);
+            const filename = ASSET_FILES[randomIndex];
+            const fileUrl = CDN_BASE_URL + filename;
+
+            if (isVideo(filename)) {
+                videoViewer.src = fileUrl;
+                videoViewer.onloadeddata = () => {
+                    videoViewer.classList.add('active');
+                };
+                
+                const playPromise = videoViewer.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => console.warn("Autoplay prevented:", error));
+                }
+            } else {
+                imageViewer.src = fileUrl;
+                imageViewer.onload = () => {
+                    imageViewer.classList.add('active');
+                };
+            }
+            
+            resetSlideshowTimer();
+        }
+
+        function transitionToNextAsset() {
+            imageViewer.classList.remove('active');
+            videoViewer.classList.remove('active');
+
+            setTimeout(() => {
+                if (!isExpandedCover) {
+                    isExpandedCover = true;
+                    imageViewer.classList.replace('mode-contain', 'mode-cover');
+                    videoViewer.classList.replace('mode-contain', 'mode-cover');
+                }
+                loadRandomAsset();
+            }, 400); 
+        }
+
+        function resetSlideshowTimer() {
+            clearTimeout(slideshowTimer);
+            slideshowTimer = setTimeout(transitionToNextAsset, SLIDESHOW_INTERVAL_MS);
+        }
+
+        // ==========================================
+        // 4. DISPLAY MODE TOGGLE
+        // ==========================================
+        function toggleDisplayMode() {
+            isExpandedCover = !isExpandedCover;
+            const mode = isExpandedCover ? 'mode-cover' : 'mode-contain';
+            const removeMode = isExpandedCover ? 'mode-contain' : 'mode-cover';
+
+            imageViewer.classList.replace(removeMode, mode);
+            videoViewer.classList.replace(removeMode, mode);
+            
+            resetIdleTimer();
+        }
+
+        // ==========================================
+        // 5. IDLE TIMER
+        // ==========================================
+        function resetIdleTimer() {
+            viewer.classList.remove('idle');
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                viewer.classList.add('idle');
+            }, 2500);
+        }
+        
+        window.addEventListener('mousemove', resetIdleTimer);
+        window.addEventListener('keydown', resetIdleTimer);
+
+        // ==========================================
+        // 6. EVENT LISTENERS
+        // ==========================================
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'f') {
+                toggleDisplayMode();
+            }
+        });
+
+        viewer.addEventListener('click', () => {
+            toggleDisplayMode();
+        });
+
+        // Stop the click on the link from triggering the display toggle
+        unsubscribeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRandomAsset();
+            resetIdleTimer();
+            // Set current URL dynamically for the self-referencing link
+            unsubscribeBtn.href = window.location.href;
+        });
+    </script>
+</body>
+</html>
