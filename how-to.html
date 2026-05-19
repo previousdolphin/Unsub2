@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UNSUBSCRIBE NYC LLC | How-To</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #F2F2F2;
+            --text-color: #0F0F0F;
+            --grid-line: 1px solid #0F0F0F;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Space Mono', monospace;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            cursor: crosshair;
+        }
+
+        /* Typography */
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        /* Borders */
+        .border-b-black { border-bottom: var(--grid-line); }
+        .border-t-black { border-top: var(--grid-line); }
+        .border-r-black { border-right: var(--grid-line); }
+        .border-l-black { border-left: var(--grid-line); }
+        .border-black { border: var(--grid-line); }
+
+        /* Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+
+        /* Reveal Animation */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hover Inversion */
+        .hover-invert {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .hover-invert:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        /* TidyCal iframe wrapper */
+        .tidycal-wrap {
+            background: #fff;
+            border: var(--grid-line);
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .tidycal-wrap iframe {
+            width: 100%;
+            min-height: 720px;
+            border: none;
+            display: block;
+            background: #fff;
+        }
+        @media (max-width: 768px) {
+            .tidycal-wrap iframe { min-height: 820px; }
+        }
+    </style>
+</head>
+<body class="selection:bg-black selection:text-white relative">
+
+    <!-- Three.js Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 border-b-black bg-[#F2F2F2]/90 backdrop-blur-md">
+        <div class="flex justify-between items-center px-4 md:px-6 py-3 uppercase text-[10px] md:text-xs tracking-widest font-bold">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-black rounded-full inline-block animate-pulse"></span>
+                Unsubscribe NYC LLC
+            </div>
+            <div class="hidden md:block">P. Pissarro / J. Do</div>
+            <div class="text-right whitespace-nowrap">[ 2026 ]</div>
+        </div>
+    </header>
+
+    <!-- Floating CTA: Book intro -->
+    <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-50 bg-[#F2F2F2] border border-black px-5 py-3 md:px-6 md:py-4 font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] flex items-center gap-3 hover-invert group shadow-lg backdrop-blur-md">
+        Book Intro Call
+        <svg class="w-3 h-3 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="square"/>
+        </svg>
+    </a>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-12 md:pt-14">
+
+        <!-- SECTION 1: HERO -->
+        <section class="min-h-[80vh] flex flex-col justify-center items-center border-b-black relative px-4 py-20 bg-[#F2F2F2]/80 backdrop-blur-sm">
+            <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-400 tracking-[0.3em] uppercase mix-blend-multiply">
+                [ CoCA // How-To ]
+            </div>
+
+            <div class="max-w-4xl w-full text-center reveal-text space-y-8 md:space-y-12">
+                <h1 class="font-mono text-[10px] md:text-xs tracking-[0.2em] text-gray-500 uppercase">
+                    Coaching &amp; Literacy Architecture
+                </h1>
+
+                <p class="font-serif text-3xl md:text-5xl lg:text-6xl leading-[1.1] font-medium px-2">
+                    How to use <span class="italic">what is changing everything.</span>
+                </p>
+
+                <p class="font-mono text-xs md:text-sm max-w-2xl mx-auto leading-relaxed text-gray-600">
+                    One-on-one coaching and team workshops that make AI make sense. For creative professionals, companies, and anyone who wants to keep up <span class="italic text-black">without losing themselves.</span>
+                </p>
+
+                <div class="pt-4 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                    <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-black bg-black text-white px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-white hover:text-black transition-colors inline-flex items-center justify-center gap-3">
+                        Book A Free Intro Call
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="square"/></svg>
+                    </a>
+                    <a href="#protocols" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-black px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-black hover:text-white transition-colors inline-flex items-center justify-center">
+                        See The Programs
+                    </a>
+                </div>
+
+                <div class="border-t border-b border-gray-300 py-4 mt-12 max-w-xl mx-auto">
+                    <p class="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 text-left">
+                        * SYSTEM NOTE: SESSIONS DELIVERED BY PAUL-ALEXANDER PISSARRO. WORKSHOPS CO-FACILITATED WITH JESSE DO. RATES BELOW ARE HISTORICAL BASELINES — FINAL SCOPE SCALES WITH THE CONVERSATION.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: WHO THIS IS FOR -->
+        <section class="bg-[#F2F2F2]">
+            <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
+                <h2 class="font-serif text-2xl md:text-4xl italic pr-4">Who This Is For</h2>
+                <span class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1">[ 03 DOORS ]</span>
+            </div>
+
+            <div class="flex flex-col">
+                <!-- 01: Beginnings -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[180px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">01</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">01</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Beginnings</h3>
+                        <div class="font-mono text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mt-1">You are in your 20s or 30s</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">You feel pressure to use AI but are not sure where to start, or you are already using it and want to do more with it. Direction coaching and AI literacy for people building their first chapter.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Book Session</a>
+                    </div>
+                </div>
+
+                <!-- 02: At Your Pace -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[180px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">02</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">02</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">At Your Pace</h3>
+                        <div class="font-mono text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mt-1">It feels like too much, too fast</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">AI feels like it is moving too fast and you are worried about being left behind. These sessions go at your pace. No jargon. No judgment. Just clarity.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Book Session</a>
+                    </div>
+                </div>
+
+                <!-- 03: Teams -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[180px] transition-colors duration-200 relative bg-white">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">03</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">03</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Teams</h3>
+                        <div class="font-mono text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mt-1">Your org needs to integrate AI</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">Your team knows it needs to integrate AI. Nobody knows who should lead that. We run half-day and full-day workshops that change how your team actually works — not just how they think about it.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="mailto:office@unsubscribe.llc?subject=Inquiry:%20Team%20AI%20Workshop" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Book Workshop</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: PROGRAMS / SERVICES -->
+        <section id="protocols" class="bg-[#F2F2F2]">
+            <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
+                <h2 class="font-serif text-2xl md:text-4xl italic pr-4">Programs</h2>
+                <span class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1">[ 05 ITEMS ]</span>
+            </div>
+
+            <div class="flex flex-col">
+                <!-- 01: Story & Direction Coaching -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">01</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">01</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Story &amp; Direction Coaching</h3>
+                        <div class="font-mono text-sm opacity-80">$75 – $100 / session</div>
+                        <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mt-2">60 min · Intro call free</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">For people building their first chapter. Direction, narrative, and what to do next — held by someone who has been a chef, a filmmaker, an artist, and is now a sober ally.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Book</a>
+                    </div>
+                </div>
+
+                <!-- 02: AI Literacy Coaching -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">02</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">02</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">AI Literacy Coaching</h3>
+                        <div class="font-mono text-sm opacity-80">$90 – $120 / session</div>
+                        <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mt-2">60 min · Packages available</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">One-on-one work to make AI usable in your actual life. We start where you are, in plain language. By the end of the session you can do something you couldn’t do at the start of it.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Book</a>
+                    </div>
+                </div>
+
+                <!-- 03: AI for Older Adults -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">03</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">03</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">AI for Older Adults</h3>
+                        <div class="font-mono text-sm opacity-80">$75 – $90 / session</div>
+                        <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mt-2">60 min · No jargon, no judgment</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">Patient, grounded sessions for adults who want to keep up without losing themselves. We slow down where it matters and protect what already works in your life.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Book</a>
+                    </div>
+                </div>
+
+                <!-- 04: Team AI Literacy Workshop -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">04</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">04</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Team AI<br>Literacy Workshop</h3>
+                        <div class="font-mono text-sm opacity-80">$1,500 – $3,000 / day</div>
+                        <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mt-2">Half or full day · Pilot rate available</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">Workshops that change how your team actually works — not just how they think about it. Co-facilitated by Paul and Jesse. Built for the operators who will use it Monday morning.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="mailto:office@unsubscribe.llc?subject=Inquiry:%20Team%20Workshop" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Inquire</a>
+                    </div>
+                </div>
+
+                <!-- 05: Monthly Group Circle -->
+                <div class="grid grid-cols-1 md:grid-cols-12 border-b-black hover-invert group min-h-[160px] transition-colors duration-200 relative bg-white">
+                    <div class="absolute bottom-2 right-2 font-mono text-[8px] text-gray-300 opacity-50 group-hover:text-gray-600 transition-colors pointer-events-none uppercase tracking-[0.2em]">[ CoCA ]</div>
+
+                    <div class="hidden md:flex md:col-span-1 p-6 border-r-black items-start justify-center">
+                        <span class="font-mono text-xs opacity-40 group-hover:opacity-100">05</span>
+                    </div>
+                    <div class="md:hidden px-6 pt-6 font-mono text-xs opacity-40">05</div>
+
+                    <div class="md:col-span-4 p-6 md:border-r-black flex flex-col justify-center">
+                        <h3 class="font-serif text-2xl md:text-3xl font-bold uppercase leading-none mb-2">Monthly Group Circle</h3>
+                        <div class="font-mono text-sm opacity-80">$30 – $40 / month</div>
+                        <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 mt-2">Recurring · First session free</div>
+                    </div>
+
+                    <div class="md:col-span-5 p-6 flex flex-col justify-center">
+                        <p class="font-serif text-lg md:text-xl italic leading-snug">A small standing group to share what you are learning, what you are working on, and what you are worried about. Quiet, useful, low-stakes. A place to stay current alongside others.</p>
+                    </div>
+
+                    <div class="md:col-span-2 p-6 md:border-l-black flex items-center justify-center md:justify-end">
+                        <a href="mailto:office@unsubscribe.llc?subject=Inquiry:%20Group%20Circle" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-current px-6 py-3 rounded-full hover:bg-black hover:text-white transition-colors group-hover:bg-white group-hover:text-black">Join</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ARCHITECTS / ABOUT -->
+        <section class="border-b-black bg-white relative">
+            <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-300 tracking-[0.3em] uppercase pointer-events-none">[ CoCA // Architecture ]</div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12">
+                <!-- Left: Paul -->
+                <div class="md:col-span-7 p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black flex flex-col justify-center bg-[#F2F2F2]">
+                    <h3 class="font-mono text-[10px] uppercase tracking-widest mb-6 text-gray-500">The Architect of This Practice</h3>
+                    <h2 class="font-serif text-3xl md:text-5xl leading-tight mb-8">Paul-Alexander Pissarro</h2>
+
+                    <div class="space-y-5 font-serif text-lg md:text-xl italic leading-snug text-black max-w-2xl">
+                        <p>Has been many things. Chef. Filmmaker. Conceptual artist. Sober ally.</p>
+                        <p>Now he helps people navigate the most disorienting technological shift of our time — without losing what makes them human.</p>
+                    </div>
+
+                    <div class="mt-10 pt-6 border-t border-gray-300">
+                        <h4 class="font-mono text-[10px] uppercase tracking-widest mb-4 text-gray-500">Credentials</h4>
+                        <ul class="font-mono text-xs md:text-sm space-y-2">
+                            <li class="flex items-center justify-between gap-4 border-b border-gray-200 pb-2">
+                                <span class="uppercase tracking-widest">CAIP</span>
+                                <span class="text-gray-500 uppercase tracking-widest text-[10px]">Held</span>
+                            </li>
+                            <li class="flex items-center justify-between gap-4 border-b border-gray-200 pb-2">
+                                <span class="uppercase tracking-widest">Erickson ICF</span>
+                                <span class="text-gray-500 uppercase tracking-widest text-[10px]">In Completion</span>
+                            </li>
+                            <li class="flex items-center justify-between gap-4">
+                                <span class="uppercase tracking-widest">CCAR</span>
+                                <span class="text-gray-500 uppercase tracking-widest text-[10px]">In Progress</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right: Jesse -->
+                <div class="md:col-span-5 p-8 md:p-16 flex flex-col justify-center bg-white">
+                    <h3 class="font-mono text-[10px] uppercase tracking-widest mb-6 text-gray-500">Co-Built With</h3>
+                    <h2 class="font-serif text-3xl md:text-4xl leading-tight mb-6">Jesse Do</h2>
+
+                    <p class="font-serif text-base md:text-lg italic leading-snug text-black max-w-md mb-8">
+                        Engineer and builder. How-To is co-built by Jesse. Sessions are delivered by Paul. Workshops are co-facilitated.
+                    </p>
+
+                    <a href="about-us.html" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-black px-6 py-3 md:py-4 rounded-full hover:bg-black hover:text-white transition-colors text-center inline-flex items-center justify-center gap-3 w-fit">
+                        Read About Us
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="square"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: BOOK -->
+        <section id="book" class="border-b-black bg-[#F2F2F2] relative">
+            <div class="sticky top-[45px] z-40 border-b-black p-4 md:p-6 flex justify-between items-end bg-black text-white">
+                <h2 class="font-serif text-2xl md:text-4xl italic pr-4">Start Here</h2>
+                <span class="font-mono text-[10px] md:text-xs whitespace-nowrap opacity-70 mb-1">[ 20 MIN · FREE ]</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12">
+                <!-- Left context -->
+                <div class="md:col-span-5 p-8 md:p-16 border-b-black md:border-b-0 md:border-r-black flex flex-col justify-center bg-white">
+                    <h3 class="font-mono text-[10px] uppercase tracking-widest mb-6 text-gray-500">The Intro Call</h3>
+                    <h2 class="font-serif text-3xl md:text-4xl lg:text-5xl leading-tight mb-8">
+                        A free 20-minute call.<br><span class="italic text-gray-500">No pressure. No pitch.</span>
+                    </h2>
+
+                    <p class="font-serif text-lg md:text-xl italic leading-snug max-w-md mb-8">
+                        Just a conversation about where you are, what you need, and whether this is the right fit.
+                    </p>
+
+                    <p class="font-mono text-xs md:text-sm text-gray-600 leading-relaxed max-w-md">
+                        Trouble with the booking widget? Email
+                        <a href="mailto:hello@unsubscribe.llc" class="underline decoration-1 underline-offset-4 text-black hover:text-red-500 transition-colors">hello@unsubscribe.llc</a>.
+                    </p>
+                </div>
+
+                <!-- Right: TidyCal embed -->
+                <div class="md:col-span-7 p-4 md:p-8 lg:p-10 bg-[#F2F2F2] flex flex-col justify-center reveal-text">
+                    <div class="tidycal-wrap">
+                        <iframe src="https://tidycal.com/pissarropaul" title="Book an intro call with Paul-Alexander Pissarro" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <p class="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-gray-500 mt-3 text-right">
+                        Widget: tidycal.com/pissarropaul
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: NOTE -->
+        <section class="border-b-black bg-[#F2F2F2] p-8 md:p-24 flex justify-center text-center relative">
+            <div class="absolute bottom-6 left-6 font-mono text-[8px] text-gray-400 tracking-[0.3em] uppercase pointer-events-none">[ CoCA // Note ]</div>
+
+            <div class="max-w-3xl reveal-text">
+                <h3 class="font-mono text-[10px] uppercase tracking-widest mb-8 text-gray-500">A Note On How This Works</h3>
+                <p class="font-serif text-2xl md:text-4xl leading-tight italic">
+                    The work is not to know everything about AI. The work is to keep yourself — your judgment, your taste, your story — intact while you use it.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 7: FOOTER -->
+        <footer class="bg-black text-white min-h-[80vh] flex flex-col justify-between p-6 md:p-16 relative">
+            <div class="absolute top-6 right-6 font-mono text-[8px] text-gray-800 tracking-[0.3em] uppercase pointer-events-none">CoCA 2026</div>
+
+            <div class="flex-grow flex flex-col justify-center items-center text-center reveal-text space-y-8">
+                <div class="font-mono text-[10px] uppercase tracking-widest text-gray-500 border border-gray-800 px-4 py-1 rounded-full">Systems Online</div>
+                <h2 class="font-serif text-4xl md:text-7xl lg:text-8xl leading-[0.9]">
+                    LEARN TO USE<br>WHAT IS CHANGING<br>EVERYTHING.
+                </h2>
+                <p class="font-mono text-xs md:text-sm text-gray-400 max-w-xl leading-relaxed">
+                    // SYSTEM MESSAGE:<br>
+                    KEEP YOURSELF.
+                </p>
+                <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="font-mono text-[10px] md:text-xs uppercase tracking-widest border border-white px-8 py-4 rounded-full hover:bg-white hover:text-black transition-colors inline-flex items-center gap-3">
+                    Book A Free Intro Call
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="square"/></svg>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 font-mono text-[10px] uppercase tracking-widest pt-12 border-t border-white/20">
+                <div>
+                    <span class="block text-gray-500 mb-2">Architects</span>
+                    <a href="about-us.html" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Jesse Do<br>Paul Pissarro</a>
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Practice</span>
+                    <a href="services.html" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Services</a><br>
+                    <a href="how-to.html" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">How-To</a>
+                </div>
+                <div>
+                    <span class="block text-gray-500 mb-2">Origin</span>
+                    NYC / Paris<br>Berlin / Hamburg
+                </div>
+                <div class="text-right flex flex-col">
+                    <span class="block text-gray-500 mb-2">Input</span>
+                    <a href="mailto:office@unsubscribe.llc" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4 mb-2">Connect_</a>
+                    <a href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener" class="hover:text-red-500 transition-colors underline decoration-1 underline-offset-4">Book Intro</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- THREE.JS BACKGROUND ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0xF2F2F2, 0.002);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.PlaneGeometry(24, 24, 32, 32);
+            const material = new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.08,
+            });
+            const plane = new THREE.Mesh(geometry, material);
+            plane.rotation.x = -Math.PI / 2.5;
+            scene.add(plane);
+
+            let time = 0;
+            let mouseX = 0;
+            let mouseY = 0;
+
+            const handleInput = (x, y) => {
+                mouseX = (x - window.innerWidth / 2) * 0.001;
+                mouseY = (y - window.innerHeight / 2) * 0.001;
+            };
+
+            document.addEventListener('mousemove', (e) => handleInput(e.clientX, e.clientY));
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    handleInput(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                time += 0.002;
+
+                const positionAttribute = geometry.attributes.position;
+                const vertex = new THREE.Vector3();
+
+                for (let i = 0; i < positionAttribute.count; i++) {
+                    vertex.fromBufferAttribute(positionAttribute, i);
+                    const wave1 = 0.5 * Math.sin(vertex.x * 0.5 + time);
+                    const wave2 = 0.3 * Math.sin(vertex.y * 0.8 + time * 1.5);
+                    const wave3 = 0.1 * Math.sin(vertex.x * 2 + vertex.y * 0.5 + time);
+                    vertex.z = (wave1 + wave2 + wave3) * 1.2;
+                    positionAttribute.setZ(i, vertex.z);
+                }
+                positionAttribute.needsUpdate = true;
+
+                plane.rotation.z += 0.0005;
+                plane.rotation.x += (mouseY * 0.5 - plane.rotation.x - Math.PI / 2.5) * 0.05;
+                plane.rotation.y += (mouseX * 0.5 - plane.rotation.y) * 0.05;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // --- OBSERVER ---
+        const initObserver = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal-text').forEach(el => observer.observe(el));
+        };
+
+        window.addEventListener('load', () => {
+            try { initThreeJS(); } catch (e) { console.log('WebGL fallback'); }
+            initObserver();
+        });
+    </script>
+</body>
+</html>
