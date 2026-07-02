@@ -48,6 +48,8 @@
         .img-placeholder img {
             position: relative;
             z-index: 1;
+            /* Dissolves the flat white photo background into the paper */
+            mix-blend-mode: multiply;
         }
         .btn-primary {
             display: inline-block;
@@ -106,7 +108,7 @@
             <article class="flex flex-col">
                 <div class="aspect-[4/5] w-full img-placeholder mb-8">
                     <span>Thistle</span>
-                      <img src="thistle-tee.svg" alt="Thistle t-shirt" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-300 hover:scale-[1.02] zoomable-image" onerror="this.style.opacity='0'">
+                      <img src="thistle-tee.jpg" alt="Thistle t-shirt" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-300 hover:scale-[1.02] zoomable-image" onerror="this.style.opacity='0'">
                 </div>
                 <div class="flex-grow">
                     <h3 class="font-serif-custom text-2xl md:text-3xl mb-3">"Thistle"</h3>
@@ -129,7 +131,7 @@
             <article class="flex flex-col">
                 <div class="aspect-[4/5] w-full img-placeholder mb-8">
                     <span>I Prefer Not</span>
-                      <img src="iprefernot-tee.svg" alt="I Prefer Not t-shirt" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-300 hover:scale-[1.02] zoomable-image" onerror="this.style.opacity='0'">
+                      <img src="iprefernot-tee.jpg" alt="I Prefer Not t-shirt" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-300 hover:scale-[1.02] zoomable-image" onerror="this.style.opacity='0'">
                 </div>
                 <div class="flex-grow">
                     <h3 class="font-serif-custom text-2xl md:text-3xl mb-3">"I Prefer Not"</h3>
