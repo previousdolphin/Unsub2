@@ -113,14 +113,19 @@
                     A work on paper, adapted for print. Silkscreen printed in NYC on 100% cotton blanks.
                     </p>
                 </div>
-                <div class="flex items-center justify-between mt-auto border-t border-gray-200 pt-6">
-                    <div>
+                <div class="mt-auto border-t border-gray-200 pt-6">
+                    <div class="mb-5">
                         <span class="text-lg font-light">$65</span>
                         <span class="text-[10px] text-gray-400 uppercase tracking-widest block mt-1">tax / shipping included</span>
                     </div>
-                    <a href="https://buy.stripe.com/8x29AM6INdfx6OXdSudwc0j" target="_blank" class="text-xs uppercase tracking-widest hover:text-gray-500 transition-colors border-b border-black pb-1 hover:border-gray-500">
-                        Purchase &rarr;
-                    </a>
+                    <div class="w-full" data-design="thistle">
+                        <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">Size</div>
+                        <div class="flex gap-2 mb-4 sizes"></div>
+                        <button class="buy w-full text-xs uppercase tracking-widest border border-black py-3 hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black" disabled>
+                            Purchase &rarr;
+                        </button>
+                        <div class="note text-[10px] text-gray-400 uppercase tracking-widest mt-2 h-4"></div>
+                    </div>
                 </div>
             </article>
 
@@ -135,14 +140,19 @@
                     A reprint of an original design from 2006, silkscreen printed in NYC on 100% cotton blanks.
                     </p>
                 </div>
-                <div class="flex items-center justify-between mt-auto border-t border-gray-200 pt-6">
-                    <div>
+                <div class="mt-auto border-t border-gray-200 pt-6">
+                    <div class="mb-5">
                         <span class="text-lg font-light">$65</span>
                         <span class="text-[10px] text-gray-400 uppercase tracking-widest block mt-1">tax / shipping included</span>
                     </div>
-                    <a href="https://buy.stripe.com/9B69AM5EJ5N55KTbKmdwc0k" target="_blank" class="text-xs uppercase tracking-widest hover:text-gray-500 transition-colors border-b border-black pb-1 hover:border-gray-500">
-                        Purchase &rarr;
-                    </a>
+                    <div class="w-full" data-design="prefernot">
+                        <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">Size</div>
+                        <div class="flex gap-2 mb-4 sizes"></div>
+                        <button class="buy w-full text-xs uppercase tracking-widest border border-black py-3 hover:bg-black hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-black" disabled>
+                            Purchase &rarr;
+                        </button>
+                        <div class="note text-[10px] text-gray-400 uppercase tracking-widest mt-2 h-4"></div>
+                    </div>
                 </div>
             </article>
 
@@ -160,7 +170,20 @@
                     <span class="text-3xl font-light">$117</span>
                 </div>
                 <span class="text-[10px] text-gray-400 uppercase tracking-widest block mb-6">tax / shipping included</span>
-                <a href="https://buy.stripe.com/8x27sE0kpejB1uD01Edwc0l" target="_blank" class="btn-primary">Buy Both</a>
+                <div id="bundle" class="w-full max-w-md">
+                    <div class="grid grid-cols-2 gap-6 mb-6 text-left">
+                        <div data-bundle="thistle">
+                            <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">"Thistle" size</div>
+                            <div class="flex gap-2 sizes"></div>
+                        </div>
+                        <div data-bundle="prefernot">
+                            <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">"I Prefer Not" size</div>
+                            <div class="flex gap-2 sizes"></div>
+                        </div>
+                    </div>
+                    <button id="bundle-buy" class="btn-primary w-full disabled:opacity-30 disabled:cursor-not-allowed" disabled>Buy Both</button>
+                    <div id="bundle-note" class="text-[10px] text-gray-400 uppercase tracking-widest mt-3 h-4"></div>
+                </div>
             </div>
 
             <div class="mt-8 text-xs text-gray-500 bg-[#F4F4F2] px-6 py-4 inline-block text-center leading-relaxed">
@@ -253,5 +276,160 @@
         });
     </script>
 
+<script>
+// Talks to exactly the endpoints the public page will use once this is signed off.
+// Same endpoints the preview was signed off against.
+const BASE = "";
+const SIZES = ["S", "M", "L"];
+const picked = {};
+
+async function loadStock() {
+  let stock;
+  try {
+    stock = await (await fetch(BASE + "/shop/stock")).json();
+    if (stock.error) throw new Error(stock.error);
+  } catch (e) {
+    document.querySelectorAll("[data-design] .note").forEach(n => {
+      n.textContent = "Stock unavailable"; n.style.color = "#b91c1c";
+    });
+    return;
+  }
+  for (const el of document.querySelectorAll("[data-design]")) {
+    const design = el.dataset.design;
+    const sizes = (stock[design] || {}).sizes || {};
+    const row = el.querySelector(".sizes");
+    row.innerHTML = "";
+    for (const size of SIZES) {
+      const n = sizes[size];
+      const out = n === null || n === 0;
+      const b = document.createElement("button");
+      b.className = "px-4 py-2 text-xs uppercase tracking-widest border transition-colors " +
+        (out ? "border-gray-200 text-gray-300 line-through cursor-not-allowed"
+             : "border-gray-300 hover:border-black");
+      b.textContent = size;
+      b.disabled = out;
+      if (!out) b.onclick = () => choose(el, size, b);
+      row.appendChild(b);
+    }
+    // Counts are only mentioned when they're low enough to matter to a buyer.
+    const low = SIZES.filter(s => sizes[s] > 0 && sizes[s] <= 2).map(s => sizes[s] + " " + s + " left");
+    const anything = SIZES.some(s => sizes[s] > 0);
+    const note = el.querySelector(".note");
+    note.style.color = "";
+    note.textContent = anything ? low.join(" · ") : "Sold out";
+    if (!anything) el.querySelector(".buy").disabled = true;
+  }
+  renderBundle(stock);
+}
+
+function choose(el, size, btn) {
+  picked[el.dataset.design] = size;
+  el.querySelectorAll(".sizes button").forEach(b => {
+    const on = b === btn;
+    b.classList.toggle("bg-black", on);
+    b.classList.toggle("text-white", on);
+    b.classList.toggle("border-black", on);
+    if (!b.disabled) b.classList.toggle("border-gray-300", !on);
+  });
+  el.querySelector(".buy").disabled = false;
+}
+
+for (const el of document.querySelectorAll("[data-design]")) {
+  el.querySelector(".buy").onclick = async () => {
+    const design = el.dataset.design, size = picked[design];
+    if (!size) return;
+    const btn = el.querySelector(".buy"), note = el.querySelector(".note");
+    btn.disabled = true;
+    btn.textContent = "Reserving…";
+    try {
+      const r = await fetch(BASE + "/shop/buy", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ design, size }),
+      });
+      const d = await r.json();
+      if (d.error) {
+        note.textContent = d.error;
+        note.style.color = "#b91c1c";
+        btn.textContent = "Purchase →";
+        btn.disabled = false;
+        loadStock();                    // someone else may have taken the last one
+        return;
+      }
+      location.href = d.url;            // to Stripe, with the shirt held
+    } catch (e) {
+      note.textContent = "Could not start checkout";
+      note.style.color = "#b91c1c";
+      btn.textContent = "Purchase →";
+      btn.disabled = false;
+    }
+  };
+}
+
+
+// ── bundle ────────────────────────────────────────────────────────────────
+const bundlePick = {};
+
+function renderBundle(stock) {
+  for (const el of document.querySelectorAll("[data-bundle]")) {
+    const design = el.dataset.bundle;
+    const sizes = (stock[design] || {}).sizes || {};
+    const row = el.querySelector(".sizes");
+    row.innerHTML = "";
+    for (const size of SIZES) {
+      const n = sizes[size];
+      const out = n === null || n === 0;
+      const b = document.createElement("button");
+      b.className = "px-3 py-2 text-xs uppercase tracking-widest border transition-colors " +
+        (out ? "border-gray-200 text-gray-300 line-through cursor-not-allowed"
+             : "border-gray-300 hover:border-black");
+      b.textContent = size;
+      b.disabled = out;
+      if (!out) b.onclick = () => {
+        bundlePick[design] = size;
+        row.querySelectorAll("button").forEach(x => {
+          const on = x === b;
+          x.classList.toggle("bg-black", on);
+          x.classList.toggle("text-white", on);
+          x.classList.toggle("border-black", on);
+          if (!x.disabled) x.classList.toggle("border-gray-300", !on);
+        });
+        // Both halves must be chosen — a bundle is two shirts, not one.
+        document.getElementById("bundle-buy").disabled =
+          !(bundlePick.thistle && bundlePick.prefernot);
+      };
+      row.appendChild(b);
+    }
+  }
+}
+
+document.getElementById("bundle-buy").onclick = async () => {
+  const btn = document.getElementById("bundle-buy");
+  const note = document.getElementById("bundle-note");
+  btn.disabled = true;
+  btn.textContent = "Reserving…";
+  try {
+    const r = await fetch(BASE + "/shop/buy", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: [
+        { design: "thistle",   size: bundlePick.thistle },
+        { design: "prefernot", size: bundlePick.prefernot },
+      ] }),
+    });
+    const d = await r.json();
+    if (d.error) {
+      note.textContent = d.error; note.style.color = "#b91c1c";
+      btn.textContent = "Buy Both"; btn.disabled = false;
+      loadStock();
+      return;
+    }
+    location.href = d.url;
+  } catch (e) {
+    note.textContent = "Could not start checkout"; note.style.color = "#b91c1c";
+    btn.textContent = "Buy Both"; btn.disabled = false;
+  }
+};
+
+loadStock();
+</script>
 </body>
 </html>
