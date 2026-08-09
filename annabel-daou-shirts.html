@@ -293,8 +293,8 @@
     </script>
 
 <script>
-// Talks to exactly the endpoints the public page will use once this is signed off.
-// Same endpoints the preview was signed off against.
+// Stock and checkout come from the shirt-sales Worker (unsubscribe.llc/shop/*), which
+// holds the unit before Stripe ever sees it — the only place stock can be enforced.
 const BASE = "";
 const SIZES = ["S", "M", "L"];
 const picked = {};
@@ -313,6 +313,9 @@ function shipNotes() {
     : "tax / US shipping included";
   document.querySelectorAll(".ship-note").forEach(n => { n.textContent = text; });
 }
+// So the surcharge is written once on this page, not in the markup as well.
+shipTo.querySelector('option[value="intl"]').textContent =
+  "Rest of world — +" + INTL_SHIPPING + " shipping";
 shipTo.onchange = shipNotes;
 
 async function loadStock() {
