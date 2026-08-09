@@ -100,6 +100,16 @@
            </div>
         </header>
 
+        <!-- Where it's going. Starts on the visitor's own country, so almost nobody
+             has to touch it; it's here because postage abroad isn't in the price. -->
+        <div class="max-w-4xl mx-auto text-center mb-16">
+            <label for="ship-to" class="text-[10px] text-gray-400 uppercase tracking-widest block mb-2">Ship to</label>
+            <select id="ship-to" class="text-xs uppercase tracking-widest border border-gray-300 bg-transparent px-4 py-2 hover:border-black focus:border-black focus:outline-none transition-colors">
+                <option value="us">United States &mdash; shipping included</option>
+                <option value="intl">Rest of world &mdash; +$25 shipping</option>
+            </select>
+        </div>
+
         <!-- Individual Shirts Section -->
         <section class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-32">
 
@@ -117,7 +127,7 @@
                 <div class="mt-auto border-t border-gray-200 pt-6">
                     <div class="mb-5">
                         <span class="text-lg font-light">$65</span>
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest block mt-1">tax / shipping included</span>
+                        <span class="ship-note text-[10px] text-gray-400 uppercase tracking-widest block mt-1">tax / US shipping included</span>
                     </div>
                     <div class="w-full" data-design="thistle">
                         <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">Size</div>
@@ -144,7 +154,7 @@
                 <div class="mt-auto border-t border-gray-200 pt-6">
                     <div class="mb-5">
                         <span class="text-lg font-light">$65</span>
-                        <span class="text-[10px] text-gray-400 uppercase tracking-widest block mt-1">tax / shipping included</span>
+                        <span class="ship-note text-[10px] text-gray-400 uppercase tracking-widest block mt-1">tax / US shipping included</span>
                     </div>
                     <div class="w-full" data-design="prefernot">
                         <div class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">Size</div>
@@ -175,7 +185,7 @@
                     <span class="text-2xl font-light line-through text-gray-400">$130</span>
                     <span class="text-3xl font-light">$117</span>
                 </div>
-                <span class="text-[10px] text-gray-400 uppercase tracking-widest block mb-6">tax / shipping included</span>
+                <span class="ship-note text-[10px] text-gray-400 uppercase tracking-widest block mb-6">tax / US shipping included</span>
                 <div id="bundle" class="w-full max-w-md">
                     <div class="grid grid-cols-2 gap-6 mb-6 text-left">
                         <div data-bundle="thistle">
@@ -289,11 +299,31 @@ const BASE = "";
 const SIZES = ["S", "M", "L"];
 const picked = {};
 
+// ── ship to ───────────────────────────────────────────────────────────────
+// Postage inside the US is already in the $65; anywhere else is a flat surcharge.
+// Keep the figure here in step with INTL_SHIPPING_CENTS in the Worker's shop.js.
+const INTL_SHIPPING = "$25";
+// Places that post at US domestic rates, so they pay nothing extra.
+const DOMESTIC = ["US", "PR", "VG"];
+const shipTo = document.getElementById("ship-to");
+
+function shipNotes() {
+  const text = shipTo.value === "intl"
+    ? "tax included · " + INTL_SHIPPING + " shipping"
+    : "tax / US shipping included";
+  document.querySelectorAll(".ship-note").forEach(n => { n.textContent = text; });
+}
+shipTo.onchange = shipNotes;
+
 async function loadStock() {
   let stock;
   try {
     stock = await (await fetch(BASE + "/shop/stock")).json();
     if (stock.error) throw new Error(stock.error);
+    // Land on the shopper's own country. Only a default — they can still change it,
+    // and Stripe won't take an address that contradicts whatever they end on.
+    if (stock.country && !DOMESTIC.includes(stock.country)) shipTo.value = "intl";
+    shipNotes();
   } catch (e) {
     document.querySelectorAll("[data-design] .note").forEach(n => {
       n.textContent = "Stock unavailable"; n.style.color = "#b91c1c";
@@ -350,7 +380,7 @@ for (const el of document.querySelectorAll("[data-design]")) {
     try {
       const r = await fetch(BASE + "/shop/buy", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ design, size }),
+        body: JSON.stringify({ design, size, dest: shipTo.value }),
       });
       const d = await r.json();
       if (d.error) {
@@ -416,7 +446,7 @@ document.getElementById("bundle-buy").onclick = async () => {
   try {
     const r = await fetch(BASE + "/shop/buy", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: [
+      body: JSON.stringify({ dest: shipTo.value, items: [
         { design: "thistle",   size: bundlePick.thistle },
         { design: "prefernot", size: bundlePick.prefernot },
       ] }),
