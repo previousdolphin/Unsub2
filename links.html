@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unsubscribe — Links</title>
+<meta name="description" content="Saw a post from @unsubscribe.llc? Tap it here to go straight there.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Space+Mono:wght@400;700&display=swap">
+<style>
+  :root { --bg: #F2F2F2; --ink: #0F0F0F; --mute: #6b6b68; --line: #0F0F0F; --red: #e0261b; }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 'Space Mono', ui-monospace, Menlo, monospace; padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+  .wrap { max-width: 560px; margin: 0 auto; padding: 22px 16px 40px; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font: 700 11px/1 'Space Mono', monospace; letter-spacing: .22em; text-transform: uppercase; }
+  .top .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); margin-right: 8px; vertical-align: 1px; }
+  .top a { text-decoration: none; border: 1px solid var(--ink); padding: 7px 9px; }
+  h1 { font: 900 clamp(52px, 15vw, 84px)/.84 'Archivo', 'Arial Narrow', sans-serif; font-stretch: 62%; text-transform: uppercase; margin: 22px 0 10px; letter-spacing: -.005em; }
+  .lede { margin: 0 0 18px; font-size: 13px; color: var(--mute); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  .tile { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; background: #ddd; }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .2s; }
+  .tile span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 6px 6px; font: 700 9.5px/1.2 'Space Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #fff; background: linear-gradient(transparent, rgba(0,0,0,.78)); }
+  .tile:hover img { transform: scale(1.03); }
+
+  .also { margin-top: 26px; display: grid; gap: 8px; }
+  .btn { display: flex; justify-content: space-between; align-items: center; gap: 12px; text-decoration: none; border: 2px solid var(--ink); padding: 14px 16px; font: 700 13px/1.2 'Space Mono', monospace; letter-spacing: .08em; text-transform: uppercase; background: var(--bg); }
+  .btn.primary { background: var(--ink); color: var(--bg); }
+  .btn:hover { background: var(--ink); color: var(--bg); }
+  .btn.primary:hover { background: var(--red); border-color: var(--red); }
+  .foot { margin-top: 28px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  /* sheet */
+  .scrim { position: fixed; inset: 0; background: rgba(15,15,15,.55); z-index: 10; }
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 11; max-height: 88vh; overflow-y: auto; background: var(--bg); border-top: 3px solid var(--ink); padding: 14px 16px calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateY(0); transition: transform .22s ease; }
+  .sheet[hidden], .scrim[hidden] { display: none; }
+  .sheet .in { max-width: 560px; margin: 0 auto; }
+  .grab { width: 44px; height: 4px; background: var(--ink); opacity: .25; margin: 0 auto 14px; border-radius: 2px; }
+  .head { display: grid; grid-template-columns: 96px 1fr auto; gap: 14px; align-items: start; }
+  .head img { width: 96px; aspect-ratio: 4 / 5; object-fit: cover; display: block; border: 1px solid var(--ink); }
+  .head h2 { font: 900 38px/.86 'Archivo', 'Arial Narrow', sans-serif; font-stretch: 62%; text-transform: uppercase; margin: 2px 0 8px; }
+  .head p { margin: 0; font-size: 13px; line-height: 1.45; }
+  .close { font-size: 26px; line-height: 1; padding: 2px 4px; }
+  .links { display: grid; gap: 8px; margin: 14px 0 16px; }
+  .strip { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px 16px; padding: 0 16px 6px; scrollbar-width: thin; }
+  .strip img, .strip video { flex: none; width: 168px; height: 210px; object-fit: cover; scroll-snap-align: start; border: 1px solid var(--ink); background: #111; display: block; }
+  .facts { border-top: 2px solid var(--ink); margin: 0; padding: 0; list-style: none; }
+  .facts li { border-bottom: 1px solid rgba(15,15,15,.2); padding: 11px 0; font-size: 12.5px; line-height: 1.5; }
+  .facts b { display: block; font: 800 20px/1 'Archivo', 'Arial Narrow', sans-serif; font-stretch: 70%; text-transform: uppercase; margin-bottom: 4px; }
+  .copy { margin-top: 12px; font: 700 10px/1 'Space Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); border: 1px solid rgba(15,15,15,.3); padding: 8px 9px; }
+  @media (prefers-reduced-motion: reduce) { .tile img, .sheet { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><span><span class="dot"></span>Unsubscribe NYC LLC</span><a href="https://www.unsubscribe.llc/">Home</a></div>
+  <h1>Find the post you saw.</h1>
+  <p class="lede">Same grid as Instagram. Tap it to go straight there.</p>
+
+  <nav class="grid" aria-label="Posts">
+    <a class="tile" href="#studio" data-id="studio" aria-label="The studio"><img src="links-media/studio.jpg" alt="" width="480" height="600" loading="lazy"><span>The studio</span></a>
+    <a class="tile" href="#services" data-id="services" aria-label="Services"><img src="links-media/services.jpg" alt="" width="480" height="600" loading="lazy"><span>Services</span></a>
+    <a class="tile" href="#ai-pilot-license" data-id="ai-pilot-license" aria-label="AI Pilot License"><img src="links-media/ai-pilot-license.jpg" alt="" width="480" height="600" loading="lazy"><span>AI Pilot License</span></a>
+    <a class="tile" href="#how-to" data-id="how-to" aria-label="Coaching &amp; AI literacy"><img src="links-media/how-to.jpg" alt="" width="480" height="600" loading="lazy"><span>Coaching &amp; AI literacy</span></a>
+    <a class="tile" href="#jesse-do" data-id="jesse-do" aria-label="Jesse Do"><img src="links-media/jesse-do.jpg" alt="" width="480" height="600" loading="lazy"><span>Jesse Do</span></a>
+    <a class="tile" href="#paul-pissarro" data-id="paul-pissarro" aria-label="Paul-Alexander Pissarro"><img src="links-media/paul-pissarro.jpg" alt="" width="480" height="600" loading="lazy"><span>Paul-Alexander Pissarro</span></a>
+    <a class="tile" href="#annabel-daou" data-id="annabel-daou" aria-label="Annabel Daou tees"><img src="links-media/annabel-daou.jpg" alt="" width="480" height="600" loading="lazy"><span>Annabel Daou tees</span></a>
+    <a class="tile" href="#good-cause" data-id="good-cause" aria-label="Pages for a union"><img src="links-media/good-cause.jpg" alt="" width="480" height="600" loading="lazy"><span>Pages for a union</span></a>
+    <a class="tile" href="#typesetting" data-id="typesetting" aria-label="Book typesetting"><img src="links-media/typesetting.jpg" alt="" width="480" height="600" loading="lazy"><span>Book typesetting</span></a>
+    <a class="tile" href="#finaldues" data-id="finaldues" aria-label="Final Dues"><img src="links-media/finaldues.jpg" alt="" width="480" height="600" loading="lazy"><span>Final Dues</span></a>
+    <a class="tile" href="#name-of-my" data-id="name-of-my" aria-label="Name of My Gallery"><img src="links-media/name-of-my.jpg" alt="" width="480" height="600" loading="lazy"><span>Name of My Gallery</span></a>
+    <a class="tile" href="#yourveryownweb" data-id="yourveryownweb" aria-label="Your Very Own Website"><img src="links-media/yourveryownweb.jpg" alt="" width="480" height="600" loading="lazy"><span>Your Very Own Website</span></a>
+    <a class="tile" href="#adversarial-wonderland" data-id="adversarial-wonderland" aria-label="Adversarial Wonderland"><img src="links-media/adversarial-wonderland.jpg" alt="" width="480" height="600" loading="lazy"><span>Adversarial Wonderland</span></a>
+    <a class="tile" href="#lab" data-id="lab" aria-label="The Lab"><img src="links-media/lab.jpg" alt="" width="480" height="600" loading="lazy"><span>The Lab</span></a>
+    <a class="tile" href="#art-is-dead" data-id="art-is-dead" aria-label="ART IS DEAD"><img src="links-media/art-is-dead.jpg" alt="" width="480" height="600" loading="lazy"><span>ART IS DEAD</span></a>
+    <a class="tile" href="#zine-book" data-id="zine-book" aria-label="The Zine Book"><img src="links-media/zine-book.jpg" alt="" width="480" height="600" loading="lazy"><span>The Zine Book</span></a>
+    <a class="tile" href="#zero-dollar-protocol" data-id="zero-dollar-protocol" aria-label="Zero-Dollar Protocol"><img src="links-media/zero-dollar-protocol.jpg" alt="" width="480" height="600" loading="lazy"><span>Zero-Dollar Protocol</span></a>
+    <a class="tile" href="#oracle" data-id="oracle" aria-label="Coke Diet Oracle"><img src="links-media/oracle.jpg" alt="" width="480" height="600" loading="lazy"><span>Coke Diet Oracle</span></a>
+  </nav>
+
+  <div class="also">
+    <a class="btn primary" href="https://tidycal.com/pissarropaul" target="_blank" rel="noopener">Book a free 20-min intro call <span aria-hidden="true">→</span></a>
+    <a class="btn" href="https://www.unsubscribe.llc/services.html">Start a project <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="foot"><span>NYC / Paris / Berlin / Hamburg</span><span>by Unsubscribe LLC.</span></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<section class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="s-title"><div class="in" id="sheet-in"></div></section>
+
+<script>
+(function () {
+  var ITEMS = [{"id":"studio","label":"The studio","line":"Who we are and what we believe.","links":[["Read the manifesto","https://www.unsubscribe.llc/"]],"facts":[["The death of","Artificial scarcity. Traditional trust. Fixed reality. Hierarchical power. Linear time."],["The birth of","Conscious commerce. Mystical technology. Fluid identity. Collective creativity. Art as operating system."],["Craft is not product.","It is operating system. Work is not output; it is invocation. Culture is not consumed; it is conjured."]],"cover":"links-media/studio.jpg","slides":[{"v":"links-media/studio.mp4","poster":"links-media/studio-1.jpg"},{"i":"links-media/studio-2.jpg"},{"i":"links-media/studio-3.jpg"},{"i":"links-media/studio-4.jpg"}]},{"id":"services","label":"Services","line":"Websites, e-commerce, ghostwriting, coaching and the Good Cause track.","links":[["See services & rates","https://www.unsubscribe.llc/services.html"]],"facts":[["A signature, not a watermark.","Everything we build carries “by Unsubscribe LLC.” Clients can pay to remove it. Most keep it."],["Every job becomes a story.","We document each engagement as content, so your story becomes part of ours."],["We don’t take every client.","Social strategy starts with one question: why is your brand positioned correctly? Answer it and we build from there."]],"cover":"links-media/services.jpg","slides":[{"i":"links-media/services-1.jpg"},{"i":"links-media/services-2.jpg"},{"i":"links-media/services-3.jpg"},{"i":"links-media/services-4.jpg"}]},{"id":"ai-pilot-license","label":"AI Pilot License","line":"Certification for operating AI like a pilot. Curriculum is free.","links":[["Start the curriculum","https://aipilotlicense.com"]],"facts":[["Skill didn’t fix it. A checklist did.","A Boeing Model 299 crashed on takeoff in 1935 with a control lock still engaged. Aviation’s answer was the pre-flight checklist."],["6 modules. 60 questions. 75% to pass.","Curriculum access is free. The credential is the proctored exam: 90 minutes, two attempts."],["Eyes open.","“Most people fly the plane with their eyes closed and call it magic.” A certified pilot names what they’re holding and answers for where it lands."]],"cover":"links-media/ai-pilot-license.jpg","slides":[{"i":"links-media/ai-pilot-license-1.jpg"},{"i":"links-media/ai-pilot-license-2.jpg"},{"i":"links-media/ai-pilot-license-3.jpg"},{"i":"links-media/ai-pilot-license-4.jpg"}]},{"id":"how-to","label":"Coaching & AI literacy","line":"One-on-one coaching and team workshops. First 20 minutes free.","links":[["Book a free intro call","https://tidycal.com/pissarropaul"],["See the programs","https://www.unsubscribe.llc/how-to.html"]],"facts":[["Where are you starting from?","Beginnings: building a first chapter. At your pace: it feels like too much, too fast. Teams: your org needs to integrate AI."],["Keep your taste.","The goal isn’t to know everything about AI. It’s to keep your judgment, your taste and your story intact while you use it."],["20 minutes. Free.","No pressure. No pitch. A conversation about where you are, what you need, and whether this is the right fit."]],"cover":"links-media/how-to.jpg","slides":[{"i":"links-media/how-to-1.jpg"},{"i":"links-media/how-to-2.jpg"},{"i":"links-media/how-to-3.jpg"},{"i":"links-media/how-to-4.jpg"}]},{"id":"jesse-do","label":"Jesse Do","line":"Web, graphic and strategic design, installations, full-stack apps.","links":[["See the work","https://www.unsubscribe.llc/showcase.html"],["Start a project","https://www.unsubscribe.llc/services.html"]],"facts":[["Every landscape here is one formula.","Three sine waves, borrowed from our site’s background: 0.5·sin(x/2 + t) + 0.3·sin(0.8z + 1.5t) + 0.1·sin(2x + z/2 + t)"],["Small tools, owned outright.","Cloudflare Workers, D1, Durable Objects, three.js, Stripe. Sites you can move. Apps you can read."],["Function first. Polish after.","Make it work. Make it hold. Then, and only then, make it pretty."]],"cover":"links-media/jesse-do.jpg","slides":[{"i":"links-media/jesse-do-1.jpg"},{"i":"links-media/jesse-do-2.jpg"},{"i":"links-media/jesse-do-3.jpg"},{"i":"links-media/jesse-do-4.jpg"}]},{"id":"paul-pissarro","label":"Paul-Alexander Pissarro","line":"Coaching for people and teams finding their way with AI.","links":[["Book a free intro call","https://tidycal.com/pissarropaul"],["About the coaching","https://www.unsubscribe.llc/how-to.html"]],"facts":[["Chef. Filmmaker. Artist. Ally.","Paul has lived several careers. Now he helps people through the most disorienting technological shift of our time, without losing what makes them human."],["CAIP. ICF. CCAR.","Certified AI Pilot: held. Erickson ICF coaching: in completion. CCAR: in progress."],["First session free.","A small standing group to share what you’re learning, working on and worried about. From $30 a month. Quiet, useful, low-stakes."]],"cover":"links-media/paul-pissarro.jpg","slides":[{"i":"links-media/paul-pissarro-1.jpg"},{"i":"links-media/paul-pissarro-2.jpg"},{"i":"links-media/paul-pissarro-3.jpg"},{"i":"links-media/paul-pissarro-4.jpg"}]},{"id":"annabel-daou","label":"Annabel Daou tees","line":"Thistle and I Prefer Not. Limited edition, $65.","links":[["Shop the tees","https://www.unsubscribe.llc/annabel-daou-shirts.html"],["annabeldaou.com","https://annabeldaou.com"]],"facts":[["“I would prefer not to.”","Melville’s Bartleby said it first, in 1853. Annabel’s design retakes the line: “I prefer not,” written over and over in cursive and print."],["Sign up. Get a ticket.","For Fortune 2026 we built a fully functional sign-up and ticketing system into Annabel’s site."],["Thistle, from paper.","A new tee adapted from Annabel’s paper sculpture, released alongside the reissued I Prefer Not. $65 each, US shipping included."]],"cover":"links-media/annabel-daou.jpg","slides":[{"i":"links-media/annabel-daou-1.jpg"},{"i":"links-media/annabel-daou-2.jpg"},{"i":"links-media/annabel-daou-3.jpg"},{"i":"links-media/annabel-daou-4.jpg"}]},{"id":"good-cause","label":"Pages for a union","line":"Web pages for NYC student and teacher workers. Non-profits: ask about the Good Cause track.","links":[["The Good Cause track","https://www.unsubscribe.llc/services.html"]],"facts":[["Built for the hallway.","Organizing happens between classes and on commutes. Pages that load fast and read clearly on any phone."],["One page. One ask.","Sign it, show up, share it. Lead with a single action and get out of the way."]],"cover":"links-media/good-cause.jpg","slides":[{"i":"links-media/good-cause-1.jpg"},{"i":"links-media/good-cause-2.jpg"},{"i":"links-media/good-cause-3.jpg"}]},{"id":"typesetting","label":"Book typesetting","line":"Interiors, margins, leading and print-ready files for forthcoming books.","links":[["Ask about typesetting","https://www.unsubscribe.llc/services.html"]],"facts":[["Leading was literally lead.","Printers spaced lines of metal type with thin strips of lead. The word stuck; the metal didn’t."],["Type should be invisible.","Beatrice Warde’s “The Crystal Goblet” argued printing should be clear glass: you notice the wine, not the vessel."],["No widows. No orphans.","Lone lines stranded at the top or bottom of a page. Readers never notice them gone. We notice them there."]],"cover":"links-media/typesetting.jpg","slides":[{"i":"links-media/typesetting-1.jpg"},{"i":"links-media/typesetting-2.jpg"},{"i":"links-media/typesetting-3.jpg"},{"i":"links-media/typesetting-4.jpg"}]},{"id":"finaldues","label":"Final Dues","line":"Entry passes to Heaven ($7.77) or Hell ($6.66). On record, forever.","links":[["Get your pass","https://finaldues.com"]],"facts":[["Selling the afterlife isn’t new.","Church indulgences helped provoke Luther’s 95 Theses. We added a public hash chain and a receipt."],["$7.77 + $6.66 = $14.43","Hedging your bets costs exactly the sum. No bundle discount in the afterlife."],["$777 or $666.","The only physical goods: an engraved credential, a framed certificate and priority lane access."]],"cover":"links-media/finaldues.jpg","slides":[{"i":"links-media/finaldues-1.jpg"},{"i":"links-media/finaldues-2.jpg"},{"i":"links-media/finaldues-3.jpg"},{"i":"links-media/finaldues-4.jpg"}]},{"id":"name-of-my","label":"Name of My Gallery","line":"Contemporary art and limited editions. The shop is open.","links":[["Visit the shop","https://nameofmy.com"]],"facts":[["Made to be owned, not displayed.","Name of My Gallery is a curated object space. Pop-up shops rotate; right now it holds CoCA materials and candles."],["Seven names, one shop.","M.LLION · Helena Voss · Rex.D.Hammer · Annabel Daou · Isaac Aden · J.Do + P.Pissarro · Adversarial Wonderland"]],"cover":"links-media/name-of-my.jpg","slides":[{"i":"links-media/name-of-my-1.jpg"},{"i":"links-media/name-of-my-2.jpg"},{"i":"links-media/name-of-my-3.jpg"}]},{"id":"yourveryownweb","label":"Your Very Own Website","line":"A site that’s yours, live in minutes, $0 hosting.","links":[["Build yours","https://yourveryownweb.site"]],"facts":[["Most platforms rent you a website.","Stop paying and it disappears. Ours lives in a free GitHub account you control."],["Under 50¢. $0 hosting.","A full site for under 50¢ of credits, hosted free on GitHub Pages, with every change kept in history."],["Leaving is free.","Stop using us and your site stays live. Zero lock-in, by design."]],"cover":"links-media/yourveryownweb.jpg","slides":[{"i":"links-media/yourveryownweb-1.jpg"},{"i":"links-media/yourveryownweb-2.jpg"},{"i":"links-media/yourveryownweb-3.jpg"},{"i":"links-media/yourveryownweb-4.jpg"}]},{"id":"adversarial-wonderland","label":"Adversarial Wonderland","line":"Art that AI can’t read. Prints, cases, mugs and postcards.","links":[["Shop the art","https://adversarialwonderland.com"]],"facts":[["Panda → gibbon. 99.3% sure.","Researchers added noise too faint to see to a photo of a panda. The network confidently called it a gibbon."],["A blind spot is a shield.","The patterns that confuse machine vision become the material of the work. People see the picture. Models see something else."],["Prints. Cases. Mugs. Postcards.","Fine art and everyday objects carrying adversarial artwork. adversarialwonderland.com"]],"cover":"links-media/adversarial-wonderland.jpg","slides":[{"i":"links-media/adversarial-wonderland-1.jpg"},{"i":"links-media/adversarial-wonderland-2.jpg"},{"i":"links-media/adversarial-wonderland-3.jpg"},{"i":"links-media/adversarial-wonderland-4.jpg"}]},{"id":"lab","label":"The Lab","line":"The Thinking Room, the seat and PRESENCE: experiments in progress.","links":[["The Thinking Room","https://thinking-room.pages.dev/"]],"facts":[["One hour. A synthetic team.","It comes prepared, interviews you and builds alongside you. Trials recruiting for 2027."],["Memory that asks first.","A voice-first thinking partner that files what it learns about you, but only after you confirm it."],["10,000³ = one trillion cells.","Place points of light daily. They breed hourly. The Frontier erodes the edges. Growth is balanced by decay, not a cap."]],"cover":"links-media/lab.jpg","slides":[{"v":"links-media/lab.mp4","poster":"links-media/lab-1.jpg"},{"i":"links-media/lab-2.jpg"},{"i":"links-media/lab-3.jpg"},{"i":"links-media/lab-4.jpg"}]},{"id":"art-is-dead","label":"ART IS DEAD","line":"The Church of Conceptual Art’s short film. Early draft cut, now screening.","links":[["Watch the film","https://churchofconceptualart.org/art-is-dead"]],"facts":[["Every religion is a design system.","Texts, symbols, rituals, a place to gather. We designed ours, then filmed how its bibles and dogma were made."],["CoCA is everywhere here.","Final Dues sells passes under its decree. The Zero-Dollar Protocol enshrines its winner in the CoCA Permanent Collection. Name of My stocks its materials."]],"cover":"links-media/art-is-dead.jpg","slides":[{"v":"links-media/art-is-dead.mp4","poster":"links-media/art-is-dead-1.jpg"},{"i":"links-media/art-is-dead-2.jpg"},{"i":"links-media/art-is-dead-3.jpg"},{"v":"links-media/art-is-dead-x0.mp4","poster":"links-media/art-is-dead-x0.jpg"}]},{"id":"zine-book","label":"The Zine Book","line":"A limited run of physical artifacts.","links":[["See the showcase","https://www.unsubscribe.llc/showcase.html"]],"facts":[["Photocopied. Stapled. Passed on.","Zines carried punk, riot grrrl and countless scenes before the internet did. Small runs, no gatekeepers."],["Source code, on paper.","A limited run of physical artifacts containing our most dangerous ideas."]],"cover":"links-media/zine-book.jpg","slides":[{"i":"links-media/zine-book-1.jpg"},{"i":"links-media/zine-book-2.jpg"},{"i":"links-media/zine-book-3.jpg"}]},{"id":"zero-dollar-protocol","label":"Zero-Dollar Protocol","line":"A 24-hour, zero-dollar film festival. $1,000 bounty.","links":[["Festival page","https://filmfreeway.com/TheZero-DollarProtocol"]],"facts":[["24 hours. $0.","The System requires proof of creativity, not budget. Make us feel something."],["50,000 sq ft. Brooklyn.","The live audit: Rollin Studios, an industrial space usually reserved for high-capital commercial extraction."],["The winner takes the capital.","The System retains the memory. $1,000, plus enshrinement in the CoCA Permanent Collection."]],"cover":"links-media/zero-dollar-protocol.jpg","slides":[{"v":"links-media/zero-dollar-protocol.mp4","poster":"links-media/zero-dollar-protocol-1.jpg"},{"i":"links-media/zero-dollar-protocol-2.jpg"},{"i":"links-media/zero-dollar-protocol-3.jpg"},{"i":"links-media/zero-dollar-protocol-4.jpg"}]},{"id":"oracle","label":"Coke Diet Oracle","line":"An I Ching oracle LLM that makes you ask a better question.","links":[["Consult the oracle","https://www.unsubscribe.llc/dietcoke"]],"facts":[["2⁶ = 64.","Six lines, each broken or solid, make 64 hexagrams: the I Ching’s full vocabulary for a situation."],["700 → 70,000.","About 700 handwritten question–answer pairs, grown synthetically to ~70,000, then LoRA-trained into Gemma 4 (31B)."],["Be clinical.","Bring a specific target. Strip out the feelings. Accept the pushback: the rejections are the method."]],"cover":"links-media/oracle.jpg","slides":[{"i":"links-media/oracle-1.jpg"},{"i":"links-media/oracle-2.jpg"},{"i":"links-media/oracle-3.jpg"},{"i":"links-media/oracle-4.jpg"}]}];
+  var byId = {}; ITEMS.forEach(function (it) { byId[it.id] = it; });
+  var sheet = document.getElementById('sheet'), inner = document.getElementById('sheet-in'), scrim = document.getElementById('scrim');
+  var last = null;
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function open(id, fromTile) {
+    var it = byId[id]; if (!it) return;
+    var img = { src: it.cover };
+    inner.innerHTML =
+      '<div class="grab"></div>' +
+      '<div class="head"><img src="' + (img ? img.src : '') + '" alt=""><div><h2 id="s-title">' + esc(it.label) + '</h2><p>' + esc(it.line) + '</p></div>' +
+      '<button class="close" id="s-close" aria-label="Close">×</button></div>' +
+      '<div class="links">' + it.links.map(function (l, i) {
+        return '<a class="btn' + (i === 0 ? ' primary' : '') + '" href="' + esc(l[1]) + '" target="_blank" rel="noopener">' + esc(l[0]) + ' <span aria-hidden="true">→</span></a>';
+      }).join('') + '</div>' +
+      '<div class="strip" aria-label="Slides from this post">' + it.slides.map(function (m) {
+        return m.v ? '<video src="' + m.v + '" poster="' + m.poster + '" muted loop playsinline autoplay preload="metadata"></video>'
+                   : '<img src="' + m.i + '" alt="" loading="lazy">';
+      }).join('') + '</div>' +
+      (it.facts.length ? '<ul class="facts">' + it.facts.map(function (f) { return '<li><b>' + esc(f[0]) + '</b>' + esc(f[1]) + '</li>'; }).join('') + '</ul>' : '') +
+      '<button class="copy" id="s-copy">Copy link to this post</button>';
+    sheet.hidden = false; scrim.hidden = false; document.body.style.overflow = 'hidden';
+    last = fromTile || null;
+    document.getElementById('s-close').onclick = close;
+    document.getElementById('s-copy').onclick = function (e) {
+      var url = location.href.split('#')[0] + '#' + id, b = e.currentTarget;
+      if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { b.textContent = 'Copied'; }, function () { b.textContent = url; });
+      else b.textContent = url;
+    };
+    sheet.querySelector('.btn').focus({ preventScroll: true });
+    if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
+  }
+  function close() {
+    inner.querySelectorAll('video').forEach(function (v) { v.pause(); });
+    sheet.hidden = true; scrim.hidden = true; document.body.style.overflow = '';
+    history.replaceState(null, '', location.pathname + location.search);
+    if (last) last.focus();
+  }
+  document.querySelectorAll('.tile').forEach(function (t) {
+    t.addEventListener('click', function (e) { e.preventDefault(); open(t.dataset.id, t); });
+  });
+  scrim.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hidden) close(); });
+  if (location.hash) open(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
